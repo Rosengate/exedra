@@ -31,7 +31,7 @@ Abstract Class Builder
 		{
 			if($constructorParam)
 			{
-				$reflection	= new ReflectionClass($className);
+				$reflection	= new \ReflectionClass($className);
 				$controller	= $reflection->newInstanceArgs($constructorParam);
 			}
 			else
