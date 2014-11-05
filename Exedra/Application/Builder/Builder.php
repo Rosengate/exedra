@@ -17,7 +17,7 @@ Abstract Class Builder
 		$path	= $this->structure->getPath($this->name,$cname.".php");
 
 		## Exception : file not found.
-		if(!file_exists($path)) throw new Exception("Class file for ".$this->name." named '$cname' does not exists.");
+		if(!file_exists($path)) throw new \Exception("Class file for ".$this->name." named '$cname' does not exists.");
 
 		$this->loader->load($path);
 
@@ -25,7 +25,7 @@ Abstract Class Builder
 		$className		= $this->structure->getPattern($this->patternName,$cname);
 		
 		## Exception : class name not found.
-		if(!class_exists($className)) throw new Exception("Class named '$className' does not exists for ".$this->name." '$cname'");
+		if(!class_exists($className)) throw new \Exception("Class named '$className' does not exists for ".$this->name." '$cname'");
 
 		if(!is_object($className))
 		{
@@ -53,7 +53,7 @@ Abstract Class Builder
 			$controller	= $cname;
 
 		if(!method_exists($controller, $method))
-			throw new Exception("Method ($method) does not exists.");
+			throw new \Exception("Method ($method) does not exists.");
 
 		return call_user_func_array(Array($controller,$method), $parameter);
 	}

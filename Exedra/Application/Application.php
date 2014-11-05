@@ -70,7 +70,7 @@ class Application
 			{
 				$q	= Array();
 				foreach($query as $k=>$v) $q[]	= $k." : ".$v;
-				throw new Exception("Route not found. Query :<br>".implode("<br>",$q), 1);
+				throw new \Exception("Route not found. Query :<br>".implode("<br>",$q), 1);
 			}
 
 			$route		= $result['route'];
@@ -93,7 +93,7 @@ class Application
 			return $executor->execute($route[$routename]['execute'],$parameter,$this);
 
 		} 
-		catch(Exception $e)
+		catch(\Exception $e)
 		{
 			if($this->executionFailRoute)
 			{

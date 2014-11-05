@@ -15,7 +15,7 @@ class Response
 	{
 		if(!in_array($format,Array("json","view")))
 		{
-			throw new Exception("Response format unknown : $format");
+			throw new \Exception("Response format unknown : $format");
 		}
 
 

@@ -45,7 +45,7 @@ class Structure
 
 		## Exception : directory for this path does not exists.
 		if(!is_dir($temp = $this->refinePath($paths)))
-			throw new Exception("Directory for Structure.$name ($temp) does not exists");
+			throw new \Exception("Directory for Structure.$name ($temp) does not exists");
 
 		if($additional)
 		{
@@ -64,7 +64,7 @@ class Structure
 	public function getPattern($pattern,$val)
 	{
 		if(!isset($this->pattern[$pattern]))
-			throw new Exception("Structure.pattern called $pattern does not exists.");
+			throw new \Exception("Structure.pattern called $pattern does not exists.");
 
 		return $this->pattern[$pattern]($val);
 	}
