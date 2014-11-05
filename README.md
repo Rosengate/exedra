@@ -8,7 +8,7 @@ This simple nano (smaller than micro?) framework will first focus mainly on nest
 
 History
 ======
-The first unreleased version of exedra has quite constraining ungroupable routing capability, and has a lot of static usage. This version was intended to fix them, give more (self-claimed) powerful multi-tier nestable routing ability and hopefully will adapt to modern web development practices.
+The first unreleased version of exedra has quite constraining ungroupable routing capability, and has a lot of static usage. This version was intended to fix them, give more (self-proclaimed) powerful multi-tier nestable routing ability and hopefully will adapt to modern web development practices.
 
 Main route-mapping API
 ======
