@@ -187,7 +187,7 @@ text3 : are
 ```
 echo $myapp->execute(Array(
 	"method"=>"get",
-	"uri"=>"remi-page/about-me"
+	"uri"=>"remipage/about-me"
 	));
 // Bad day for me : are you looking for remi-page/about-me?.
 ```
