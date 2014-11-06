@@ -27,7 +27,8 @@ class ExedraLoader
 	public function registerAutoload()
 	{
 		$dir	= dirname(__FILE__);
-		spl_autoload_register(function($class) use ($dir)
+		$context	= $this;
+		spl_autoload_register(function($class) use ($dir,$context)
 		{
 			list($exedra,$class)	= explode("\\",$class,2);
 
@@ -39,17 +40,18 @@ class ExedraLoader
 			$dir	= rtrim($dir,"/").($lastDirChar == "_"?"":"/");
 			$path	= $dir.$class.".php";
 
+			$path	= refine_path($path);
 			if(file_exists($path))
 			{
-				$this->registerLoadedClass($class);
+				$context->registerLoadedClass($class);
 				require_once $path;
 			}
 		});
 	}
 
-	private function registerLoadedClass($class)
+	public function registerLoadedClass($class)
 	{
-		$loadedClass[]	= $class;
+		$this->loadedClass[]	= $class;
 	}
 }
 
