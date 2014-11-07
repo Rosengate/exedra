@@ -84,13 +84,13 @@ class Application
 				{
 					foreach($this->map->binds[$routeName] as $bindName=>$callback)
 					{
-						$binds[$bindName]	= $callback;
+						$binds[$bindName][]	= $callback;
 					}
 				}
 			}
 
 			$executor	= new Execution\Executor($this->controller,new Execution\Binder($binds),$this);
-			return $executor->execute($route[$routename]['execute'],$parameter,$this);
+			return $executor->execute($route[$routename]['execute'],new Execution\Result($parameter),$this);
 
 		} 
 		catch(\Exception $e)

@@ -17,8 +17,15 @@ class Executor
 		{
 			if($this->binder->hasBind("execute"))
 			{
-				$parent_execution	= $this->binder->getBind("execute");
-				return $parent_execution($params,$execution);
+				$parent_execution			= $this->binder->getBind("execute");
+
+				$params->containers			= $parent_execution;
+
+				## set the last of the container as execution.
+				$params->containers[count($parent_execution)]	= $execution;
+
+				return $parent_execution[0]($params);
+				// return $parent_execution($params,$execution);
 			}
 			return $execution($params);
 		}
