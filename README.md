@@ -1,6 +1,6 @@
 Exédra
 ======
-A multi-tier nestable routing PHP Framework.
+A multi-tier ~~nestable~~ nestful routing PHP Framework.
 
 Introduction
 ======
@@ -64,12 +64,12 @@ $myapp = $exedra->build("myapp",function($app)
 	$app->setExecutionFailRoute("error");
 
 	$app->map->addRoute(Array(
-		"error"=>Array("get","eh",function($param)
+		"error"=>Array("get","eh",function($result)
 			{
-				if($param['exception'])
-					return $param['exception']->getMessage();
+				if($result->exception)
+					return $result->exception->getMessage();
 				else
-					return $param['msg'];
+					return $result->msg;
 			}),
 		"home"=>Array(
 			"method"=>"any",
@@ -81,43 +81,43 @@ $myapp = $exedra->build("myapp",function($app)
 						"directory"=>Array(
 							"method"=>"get",
 							"uri"=>"direktori/[:myparam]",
-							"execute"=>function($param)
+							"execute"=>function($result)
 								{
-									return "my param is : ".$param['myparam'];
+									return "my param is : ".$result->myparam;
 								}
 							)
 						)
 					),
-				"about"=>Array("get","about-us/[:page]",function($param)
+				"about"=>Array("get","about-us/[:page]",function($result)
 					{
-						return "you're he in home.about, are you looking for page '".$param['page']."'?";
+						return "you're he in home.about, are you looking for page '".$result->page."'?";
 					}),
-				"contact"=>Array("get","[:uriparam]/contact-us",function($param)
+				"contact"=>Array("get","[:uriparam]/contact-us",function($result)
 					{
-						return "Inside an home.contact, but you may come from somewhere if you could see this text : ".$param['myparam'];
+						return "Inside an home.contact, but you may come from somewhere if you could see this text : ".$result->myparam;
 					}),
 				"routeception"=>Array("get","test",function() use($app)
 					{
 						return $app->execute("home.contact",Array("myparam"=>"routeception (o....o)"));
 					}),
 				"mypage"=>Array(
-					"bind:execute"=>function($param,$execution) use($app)
+					"bind:execute"=>function($result) use($app)
 					{
 						## check page-slug, if it ever exists.
-						if($param['page-slug'] != "remi-page")
+						if($result->page_slug != "remi-page")
 						{
 							return $app->execute("error",Array("msg"=>"Bad day for me : are you looking for remi-page/about-me?."));
 						}
 
-						## we may do the execution part in behalf of the main execution.
-						return $execution($param,"i am gift from papa");
+						## we may do the execution part in behalf of the main execution, through the passed container.
+						return $result->container($result,"i am gift from papa");
 					},
 					"method"=>"get",
-					"uri"=>"[:page-slug]",
+					"uri"=>"[:page_slug]",
 					"subroute"=>Array(
-						"about-me"=>Array("get","about-me",function($param,$argFromPapa = null)
+						"about-me"=>Array("get","about-me",function($result,$argFromPapa = null)
 							{
-								return "You're inside route home.mypage.about-me. Your page-slug is : ".$param['page-slug']." can u see this. : ".$argFromPapa;
+								return "You're inside route home.mypage.about-me. Your page-slug is : ".$result->page_slug." can u see this. : ".$argFromPapa;
 							})
 						)
 					)
@@ -129,12 +129,12 @@ $myapp = $exedra->build("myapp",function($app)
 	$app->map->addRoute(Array(
 		"route1"=>Array("any","hello/[:text1]",Array(
 			"subroute2"=>Array("any","[:text2]/world",Array(
-				"subroute3"=>Array("get","[:text3]/you",function($param)
+				"subroute3"=>Array("get","[:text3]/you",function($result)
 					{
 						$paramtest[]	= "Far-away nested route test..";
-						$paramtest[]	= "text1 : ".$param['text1'];
-						$paramtest[]	= "text2 : ".$param['text2'];
-						$paramtest[]	= "text3 : ".$param['text3'];
+						$paramtest[]	= "text1 : ".$result->text1;
+						$paramtest[]	= "text2 : ".$result->text2;
+						$paramtest[]	= "text3 : ".$result->text3;
 
 						return implode("<br>",$paramtest);
 					})
@@ -143,14 +143,14 @@ $myapp = $exedra->build("myapp",function($app)
 		));
 
 	## on route binding (all the subroute will be affected by this binding)
-	$app->map->onRoute("home","bind:execute",function($param,$execution) use($app,$loggedIn)
+	$app->map->onRoute("home","bind:execute",function($result) use($app,$loggedIn)
 	{
 		if(!$loggedIn)
 		{
 			return $app->execute("error",Array("msg"=>"You're not logged in!"));
 		}
 
-		return $execution($param);
+		return $result->container($result);
 	});
 });
 ```
