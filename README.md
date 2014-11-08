@@ -50,6 +50,7 @@ Example
 ======
 #### Real-life routing example :
 Let's try build some example :
+(To search routes for the tests below, just find the title, like [Example 5])
 ```
 // require exedra, or wherever you can find it.
 require "Exedra/Exedra.php";
@@ -214,7 +215,7 @@ $myapp = $exedra->build("myapp",function($app)
 });
 ```
 #### Tests :
-##### Example 1 : Basics
+##### [Example 1] : Basics
 ```
 echo $myapp->execute("home.member.directory",Array("myparam"=>"hello-world."));
 // my param is : hello-world.
@@ -222,13 +223,13 @@ echo $myapp->execute(Array("method"=>"get","uri"=>"ahli/direktori/hello-world-2"
 // my param is : hello-world-2
 ```
 
-##### Example 2 : Routeception (re-routing)
+##### [Example 2] : Routeception (re-routing)
 ```
 echo $myapp->execute("home.routeception");
 // Inside an home.contact, but you may come from somewhere if you could see this text : routeception (o....o)
 ```
 
-##### Example 3.1 : Bind pre-execution container, do re-routing to route 'error'.
+##### [Example 3.1] : Bind pre-execution container, do re-routing to route 'error'.
 ```
 echo $myapp->execute(Array(
 	"method"=>"get",
@@ -237,7 +238,7 @@ echo $myapp->execute(Array(
 // Bad day for me : are you looking for remi-page/about-me?.
 ```
 
-##### Example 3.2 : Bind pre-execution container, do pass something to main execution container.
+##### [Example 3.2] : Bind pre-execution container, do pass something to main execution container.
 ```
 echo $myapp->execute(Array(
 	"method"=>"get",
@@ -246,7 +247,7 @@ echo $myapp->execute(Array(
 // You're inside route home.mypage.about-me. Your page-slug is : remi-page. can u see this. : i am gift from papa
 ```
 
-##### Example 4 : Testing the nested route
+##### [Example 4] : Testing the nested route
 ```
 echo $myapp->execute(Array(
 	"method"=>"get",
@@ -260,12 +261,18 @@ text3 : are
 */
 ```
 
-##### Example 5 : Multiple pre-execution container binding test.
+##### [Example 5] : Multiple pre-execution container binding test.
 ```
 echo $myapp->execute(Array(
 	"method"=>"get",
 	"uri"=>"user/eimihar/blog/exedrablog"
 	));
+/*
+If you can read this, you're finally here, in 'Rehmi/Ini blog saya',
+without failure in numerous authentication based on parameter from the given uri.
+Try change the value in the uri of this example. Try do it like :
+user/gades/blog/my-IT-world, or user/eimihar/blog/my-blog
+*/
 ```
 
 Development
