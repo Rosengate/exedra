@@ -14,7 +14,7 @@ Abstract Class Builder
 	public function build($cname,$constructorParam = null)
 	{
 		## loader.
-		$path	= $this->structure->getPath($this->name,$cname.".php");
+		$path	= $this->structure->get($this->name,$cname.".php");
 
 		## Exception : file not found.
 		if(!file_exists($path)) throw new \Exception("Class file for ".$this->name." named '$cname' does not exists.");

@@ -58,12 +58,12 @@ class HTTPRequest
 
 	public function isSecure()
 	{
-
+		
 	}
 
 	public function isAjax()
 	{
-
+		return $this->headers['X_REQUESTED_WITH'] === 'XMLHttpRequest';
 	}
 
 	public function getMethod()

@@ -1,5 +1,5 @@
 <?php
-namespace Exedra\Application;
+namespace Exedra\Application\Map;
 
 class Map
 {
@@ -7,12 +7,15 @@ class Map
 	public $binds 		= Array();
 	private $request 	= null;
 	private $resultData	= null;
+	private $loader;
+	public	$config		= Array();
 
 	## variables.
 	private $methodDelimiter	= ",";
 
-	public function __construct()
+	public function __construct(\Exedra\Application\Loader $loader)
 	{
+		$this->loader	= $loader;
 	}
 
 	public function onRoute($routeName,$action,$param)
@@ -23,9 +26,6 @@ class Map
 		{
 			case "bind":
 			$this->bindRoute($routeName,$actionExecution,$param);
-			break;
-			case "set":
-			
 			break;
 		}
 	}
@@ -80,7 +80,7 @@ class Map
 			{
 				foreach($data as $data_key=>$val)
 				{
-					if(in_array($data_key,Array("method","uri","execute","subroute")))
+					if(in_array($data_key,Array("method","uri","execute","subroute","config")))
 					{
 						$routeData[$data_key]	= $val;
 					}
@@ -89,6 +89,12 @@ class Map
 					{
 						$routeName	= array_merge($parentRouteNames,Array($key));
 						$this->onRoute(implode(".",$routeName),$data_key,$val);
+					}
+
+					if($data_key == "config")
+					{
+						$routeName	= array_merge($parentRouteNames,Array($key));
+						$this->setConfig(implode(".",$routeName),$val);
 					}
 				}
 			}
@@ -155,14 +161,19 @@ class Map
 		$this->binds[$routeName][$bindName]	= $execution;
 	}
 
-/*	public function getRoute($name,$parameter = Array())
+	public function setConfig($routeName,$key,$value = null)
 	{
-		return $this->_getRoute($name);
-	}*/
-
-	public function toRoute($name,$parameter = Array())
-	{
-
+		if(is_array($key))
+		{
+			foreach($key as $k=>$v)
+			{
+				$this->setConfig($routeName,$k,$v);
+			}
+		}
+		else
+		{
+			$this->config[$routeName][$key]	= $value;
+		}
 	}
 
 	## Recursively and safely find deeper route on every level. Beware of the recursion demon.
@@ -262,11 +273,6 @@ class Map
 					foreach($vals as $valsKey=>$val)
 					{
 						$newParams[$valsKey]	= $val;
-
-						/*if(!isset($relations[$name]))
-							$relations[$name]	= Array();
-
-						$relations[$name][]	= $valsKey;*/
 					}
 				}
 			}
@@ -432,25 +438,6 @@ class Map
 		return $result;
 	}
 
-	## dispatch request onto the map.
-	/*public function dispatch($request)
-	{
-		$this->request	= $request;
-		$uri			= $this->request->getUri();
-
-		## find route by uri.
-		$result			= $this->routeFind($this->route,$uri);
-
-		if($result['result'])
-		{
-			return $this->executeRoute($result['data']['route']['name'],$result['data']['route']['parameter']);
-		}
-		else
-		{
-			return false;
-		}
-	}*/
-
 	public function find($query)
 	{
 		if(isset($query['uri']))
@@ -491,17 +478,7 @@ class Map
 			$finding['route']			= $route['result'];
 			$finding['parameters']		= $route['parameter'];
 
-			## if uri was queried. 
-			if($query['uri'])
-			{
-				/*$finding['uri']				= Array(
-					"route_relation"=>$result['data']['route']['parameter_relation']
-										);*/
-			}
-
 			return $finding;
-
-			// return $result['data'];
 		}
 
 		return false;
@@ -553,18 +530,6 @@ class Map
 			}
 
 			$executedRoutes[]	= $route;
-
-			## has binder for this.
-			/*if(isset($this->binds[implode(".",$executedRoutes)]))
-			{
-				foreach($this->binds[implode(".",$executedRoutes)] as $bindName=>$callback)
-				{
-					$this->binder->bind($bindName,$callback);
-				}
-			}*/
-
-			## prepare uri parameter..
-
 
 			## ends.
 			$temp		= $routes[$route];

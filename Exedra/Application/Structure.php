@@ -5,6 +5,7 @@ class Structure
 {
 	private $path;
 	private $pattern;
+	private $data;
 
 	public function __construct()
 	{
@@ -13,6 +14,14 @@ class Structure
 
 		## default path for exedra.
 		$this->path['folder']	= Array(
+			"default_subapp"=>"default",
+			"controller"	=>"_controller",
+			"layout"		=>"_layout",
+			"model"			=>"_model",
+			"config"		=>"_config"
+			);
+
+		$this->data			= Array(
 			"default_subapp"=>"default",
 			"controller"	=>"_controller",
 			"layout"		=>"_layout",
@@ -37,11 +46,11 @@ class Structure
 		return implode("/",$paths);
 	}
 
-	public function getPath($name,$additional = null)
+	public function get($name,$additional = null)
 	{
 		$paths	= Array();
 		$paths[]	= $this->app;
-		$paths[]	= $this->path['folder'][$name];
+		$paths[]	= $this->data[$name];
 
 		## Exception : directory for this path does not exists.
 		if(!is_dir($temp = $this->refinePath($paths)))

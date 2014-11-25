@@ -4,11 +4,11 @@ require_once "ExedraLoader.php";
 
 class Exedra
 {
-	## required objects.
+	## Required objects.
 	var $response	= null;
 	var $apps		= Array();
 
-	## executed application.
+	## Executed application.
 	var $executionResult	= null;
 
 	public function __construct()
@@ -19,10 +19,7 @@ class Exedra
 		$loader->loadFunctions("helper");
 
 		## register autoload.
-		// $loader->registerAutoload(refine_path(dirname(__FILE__)."/Application"));
-		// $loader->registerAutoload(refine_path(dirname(__FILE__)."/Exedrian"));
 		$loader->registerAutoload();
-
 
 		## create http request.
 		$this->httpRequest	= new \Exedra\Exedrian\HTTPRequest;
@@ -38,23 +35,25 @@ class Exedra
 			return $this->apps[$app_name];
 
 		## create new application with an injected Map (with an injected map, request (an injected http request), and configuration handler.).
-		$this->apps[$app_name]	= new \Exedra\Application\Application($app_name,Array(
-			"map"		=>new \Exedra\Application\Map(),
-			"loader"	=>$loader = new \Exedra\Application\Loader,
-			"structure"	=>$structure = new \Exedra\Application\Structure,
+		$this->apps[$app_name] = new \Exedra\Application\Application($app_name,Array(
+			"structure"	=>$structure 	= new \Exedra\Application\Structure,
+			"loader"	=>$loader 		= new \Exedra\Application\Loader($structure),
+			"map"		=>new \Exedra\Application\Map\Map($loader),
 			"request"	=>new \Exedra\Application\Request($this->httpRequest),
 			"response"	=>new \Exedra\Application\Response,
 			"controller"=>new \Exedra\Application\Builder\Controller($structure,$loader),
 			"layout" 	=>new \Exedra\Application\Builder\Layout($structure,$loader)
 			));
 			
-		if($execution)
-		{
-			// $this->apps[$app_name]->setExecution($execution);
-			$this->apps[$app_name]->build($execution);
-		}
+		## Execute in instant.
+		$execution($this->apps[$app_name]);
 
 		return $this->apps[$app_name];
+	}
+
+	public function get($name)
+	{
+		return isset($this->apps[$name])?$this->apps[$name]:null;
 	}
 
 	## load application by closure.

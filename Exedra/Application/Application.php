@@ -23,47 +23,19 @@ class Application
 		$this->response		= $dependencies['response'];
 	}
 
-	public function setExecution($execution)
-	{
-		$this->execution	= $execution;
-	}
-
-	/*public function start($param = null)
-	{
-		$this->started	= true;
-
-		if($param['onURI'])
-			$this->map->setBaseURI($param['onURI']);
-	}*/
-
-	public function goToRoute($routeName,$parameter = null)
-	{
-		$result	= $this->map->executeRoute($routeName,$parameter);
-		return $this->executor->execute($result['result']['execute'],$result['parameter'],$this);
-	}
-
-	public function build($execution)
-	{
-		## execute execution first.
-		$execution($this);
-
-		## dispatch routing beast.
-		// $dispatchResult	= $this->map->dispatch($this->request);
-
-
-		// return $this->executor->execute($dispatchResult['result']['execute'],$dispatchResult['parameter'],$this);
-	}
-
 	public function setExecutionFailRoute($routename)
 	{
 		$this->executionFailRoute	= $routename;
 	}
 
-	public function execute($routename,$parameter = Array())
+	/*
+	main application execution interface.
+	*/
+	public function execute($query,$parameter = Array())
 	{
 		try
 		{
-			$query	= !is_array($routename)?Array("route"=>$routename):$routename;
+			$query	= !is_array($query)?Array("route"=>$query):$query;
 			$result	= $this->map->find($query);
 
 			if(!$result)
@@ -78,8 +50,10 @@ class Application
 			$parameter	= array_merge($result['parameters'],$parameter);
 
 			$binds		= Array();
+			$configs	= Array();
 			foreach($route as $routeName=>$routeData)
 			{
+				## Binds
 				if(isset($this->map->binds[$routeName]))
 				{
 					foreach($this->map->binds[$routeName] as $bindName=>$callback)
@@ -87,10 +61,25 @@ class Application
 						$binds[$bindName][]	= $callback;
 					}
 				}
+
+				## Configs
+				if(isset($this->map->config[$routeName]))
+				{
+					foreach($this->map->config[$routeName] as $paramName=>$val)
+					{
+						$configs[$paramName]	= $val;
+					}
+				}
 			}
 
+			## Prepare result parameter.
+			$executionResult	= new Execution\Result($parameter);
+
+			if($configs)
+				$executionResult->addVariable("config",$configs);
+
 			$executor	= new Execution\Executor($this->controller,new Execution\Binder($binds),$this);
-			return $executor->execute($route[$routename]['execute'],new Execution\Result($parameter),$this);
+			return $executor->execute($route[$routename]['execute'],$executionResult,$this);
 
 		} 
 		catch(\Exception $e)
@@ -109,16 +98,5 @@ class Application
 			}
 		}
 	}
-
-	/*public function execute()
-	{
-		## execute execution first.
-		$execution	= $this->execution;
-		$execution($this);
-
-		## dispatch routing beast.
-		$dispatchResult	= $this->map->dispatch($this->request);
-		return $this->executor->execute($dispatchResult['result']['execute'],$dispatchResult['parameter'],$this);
-	}*/
 }
 ?>
