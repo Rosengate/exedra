@@ -5,21 +5,23 @@ require_once "ExedraLoader.php";
 class Exedra
 {
 	## Required objects.
-	var $response	= null;
-	var $apps		= Array();
+	var $response			= null;
+	var $apps				= Array();
+	private $exedraLoader 	= null;
 
 	## Executed application.
 	var $executionResult	= null;
 
-	public function __construct()
+	public function __construct($dir)
 	{
-		$loader	= new ExedraLoader();
+		$this->exedraLoader	= new ExedraLoader();
 		
 		## helper functions.
-		$loader->loadFunctions("helper");
+		$this->exedraLoader->loadFunctions("helper");
 
 		## register autoload.
-		$loader->registerAutoload();
+		// $this->exedraLoader->registerAutoload();
+		$this->exedraLoader->registerAutoload($dir);
 
 		## create http request.
 		$this->httpRequest	= new \Exedra\Exedrian\HTTPRequest;
@@ -34,15 +36,18 @@ class Exedra
 		if(isset($this->apps[$app_name]))
 			return $this->apps[$app_name];
 
+		## register autoload for this app_name.
+		$this->exedraLoader->registerAutoload($app_name);
+
 		## create new application with an injected Map (with an injected map, request (an injected http request), and configuration handler.).
 		$this->apps[$app_name] = new \Exedra\Application\Application($app_name,Array(
-			"structure"	=>$structure 	= new \Exedra\Application\Structure,
+			"structure"	=>$structure 	= new \Exedra\Application\Structure($app_name),
 			"loader"	=>$loader 		= new \Exedra\Application\Loader($structure),
 			"map"		=>new \Exedra\Application\Map\Map($loader),
 			"request"	=>new \Exedra\Application\Request($this->httpRequest),
 			"response"	=>new \Exedra\Application\Response,
 			"controller"=>new \Exedra\Application\Builder\Controller($structure,$loader),
-			"layout" 	=>new \Exedra\Application\Builder\Layout($structure,$loader)
+			"view"		=>new \Exedra\Application\Builder\View($structure,$loader),
 			));
 			
 		## Execute in instant.

@@ -21,6 +21,7 @@ class Application
 		$this->controller	= $dependencies['controller'];
 		$this->layout		= $dependencies['layout'];
 		$this->response		= $dependencies['response'];
+		$this->view			= $dependencies['view'];
 	}
 
 	public function setExecutionFailRoute($routename)

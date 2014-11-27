@@ -11,7 +11,7 @@ Abstract Class Builder
 		$this->loader		= $loader;
 	}
 
-	public function build($cname,$constructorParam = null)
+	public function create($cname,$constructorParam = null)
 	{
 		## loader.
 		$path	= $this->structure->get($this->name,$cname.".php");
@@ -46,9 +46,9 @@ Abstract Class Builder
 	public function execute($cname,$method,$parameter = Array())
 	{
 		if(is_string($cname))
-			$controller	= $this->build($cname);
+			$controller	= $this->create($cname);
 		else if(is_array($cname))
-			$controller	= $this->build($cname[0],$cname[1]);
+			$controller	= $this->create($cname[0],$cname[1]);
 		else
 			$controller	= $cname;
 

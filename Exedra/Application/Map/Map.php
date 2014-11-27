@@ -193,7 +193,6 @@ class Map
 			$hasSubroute	= $routeData['subroute']?true:false;
 
 			## found, and assign pre_uri.
-			#$routeMatch = $this->validate($methodR,$this->method,$uri,$routeData,$hasDeepRoute);
 			$routeMatch	= $this->validate($routeData,$query,$hasSubroute);
 
 			if($routeMatch['matched'] != false)
@@ -213,7 +212,6 @@ class Map
 							#"execution"=>$routeReference['execution'],
 							"data"=>Array(
 									"route"=>$this->_prepareRouteData($routeReference['routeData']),
-									// "route"=>$routeReference['routeData'],
 											),
 								);
 				}

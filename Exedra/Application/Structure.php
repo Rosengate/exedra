@@ -7,26 +7,18 @@ class Structure
 	private $pattern;
 	private $data;
 
-	public function __construct()
+	public function __construct($app_name)
 	{
 		## main container for application.
-		$this->app			= "app";
+		$this->app			= $app_name;
 
 		## default path for exedra.
-		$this->path['folder']	= Array(
-			"default_subapp"=>"default",
-			"controller"	=>"_controller",
-			"layout"		=>"_layout",
-			"model"			=>"_model",
-			"config"		=>"_config"
-			);
-
 		$this->data			= Array(
 			"default_subapp"=>"default",
-			"controller"	=>"_controller",
-			"layout"		=>"_layout",
-			"model"			=>"_model",
-			"config"		=>"_config"
+			"controller"	=>"controller",
+			"model"			=>"model",
+			"config"		=>"config",
+			"view"			=>"view",
 			);
 
 		$this->pattern	= Array(

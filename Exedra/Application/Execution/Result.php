@@ -23,6 +23,26 @@ class Result
 		return call_user_func_array($this->containers[$this->containerPointer++], func_get_args());
 	}
 
+	public function param($name)
+	{
+		$params	= is_array($name)?$name:explode(",",$name);
+
+		if(count($params) > 1)
+		{
+			$new	= Array();
+			foreach($params as $k)
+			{
+				$new[] = $this->params[$k];
+			}
+
+			return $new;
+		}
+		else
+		{
+			return $this->params[$params[0]];
+		}
+	}
+
 	public function addParameter($key,$val = null)
 	{
 		if(is_array($key))

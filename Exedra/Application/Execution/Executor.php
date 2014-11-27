@@ -24,10 +24,15 @@ class Executor
 				## set the last of the container as execution.
 				$params->containers[count($parent_execution)]	= $execution;
 
-				return $parent_execution[0]($params);
 				// return $parent_execution($params,$execution);
+				$result	= $parent_execution[0]($params);
 			}
-			return $execution($params);
+			else
+			{
+				$result	= $execution($params);
+			}
+
+			return Resolver::resolve($result);
 		}
 
 		## look for execution keyword.
