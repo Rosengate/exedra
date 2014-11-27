@@ -1,6 +1,7 @@
 Exédra
 ======
-A multi-tier ~~nestable~~ nestful routing PHP Framework.
+A multi-tier ~~nestable~~ nestful routing oriented PHP Framework.
+p/s : still in development.
 
 Introduction
 ======

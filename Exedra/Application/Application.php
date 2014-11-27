@@ -11,6 +11,7 @@ class Application
 	public $response			= null;
 	public $structure			= null;
 	private $executionFailRoute	= null;
+	private $currentRoute		= null;
 
 	public function __construct($name,$dependencies)
 	{
@@ -49,6 +50,9 @@ class Application
 			$route		= $result['route'];
 			$routename	= $result['name'];
 			$parameter	= array_merge($result['parameters'],$parameter);
+
+			## save current route result.
+			$this->currentRoute	= &$result;	
 
 			$binds		= Array();
 			$configs	= Array();
@@ -95,7 +99,8 @@ class Application
 			}
 			else
 			{
-				return $e->getMessage();
+				$routeName	= $this->currentRoute['name'];
+				return "<pre><hr><u>Caught Exception :</u>\nRoute : $routeName\n".$e->getMessage()."<hr>";
 			}
 		}
 	}

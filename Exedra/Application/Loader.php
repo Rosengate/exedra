@@ -16,9 +16,12 @@ class Loader
 		
 	}
 
-	public function load($file)
+	public function load($file,$data = null)
 	{
 		if(isset($loaded[$file])) return false;
+
+		if($data && is_array($data))
+			extract($data);
 
 		return require_once $file;
 	}

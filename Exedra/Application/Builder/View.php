@@ -16,7 +16,7 @@ class View
 	{
 		$path	= $this->structure->get("view")."/".$path.".php";
 
-		$view	= new \Exedra\Application\Response\View($path,$data);
+		$view	= new \Exedra\Application\Response\View($path,$data,$this->loader);
 		
 		return $view;
 	}

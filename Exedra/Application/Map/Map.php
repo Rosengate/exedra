@@ -377,8 +377,8 @@ class Map
 					}
 				break;
 				case "**":# trailing!
-					## get all the rest of uri for param.
-					$uriParams[$segmentParamName]	= array_pop(explode("/",$uri,$no+1));
+					## get all the rest of uri for param, and explode it so it return as list of segment.
+					$uriParams[$segmentParamName]	= explode("/",array_pop(explode("/",$uri,$no+1)));
 					$matched		= true;
 					$isTrailing		= true;
 					break 2; ## break the param loop, and set matched directly to true.
