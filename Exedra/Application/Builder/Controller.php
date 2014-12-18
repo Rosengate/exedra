@@ -4,33 +4,42 @@ namespace Exedra\Application\Builder;
 class Controller
 {
 	private $structure;
-	protected $name 		= "controller";
+	private $loader;
+	private $dir 			= null;
 	protected $patternName	= "controller_name";
+	private $namespaced		= false;
 
-	public function __construct(\Exedra\Application\Structure $structure, \Exedra\Application\Loader $loader)
+	public function __construct(\Exedra\Application\Structure $structure, \Exedra\Application\Loader $loader,$dir = null)
 	{
 		$this->structure	= $structure;
 		$this->loader		= $loader;
+		$this->dir			= $dir;
 	}
 
-	public function create($cname,$constructorParam = null)
+	public function create($className,$constructorParam = null)
 	{
 		## loader.
-		$path	= $this->structure->get($this->name,$cname.".php");
+		$path	= $this->structure->get("controller",$className.".php",$this->dir);
 
 		## Exception : file not found.
-		if(!file_exists($path)) throw new \Exception("Class file for ".$this->name." named '$cname' does not exists.");
+		if(!file_exists($path)) throw new \Exception("Class file for ".$this->name." named '$className' does not exists.");
 
 		$this->loader->load($path);
 
 		## prepare class name by pattern.
-		$className		= $this->structure->getPattern($this->patternName,$cname);
+		$className		= $this->structure->getPattern($this->patternName,$className);
 		
 		## Exception : class name not found.
-		if(!class_exists($className)) throw new \Exception("Class named '$className' does not exists for ".$this->name." '$cname'");
+		if(!class_exists($className)) throw new \Exception("Class named '$className' does not exists for controller '$className'");
 
 		if(!is_object($className))
 		{
+			## if controller builder was namespaced, alter name.
+			if($this->namespaced)
+			{
+				
+			}
+
 			if($constructorParam)
 			{
 				$reflection	= new \ReflectionClass($className);
@@ -40,6 +49,8 @@ class Controller
 			{
 				$controller	= new $className;
 			}
+
+			$reflection	= new \ReflectionClass($controller);
 		}
 
 		return $controller;
@@ -55,7 +66,10 @@ class Controller
 			$controller	= $cname;
 
 		if(!method_exists($controller, $method))
-			throw new \Exception("Method ($method) does not exists.");
+		{
+			$reflection	= new \ReflectionClass($controller);
+			throw new \Exception($reflection->getName()." : Method '$method' does not exists.");
+		}
 
 		return call_user_func_array(Array($controller,$method), $parameter);
 	}
