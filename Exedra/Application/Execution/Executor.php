@@ -11,25 +11,25 @@ class Executor
 		$this->binder		= $binder;
 	}
 
-	public function execute($execution,$params,$app)
+	public function execute($execution,$result,$container)
 	{
 		if(is_object($execution))
 		{
-			if($this->binder->hasBind("execute"))
+			if($this->binder->hasBind("middleware"))
 			{
-				$parent_execution			= $this->binder->getBind("execute");
+				$parent_execution			= $this->binder->getBind("middleware");
 
-				$params->containers			= $parent_execution;
+				$result->containers			= $parent_execution;
 
 				## set the last of the container as execution.
-				$params->containers[count($parent_execution)]	= $execution;
+				$result->containers[count($parent_execution)]	= $execution;
 
 				// return $parent_execution($params,$execution);
-				$result	= $parent_execution[0]($params);
+				$result	= $parent_execution[0]($result);
 			}
 			else
 			{
-				$result	= $execution($params);
+				$result	= $execution($result);
 			}
 
 			return Resolver::resolve($result);
@@ -41,17 +41,25 @@ class Executor
 			## controller.
 			if(strpos($execution, "controller=") === 0)
 			{
-				return $this->executeController(str_replace("controller=", "", $execution),$params,$app);
+				$controllerAction	= str_replace("controller=", "", $execution);
+
+				$handler	= function($result) use($controllerAction,$result,$container)
+				{
+					return $this->executeController($controllerAction,$result,$container);
+				};
+
+				## recursive to use the main execution.
+				return $this->execute($handler,$result,$container);
 			}
 		}
 	}
 
-	private function executeController($controllerAction,$params = Array(),$app)
+	private function executeController($controllerAction,$result,$container)
 	{
 		list($cname,$action)	= explode("@",$controllerAction);
-		if($params)
+		if($result)
 		{
-			foreach($params as $key=>$val)
+			foreach($result->params as $key=>$val)
 			{
 				$cname	= str_replace('{'.$key.'}', $val, $cname);
 				$action	= str_replace('{'.$key.'}', $val, $action);
@@ -63,7 +71,7 @@ class Executor
 			$controller_execute	= $this->binder->getBind("controller_execute");
 			return $controller_execute($cname,$action);
 		}
-		return $this->controller->execute(Array($cname,Array($app)),$action);
+		return $this->controller->execute(Array($cname,Array($container)),$action);
 	}
 }
 

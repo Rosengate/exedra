@@ -6,19 +6,20 @@ class Structure
 	private $path;
 	private $pattern;
 	private $data;
+	public $appName;
 
-	public function __construct($app_name)
+	public function __construct($appName)
 	{
 		## main container for application.
-		$this->app			= $app_name;
+		$this->appName			= $appName;
 
-		## default path for exedra.
+		## default path name.
 		$this->data			= Array(
-			"default_subapp"=>"default",
 			"controller"	=>"controller",
 			"model"			=>"model",
 			"config"		=>"config",
 			"view"			=>"view",
+			"route"			=>"routes",
 			);
 
 		$this->pattern	= Array(
@@ -38,24 +39,42 @@ class Structure
 		return implode("/",$paths);
 	}
 
-	public function get($name,$additional = null)
+	public function getAppName()
+	{
+		return $this->appName;
+	}
+
+	## prefix, add just after the app name. suffix add at the end of structure value.
+	public function get($name,$suffix = null,$prefix = null)
 	{
 		$paths	= Array();
-		$paths[]	= $this->app;
-		$paths[]	= $this->data[$name];
+		$paths[]	= $this->appName;
 
-		## Exception : directory for this path does not exists.
-		if(!is_dir($temp = $this->refinePath($paths)))
-			throw new \Exception("Directory for Structure.$name ($temp) does not exists");
-
-		if($additional)
+		if($prefix)
 		{
-			foreach($additionals = explode("/",$additional) as $no=>$p)
+			foreach($prefix = explode("/",$prefix) as $no=>$p)
 			{
 				$paths[]	= $p;
 
 				if(!is_dir($temp = $this->refinePath($paths)) && count($additionals) < $no)
-					throw new Exception("Directory for path ($temp) does not exists");
+					throw new Exception("Structure : Directory for path ($temp) does not exist");
+			}
+		}
+
+		$paths[]	= $this->data[$name];
+
+		## Exception : directory for this path does not exists.
+		if(!is_dir($temp = $this->refinePath($paths)))
+			throw new \Exception("Structure : Directory for path ($temp) does not exist");
+
+		if($suffix)
+		{
+			foreach($additionals = explode("/",$suffix) as $no=>$p)
+			{
+				$paths[]	= $p;
+
+				if(!is_dir($temp = $this->refinePath($paths)) && count($additionals) < $no)
+					throw new Exception("Structure : Directory for path ($temp) does not exist");
 			}
 		}
 
@@ -65,7 +84,7 @@ class Structure
 	public function getPattern($pattern,$val)
 	{
 		if(!isset($this->pattern[$pattern]))
-			throw new \Exception("Structure.pattern called $pattern does not exists.");
+			throw new \Exception("Structure : pattern called $pattern does not exists.");
 
 		return $this->pattern[$pattern]($val);
 	}

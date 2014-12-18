@@ -12,22 +12,32 @@ class Application
 	public $structure			= null;
 	private $executionFailRoute	= null;
 	private $currentRoute		= null;
+	private $currentResult		= null;
 
 	public function __construct($name,$dependencies)
 	{
 		$this->name			= $name;
+		$this->exedra		= $dependencies['exedra'];
 		$this->map			= $dependencies['map'];
 		$this->request		= $dependencies['request'];
 		$this->structure	= $dependencies['structure'];
+		$this->loader		= $dependencies['loader'];
 		$this->controller	= $dependencies['controller'];
 		$this->layout		= $dependencies['layout'];
-		$this->response		= $dependencies['response'];
 		$this->view			= $dependencies['view'];
+		$this->session		= $dependencies['session'];
+		$this->model		= $dependencies['model'];
 	}
 
 	public function setExecutionFailRoute($routename)
 	{
 		$this->executionFailRoute	= $routename;
+	}
+
+	## return current execution result.
+	public function getResult()
+	{
+		return $this->currentResult;
 	}
 
 	/*
@@ -54,10 +64,15 @@ class Application
 			## save current route result.
 			$this->currentRoute	= &$result;	
 
+			$subapp		= null;
 			$binds		= Array();
 			$configs	= Array();
+
 			foreach($route as $routeName=>$routeData)
 			{
+				## Sub app
+				$subapp	= isset($routeData['subapp'])?$routeData['subapp']:$subapp;
+
 				## Binds
 				if(isset($this->map->binds[$routeName]))
 				{
@@ -77,16 +92,29 @@ class Application
 				}
 			}
 
-			## Prepare result parameter.
-			$executionResult	= new Execution\Result($parameter);
+			## Prepare result parameter and automatically create controller and view builder.
+			$context	= $this;
+			$executionResult	= new Execution\Exec($routename,$this,$parameter,function($result) use($context,$subapp)
+			{
+				## check if has subapp passed through parameter.
+				$result->controller	= new Builder\Controller($context->structure,$context->loader,$subapp);
+				$result->view		= new Builder\View($context->structure,$context->loader,$subapp);
+			});
 
+			## has config.
 			if($configs)
 				$executionResult->addVariable("config",$configs);
 
-			$executor	= new Execution\Executor($this->controller,new Execution\Binder($binds),$this);
-			return $executor->execute($route[$routename]['execute'],$executionResult,$this);
+			## give result the container;
+			$executionResult->addVariable("container",$container = new Execution\Container(Array("app"=>$this,"exe"=>$executionResult)));
 
-		} 
+			$this->currentResult	= $executionResult;
+			$executor	= new Execution\Executor($this->controller,new Execution\Binder($binds),$this);
+			$execution	= $executor->execute($route[$routename]['execute'],$executionResult,$container);
+
+			$this->currentResult	= null;
+			return $execution;
+		}
 		catch(\Exception $e)
 		{
 			if($this->executionFailRoute)
@@ -100,7 +128,7 @@ class Application
 			else
 			{
 				$routeName	= $this->currentRoute['name'];
-				return "<pre><hr><u>Caught Exception :</u>\nRoute : $routeName\n".$e->getMessage()."<hr>";
+				return "<pre><hr><u>Execution Exception :</u>\nRoute : $routeName\n".$e->getMessage()."<hr>";
 			}
 		}
 	}
