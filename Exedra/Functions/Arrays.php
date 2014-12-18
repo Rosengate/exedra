@@ -48,6 +48,26 @@ abstract class Arrays
 
 		return true;
 	}
+
+	public static function deleteByNotation(&$storage,$key,$notation = ".")
+	{
+		if($key == null)
+		{
+			$storage = Array();
+			return;
+		}
+
+		$keys	= explode($notation,$key);
+
+		foreach($keys as $no=>$key)
+		{
+			if($no == 0) continue;
+			$key	= array_shift($keys);
+			$storage =& $storage[$key];
+		}
+
+		unset($storage[array_shift($keys)]);
+	}
 }
 
 
