@@ -9,6 +9,7 @@ class Map
 	private $resultData	= null;
 	private $loader;
 	public	$config		= Array();
+	private $app		= null;
 
 	## variables.
 	private $methodDelimiter	= ",";
@@ -16,6 +17,11 @@ class Map
 	public function __construct(\Exedra\Application\Loader $loader)
 	{
 		$this->loader	= $loader;
+	}
+
+	public function setApp(\Exedra\Application\Application $app)
+	{
+		$this->app	= $app;
 	}
 
 	public function onRoute($routeName,$action,$param)
@@ -41,6 +47,11 @@ class Map
 			$routeStorage	= &$routeStorage['subroute'];
 		}
 		## add route on upmost level.
+		else if(is_string($firstParam))
+		{
+			$routes			= $this->parseRoute($firstParam);
+			$routeStorage	= &$this->route;
+		}
 		else
 		{
 			$routes			= $firstParam;
@@ -80,7 +91,7 @@ class Map
 			{
 				foreach($data as $data_key=>$val)
 				{
-					if(in_array($data_key,Array("method","uri","execute","subroute","config")))
+					if(in_array($data_key,Array("method","uri","execute","subroute","config","ajax","ext","subapp")))
 					{
 						$routeData[$data_key]	= $val;
 					}
@@ -105,7 +116,7 @@ class Map
 			$routeData['method']	= array_map("strtolower", $routeData['method']);
 
 			## if execute key is an array, treat it as subroute.
-			if(is_array($routeData['execute']))
+			if(is_array($routeData['execute']) || (is_string($routeData['execute']) && strpos($routeData['execute'], "route:") === 0))
 			{
 				$routeData['subroute']	= $routeData['execute'];
 				unset($routeData['execute']);
@@ -116,6 +127,8 @@ class Map
 			## if subroute exists. create subroute.
 			if($routeData['subroute'])
 			{
+				$routeData['subroute'] = $this->parseRoute($routeData['subroute']);
+
 				$parents	= array_merge($parentRouteNames,Array($key));
 				$route[$key]['subroute']	= $this->_addRoute($routeData['subroute'],$parents);
 			}
@@ -126,6 +139,28 @@ class Map
 		}
 
 		return $route;
+	}
+
+	private function parseRoute($route)
+	{
+		if(is_string($route))
+		{
+			if(strpos($route, "route:") === 0)
+			{
+				$arr	= $this->loader->load($route,Array("app"=>$this->app));
+
+				if(!is_array($arr))
+				{
+					throw new \Exception("Unable to find routes in $route");
+				}
+
+				return $arr;
+			}
+		}
+		else
+		{
+			return $route;
+		}
 	}
 
 	## return a referenced property route based on level.
@@ -154,6 +189,11 @@ class Map
 		}
 
 		return $result;
+	}
+
+	public function getRoute($routeName)
+	{
+		return $this->find(Array("route"=>$routeName));
 	}
 
 	private function bindRoute($routeName,$bindName,$execution)
@@ -279,19 +319,37 @@ class Map
 		return Array("name"=>$routename,"parameter"=>$newParams);
 	}
 
-	## Route validation.
-	private function validate($routeData,$uri,$deepRoute = false)
+	private function validateQuery($routeData,$query)
 	{
-		// $method		= $this->request->getMethod();
-		$method		= $uri['method'];
-		$uri		= $uri['uri'];
+		foreach($routeData as $key=>$val)
+		{
+			switch($key)
+			{
+				case "method":
+				if(!in_array($query['method'],$val))
+					return false;
+				break;
+				case "ajax":
+					if(!isset($query['ajax']))
+						return false;
 
-		## 1. method check.
-		if(!in_array($method, $routeData['method']))
-			return Array("matched"=>false);
+					if($query['ajax'] != $val)
+						return false;
+				break;
+				case "ext":
+					## extract ext from uri.
 
+				break;
+			}
+		}
+
+		return true;
+	}
+
+	private function validateURI($routeURI,$uri,$deepRoute)
+	{
 		## 2. route check.
-		$segments	= explode("/",$routeData['uri']);
+		$segments	= explode("/",$routeURI);
 		$uris		= explode("/",$uri);
 
 		## initialize
@@ -429,11 +487,22 @@ class Map
 
 			## pass remaining uri.
 			// $result['remaining_uri']	= implode("/",$new_uriR);  # old 
-			$result['remaining_uri']	= $routeData['uri'] != ""?implode("/",$new_uriR):$uri; 
+			$result['remaining_uri']	= $routeURI != ""?implode("/",$new_uriR):$uri; 
 		}
 
 		## return matched, parameter founds, and remaining_uri (if deeproute)
 		return $result;
+	}
+
+	## Route validation.
+	private function validate($routeData,$query,$deepRoute = false)
+	{
+		## Query check
+		if(!$this->validateQuery($routeData,$query))
+			return Array("matched"=>false);
+
+		## URI Check
+		return $this->validateURI($routeData['uri'],$query['uri'],$deepRoute);
 	}
 
 	public function find($query)
@@ -443,7 +512,10 @@ class Map
 			$uri_querying	= true;
 			$result	= $this->routeFind($this->route,Array(
 				"method"=>$query['method'],
-				"uri"	=>$query['uri']
+				"uri"	=>$query['uri'],
+				"uri_original"	=>$query['uri'], ## save original, so that it may not be altered by a deeproute search.
+				"ajax"	=>$query['ajax'],
+				"ext"	=>$query['ext']
 				));
 		}
 		else
