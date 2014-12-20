@@ -222,12 +222,8 @@ class Map
 		$routeReference	= !isset($routeReference)?Array():$routeReference;
 		foreach($route as $key=>$routeData)
 		{
-			$routeReference['level']	= ($routeReference['level']?:0) + 1;
-
 			## get route data.
 			$routeName	= $key;
-			$methodR	= $routeData['method'];
-			$route		= $routeData['route'];
 
 			## subroute check.
 			$hasSubroute	= $routeData['subroute']?true:false;
@@ -249,7 +245,6 @@ class Map
 				{
 					return Array(
 							"result"=>true,
-							#"execution"=>$routeReference['execution'],
 							"data"=>Array(
 									"route"=>$this->_prepareRouteData($routeReference['routeData']),
 											),
@@ -258,17 +253,16 @@ class Map
 				else
 				{
 					## find deeper route based on remaining uri.
-					$query['uri']	= $routeMatch['remaining_uri'];
+					$deeperQuery = $query;
+					$deeperQuery['uri']	= $routeMatch['remaining_uri'];
 
-					$findRoute	= $this->routeFind($routeData['subroute'],$query,$routeReference,true);
+					$findRoute	= $this->routeFind($routeData['subroute'],$deeperQuery,$routeReference,true);
 					if($findRoute['result'])
 					{
 						return Array(
 							"result"=>true,
-							#"execution"=>$routeReference['execution'],
 							"data"=>Array(
 									"route"=>$this->_prepareRouteData($routeReference['routeData']),
-									// "route"=>$routeReference['routeData'],
 											),
 								);
 					}
@@ -608,12 +602,15 @@ class Map
 			$result[implode(".",$routeR)]	= $temp;
 			if(count($routeNameR) == $no+1)
 			{
-				// $result	= &$route[$routeName];
 				break;
 			}
 
 			$routes	= &$routes[$route]['subroute'];
 		}
+
+		## not found.
+		if(!isset($result[$routeName]))
+			return Array("result"=>false);
 
 		return Array("result"=>$result,"parameter"=>$parameter);
 	}
