@@ -9,6 +9,9 @@ class Request
 	protected $server		= Array();
 	protected $method		= Array();
 
+	public $post;
+	public $get;
+
 	public function __construct($param = Array())
 	{
 		$this->buildRequest($param);
@@ -18,10 +21,14 @@ class Request
 	{
 		# initiate basic request data into properties.
 		$this->parameters	= isset($param['parameters'])?$param['parameters']:Array("get"=>$_GET,"post"=>$_POST);
-		$this->header		= $param['header']?$param['header']:(function_exists("getallheaders")?getallheaders():null);
+		$this->header		= isset($param['header'])?$param['header']:(function_exists("getallheaders")?getallheaders():null);
 		$this->server		= isset($param['server'])?$param['server']:$_SERVER;
 		$this->method		= isset($param['method'])?$param['method']:$this->server['REQUEST_METHOD'];
 		$this->uri			= isset($param['uri'])?$param['uri']:$this->buildURI($_SERVER['REQUEST_URI']);
+
+		# refer post and get in a new variable.
+		$this->post			= &$this->parameters['post'];
+		$this->get			= &$this->parameters['get'];
 	}
 
 	private function buildURI($request_uri)
@@ -86,6 +93,9 @@ class Request
 
 	public function isAjax()
 	{
+		if(!isset($this->header['X_REQUESTED_WITH']))
+			return false;
+		
 		return $this->header['X_REQUESTED_WITH'] === 'XMLHttpRequest';
 	}
 
