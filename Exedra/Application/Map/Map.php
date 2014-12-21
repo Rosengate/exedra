@@ -151,7 +151,7 @@ class Map
 
 				if(!is_array($arr))
 				{
-					throw new \Exception("Unable to find routes in $route");
+					return $this->app->exception->create("Unable to find routes in $route");
 				}
 
 				return $arr;

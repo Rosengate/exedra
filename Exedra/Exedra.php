@@ -31,6 +31,11 @@ class Exedra
 		$this->parser		= new \Exedra\Exedrian\Parser;
 	}
 
+	public function registerAutoload($dir)
+	{
+		$this->exedraLoader->registerAutoload($dir);
+	}
+
 	public function build($app_name,$execution = null)
 	{
 		try
@@ -43,18 +48,9 @@ class Exedra
 			$this->exedraLoader->registerAutoload($app_name);
 
 			## create new application with an injected Map (with an injected map, request (an injected http request), and configuration handler.).
-			$this->apps[$app_name] = new \Exedra\Application\Application($app_name,Array(
-				"exedra"	=>$this,
-				"structure"	=>$structure 	= new \Exedra\Application\Structure($app_name),
-				"loader"	=>$loader 		= new \Exedra\Application\Loader($structure),
-				"map"		=>$map = new \Exedra\Application\Map\Map($loader),
-				"controller"=>new \Exedra\Application\Builder\Controller($structure,$loader),
-				"view"		=>new \Exedra\Application\Builder\View($structure,$loader),
-				"model"		=>new \Exedra\Application\Builder\Model($loader),
-				"session"	=>new \Exedra\Application\Session\Session
-				));
+			$this->apps[$app_name] = new \Exedra\Application\Application($app_name,$this);
 
-			$map->setApp($this->apps[$app_name]);
+			$this->apps[$app_name]->map->setApp($this->apps[$app_name]);
 				
 			## Execute in instant.
 			$execution($this->apps[$app_name]);
@@ -78,7 +74,7 @@ class Exedra
 	{
 		$closure	= require_once $path;
 
-		$closure($this,$parameter);
+		return $closure($this,$parameter);
 	}
 
 	## dispatch request as a query for application execution.

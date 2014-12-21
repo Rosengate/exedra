@@ -20,6 +20,7 @@ class Structure
 			"config"		=>"config",
 			"view"			=>"view",
 			"route"			=>"routes",
+			"documents"		=>"documents"
 			);
 
 		$this->pattern	= Array(

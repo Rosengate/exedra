@@ -7,26 +7,19 @@ class Application
 	private $name				= null;
 	private $executor			= null;
 	public $router				= null;
-	public $request				= null;
 	public $response			= null;
 	public $structure			= null;
 	private $executionFailRoute	= null;
 	private $currentRoute		= null;
-	private $currentResult		= null;
+	private $currentExe 		= null;
 
-	public function __construct($name,$dependencies)
+	public function __construct($name,$exedra)
 	{
-		$this->name			= $name;
-		$this->exedra		= $dependencies['exedra'];
-		$this->map			= $dependencies['map'];
-		$this->request		= $dependencies['request'];
-		$this->structure	= $dependencies['structure'];
-		$this->loader		= $dependencies['loader'];
-		$this->controller	= $dependencies['controller'];
-		$this->layout		= $dependencies['layout'];
-		$this->view			= $dependencies['view'];
-		$this->session		= $dependencies['session'];
-		$this->model		= $dependencies['model'];
+		$this->name = $name;
+		$this->exedra = $exedra;
+
+		## register dependency.
+		$this->register();
 	}
 
 	public function setExecutionFailRoute($routename)
@@ -34,10 +27,35 @@ class Application
 		$this->executionFailRoute	= $routename;
 	}
 
+	public function register()
+	{
+		$app = $this;
+
+		$this->structure = new \Exedra\Application\Structure($this->name);
+		$this->loader = new \Exedra\Application\Loader($this->structure);
+
+		$this->di = new \Exedra\Application\DI(array(
+			"request"=>$this->exedra->httpRequest,
+			"map"=> function() use($app) {return new \Exedra\Application\Map\Map($app->loader);},
+			"session"=> array("\Exedra\Application\Session\Session"),
+			"exception"=> array("\Exedra\Application\Builder\Exception")
+			),$this);
+	}
+
+	public function __get($property)
+	{
+		return $this->di->get($property);
+	}
+
 	## return current execution result.
 	public function getResult()
 	{
 		return $this->currentResult;
+	}
+
+	public function getExedra()
+	{
+		return $this->exedra;
 	}
 
 	/*
@@ -54,7 +72,8 @@ class Application
 			{
 				$q	= Array();
 				foreach($query as $k=>$v) $q[]	= $k." : ".$v;
-				throw new \Exception("Route not found. Query :<br>".implode("<br>",$q), 1);
+
+				return $this->exception->create("Route not found. Query :<br>".implode("<br>",$q));
 			}
 
 			$route		= $result['route'];
@@ -94,25 +113,20 @@ class Application
 
 			## Prepare result parameter and automatically create controller and view builder.
 			$context	= $this;
-			$executionResult	= new Execution\Exec($routename,$this,$parameter,function($result) use($context,$subapp)
-			{
-				## check if has subapp passed through parameter.
-				$result->controller	= new Builder\Controller($context->structure,$context->loader,$subapp);
-				$result->view		= new Builder\View($context->structure,$context->loader,$subapp);
-			});
+			$exe	= new Execution\Exec($routename, $this, $parameter, $subapp);
 
 			## has config.
 			if($configs)
-				$executionResult->addVariable("config",$configs);
+				$exe->addVariable("config",$configs);
 
-			## give result the container;
-			$executionResult->addVariable("container",$container = new Execution\Container(Array("app"=>$this,"exe"=>$executionResult)));
+			## give exec the container;
+			$exe->container	= $container = new Execution\Container(Array("app"=>$this,"exe"=>$exe));
 
-			$this->currentResult	= $executionResult;
+			$this->exe	= $exe;
 			$executor	= new Execution\Executor($this->controller,new Execution\Binder($binds),$this);
-			$execution	= $executor->execute($route[$routename]['execute'],$executionResult,$container);
-
-			$this->currentResult	= null;
+			$execution	= $executor->execute($route[$routename]['execute'],$exe,$container);
+			$this->exe->flash->clear();
+			$this->exe	= null;
 			return $execution;
 		}
 		catch(\Exception $e)

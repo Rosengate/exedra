@@ -29,13 +29,15 @@ class ExedraLoader
 	{
 		spl_autoload_register(function($class) use($dir)
 		{
+			$path			= $dir."/".$class.".php";
+			$originalPath	= $path;
+
 			## extract both class name and vendor from the called name.
 			list($vendor,$class)	= explode("\\",$class,2);
 
 			## check the vendor based class.
 			$class	= ucfirst($class);
 
-			## if vendor is Exedra, just use current __DIR__
 			if($vendor == "Exedra")
 				$path	= __DIR__."/".$class.".php";
 			else
@@ -44,7 +46,13 @@ class ExedraLoader
 			$path	= refine_path($path);
 
 			if(file_exists($path))
+			{
 				require_once $path;
+			}
+			else if(file_exists($originalPath))
+			{
+				require_once refine_path($originalPath);
+			}
 		});
 	}
 

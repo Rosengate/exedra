@@ -7,11 +7,12 @@ class View
 	private $loader;
 	private $dir;
 
-	public function __construct($structure,$loader,$dir = null)
+	public function __construct($exe, $structure,$loader,$dir = null)
 	{
-		$this->structure	= $structure;
-		$this->loader		= $loader;
-		$this->dir			= $dir;
+		$this->structure = $structure;
+		$this->loader = $loader;
+		$this->dir = $dir;
+		$this->exe = $exe;
 	}
 
 	public function create($path,$data = null)
@@ -20,7 +21,7 @@ class View
 		$path	= $this->structure->get("view",$path,$this->dir);
 		
 		if(!file_exists($path))
-			throw new \Exception("Unable to find view : $path");
+			$this->exe->exception->create("Unable to find view");
 
 		$view	= new \Exedra\Application\Response\View($path,$data,$this->loader);
 		
