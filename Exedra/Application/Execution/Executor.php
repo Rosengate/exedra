@@ -54,15 +54,29 @@ class Executor
 		}
 	}
 
-	private function executeController($controllerAction,$result,$container)
+	private function executeController($controllerAction,$exe,$container)
 	{
 		list($cname,$action)	= explode("@",$controllerAction);
-		if($result)
+
+		if($exe)
 		{
-			foreach($result->params as $key=>$val)
+			$parameter	= Array();
+			foreach($exe->params as $key=>$val)
 			{
 				$cname	= str_replace('{'.$key.'}', $val, $cname);
-				$action	= str_replace('{'.$key.'}', $val, $action);
+				
+				if(is_array($val))
+				{
+					$parameter 	= $val;
+					$val	= array_shift($parameter);
+
+					$action	= str_replace('{'.$key.'}', $val, $action);
+				}
+				else
+				{
+					$action	= str_replace('{'.$key.'}', $val, $action);
+				}
+
 			}
 		}
 
@@ -71,7 +85,9 @@ class Executor
 			$controller_execute	= $this->binder->getBind("controller_execute");
 			return $controller_execute($cname,$action);
 		}
-		return $this->controller->execute(Array($cname,Array($container)),$action);
+
+		## execution
+		return $exe->controller->execute(Array($cname,Array($container)),$action,$parameter);
 	}
 }
 

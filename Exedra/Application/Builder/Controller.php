@@ -9,11 +9,12 @@ class Controller
 	protected $patternName	= "controller_name";
 	private $namespaced		= false;
 
-	public function __construct(\Exedra\Application\Structure $structure, \Exedra\Application\Loader $loader,$dir = null)
+	public function __construct($exe, \Exedra\Application\Structure $structure, \Exedra\Application\Loader $loader,$dir = null)
 	{
-		$this->structure	= $structure;
-		$this->loader		= $loader;
-		$this->dir			= $dir;
+		$this->structure = $structure;
+		$this->loader = $loader;
+		$this->dir = $dir;
+		$this->exe = $exe;
 	}
 
 	public function create($className,$constructorParam = null)
@@ -22,7 +23,8 @@ class Controller
 		$path	= $this->structure->get("controller",$className.".php",$this->dir);
 
 		## Exception : file not found.
-		if(!file_exists($path)) throw new \Exception("Class file for ".$this->name." named '$className' does not exists.");
+		if(!file_exists($path))
+			$this->exe->exception->create("Class file for ".$this->name." named '$className' does not exists.");
 
 		$this->loader->load($path);
 
@@ -30,7 +32,8 @@ class Controller
 		$className		= $this->structure->getPattern($this->patternName,$className);
 		
 		## Exception : class name not found.
-		if(!class_exists($className)) throw new \Exception("Class named '$className' does not exists for controller '$className'");
+		if(!class_exists($className))
+			$this->exe->exception->create("Class named '$className' does not exists for controller '$className'");
 
 		if(!is_object($className))
 		{
@@ -68,7 +71,7 @@ class Controller
 		if(!method_exists($controller, $method))
 		{
 			$reflection	= new \ReflectionClass($controller);
-			throw new \Exception($reflection->getName()." : Method '$method' does not exists.");
+			$this->exe->exception->create($reflection->getName()." : Method '$method' does not exists.");
 		}
 
 		return call_user_func_array(Array($controller,$method), $parameter);
