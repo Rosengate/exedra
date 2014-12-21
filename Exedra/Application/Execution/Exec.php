@@ -45,7 +45,8 @@ class Exec
 			"flash"=> array("\Exedra\Application\Session\Flash", array($this->app)),
 			"redirect"=> array("\Exedra\Application\Response\Redirect", array($this)),
 			"exception"=> array("\Exedra\Application\Builder\Exception", array($this)),
-			"form"=> array("\Exedra\Application\Utilities\Form", array($this))
+			"form"=> array("\Exedra\Application\Utilities\Form", array($this)),
+			"session"=> function() use($app) {return $app->session;}
 			), $this);
 	}
 
@@ -80,7 +81,7 @@ class Exec
 		}
 		else
 		{
-			return $this->params[$params[0]];
+			return isset($this->params[$params[0]]) ? $this->params[$params[0]] : null;
 		}
 	}
 
@@ -196,8 +197,8 @@ class Exec
 		}
 	}
 
-	public function execute($route,$parameter)
+	public function execute($route,$parameter = array())
 	{
-
+		return $this->app->execute($route, $parameter);
 	}
 }

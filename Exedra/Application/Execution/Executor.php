@@ -11,7 +11,7 @@ class Executor
 		$this->binder		= $binder;
 	}
 
-	public function execute($execution,$result,$container)
+	public function execute($execution,$result)
 	{
 		if(is_object($execution))
 		{
@@ -43,18 +43,18 @@ class Executor
 			{
 				$controllerAction	= str_replace("controller=", "", $execution);
 
-				$handler	= function($result) use($controllerAction,$result,$container)
+				$handler	= function($result) use($controllerAction,$result)
 				{
-					return $this->executeController($controllerAction,$result,$container);
+					return $this->executeController($controllerAction,$result);
 				};
 
 				## recursive to use the main execution.
-				return $this->execute($handler,$result,$container);
+				return $this->execute($handler,$result);
 			}
 		}
 	}
 
-	private function executeController($controllerAction,$exe,$container)
+	private function executeController($controllerAction,$exe)
 	{
 		list($cname,$action)	= explode("@",$controllerAction);
 
@@ -63,7 +63,6 @@ class Executor
 			$parameter	= Array();
 			foreach($exe->params as $key=>$val)
 			{
-				$cname	= str_replace('{'.$key.'}', $val, $cname);
 				
 				if(is_array($val))
 				{
@@ -74,6 +73,7 @@ class Executor
 				}
 				else
 				{
+					$cname	= str_replace('{'.$key.'}', $val, $cname);
 					$action	= str_replace('{'.$key.'}', $val, $action);
 				}
 
@@ -87,7 +87,7 @@ class Executor
 		}
 
 		## execution
-		return $exe->controller->execute(Array($cname,Array($container)),$action,$parameter);
+		return $exe->controller->execute(Array($cname,Array($exe)),$action,$parameter);
 	}
 }
 

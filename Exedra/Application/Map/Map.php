@@ -111,12 +111,12 @@ class Map
 			}
 
 			## explode method, by delimiter.
-			$routeData['method']	= $routeData['method'] == null || $routeData['method'] == "any"?"GET,POST,PUT,DELETE":$routeData['method'];
+			$routeData['method']	= !isset($routeData['method']) || $routeData['method'] == null || $routeData['method'] == "any"?"GET,POST,PUT,DELETE":$routeData['method'];
 			$routeData['method']	= is_array($routeData['method'])?$routeData['method']:explode($this->methodDelimiter,$routeData['method']);
 			$routeData['method']	= array_map("strtolower", $routeData['method']);
 
 			## if execute key is an array, treat it as subroute.
-			if(is_array($routeData['execute']) || (is_string($routeData['execute']) && strpos($routeData['execute'], "route:") === 0))
+			if(isset($routeData['execute']) && (is_array($routeData['execute']) || (is_string($routeData['execute']) && strpos($routeData['execute'], "route:") === 0)))
 			{
 				$routeData['subroute']	= $routeData['execute'];
 				unset($routeData['execute']);
@@ -125,16 +125,12 @@ class Map
 			$route[$key]	= $routeData;
 
 			## if subroute exists. create subroute.
-			if($routeData['subroute'])
+			if(isset($routeData['subroute']))
 			{
 				$routeData['subroute'] = $this->parseRoute($routeData['subroute']);
 
 				$parents	= array_merge($parentRouteNames,Array($key));
 				$route[$key]['subroute']	= $this->_addRoute($routeData['subroute'],$parents);
-			}
-			else if($routeNames)
-			{
-
 			}
 		}
 
@@ -226,7 +222,7 @@ class Map
 			$routeName	= $key;
 
 			## subroute check.
-			$hasSubroute	= $routeData['subroute']?true:false;
+			$hasSubroute	= isset($routeData['subroute'])?true:false;
 
 			## found, and assign pre_uri.
 			$routeMatch	= $this->validate($routeData,$query,$hasSubroute);
@@ -238,7 +234,7 @@ class Map
 								"parameter"=>$routeMatch['parameter']
 					);
 				
-				$routeReference['execution']	= $routeData['execute'];
+				$routeReference['execution']	= isset($routeData['execute']) ? $routeData['execute'] : null;
 
 				## the third parameter is not an array, so just return true.
 				if(!$hasSubroute)
@@ -362,7 +358,8 @@ class Map
 			}
 
 			## 2.1 non-pattern comparation.
-			if($segment[0] != "[" || $segment[strlen($segment) - 1] != "]")
+			// if($segment[0] != "[" || $segment[strlen($segment) - 1] != "]") gives notice due to uninitialized segment.
+			if($segment == "" || ($segment[0] != "[" || $segment[strlen($segment) - 1] != "]"))
 			{
 				$equal	= false;
 				## need to move this logic outside perhaps.
@@ -430,7 +427,8 @@ class Map
 				break;
 				case "**":# trailing!
 					## get all the rest of uri for param, and explode it so it return as list of segment.
-					$uriParams[$segmentParamName]	= explode("/",array_pop(explode("/",$uri,$no+1)));
+					$explodes = explode("/",$uri,$no+1);
+					$uriParams[$segmentParamName]	= explode("/",array_pop($explodes));
 					$matched		= true;
 					$isTrailing		= true;
 					break 2; ## break the param loop, and set matched directly to true.
@@ -496,11 +494,13 @@ class Map
 			return Array("matched"=>false);
 
 		## URI Check
-		return $this->validateURI($routeData['uri'],$query['uri'],$deepRoute);
+		return $this->validateURI(isset($routeData['uri'])?$routeData['uri']:null,isset($query['uri'])?$query['uri']:null,$deepRoute);
 	}
 
 	public function find($query)
 	{
+		$result = array('result'=>false);
+
 		if(isset($query['uri']))
 		{
 			$uri_querying	= true;
@@ -509,7 +509,7 @@ class Map
 				"uri"	=>$query['uri'],
 				"uri_original"	=>$query['uri'], ## save original, so that it may not be altered by a deeproute search.
 				"ajax"	=>$query['ajax'],
-				"ext"	=>$query['ext']
+				"ext"	=>isset($query['ext']) ? $query['ext'] : null
 				));
 		}
 		else
@@ -518,17 +518,17 @@ class Map
 		}
 
 		## If both were passed (uri/method and route, do comparation);
-		if($result['result'] && $query['route'] && ($result['data']['route']['name'] != $query['route']))
+		if($result['result'] && isset($query['route']) && ($result['data']['route']['name'] != $query['route']))
 			return false;
 
-		if($result['result'] || $query['route'])
+		if($result['result'] || isset($query['route']))
 		{
 			## result not found (if it's doing a uri_querying)
-			if($query['route'] && !$result['result'] && $uri_querying)
+			if(isset($query['route']) && !$result['result'] && $uri_querying)
 				return false;
 
 			$name	= isset($query['route'])?$query['route']:$result['data']['route']['name'];
-			$parameters	= !$query['route'] || $uri_querying?$result['data']['route']['parameter']:Array();
+			$parameters	= !isset($query['route']) || $uri_querying?$result['data']['route']['parameter']:Array();
 
 			$route	= $this->executeRoute($name,$parameters);
 
@@ -538,7 +538,7 @@ class Map
 			}
 
 			## build result.
-			$finding['name']			= !$query['route']?$result['data']['route']['name']:$query['route'];
+			$finding['name']			= !isset($query['route'])?$result['data']['route']['name']:$query['route'];
 			$finding['route']			= $route['result'];
 			$finding['parameters']		= $route['parameter'];
 

@@ -28,7 +28,7 @@ class Di
 			{
 				$val	= $class;
 			}
-			else if(!$class[1])
+			else if(!isset($class[1]))
 			{
 				$val	= new $class[0];
 			}

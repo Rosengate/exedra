@@ -120,13 +120,12 @@ class Application
 				$exe->addVariable("config",$configs);
 
 			## give exec the container;
-			$exe->container	= $container = new Execution\Container(Array("app"=>$this,"exe"=>$exe));
+			// $exe->container	= $container = new Execution\Container(Array("app"=>$this,"exe"=>$exe));
 
 			$this->exe	= $exe;
 			$executor	= new Execution\Executor($this->controller,new Execution\Binder($binds),$this);
-			$execution	= $executor->execute($route[$routename]['execute'],$exe,$container);
+			$execution	= $executor->execute($route[$routename]['execute'],$exe);
 			$this->exe->flash->clear();
-			$this->exe	= null;
 			return $execution;
 		}
 		catch(\Exception $e)

@@ -23,6 +23,10 @@ class Structure
 			"documents"		=>"documents"
 			);
 
+		$this->character = array(
+			"absolute"		=>"@"
+			);
+
 		$this->pattern	= Array(
 			"controller_name"=>function($val)
 				{
@@ -58,7 +62,7 @@ class Structure
 				$paths[]	= $p;
 
 				if(!is_dir($temp = $this->refinePath($paths)) && count($additionals) < $no)
-					throw new Exception("Structure : Directory for path ($temp) does not exist");
+					throw new \Exception("Structure : Directory for path ($temp) does not exist");
 			}
 		}
 
@@ -75,11 +79,16 @@ class Structure
 				$paths[]	= $p;
 
 				if(!is_dir($temp = $this->refinePath($paths)) && count($additionals) < $no)
-					throw new Exception("Structure : Directory for path ($temp) does not exist");
+					throw new \Exception("Structure : Directory for path ($temp) does not exist");
 			}
 		}
 
 		return $this->refinePath($paths);
+	}
+
+	public function getCharacter($key)
+	{
+		return $this->character[$key];
 	}
 
 	public function getPattern($pattern,$val)

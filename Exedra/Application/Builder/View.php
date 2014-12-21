@@ -21,7 +21,7 @@ class View
 		$path	= $this->structure->get("view",$path,$this->dir);
 		
 		if(!file_exists($path))
-			$this->exe->exception->create("Unable to find view");
+			$this->exe->exception->create("Unable to find view '$path'");
 
 		$view	= new \Exedra\Application\Response\View($path,$data,$this->loader);
 		
