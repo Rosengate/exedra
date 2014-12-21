@@ -23,8 +23,11 @@ class Flash
 		}
 	}
 
-	public function get($key)
+	public function get($key, $default = null)
 	{
+		if($default && !$this->has($key))
+			return $default;
+		
 		return $this->session->get("flash.$key");
 	}
 
