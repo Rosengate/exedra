@@ -111,6 +111,22 @@ class Form
 		return "<input type='password' name='$name' id='$name' ".$this->buildParameter($name, $attr, $value)." />";
 	}
 
+	/**
+	 * HTML 5 compliance
+	 */
+	public function date($name, $attr = null, $value = null)
+	{
+		return "<input type='date' name='$name' id='$name' ".$this->buildParameter($name, $attr, $value)." />";
+	}
+
+	/**
+	 * HTML 5 compliance
+	 */
+	public function time($name, $attr = null, $value = null)
+	{
+		return "<input type='time' name='$name' id='$name' ".$this->buildParameter($name, $attr, $value)." />";
+	}
+
 	public function select($name,$array = array(),$attr = null,$value = null, $firstOpt = '[Please select]')
 	{
 		$array = is_array($array)?$array:array();
