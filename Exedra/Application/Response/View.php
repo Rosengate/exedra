@@ -4,7 +4,7 @@ namespace Exedra\Application\Response;
 class View
 {
 	private $path;
-	private $data = Array();
+	public $data = Array();
 	private $loader		= null;
 	private $required 	= Array();
 	private $callbacks	= Array();

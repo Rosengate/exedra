@@ -8,17 +8,23 @@ class Redirect
 		$this->exe = $exe;
 	}
 
-	public function toUrl($url)
+	final public function toUrl($url)
 	{
 		header("location:$url");die;
 	}
 
-	public function refresh()
+	public function flash($key, $val)
+	{
+		$this->exe->flash->set($key, $val);
+		return $this;
+	}
+
+	final public function refresh()
 	{
 		return $this->to($this->exe->getRoute(), $this->exe->getParams());
 	}
 
-	public function to($route = null, $params = array())
+	final public function to($route = null, $params = array())
 	{
 		if(!$route)
 			return $this->refresh();

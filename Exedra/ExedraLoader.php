@@ -33,7 +33,11 @@ class ExedraLoader
 			$originalPath	= $path;
 
 			## extract both class name and vendor from the called name.
-			list($vendor,$class)	= explode("\\",$class,2);
+			$explodes = explode("\\", $class, 2);
+			if(count($explodes) > 1)
+				 list($vendor,$class)	= $explodes;
+			else
+				list($vendor) = $explodes;
 
 			## check the vendor based class.
 			$class	= ucfirst($class);
