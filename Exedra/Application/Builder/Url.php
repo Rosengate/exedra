@@ -44,7 +44,17 @@ class Url
 	public function create($routeName,$data = Array())
 	{
 		## base the routename, either on parent route or the configured routePrefix
-		if($this->exe)
+		/*if($this->exe)
+		{
+			$routePrefix = $this->exe->getRoutePrefix();
+			$routeName		= $routePrefix?$routePrefix.".".$routeName:$routeName;
+		}*/
+
+		if(strpos($routeName, $this->app->structure->getCharacter('absolute')) === 0)
+		{
+			$routeName = substr($routeName, 1, strlen($routeName)-1);
+		}
+		else
 		{
 			$routePrefix = $this->exe->getRoutePrefix();
 			$routeName		= $routePrefix?$routePrefix.".".$routeName:$routeName;
@@ -55,7 +65,7 @@ class Url
 
 		if(!$route)
 		{
-			return $this->exe->exception->create("Unable to find route $routeName.");
+			return $this->exe->exception->create("Unable to find route '$routeName'");
 		}
 
 		$uris	= Array();
