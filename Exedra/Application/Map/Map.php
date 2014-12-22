@@ -338,6 +338,9 @@ class Map
 
 	private function validateURI($routeURI,$uri,$deepRoute)
 	{
+		if($routeURI === false)
+			return array("matched"=>false);
+
 		## 2. route check.
 		$segments	= explode("/",$routeURI);
 		$uris		= explode("/",$uri);
