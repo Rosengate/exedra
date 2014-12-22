@@ -24,7 +24,7 @@ class Controller
 
 		## Exception : file not found.
 		if(!file_exists($path))
-			$this->exe->exception->create("Class file for ".$this->name." named '$className' does not exists.");
+			$this->exe->exception->create("Unable to find file '".$path."' for controller : ".$className.($this->dir?" (subapp : ".$this->dir.")":"").".");
 
 		$this->loader->load($path);
 

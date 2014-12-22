@@ -121,7 +121,7 @@ class Exec
 	public function getParentRoute()
 	{
 		$absoluteRoute	= $this->getAbsoluteRoute();
-		$absoluteRoutes	= explode(".",$absoluteRoutes);
+		$absoluteRoutes	= explode(".",$absoluteRoute);
 
 		if(count($absoluteRoutes) == 1)
 			return null;
@@ -145,6 +145,22 @@ class Exec
 			$routePrefix	= $this->getParentRoute();
 
 		return $routePrefix?$routePrefix:null;
+	}
+
+	// prefix the route with availiable routePrefix.
+	public function prefixRoute($route)
+	{
+		if(strpos($route, $this->app->structure->getCharacter('absolute')) === 0)
+		{
+			$route = substr($route, 1, strlen($route)-1);
+		}
+		else
+		{
+			$routePrefix = $this->getRoutePrefix();
+			$route		= $routePrefix?$routePrefix.".".$route:$route;
+		}
+
+		return $route;
 	}
 
 	public function addParameter($key,$val = null)
@@ -199,6 +215,7 @@ class Exec
 
 	public function execute($route,$parameter = array())
 	{
+		$route = $this->prefixRoute($route);
 		return $this->app->execute($route, $parameter);
 	}
 }

@@ -31,12 +31,12 @@ class Url
 		return trim($this->assetUrl,"/")."/".$asset;
 	}
 
-	public function setBaseUrl($baseUrl)
+	public function setBase($baseUrl)
 	{
 		$this->baseUrl = $baseUrl;
 	}
 
-	public function setAssetUrl($assetUrl)
+	public function setAsset($assetUrl)
 	{
 		$this->assetUrl	= $assetUrl;
 	}
@@ -50,15 +50,7 @@ class Url
 			$routeName		= $routePrefix?$routePrefix.".".$routeName:$routeName;
 		}*/
 
-		if(strpos($routeName, $this->app->structure->getCharacter('absolute')) === 0)
-		{
-			$routeName = substr($routeName, 1, strlen($routeName)-1);
-		}
-		else
-		{
-			$routePrefix = $this->exe->getRoutePrefix();
-			$routeName		= $routePrefix?$routePrefix.".".$routeName:$routeName;
-		}
+		$routeName = $this->exe->prefixRoute($routeName);
 
 		## get route data by this name.
 		$route	= $this->app->map->getRoute($routeName);
