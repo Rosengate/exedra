@@ -30,7 +30,7 @@ class ExedraLoader
 		spl_autoload_register(function($class) use($dir)
 		{
 			$path			= $dir."/".$class.".php";
-			$originalPath	= $path;
+			$originalPath	= strtolower($path);
 
 			## extract both class name and vendor from the called name.
 			$explodes = explode("\\", $class, 2);
@@ -53,7 +53,7 @@ class ExedraLoader
 			{
 				require_once $path;
 			}
-			else if(file_exists($originalPath))
+			else if(file_exists(refine_path($originalPath)))
 			{
 				require_once refine_path($originalPath);
 			}
