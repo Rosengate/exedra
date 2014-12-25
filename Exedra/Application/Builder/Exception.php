@@ -22,6 +22,9 @@ class Exception
 			$params = null;
 		}
 
+		if($route)
+			$message = "[Route : $route] ".$message;
+
 		throw new \Exedra\Application\Exception\Exception($message, $route, $params);		
 	}
 }

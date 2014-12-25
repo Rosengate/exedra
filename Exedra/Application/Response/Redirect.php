@@ -13,7 +13,7 @@ class Redirect
 		header("location:$url");die;
 	}
 
-	public function flash($key, $val)
+	public function flash($key, $val = null)
 	{
 		$this->exe->flash->set($key, $val);
 		return $this;

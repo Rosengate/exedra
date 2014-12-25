@@ -23,8 +23,8 @@ class Request
 		$this->parameters	= isset($param['parameters'])?$param['parameters']:Array("get"=>$_GET,"post"=>$_POST);
 		$this->header		= isset($param['header'])?$param['header']:(function_exists("getallheaders")?getallheaders():null);
 		$this->server		= isset($param['server'])?$param['server']:$_SERVER;
-		$this->method		= isset($param['method'])?$param['method']:$this->server['REQUEST_METHOD'];
-		$this->uri			= isset($param['uri'])?$param['uri']:$this->buildURI($_SERVER['REQUEST_URI']);
+		$this->method		= isset($param['method'])?$param['method']:(isset($this->server['REQUEST_METHOD'])?$this->server['REQUEST_METHOD'] : null);
+		$this->uri			= isset($param['uri'])?$param['uri']:(isset($this->server['REQUEST_URI']) ? $this->buildURI($this->server['REQUEST_URI']) : null );
 
 		# refer post and get in a new variable.
 		$this->post			= &$this->parameters['post'];
