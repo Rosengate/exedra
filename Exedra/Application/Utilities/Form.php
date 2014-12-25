@@ -13,14 +13,35 @@ class Form
 			$this->set($this->exe->flash->get('form_data'));
 	}
 
-	private function buildParameter($name, $attr = null, $value = null, $valueOnly = false)
+	/**
+	 * @param string name
+	 * @param string value
+	 * @param boolean valueOnly
+	 * @return string
+	 */
+	private function buildValue($name, $value = null, $valueOnly = false)
+	{
+		if($value !== false)
+		{
+			$value = $this->has($name) ? $this->get($name) : $value;
+			$value = $value?($valueOnly?$value:' value="'.$value. '"' ):"";
+		}
+
+		return $value;
+	}
+
+	/**
+	 * @param mixed attr
+	 * @return string
+	 */
+	private function buildAttr($attr = null)
 	{
 		$attrs	= "";
 		if(is_array($attr))
 		{
 			foreach($attr as $key=>$val)
 			{
-				$attrs	.= $key."='".$val."' ";
+				$attrs	.= $key.'="'.$val.'" ';
 			}
 		}
 		else
@@ -28,11 +49,7 @@ class Form
 			$attrs = $attr?$attr:"";
 		}
 
-		// $value = $this->flash->get($name, $value);
-		$value = $this->has($name) ? $this->get($name) : $value;
-		$value = $value?($valueOnly?$value:"value='$value'"):"";
-
-		return $attrs.$value;
+		return $attrs;
 	}
 
 	/**
@@ -63,12 +80,17 @@ class Form
 		return $this;
 	}
 
-	public function get($key)
+	/**
+	 * @param mixed key
+	 * @return mixed $this->data
+	 */
+	public function get($key = null)
 	{
-		return $this->data[$key];
+		return $key ? $this->data[$key] : $this->data;
 	}
 
 	/**
+	 * aliast to set()
 	 * @param mixed key
 	 * @param mixed val
 	 * @param boolean override
@@ -79,11 +101,19 @@ class Form
 		return $this->set($key, $val, $override);
 	}
 
+	/**
+	 * @param string key
+	 * @param boolean
+	 */
 	public function has($key)
 	{
 		return isset($this->data[$key]);
 	}
 
+	/**
+	 * @param array $data
+	 * @return $this
+	 */
 	public function flash($data = array())
 	{
 		## re-flash with post data, if $data wasn't set.
@@ -96,19 +126,44 @@ class Form
 		return $this;
 	}
 
+	/**
+	 * @param string name
+	 * @param mixed attr
+	 * @param string value
+	 * @return string
+	 */
 	public function text($name, $attr = null, $value = null)
 	{
-		return "<input name='$name' id='$name' type='text' ".$this->buildParameter($name, $attr, $value)." />";
+		$value = $this->buildValue($name, $value);
+		$attr = $this->buildAttr($attr);
+		return "<input name='$name' id='$name' type='text' $attr $value />";
 	}
 
-	public function textarea($name, $attr = null, $value = null)
+	/**
+	 * @param string name
+	 * @param mixed attr
+	 * @param string value
+	 * @return string
+	 */
+	public function textarea( $name, $attr = null, $value = null)
 	{
-		return "<textarea name='$name' id='$name' $attr value='' ".$this->buildParameter($name, $attr, null).">".$this->buildParameter($name, null, $value, true)."</textarea>";
+		$attr = $this->buildAttr( $attr );
+		$value = $this->buildValue( $name, $value, true );
+
+		return '<textarea name="'.$name.'" id="'.$name.'" '.$attr.'>'.$value.'</textarea>';
 	}
 
+	/**
+	 * @param string name
+	 * @param mixed attr
+	 * @param string value
+	 * @return string
+	 */
 	public function password($name,$attr = null,$value = null)
 	{
-		return "<input type='password' name='$name' id='$name' ".$this->buildParameter($name, $attr, $value)." />";
+		$attr = $this->buildAttr($attr);
+		$value = $this->buildValue($name, $value);
+		return '<input type="password" name="'. $name .'" id="'.$name.'" '.$attr.' '.$value.' />';
 	}
 
 	/**
@@ -116,7 +171,10 @@ class Form
 	 */
 	public function date($name, $attr = null, $value = null)
 	{
-		return "<input type='date' name='$name' id='$name' ".$this->buildParameter($name, $attr, $value)." />";
+		$attr = $this->buildAttr($attr);
+		$value = $this->buildValue($name, $value);
+
+		return '<input type="date" name="'. $name .'" id="'. $name .'" '.$attr.' '.$value.' />';
 	}
 
 	/**
@@ -124,30 +182,50 @@ class Form
 	 */
 	public function time($name, $attr = null, $value = null)
 	{
-		return "<input type='time' name='$name' id='$name' ".$this->buildParameter($name, $attr, $value)." />";
+		$attr = $this->buildAttr($attr);
+		$value = $this->buildValue($name, $value);
+
+		return '<input type="time" name="'.$name.'" id="'.$name.'" '.$attr.' '.$value.' />';
 	}
 
+	/**
+	 * @param string name
+	 * @param array array
+	 * @param mixed attr
+	 * @param string value
+	 * @param string firstOpt
+	 * @return string
+	 */
 	public function select($name,$array = array(),$attr = null,$value = null, $firstOpt = '[Please select]')
 	{
 		$array = is_array($array)?$array:array();
-		$firstOpt = $firstOpt !== false?"<option value=''>$firstOpt</option>":"";
+		$firstOpt = $firstOpt !== false?'<option value="">'. $firstOpt .'</option>':'';
 
-		$value = $this->buildParameter($name, null, $value, true);
-		
-		$sel = "<select name='$name' id='$name' ".$this->buildParameter($name, $attr)." >$firstOpt";
-		$selected = "";
+		$attr = $this->buildAttr($attr);
+		$value = $this->buildValue($name, $value, true);
+
+		$sel = '<select name="'.$name.'" id="'.$name.'" '.$attr.' >'.$firstOpt;
+		$selected = '';
 		foreach($array as $key=>$val)
 		{
-			if($value != "")
-				$selected	= $value == $key?"selected":"";
+			if($value != '')
+				$selected	= $value == $key?'selected':'';
 			
-			$sel .= "<option value='$key' $selected>$val</option>";
+			$sel .= '<option value="'.$key.'" '.$selected.'>'.$val.'</option>';
 		}
-		$sel .=	"</select>";
+		$sel .=	'</select>';
 		
 		return $sel;
 	}
 
+	/**
+	 * @param string name
+	 * @param array array
+	 * @param mixed attr
+	 * @param string value
+	 * @param string wrapper
+	 * @return string
+	 */
 	public function radio($name,$array = array(),$attr = null,$value = null,$wrapper = "")
 	{
 		$array		= is_array($array)? $array : array();
@@ -158,21 +236,35 @@ class Form
 
 		foreach($array as $key=>$val)
 		{
-			$sel	=  $value?($key == $value?"checked":""):"";
-			$radio	= "<label><input type='radio' value='$key'  $sel $attr name='$name' />$val</label>";
+			$sel	=  $value?($key == $value?'checked':''):'';
+			$radio	= '<label><input type="radio" value="'.$key.'"  '.$sel.' '.$attr.' name="'.$name.'" />'.$val.'</label>';
 			$result	.= $wrapper?str_replace("{content}",$radio, $wrapper):$radio;
 		}
 
 		return $result;
 	}
 
-	public function file($name,$attr = "")
+	/**
+	 * @param string name
+	 * @param mixed attr
+	 * @return string
+	 */
+	public function file($name,$attr = null)
 	{
-		return "<input type='file' name='$name' id='$name' ".$this->buildParameter($name, $attr)." />";
+		$attr = $this->buildAttr($attr);
+		return '<input type="file" name="'.$name.'" id="'.$name.'" '.$attr.' />';
 	}
 
-	public function hidden($name,$attr = "",$value = "")
+	/**
+	 * @param string name
+	 * @param mixed attr
+	 * @param string value
+	 * @return string
+	 */
+	public function hidden($name,$attr = null,$value = null)
 	{
-		return "<input name='$name' id='$name' type='hidden' $message ".$this->buildParameter($name, $attr, $value)." />";
+		$attr = $this->buildAttr($attr);
+		$value = $this->buildValue($name, $value);
+		return '<input type="hidden" name="'.$name.'" id="'.$name.'" '.$attr.' '.$value.' />';
 	}
 }
