@@ -3,9 +3,9 @@ namespace Exedra\Application\Session;
 
 class Flash
 {
-	public function __construct(\Exedra\Application\Application $app)
+	public function __construct(\Exedra\Application\Session\Session $session)
 	{
-		$this->session = $app->session;
+		$this->session = $session;
 	}
 
 	public function set($key, $val = array())

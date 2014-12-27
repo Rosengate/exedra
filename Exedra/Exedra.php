@@ -36,6 +36,13 @@ class Exedra
 		$this->exedraLoader->registerAutoload($dir);
 	}
 
+	/**
+	 * Build application instance
+	 * @param string app_name
+	 * @param callback execution
+	 * @return \Exedra\Application\Application
+	 * @throws \Exception
+	 */
 	public function build($app_name,$execution = null)
 	{
 		try
@@ -49,8 +56,6 @@ class Exedra
 
 			## create new application with an injected Map (with an injected map, request (an injected http request), and configuration handler.).
 			$this->apps[$app_name] = new \Exedra\Application\Application($app_name,$this);
-
-			$this->apps[$app_name]->map->setApp($this->apps[$app_name]);
 				
 			## Execute in instant.
 			$execution($this->apps[$app_name]);
@@ -64,12 +69,22 @@ class Exedra
 		}
 	}
 
+	/**
+	 * Get application instance
+	 * @param string name
+	 * @return \Exedra\Application\Application
+	 */
 	public function get($name)
 	{
 		return isset($this->apps[$name])?$this->apps[$name]:null;
 	}
 
 	## load application by closure.
+	/**
+	 * Load application by closure
+	 * @param string path
+	 * @param mixed parameter
+	 */
 	public function load($path,$parameter = null)
 	{
 		$closure	= require_once $path;
@@ -88,33 +103,6 @@ class Exedra
 				"ajax"=>$this->httpRequest->isAjax(),
 				));
 		}
-
-		/*
-		try{
-			## loop the application. and execute the routing.
-			foreach($this->apps as $app_name=>$app)
-			{
-				$executionResponse	= $app->dispatch();
-
-				## matched.
-				if($executionResponse)
-				{
-					## save.
-					$this->executionResponse['app_name']	= $app_name;
-					$this->executionResponse['data']		= $executionResponse;
-				}
-			}
-
-			## return a parsed router response.
-			return $this->executionResponse?$this->parser->parse($this->executionResponse['data']):null;
-		}
-		catch(exception $e)
-		{
-			$message[]	= $e->getMessage();
-			return $this->parser->parse(implode("<br>",$message),404);
-		}*/
-
-
 	}
 }
 

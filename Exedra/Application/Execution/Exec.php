@@ -36,13 +36,14 @@ class Exec
 		}
 
 		$this->di = new \Exedra\Application\DI(array(
-			"controller"=> array("\Exedra\Application\Builder\Controller", array($this, $this->app->structure, $this->app->loader, $this->subapp)),
-			"view"=> array("\Exedra\Application\Builder\View", array($this, $this->app->structure, $this->app->loader, $this->subapp)),
+			"controller"=> array("\Exedra\Application\Builder\Controller", array($this, $this->app->loader, $this->subapp)),
+			"view"=> array("\Exedra\Application\Builder\View", array($this, $this->app->loader, $this->subapp)),
+			"middleware"=> array("\Exedra\Application\Builder\Middleware", array($this, $this->app->loader, $this->subapp)),
 			"url"=> array("\Exedra\Application\Builder\Url", array($this->app,$this)),
 			"request"=>$this->app->request,
 			"response"=>$this->app->exedra->httpResponse,
 			"validator"=> array("\Exedra\Application\Utilities\Validator"),
-			"flash"=> array("\Exedra\Application\Session\Flash", array($this->app)),
+			"flash"=> function() use($app) {return new \Exedra\Application\Session\Flash($app->session);},
 			"redirect"=> array("\Exedra\Application\Response\Redirect", array($this)),
 			"exception"=> array("\Exedra\Application\Builder\Exception", array($this)),
 			"form"=> array("\Exedra\Application\Utilities\Form", array($this)),

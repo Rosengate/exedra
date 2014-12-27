@@ -4,24 +4,18 @@ namespace Exedra\Application\Map;
 class Map
 {
 	private $route 		= Array();
-	public $binds 		= Array();
-	private $request 	= null;
-	private $resultData	= null;
 	private $loader;
-	public	$config		= Array();
 	private $app		= null;
+	public $binds 		= Array();
+	public $config		= Array();
 
 	## variables.
 	private $methodDelimiter	= ",";
 
-	public function __construct(\Exedra\Application\Loader $loader)
+	public function __construct(\Exedra\Application\Application $app)
 	{
-		$this->loader	= $loader;
-	}
-
-	public function setApp(\Exedra\Application\Application $app)
-	{
-		$this->app	= $app;
+		$this->app = $app;
+		$this->loader = $app->loader;
 	}
 
 	public function onRoute($routeName,$action,$param)
@@ -37,6 +31,11 @@ class Map
 	}
 
 	## Main function to add Route.
+	/**
+	 * Add route to the map.
+	 * @param mixed firstParam
+	 * @param mixed secondParam
+	 */
 	public function addRoute($firstParam,$secondParam = null)
 	{
 		## second param was passed, it's adding subroute.
@@ -68,16 +67,10 @@ class Map
 	private function _addRoute(&$routes,$parentRouteNames = Array())
 	{
 		$route	= Array();
-		// $firstlevel	= !$routeNames?true:false;
+
 		foreach($routes as $key=>$data)
 		{
 			$routeData	= Array();
-
-			## if this loop is withing the first level of route name.
-			// if($firstlevel)
-				// $routeNames	= Array();
-
-			// $routeNames[]	= $key;
 
 			## subsequential based
 			if(isset($data[0]))
@@ -242,7 +235,7 @@ class Map
 					return Array(
 							"result"=>true,
 							"data"=>Array(
-									"route"=>$this->_prepareRouteData($routeReference['routeData']),
+									"route"=>$this->prepareRouteData($routeReference['routeData']),
 											),
 								);
 				}
@@ -258,7 +251,7 @@ class Map
 						return Array(
 							"result"=>true,
 							"data"=>Array(
-									"route"=>$this->_prepareRouteData($routeReference['routeData']),
+									"route"=>$this->prepareRouteData($routeReference['routeData']),
 											),
 								);
 					}
@@ -285,7 +278,7 @@ class Map
 		return Array("result"=>false,"response"=>null);
 	}
 
-	private function _prepareRouteData($routeData)
+	private function prepareRouteData($routeData)
 	{
 		$routename	= implode(".",array_keys($routeData));
 

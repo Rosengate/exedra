@@ -20,7 +20,8 @@ class Structure
 			"config"		=>"config",
 			"view"			=>"view",
 			"route"			=>"routes",
-			"documents"		=>"documents"
+			"documents"		=>"documents",
+			"middleware"	=>"middleware"
 			);
 
 		$this->character = array(
@@ -32,14 +33,14 @@ class Structure
 				{
 					return "Controller".str_replace(" ","",ucwords(str_replace("/", " ", $val)));
 				},
-			"layout_name"=>function($val)
+			"middleware_name"=>function($val)
 				{
-					return "Layout".str_replace(" ","",ucwords(str_replace("/"," ", $val)));
+					return "Middleware".str_replace(" ", "", ucwords(str_replace("/", " ", $val)));
 				}
 			);
 	}
 
-	public function refinePath($paths)
+	private function refinePath($paths)
 	{
 		return implode("/",$paths);
 	}
@@ -65,6 +66,9 @@ class Structure
 					throw new \Exception("Structure : Directory for path ($temp) does not exist");
 			}
 		}
+
+		if(!isset($this->data[$name]))
+			throw new \Exception("Structure '$name' does not exist");
 
 		$paths[]	= $this->data[$name];
 

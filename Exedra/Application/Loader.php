@@ -11,12 +11,12 @@ class Loader
 		$this->structure	= $structure;
 	}
 
-	public function loadStructure()
+	public function isLoadable($file)
 	{
-		
+		return strpos($file, ":") !== false;
 	}
 
-	public function load($file,$data = null)
+	public function load($file,$data = null, $subapp = null)
 	{
 		if(($colonPos = strpos($file, ":")) !== false)
 		{
@@ -26,11 +26,11 @@ class Loader
 
 		if(isset($loaded[$file])) return false;
 
-		if($data && is_array($data))
-			extract($data);
-
 		if(!file_exists($file))
 			throw new \Exception("File not found : $file", 1);
+
+		if($data && is_array($data))
+			extract($data);
 
 		return require_once $file;
 	}

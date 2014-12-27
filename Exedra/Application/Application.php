@@ -22,6 +22,10 @@ class Application
 		$this->register();
 	}
 
+	/**
+	 * Set route for execution exception
+	 * @param string routename
+	 */
 	public function setExecutionFailRoute($routename)
 	{
 		$this->executionFailRoute	= $routename;
@@ -36,7 +40,7 @@ class Application
 
 		$this->di = new \Exedra\Application\DI(array(
 			"request"=>$this->exedra->httpRequest,
-			"map"=> function() use($app) {return new \Exedra\Application\Map\Map($app->loader);},
+			"map"=> function() use($app) {return new \Exedra\Application\Map\Map($app);},
 			"session"=> array("\Exedra\Application\Session\Session"),
 			"exception"=> array("\Exedra\Application\Builder\Exception")
 			),$this);
@@ -53,19 +57,26 @@ class Application
 		return $this->currentResult;
 	}
 
+	/**
+	 * Get exedra instance
+	 * @return \Exedra\Exedra
+	 */
 	public function getExedra()
 	{
 		return $this->exedra;
 	}
 
-	/*
-	main application execution interface.
-	*/
+	/**
+	 * Execute application
+	 * @param mixed query
+	 * @param array parameter
+	 * @return mixed
+	 */
 	public function execute($query,$parameter = Array())
 	{
 		try
 		{
-			$query	= !is_array($query)?Array("route"=>$query):$query;
+			$query	= !is_array($query) && is_string($query) ?Array("route"=>$query):$query;
 			$result	= $this->map->find($query);
 
 			if(!$result)

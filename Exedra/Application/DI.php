@@ -9,11 +9,21 @@ class Di
 		$this->instance = $instance;
 	}
 
+	/**
+	 * Register dependency
+	 * @param mixed key
+	 * @param mixed val
+	 */
 	public function register($key, $val = null)
 	{
 		if(is_array($key)) foreach($key as $k=>$v) $this->$k = $v; else $this->$key = $val;
 	}
 
+	/**
+	 * Check if has dependency used.
+	 * @param string property
+	 * @return boolean
+	 */
 	public function has($property)
 	{
 		if(isset($this->$property))
@@ -41,17 +51,29 @@ class Di
 			}
 
 			## register as property.
-			$this->set($property, $val);
+			$this->save($property, $val);
 
 			return true;
 		}
+
+		return false;
 	}
 
-	private function set($property, $val)
+	/**
+	 * Save the dependency
+	 * @param string property
+	 * @param mixed val
+	 */
+	private function save($property, $val)
 	{
 		$this->$property = $val;
 	}
 
+	/**
+	 * Return the dependency
+	 * @param string property
+	 * @return mixed
+	 */
 	public function get($property)
 	{
 		if($this->has($property))

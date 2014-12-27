@@ -16,6 +16,11 @@ class View
 		$this->loader = $loader;
 	}
 
+	/**
+	 * Set required data for rendering.
+	 * @param array @keys
+	 * @return this
+	 */
 	public function setRequired($keys)
 	{
 		if(is_string($keys))
@@ -34,11 +39,22 @@ class View
 		return $this;
 	}
 
+	/**
+	 * Set callback for the given data key
+	 * @param string key
+	 * @param callback callback
+	 * @return this
+	 */
 	public function setCallback($key,$callback)
 	{
 		$this->callbacks[$key]	= $callback;
+		return $this;
 	}
 
+	/**
+	 * Resolve callback in rendering
+	 * @return null
+	 */
 	private function callbackResolve()
 	{
 		foreach($this->data as $key=>$val)
@@ -48,15 +64,26 @@ class View
 		}
 	}
 
+	/**
+	 * Set view path
+	 * @param string path
+	 * @return this
+	 */
 	public function setPath($path)
 	{
 		$this->path	= $path;
 		return $this;
 	}
 
-	public function set($key,$v = null)
+	/**
+	 * Set view data
+	 * @param mixed key
+	 * @param mixed value
+	 * @return this
+	 */
+	public function set($key,$value = null)
 	{
-		if(!$v && is_array($key))
+		if(!$value && is_array($key))
 		{
 			foreach($key as $k=>$v)
 			{
@@ -65,12 +92,14 @@ class View
 			return $this;
 		}
 
-		$this->data[$key]	= $v;
+		$this->data[$key]	= $value;
 
 		return $this;
 	}
 
-
+	/**
+	 * @return mixed
+	 */
 	private function requirementCheck()
 	{
 		if(count($this->required) > 0)
@@ -92,22 +121,25 @@ class View
 		return false;
 	}
 
+	/**
+	 * Main rendering function, load the with loader function.
+	 * @return null
+	 */
 	public function render()
 	{
 		## has required.
 		if($requiredArgs = $this->requirementCheck())
-			throw new \Exception("View.render : Missing required argument(s) for view ('".$this->path."') : <b>".$requiredArgs."</b>");
+			return $this->exe->excepton->create('View.render : Missing required argument(s) for view ("'. $this->path .'") : <br> '. $requiredArgs .'</b>');
 
 		## resolve any related callback.
 		$this->callbackResolve();
 
 		if($this->path == null)
-			throw new \Exception("View.render : path was not set (null).");
+			return $this->exe->excepton->create('View.render : path was not set (null)');
 
 		if(!file_exists($this->path))
-			throw new \Exception("View.render : Path '".$this->path."' does not exists.");
+			return $this->exe->excepton->create('View.render : Path "'. $this->path .'"" does not exist');
 
-		extract($this->data);
 		$this->loader->load($this->path,$this->data);
 	}
 }
