@@ -23,11 +23,14 @@ class Exec
 	/* di container */
 	public $di;
 
-	public function __construct($route,$app,$params,$subapp = null)
+	public $config;
+
+	public function __construct($route, $app, $params, $config, $subapp = null)
 	{
 		$this->absoluteRoute = $route;
 		$this->app = $app;
 		$this->subapp = $subapp;
+		$this->config = $config;
 
 		## Create params
 		foreach($params as $key=>$val)

@@ -91,19 +91,19 @@ class Application
 			$routename	= $result['name'];
 			$parameter	= array_merge($result['parameters'],$parameter);
 
-			## save current route result.
+			// save current route result.
 			$this->currentRoute	= &$result;	
 
-			$subapp		= null;
-			$binds		= Array();
-			$configs	= Array();
+			$subapp = null;
+			$binds = Array();
+			$config	= new \Exedra\Application\Config;
 
 			foreach($route as $routeName=>$routeData)
 			{
-				## Sub app
+				// Sub app
 				$subapp	= isset($routeData['subapp'])?$routeData['subapp']:$subapp;
 
-				## Binds
+				// Binds
 				if(isset($this->map->binds[$routeName]))
 				{
 					foreach($this->map->binds[$routeName] as $bindName=>$callback)
@@ -112,30 +112,24 @@ class Application
 					}
 				}
 
-				## Configs
+				// Initialize config
 				if(isset($this->map->config[$routeName]))
 				{
 					foreach($this->map->config[$routeName] as $paramName=>$val)
 					{
-						$configs[$paramName]	= $val;
+						$config->set($paramName, $val);
 					}
 				}
 			}
 
-			## Prepare result parameter and automatically create controller and view builder.
-			$context	= $this;
-			$exe	= new Execution\Exec($routename, $this, $parameter, $subapp);
-
-			## has config.
-			if($configs)
-				$exe->addVariable("config",$configs);
-
-			## give exec the container;
-			// $exe->container	= $container = new Execution\Container(Array("app"=>$this,"exe"=>$exe));
+			// Prepare result parameter and automatically create controller and view builder.
+			$exe	= new Execution\Exec($routename, $this, $parameter, $config, $subapp);
 
 			$this->exe	= $exe;
 			$executor	= new Execution\Executor($this->controller,new Execution\Binder($binds),$this);
 			$execution	= $executor->execute($route[$routename]['execute'],$exe);
+
+			// clear flash on every application execution.
 			$this->exe->flash->clear();
 			return $execution;
 		}
@@ -145,7 +139,7 @@ class Application
 			{
 				$failRoute = $this->executionFailRoute;
 
-				## set this false, so that it wont loop if later this fail route doesn't exists.
+				// set this false, so that it wont loop if later this fail route doesn't exists.
 				$this->executionFailRoute = false;
 				return $this->execute($failRoute,Array("exception"=>$e));
 			}
