@@ -17,6 +17,12 @@ class Session
 		}
 	}
 
+	// not sure but look's ugly because this is the only use of static :X
+	public static function hasStarted()
+	{
+		return session_status() != PHP_SESSION_NONE;
+	}
+
 	public function set($key,$value)
 	{
 		\Exedra\Functions\Arrays::setByNotation($this->storage,$key,$value);

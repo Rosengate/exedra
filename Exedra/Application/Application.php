@@ -31,6 +31,14 @@ class Application
 		$this->executionFailRoute	= $routename;
 	}
 
+	/**
+	 * Alias for top method.
+	 */
+	public function setFailRoute($routename)
+	{
+		$this->setExecutionFailRoute($routename);
+	}
+
 	public function register()
 	{
 		$app = $this;
@@ -129,8 +137,10 @@ class Application
 			$executor	= new Execution\Executor($this->controller,new Execution\Binder($binds),$this);
 			$execution	= $executor->execute($route[$routename]['execute'],$exe);
 
-			// clear flash on every application execution.
-			$this->exe->flash->clear();
+			// clear flash on every application execution (only if it has started).
+			if(\Exedra\Application\Session\Session::hasStarted())
+				$this->exe->flash->clear();
+			
 			return $execution;
 		}
 		catch(\Exception $e)
