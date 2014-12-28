@@ -35,8 +35,12 @@ class Executor
 						{
 							$middlewares[0] = $closure;
 						}
+						else
+						{
+							return $exe->exception->create("The file located in '".$middlewares[0]."' must be a returned closure.");
+						}
 					}
-					// has middleware=
+					// has middleware=, if no method was passed, will use handle as method name.
 					else if(strpos($middlewares[0], "middleware=") === 0)
 					{
 						$middleware = str_replace("middleware=", "", $middlewares[0]);

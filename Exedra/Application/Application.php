@@ -146,7 +146,7 @@ class Application
 			else
 			{
 				$routeName	= $this->currentRoute['name'];
-				return "<pre><hr><u>Execution Exception :</u>\nRoute : $routeName\n".$e->getMessage()."<hr>";
+				return "<pre><hr><u>Execution Exception :</u>\n".$e->getMessage()."<hr>";
 			}
 		}
 	}
