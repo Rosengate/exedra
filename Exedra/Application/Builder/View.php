@@ -24,10 +24,9 @@ class View
 	 */
 	public function create($path,$data = array())
 	{
-		$path	= $path.".php";
-		$path	= $this->structure->get("view",$path,$this->dir);
+		$path = $this->buildPath($path);
 		
-		if(!file_exists($path))
+		if(!$this->has($path, false))
 			$this->exe->exception->create("Unable to find view '$path'");
 
 		if(count($this->defaultData) > 0)
@@ -36,6 +35,27 @@ class View
 		$view	= new \Exedra\Application\Response\View($path,$data,$this->loader);
 		
 		return $view;
+	}
+
+	private function buildPath($path)
+	{
+		$path	= $path.".php";
+		$path	= $this->structure->get("view",$path,$this->dir);
+
+		return $path;
+	}
+
+	/**
+	 * Return boolean of existence for the given path name.
+	 */
+	public function has($path, $build = true)
+	{
+		if($build)
+		{
+			$path = $this->buildPath($path);
+		}
+
+		return file_exists($path);
 	}
 
 	/**
