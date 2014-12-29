@@ -4,7 +4,7 @@ namespace Exedra\Application\Execution;
 class Exec
 {
 	/* application instance */
-	private $app;
+	public $app;
 
 	/* route information */
 	public $absoluteRoute;

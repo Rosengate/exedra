@@ -14,6 +14,13 @@ class Url
 
 		if($exe)
 			$this->exe	= $exe;
+
+		// if app.config has both base url and asset url.
+		if($app->config->has('url.base'))
+			$this->setBase($app->config->get('url.base'));
+
+		if($app->config->has('url.asset'))
+			$this->setAsset($app->config->get('url.asset'));
 	}
 
 	/*public function setRoutePrefix($prefix)

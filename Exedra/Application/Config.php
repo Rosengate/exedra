@@ -4,8 +4,16 @@ class Config
 {
 	private $storage = array();
 
-	public function set($key,$value)
+	public function set($key,$value = null)
 	{
+		if(is_array($key))
+		{
+			foreach($key as $k=>$v)
+				$this->set($k, $v);
+
+			return $this;
+		}
+
 		\Exedra\Functions\Arrays::setByNotation($this->storage,$key,$value);
 		return $this;
 	}

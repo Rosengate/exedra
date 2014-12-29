@@ -49,8 +49,9 @@ class Application
 		$this->di = new \Exedra\Application\DI(array(
 			"request"=>$this->exedra->httpRequest,
 			"map"=> function() use($app) {return new \Exedra\Application\Map\Map($app);},
+			"config"=> array("\Exedra\Application\Config"),
 			"session"=> array("\Exedra\Application\Session\Session"),
-			"exception"=> array("\Exedra\Application\Builder\Exception")
+			"exception"=> array("\Exedra\Application\Builder\Exception"),
 			),$this);
 	}
 
