@@ -1,12 +1,12 @@
 <?php
-namespace Exedra\Application;
+namespace Exedra\Application\Structure;
 
 class Loader
 {
 	private $loaded;
 	public $structure;
 
-	public function __construct(\Exedra\Application\Structure $structure)
+	public function __construct(Structure $structure)
 	{
 		$this->structure	= $structure;
 	}

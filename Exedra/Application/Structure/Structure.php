@@ -1,5 +1,5 @@
 <?php
-namespace Exedra\Application;
+namespace Exedra\Application\Structure;
 
 class Structure
 {

@@ -43,8 +43,8 @@ class Application
 	{
 		$app = $this;
 
-		$this->structure = new \Exedra\Application\Structure($this->name);
-		$this->loader = new \Exedra\Application\Loader($this->structure);
+		$this->structure = new \Exedra\Application\Structure\Structure($this->name);
+		$this->loader = new \Exedra\Application\Structure\Loader($this->structure);
 
 		$this->di = new \Exedra\Application\DI(array(
 			"request"=>$this->exedra->httpRequest,
@@ -52,12 +52,16 @@ class Application
 			"config"=> array("\Exedra\Application\Config"),
 			"session"=> array("\Exedra\Application\Session\Session"),
 			"exception"=> array("\Exedra\Application\Builder\Exception"),
-			),$this);
+			));
 	}
 
 	public function __get($property)
 	{
-		return $this->di->get($property);
+		if($this->di->has($property))
+		{
+			$this->$property = $this->di->get($property);
+			return $this->$property;
+		}
 	}
 
 	## return current execution result.

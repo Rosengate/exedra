@@ -51,12 +51,16 @@ class Exec
 			"exception"=> array("\Exedra\Application\Builder\Exception", array($this)),
 			"form"=> array("\Exedra\Application\Utilities\Form", array($this)),
 			"session"=> function() use($app) {return $app->session;}
-			), $this);
+			));
 	}
 
 	public function __get($property)
 	{
-		return $this->di->get($property);
+		if($this->di->has($property))
+		{
+			$this->$property = $this->di->get($property);
+			return $this->$property;
+		}
 	}
 
 	public function next()
