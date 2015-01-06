@@ -13,17 +13,19 @@ The first unreleased version of exedra has quite constraining ungroupable routin
 
 Documentation
 ======
-Documentation for exedra is currently hosted here : http://exedra.rosengate.com
+Documentation and the homebase for exedra is currently hosted here : http://exedra.rosengate.com
 
 Examples
 ======
-Some projects has been built on top of exedra :
+Some of the projects built on top of exedra :
+
 http://github.com/rosengate/exedra-web (hosted at exedra.rosengate.com)
+
 http://github.com/eimihar/persona (hosted at persona.rosengate.com)
 
 Development
 ======
-Some components has been built, such as MVC and URL builder, session, validator, form helper et cetera.
+Some components have been built, such as MVC and URL builder, session, validator, form helper et cetera. Refer documentation for latest updates.
 
 Receptions
 ======
