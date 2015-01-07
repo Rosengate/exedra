@@ -9,8 +9,9 @@ class View
 	private $required 	= Array();
 	private $callbacks	= Array();
 
-	public function __construct($path = null,$data = null,$loader)
+	public function __construct($exe, $path = null,$data = null,$loader)
 	{
+		$this->exe = $exe;
 		if($path) $this->setPath($path);
 		if($data) $this->set($data);
 		$this->loader = $loader;
@@ -129,16 +130,16 @@ class View
 	{
 		## has required.
 		if($requiredArgs = $this->requirementCheck())
-			return $this->exe->excepton->create('View.render : Missing required argument(s) for view ("'. $this->path .'") : <br> '. $requiredArgs .'</b>');
+			return $this->exe->exception->create('View.render : Missing required argument(s) for view ("'. $this->path .'") : '. $requiredArgs .'</b>');
 
 		## resolve any related callback.
 		$this->callbackResolve();
 
 		if($this->path == null)
-			return $this->exe->excepton->create('View.render : path was not set (null)');
+			return $this->exe->exception->create('View.render : path was not set (null)');
 
 		if(!file_exists($this->path))
-			return $this->exe->excepton->create('View.render : Path "'. $this->path .'"" does not exist');
+			return $this->exe->exception->create('View.render : Path "'. $this->path .'"" does not exist');
 
 		$this->loader->load($this->path,$this->data);
 	}
