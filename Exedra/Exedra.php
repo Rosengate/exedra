@@ -12,6 +12,8 @@ class Exedra
 	## Executed application.
 	var $executionResult	= null;
 
+	private $baseDir;
+
 	public function __construct($dir)
 	{
 		$this->exedraLoader	= new ExedraLoader();
@@ -29,11 +31,19 @@ class Exedra
 
 		## parser.
 		$this->parser		= new \Exedra\Exedrian\Parser;
+
+		## baseDir
+		$this->baseDir = $dir;
 	}
 
 	public function registerAutoload($dir)
 	{
 		$this->exedraLoader->registerAutoload($dir);
+	}
+
+	public function getBaseDir()
+	{
+		return $this->baseDir;
 	}
 
 	/**

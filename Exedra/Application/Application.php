@@ -52,6 +52,7 @@ class Application
 			"config"=> array("\Exedra\Application\Config"),
 			"session"=> array("\Exedra\Application\Session\Session"),
 			"exception"=> array("\Exedra\Application\Builder\Exception"),
+			'file'=> array('\Exedra\Application\Builder\File', array($this))
 			));
 	}
 
@@ -62,6 +63,11 @@ class Application
 			$this->$property = $this->di->get($property);
 			return $this->$property;
 		}
+	}
+
+	public function getAppName()
+	{
+		return $this->name;
 	}
 
 	## return current execution result.

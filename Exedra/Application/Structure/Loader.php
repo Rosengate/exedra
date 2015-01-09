@@ -5,10 +5,12 @@ class Loader
 {
 	private $loaded;
 	public $structure;
+	private $dir;
 
-	public function __construct(Structure $structure)
+	public function __construct(Structure $structure, $dir = null)
 	{
 		$this->structure	= $structure;
+		$this->dir = $dir;
 	}
 
 	public function isLoadable($file)

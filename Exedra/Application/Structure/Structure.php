@@ -21,7 +21,8 @@ class Structure
 			"view"			=>"view",
 			"route"			=>"routes",
 			"documents"		=>"documents",
-			"middleware"	=>"middleware"
+			"middleware"	=>"middleware",
+			"storage"		=>"storage"
 			);
 
 		$this->character = array(
@@ -48,6 +49,11 @@ class Structure
 	public function getAppName()
 	{
 		return $this->appName;
+	}
+
+	public function register()
+	{
+		
 	}
 
 	## prefix, add just after the app name. suffix add at the end of structure value.
