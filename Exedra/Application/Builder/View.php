@@ -32,7 +32,7 @@ class View
 		if(count($this->defaultData) > 0)
 			$data = array_merge($data, $this->defaultData);
 
-		$view	= new \Exedra\Application\Response\View($this->exe, $path,$data,$this->loader);
+		$view	= new Blueprint\View($this->exe, $path,$data,$this->loader);
 		
 		return $view;
 	}

@@ -1,5 +1,5 @@
 <?php
-namespace Exedra\Application\Response;
+namespace Exedra\Application\Builder\Blueprint;
 
 class View
 {
