@@ -1,5 +1,5 @@
 <?php
-namespace Exedra\Exedrian\HTTP;
+namespace Exedra\HTTP;
 
 class Request
 {

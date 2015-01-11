@@ -26,11 +26,8 @@ class Exedra
 		$this->exedraLoader->registerAutoload($dir);
 
 		## create http request.
-		$this->httpRequest	= new \Exedra\Exedrian\HTTP\Request;
-		$this->httpResponse = new \Exedra\Exedrian\HTTP\Response;
-
-		## parser.
-		$this->parser		= new \Exedra\Exedrian\Parser;
+		$this->httpRequest	= new \Exedra\HTTP\Request;
+		$this->httpResponse = new \Exedra\HTTP\Response;
 
 		## baseDir
 		$this->baseDir = $dir;
