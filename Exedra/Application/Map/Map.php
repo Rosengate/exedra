@@ -217,6 +217,8 @@ class Map
 			## subroute check.
 			$hasSubroute	= isset($routeData['subroute'])?true:false;
 
+			$hasExecution = isset($routeData['execute']);
+
 			## found, and assign pre_uri.
 			$routeMatch	= $this->validate($routeData,$query,$hasSubroute);
 
@@ -230,7 +232,7 @@ class Map
 				$routeReference['execution']	= isset($routeData['execute']) ? $routeData['execute'] : null;
 
 				## the third parameter is not an array, so just return true.
-				if(!$hasSubroute)
+				if(!$hasSubroute || ($hasSubroute && $hasExecution && $routeMatch['remaining_uri'] == ""))
 				{
 					return Array(
 							"result"=>true,
@@ -475,7 +477,7 @@ class Map
 
 			## pass remaining uri.
 			// $result['remaining_uri']	= implode("/",$new_uriR);  # old 
-			$result['remaining_uri']	= $routeURI != ""?implode("/",$new_uriR):$uri; 
+			$result['remaining_uri']	= $routeURI != ""?implode("/",$new_uriR):$uri;
 		}
 
 		## return matched, parameter founds, and remaining_uri (if deeproute)
