@@ -7,7 +7,6 @@ class Application
 	private $name				= null;
 	private $executor			= null;
 	public $router				= null;
-	public $response			= null;
 	public $structure			= null;
 	private $executionFailRoute	= null;
 	private $currentRoute		= null;
@@ -48,6 +47,7 @@ class Application
 
 		$this->di = new \Exedra\Application\DI(array(
 			"request"=>$this->exedra->httpRequest,
+			"response"=>$this->exedra->httpResponse,
 			"map"=> function() use($app) {return new \Exedra\Application\Map\Map($app);},
 			"config"=> array("\Exedra\Application\Config"),
 			"session"=> array("\Exedra\Application\Session\Session"),
