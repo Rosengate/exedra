@@ -34,11 +34,30 @@ class Di
 	}
 
 	/**
+	 * Magically alias to get.
+	 * @param string dependency
+	 * @return this->get(dependency)
+	 */
+	public function __get($dependency)
+	{
+		return $this->get($dependency);
+	}
+
+	/**
+	 * Magically you can pass additional argument you want to the dependency constructor.
+	 */
+	public function __call($dependency, $args)
+	{
+		if(isset($this->registry[$dependency]))
+			return $this->get($dependency, $args);
+	}
+
+	/**
 	 * Resolve the dependency
 	 * @param string property
 	 * @return mixed
 	 */
-	public function get($dependency)
+	public function get($dependency, $args = array())
 	{
 		if(isset($this->storage[$dependency]))
 			return $this->storage[$dependency];
@@ -47,7 +66,7 @@ class Di
 
 		if($class instanceof \Closure)
 		{
-			$val	= $class();
+			$val	= call_user_func_array($class, $args);
 		}
 		else if(is_object($class))
 		{
@@ -55,12 +74,24 @@ class Di
 		}
 		else if(!isset($class[1]))
 		{
-			$val	= new $class[0];
+			if(count($args) > 0)
+			{
+				$reflection	= new \ReflectionClass($class[0]);
+				$obj	= $reflection->newInstanceArgs($args);
+
+				$val	= $obj;
+			}
+			else
+			{
+				$val = new $class[0];
+			}
 		}
 		else
 		{
+			// merge with passed argument if has any.
+			$args = array_merge($class[1], $args);
 			$reflection	= new \ReflectionClass($class[0]);
-			$obj	= $reflection->newInstanceArgs($class[1]);
+			$obj	= $reflection->newInstanceArgs($args);
 
 			$val	= $obj;
 		}
