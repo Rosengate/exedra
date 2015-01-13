@@ -3,9 +3,10 @@ namespace Exedra\Application;
 
 class Di
 {
-	private $storage;
-	private $registry = array();
-	private $dependency = array();
+	protected $storage;
+	protected $registry = array();
+	protected $dependency = array();
+	public $save = true;
 
 	public function __construct($registries = null)
 	{
@@ -46,10 +47,12 @@ class Di
 	/**
 	 * Magically you can pass additional argument you want to the dependency constructor.
 	 */
-	public function __call($dependency, $args)
+	public function __call($dependency, $args = array())
 	{
 		if(isset($this->registry[$dependency]))
+		{
 			return $this->get($dependency, $args);
+		}
 	}
 
 	/**
@@ -57,7 +60,7 @@ class Di
 	 * @param string property
 	 * @return mixed
 	 */
-	public function get($dependency, $args = array())
+	public function get($dependency, $args = false)
 	{
 		if(isset($this->storage[$dependency]))
 			return $this->storage[$dependency];
@@ -66,7 +69,7 @@ class Di
 
 		if($class instanceof \Closure)
 		{
-			$val	= call_user_func_array($class, $args);
+			$val	= is_array($args) ? call_user_func_array($class, $args) : $class();
 		}
 		else if(is_object($class))
 		{
@@ -74,7 +77,7 @@ class Di
 		}
 		else if(!isset($class[1]))
 		{
-			if(count($args) > 0)
+			if(is_array($args) && count($args) > 0)
 			{
 				$reflection	= new \ReflectionClass($class[0]);
 				$obj	= $reflection->newInstanceArgs($args);
@@ -89,14 +92,20 @@ class Di
 		else
 		{
 			// merge with passed argument if has any.
-			$args = array_merge($class[1], $args);
+			if(is_array($args))
+				$classArgs = array_merge($class[1], $args);
+			else
+				$classArgs = $class[1];
+
 			$reflection	= new \ReflectionClass($class[0]);
-			$obj	= $reflection->newInstanceArgs($args);
+			$obj	= $reflection->newInstanceArgs($classArgs);
 
 			$val	= $obj;
 		}
 
-		$this->storage[$dependency] = $val;
+		// only save if the flag is true, and no constructer was passed. (args === false)
+		if($this->save && $args === false)
+			$this->storage[$dependency] = $val;
 
 		return $this->storage[$dependency];
 
