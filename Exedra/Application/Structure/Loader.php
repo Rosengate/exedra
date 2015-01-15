@@ -29,6 +29,12 @@ class Loader
 		return $file;
 	}
 
+	/**
+	 * Required the file.
+	 * @param string file
+	 * @param array data
+	 * @return required file
+	 */
 	public function load($file,$data = null)
 	{
 		$file = $this->refinePath($file);
@@ -44,6 +50,11 @@ class Loader
 		return require_once $file;
 	}
 
+	/**
+	 * Get the content of file of the path
+	 * @param string file name
+	 * @return file content
+	 */
 	public function getContent($file)
 	{
 		$file = $this->refinePath($file);

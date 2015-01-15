@@ -12,21 +12,57 @@ class Executor
 		$this->app	= $app;
 	}
 
+	private function resolveMiddleware(&$middlewares)
+	{
+		foreach($middlewares as $no=>$middleware)
+		{
+			if(is_string($middlewares[$no]))
+			{
+				if($this->app->loader->isLoadable($middlewares[$no]))
+				{
+					$closure = $this->app->loader->load($middlewares[$no]);
+					if($closure instanceof \Closure)
+					{
+						$middlewares[$no] = $closure;
+					}
+					else
+					{
+						return $exe->exception->create("The file located in '".$middlewares[$no]."' must be a returned closure.");
+					}
+				}
+				// has middleware=, if no method was passed, will use handle as method name.
+				else if(strpos($middlewares[$no], "middleware=") === 0)
+				{
+					$middleware = str_replace("middleware=", "", $middlewares[$no]);
+
+					$atoms = explode("@", $middleware);
+					
+					$middleware = $atoms[0];
+					$handler = isset($atoms[1]) ? $atoms[1] : "handle";
+
+					$middlewares[$no] = function($exe) use($middleware, $handler) {$exe->middleware->create($middleware)->$handler($exe);};
+				}
+			}
+		}
+	}
+
 	public function execute($execution,$exe)
 	{
 		if(is_object($execution))
 		{
 			if($this->binder->hasBind("middleware"))
 			{
-				$middlewares			= $this->binder->getBind("middleware");
+				$middlewares = $this->binder->getBind("middleware");
 
-				$exe->containers			= $middlewares;
+				$this->resolveMiddleware($middlewares);
 
-				## set the last of the container as execution.
+				$exe->containers = $middlewares;
+
+				// set the last of the container as execution.
 				$exe->containers[count($middlewares)]	= $execution;
 
 				// has ':' as splitter between load path and filename
-				if(is_string($middlewares[0]))
+				/*if(is_string($middlewares[0]))
 				{
 					if($this->app->loader->isLoadable($middlewares[0]))
 					{
@@ -52,8 +88,7 @@ class Executor
 
 						$middlewares[0] = function($exe) use($middleware, $handler) {$exe->middleware->create($middleware)->$handler($exe);};
 					}
-				}
-
+				}*/
 
 				$exe	= $middlewares[0]($exe);
 			}

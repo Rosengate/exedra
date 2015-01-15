@@ -28,14 +28,14 @@ class Url
 		$this->routePrefix = $prefix;
 	}*/
 
-	public function base()
+	public function base($uri = null)
 	{
-		return trim($this->baseUrl,"/");
+		return trim($this->baseUrl, '/' ).($uri ? '/' . trim($uri, '/') : '');
 	}
 
-	public function asset($asset)
+	public function asset($asset = null)
 	{
-		return trim($this->assetUrl,"/")."/".$asset;
+		return trim($this->assetUrl,"/").($asset ? "/". trim($asset, '/') : '');
 	}
 
 	public function setBase($baseUrl)

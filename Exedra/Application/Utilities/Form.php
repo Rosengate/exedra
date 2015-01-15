@@ -1,5 +1,4 @@
-<?php
-namespace Exedra\Application\Utilities;
+<?php namespace Exedra\Application\Utilities;
 
 class Form
 {

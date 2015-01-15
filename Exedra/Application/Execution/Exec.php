@@ -12,7 +12,7 @@ class Exec
 	private $routePrefix = null;
 
 	/* pointer each time  */
-	private $containerPointer	= 1;
+	private $middlewarePointer	= 1;
 
 	/* registered objects */
 	private $registered	= Array();
@@ -66,10 +66,10 @@ class Exec
 
 	public function next()
 	{
-		if(!$this->containers[$this->containerPointer])
+		if(!isset($this->containers[$this->middlewarePointer]))
 			$this->exception->create("Exceeded execution container(s)");
 
-		return call_user_func_array($this->containers[$this->containerPointer++], func_get_args());
+		return call_user_func_array($this->containers[$this->middlewarePointer++], func_get_args());
 	}
 
 	public function param($name = null)

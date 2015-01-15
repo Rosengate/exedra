@@ -1,5 +1,4 @@
-<?php
-namespace Exedra\Application;
+<?php namespace Exedra\Application;
 
 class Di
 {

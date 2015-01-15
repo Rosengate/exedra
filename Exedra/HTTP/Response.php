@@ -142,6 +142,15 @@ class Response
 	}
 
 	/**
+	 * redirect.
+	 */
+	public function redirect($url)
+	{
+		$this->setStatus(302);
+		$this->header('location', $url);die;
+	}
+
+	/**
 	 * create a header for download.
 	 * @param string filename
 	 * @return this

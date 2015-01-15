@@ -1,9 +1,13 @@
-<?php
-namespace Exedra\Application\Utilities;
+<?php namespace Exedra\Application\Utilities;
 
 class Validator
 {
-	public function validate($item,$rules)
+	/**
+	 * Validate an associative data.
+	 * @param array item
+	 * @param array rules for the data.
+	 */
+	public function validate($item, $rules)
 	{
 		$result	= Array();
 		$checked	= Array();
@@ -98,6 +102,14 @@ class Validator
 	}
 
 	### return result with based on : _all, except:, and list,of,item
+	/**
+	 * Filter the given data with string based filter.
+	 * @param array list
+	 * @param string param
+	 * @param mixed isAssoc
+	 * @param boolean createnonexistcolumn (not sure what)
+	 * @return filtered data. 
+	 */
 	public function filter_array($listR,$param,$isAssoc = null,$createnonexistcolumn = false)
 	{
 		$isAssoc	= $isAssoc === true?true:($isAssoc === false?false:(array_values($listR) === $listR?false:true));

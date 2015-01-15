@@ -4,6 +4,12 @@ class Config
 {
 	private $storage = array();
 
+	/**
+	 * Set config value
+	 * @param mixed key or array
+	 * @param mixed value
+	 * @return this
+	 */
 	public function set($key,$value = null)
 	{
 		if(is_array($key))
@@ -18,11 +24,20 @@ class Config
 		return $this;
 	}
 
+	/**
+	 * Get config value
+	 * @param key
+	 * @return value
+	 */
 	public function get($key)
 	{
 		return \Exedra\Functions\Arrays::getByNotation($this->storage,$key);
 	}
 
+	/**
+	 * Check key existence.
+	 * @param string key.
+	 */
 	public function has($key)
 	{
 		return \Exedra\Functions\Arrays::hasByNotation($this->storage,$key);

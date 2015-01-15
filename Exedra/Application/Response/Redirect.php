@@ -10,7 +10,7 @@ class Redirect
 
 	final public function toUrl($url)
 	{
-		header("location:$url");die;
+		return $this->exe->response->redirect($url);
 	}
 
 	public function flash($key, $val = null)
@@ -30,7 +30,6 @@ class Redirect
 			return $this->refresh();
 
 		$url = $this->exe->url->create($route, $params);
-
 		return $this->toUrl($url);
 	}
 }

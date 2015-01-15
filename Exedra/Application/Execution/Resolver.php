@@ -11,7 +11,7 @@ class Resolver
 
 			switch($type)
 			{
-				case "Exedra\Application\Response\View":
+				case "Exedra\Application\Builder\Blueprint\View":
 					return $result->render();
 				break;
 			}

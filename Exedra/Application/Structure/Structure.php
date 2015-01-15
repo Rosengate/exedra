@@ -3,18 +3,18 @@ namespace Exedra\Application\Structure;
 
 class Structure
 {
-	private $path;
-	private $pattern;
-	private $data;
-	public $appName;
+	protected $paths;
+	protected $patterns;
+	protected $characters;
+	protected $basePath;
 
-	public function __construct($appName)
+	public function __construct($basePath)
 	{
-		## main container for application.
-		$this->appName			= $appName;
+		// application base path
+		$this->setBasePath($basePath);
 
-		## default path name.
-		$this->data			= Array(
+		// default path
+		$this->set(array(
 			"controller"	=>"controller",
 			"model"			=>"model",
 			"config"		=>"config",
@@ -22,23 +22,19 @@ class Structure
 			"route"			=>"routes",
 			"documents"		=>"documents",
 			"middleware"	=>"middleware",
-			"storage"		=>"storage"
-			);
+			"storage"		=>"storage"));
 
-		$this->character = array(
-			"absolute"		=>"@"
-			);
+		$this->setCharacter('absolute', '@');
 
-		$this->pattern	= Array(
-			"controller_name"=>function($val)
-				{
-					return "Controller".str_replace(" ","",ucwords(str_replace("/", " ", $val)));
-				},
-			"middleware_name"=>function($val)
-				{
-					return "Middleware".str_replace(" ", "", ucwords(str_replace("/", " ", $val)));
-				}
-			);
+		$this->setPattern('controller_name', function($val)
+		{
+			return "Controller".str_replace(" ","",ucwords(str_replace("/", " ", $val)));
+		});
+
+		$this->setPattern('middleware_name', function($val)
+		{
+			return "Middleware".str_replace(" ", "", ucwords(str_replace("/", " ", $val)));
+		});
 	}
 
 	private function refinePath($paths)
@@ -46,21 +42,32 @@ class Structure
 		return implode("/",$paths);
 	}
 
-	public function getAppName()
+	/**
+	 * Set base directory. basically this framework will default it to 'app'.
+	 */
+	public function setBasePath($path)
+	{
+		$this->basePath = $path != null ? $path : 'app';
+	}
+
+
+	/*public function getAppName()
 	{
 		return $this->appName;
-	}
-
-	public function register()
-	{
-		
-	}
+	}*/
 
 	## prefix, add just after the app name. suffix add at the end of structure value.
+	/**
+	 * Get the structure path.
+	 * @param string name of the structure
+	 * @param string additional suffix 
+	 * @param string prefix before the suffix.
+	 * @return string path.
+	 */
 	public function get($name,$suffix = null,$prefix = null)
 	{
-		$paths	= Array();
-		$paths[]	= $this->appName;
+		$paths = array();
+		$paths[] = $this->basePath;
 
 		if($prefix)
 		{
@@ -73,10 +80,10 @@ class Structure
 			}
 		}
 
-		if(!isset($this->data[$name]))
+		if(!isset($this->paths[$name]))
 			throw new \Exception("Structure '$name' does not exist");
 
-		$paths[]	= $this->data[$name];
+		$paths[]	= $this->paths[$name];
 
 		## Exception : directory for this path does not exists.
 		if(!is_dir($temp = $this->refinePath($paths)))
@@ -96,17 +103,68 @@ class Structure
 		return $this->refinePath($paths);
 	}
 
-	public function getCharacter($key)
+	/**
+	 * Set the structure path
+	 * @param mixed key
+	 * @param mixed value
+	 */
+	public function set($key, $val = null)
 	{
-		return $this->character[$key];
+		if(is_array($key))
+		{
+			foreach($key as $k=>$v)
+				$this->set($k, $v);
+
+			return $this;
+		}
+
+		$this->paths[$key] = $val;
+
+		return $this;
 	}
 
+	/**
+	 * Get character.
+	 * @param string key
+	 * @return string character.
+	 */
+	public function getCharacter($key)
+	{
+		return $this->characters[$key];
+	}
+
+	public function setCharacter($key, $val)
+	{
+		$this->characters[$key] = $val;
+
+		return $this;
+	}
+
+	/**
+	 * Get pattern
+	 * @param string pattern
+	 * @param mixed val
+	 * @return something 
+	 */
 	public function getPattern($pattern,$val)
 	{
-		if(!isset($this->pattern[$pattern]))
+		if(!isset($this->patterns[$pattern]))
 			throw new \Exception("Structure : pattern called $pattern does not exists.");
 
-		return $this->pattern[$pattern]($val);
+		return $this->patterns[$pattern]($val);
+	}
+
+	/**
+	 * Create or set a pattern.
+	 * @param string key
+	 * @param callback callback
+	 * @return this
+	 */
+	public function setPattern($key, $callback)
+	{
+		$this->patterns[$key] = $callback;
+
+		return $this;
 	}
 }
 

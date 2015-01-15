@@ -1,5 +1,4 @@
-<?php
-namespace Exedra\Application;
+<?php namespace Exedra\Application;
 
 class Application
 {
@@ -12,7 +11,12 @@ class Application
 	private $currentRoute		= null;
 	private $currentExe 		= null;
 
-	public function __construct($name,$exedra)
+	/**
+	 * Create a new application
+	 * @param string name (application name)
+	 * @param \Exedra\Exedra exedra instance
+	 */
+	public function __construct($name, $exedra)
 	{
 		$this->name = $name;
 		$this->exedra = $exedra;
@@ -31,14 +35,18 @@ class Application
 	}
 
 	/**
-	 * Alias for top method.
+	 * Alias for above method.
+	 * @param string routename
 	 */
 	public function setFailRoute($routename)
 	{
 		$this->setExecutionFailRoute($routename);
 	}
 
-	public function register()
+	/**
+	 * Register dependencies.
+	 */
+	private function register()
 	{
 		$app = $this;
 
@@ -65,6 +73,10 @@ class Application
 		}
 	}
 
+	/**
+	 * Get application name
+	 * @return string application name
+	 */
 	public function getAppName()
 	{
 		return $this->name;
