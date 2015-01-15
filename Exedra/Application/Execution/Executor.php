@@ -3,13 +3,13 @@ namespace Exedra\Application\Execution;
 
 class Executor
 {
-	private $controller	= null;
+	protected $controller;
+	protected $middlewares;
 	
-	public function __construct( $controller, $binder, $app )
+	public function __construct(\Exedra\Application\Execution\Binder $binder, \Exedra\Application\Structure\Loader $loader)
 	{
-		$this->controller 	= $controller;
-		$this->binder		= $binder;
-		$this->app	= $app;
+		$this->binder = $binder;
+		$this->loader = $loader;
 	}
 
 	private function resolveMiddleware(&$middlewares)
@@ -18,9 +18,9 @@ class Executor
 		{
 			if(is_string($middlewares[$no]))
 			{
-				if($this->app->loader->isLoadable($middlewares[$no]))
+				if($this->loader->isLoadable($middlewares[$no]))
 				{
-					$closure = $this->app->loader->load($middlewares[$no]);
+					$closure = $this->loader->load($middlewares[$no]);
 					if($closure instanceof \Closure)
 					{
 						$middlewares[$no] = $closure;
@@ -30,7 +30,7 @@ class Executor
 						return $exe->exception->create("The file located in '".$middlewares[$no]."' must be a returned closure.");
 					}
 				}
-				// has middleware=, if no method was passed, will use handle as method name.
+				// has middleware builder.
 				else if(strpos($middlewares[$no], "middleware=") === 0)
 				{
 					$middleware = str_replace("middleware=", "", $middlewares[$no]);
@@ -38,9 +38,12 @@ class Executor
 					$atoms = explode("@", $middleware);
 					
 					$middleware = $atoms[0];
-					$handler = isset($atoms[1]) ? $atoms[1] : "handle";
 
-					$middlewares[$no] = function($exe) use($middleware, $handler) {$exe->middleware->create($middleware)->$handler($exe);};
+					// if no method was passed, will use handle as method name.
+					$method = isset($atoms[1]) ? $atoms[1] : "handle";
+
+					// create a handler.
+					$middlewares[$no] = function($exe) use($middleware, $method) {$exe->middleware->create($middleware)->$method($exe);};
 				}
 			}
 		}
@@ -52,49 +55,20 @@ class Executor
 		{
 			if($this->binder->hasBind("middleware"))
 			{
-				$middlewares = $this->binder->getBind("middleware");
+				$exe->middlewares = new \ArrayIterator($this->binder->getBind("middleware"));
 
-				$this->resolveMiddleware($middlewares);
-
-				$exe->containers = $middlewares;
+				$this->resolveMiddleware($exe->middlewares);
 
 				// set the last of the container as execution.
-				$exe->containers[count($middlewares)]	= $execution;
+				$exe->middlewares->offsetSet($exe->middlewares->count(), $execution);
 
-				// has ':' as splitter between load path and filename
-				/*if(is_string($middlewares[0]))
-				{
-					if($this->app->loader->isLoadable($middlewares[0]))
-					{
-						$closure = $this->app->loader->load($middlewares[0]);
-						if($closure instanceof \Closure)
-						{
-							$middlewares[0] = $closure;
-						}
-						else
-						{
-							return $exe->exception->create("The file located in '".$middlewares[0]."' must be a returned closure.");
-						}
-					}
-					// has middleware=, if no method was passed, will use handle as method name.
-					else if(strpos($middlewares[0], "middleware=") === 0)
-					{
-						$middleware = str_replace("middleware=", "", $middlewares[0]);
+				$exe->middlewares->rewind();
 
-						$atoms = explode("@", $middleware);
-						
-						$middleware = $atoms[0];
-						$handler = isset($atoms[1]) ? $atoms[1] : "handle";
-
-						$middlewares[0] = function($exe) use($middleware, $handler) {$exe->middleware->create($middleware)->$handler($exe);};
-					}
-				}*/
-
-				$exe	= $middlewares[0]($exe);
+				$exe = $exe->middlewares[0]($exe);
 			}
 			else
 			{
-				$exe	= $execution($exe);
+				$exe= $execution($exe);
 			}
 
 			return Resolver::resolve($exe);

@@ -157,7 +157,7 @@ class Application
 			$exe	= new Execution\Exec($routename, $this, $parameter, $config, $subapp);
 
 			$this->exe	= $exe;
-			$executor	= new Execution\Executor($this->controller,new Execution\Binder($binds),$this);
+			$executor	= new Execution\Executor(new Execution\Binder($binds), $this->loader);
 			$execution	= $executor->execute($route[$routename]['execute'],$exe);
 
 			// clear flash on every application execution (only if it has started).
