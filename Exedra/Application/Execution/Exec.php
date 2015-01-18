@@ -7,7 +7,7 @@ class Exec
 	public $app;
 
 	/* route information */
-	public $absoluteRoute;
+	public $route;
 	public $params	= Array();
 	private $routePrefix = null;
 
@@ -25,9 +25,9 @@ class Exec
 
 	public $config;
 
-	public function __construct($route, $app, $params, $config, $subapp = null)
+	public function __construct(\Exedra\Application\Map\Route $route, $app, $params, $config, $subapp = null)
 	{
-		$this->absoluteRoute = $route;
+		$this->route = $route;
 		$this->app = $app;
 		$this->subapp = $subapp;
 		$this->config = $config;
@@ -66,9 +66,6 @@ class Exec
 
 	public function next()
 	{
-		// if(!isset($this->middlewares[$this->middlewarePointer]))
-		// 	$this->exception->create("Exceeded execution container(s)");
-
 		// move to next middleware
 		$this->middlewares->next();
 		return call_user_func_array($this->middlewares->current(), func_get_args());
@@ -126,7 +123,7 @@ class Exec
 	*/
 	private function getAbsoluteRoute()
 	{
-		return $this->absoluteRoute;
+		return $this->route->absoluteRoute;
 	}
 
 	public function getParentRoute()
@@ -142,12 +139,19 @@ class Exec
 		return $routePrefix;
 	}
 
+	/**
+	 * Set a route prefix for this execution.
+	 * @param string prefix
+	 */
 	public function setRoutePrefix($prefix)
 	{
 		$this->routePrefix = $prefix;
 	}
 
-	/* route prefix for this execution. if there's none, return null. */
+	/**
+	 * Get a prefix for this execution. Return null, if not set.
+	 * @return string prefix.
+	 */
 	public function getRoutePrefix()
 	{
 		if($this->routePrefix)
@@ -158,7 +162,10 @@ class Exec
 		return $routePrefix?$routePrefix:null;
 	}
 
-	// prefix the route with availiable routePrefix.
+	/**
+	 * Prefix the given route. Or return an absolute route, if absolute character was given at the beginning of the given string.
+	 * @param string route
+	 */
 	public function prefixRoute($route)
 	{
 		if(strpos($route, $this->app->structure->getCharacter('absolute')) === 0)
@@ -213,7 +220,7 @@ class Exec
 		}
 	}
 
-	public function addVariable($varName,$data)
+	/*public function addVariable($varName,$data)
 	{
 		if(!isset($this->$varName))
 			$this->$varName	= Array();
@@ -222,7 +229,7 @@ class Exec
 		{
 			\Exedra\Functions\Arrays::setByNotation($this->$varName,$key,$val);
 		}
-	}
+	}*/
 
 	public function execute($route,$parameter = array())
 	{

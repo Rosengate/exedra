@@ -5,10 +5,11 @@ class Binder
 {
 	private $list;
 
-	public function __construct($binds)
+	public function __construct(array $binds = array())
 	{
-		foreach($binds as $name=>$callback)
-			$this->bind($name,$callback);
+		if($binds)
+			foreach($binds as $name=>$callback)
+				$this->bind($name,$callback);
 	}
 
 	public function bind($name,$callback)

@@ -165,8 +165,8 @@ class Response
 	 * Send header on object destruct
 	 */
 	public function __destruct()
-	{
+	{/*
 		if(!headers_sent())
-			$this->send();
+			$this->send();*/
 	}
 }

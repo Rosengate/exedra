@@ -1,24 +1,26 @@
-<?php
-namespace Exedra\Application\Map;
+<?php namespace Exedra\Application\Map;
 
 class Map
 {
-	private $route 		= Array();
-	private $loader;
-	private $app		= null;
-	public $binds 		= Array();
-	public $config		= Array();
+	/**
+	 * Cache storage.
+	 * @var array
+	 */
+	private $cache = array();
 
-	## variables.
-	private $methodDelimiter	= ",";
+	/**
+	 * First level of this map.
+	 * @var \Exedra\Application\Map\Level
+	 */
+	protected $level;
 
 	public function __construct(\Exedra\Application\Application $app)
 	{
 		$this->app = $app;
-		$this->loader = $app->loader;
+		$this->level = new Level;
 	}
 
-	public function onRoute($routeName,$action,$param)
+	/*public function onRoute($routeName,$action,$param)
 	{
 		list($action,$actionExecution)	= explode(":",$action);
 
@@ -28,42 +30,61 @@ class Map
 			$this->bindRoute($routeName,$actionExecution,$param);
 			break;
 		}
+	}*/
+
+	/**
+	 * Add route to the first level on this map.
+	 * @param array $routes
+	 */
+	public function addRoute(array $routes)
+	{
+		foreach($routes as $name=>$routeData)
+			$this->level->addRoute(new Route($this->level, $name, $routeData));
+
+		return $this;
 	}
 
-	## Main function to add Route.
 	/**
-	 * Add route to the map.
-	 * @param mixed firstParam
-	 * @param mixed secondParam
+	 * Find route by the absolute name.
+	 * @param string name.
+	 * @return route or false.
 	 */
-	public function addRoute($firstParam,$secondParam = null)
+	public function findByName($name)
 	{
-		## second param was passed, it's adding subroute.
-		if($secondParam && is_string($firstParam))
+		if(isset($this->cache[$name]))
 		{
-			$routes	= $secondParam;
-			$routeStorage	= &$this->_getRoute($firstParam);
-			$routeStorage	= &$routeStorage['subroute'];
-		}
-		## add route on upmost level.
-		else if(is_string($firstParam))
-		{
-			$routes			= $this->parseRoute($firstParam);
-			$routeStorage	= &$this->route;
+			$route = $this->cache[$name];
 		}
 		else
 		{
-			$routes			= $firstParam;
-			$routeStorage	= &$this->route;
+			$route = $this->level->findRouteByName($name);
+
+			// save this finding.
+			$this->cache[$name] = $route;
 		}
 
-		## sanitize route.
-		$route	= $this->_addRoute($routes);
-
-		## merge 
-		$routeStorage	= array_merge($routeStorage,$route);
+		return $route ? $route : false ;
 	}
 
+	/**
+	 * Find route by parameters.
+	 * @param array query
+	 * @return array(
+	 *  	route => \Exedra\Application\Map\Route OR false if not found
+	 *		parameter => array
+	 *				)
+	 */
+	public function find(array $query)
+	{
+		$result = $this->level->query($query);
+
+		// rebuild
+		return array(
+			'route'=>$result['route'],
+			'parameter'=>isset($result['parameter']) ? $result['parameter'] : array()
+			);
+	}
+/*
 	private function _addRoute(&$routes,$parentRouteNames = Array())
 	{
 		$route	= Array();
@@ -495,7 +516,7 @@ class Map
 		return $this->validateURI(isset($routeData['uri'])?$routeData['uri']:null,isset($query['uri'])?$query['uri']:null,$deepRoute);
 	}
 
-	public function find($query)
+	public function find_old($query)
 	{
 		$result = array('result'=>false);
 
@@ -612,6 +633,8 @@ class Map
 
 		return Array("result"=>$result,"parameter"=>$parameter);
 	}
+
+	*/
 }
 
 

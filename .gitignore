@@ -1,1 +1,3 @@
 *.old
+vendor
+vendor/*

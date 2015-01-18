@@ -2,14 +2,41 @@
 
 class Application
 {
-	private $started			= false;
-	private $name				= null;
-	private $executor			= null;
-	public $router				= null;
-	public $structure			= null;
+	/**
+	 * Application name. Reflected as your directory name.
+	 * @var string
+	 */
+	private $name = null;
+
+	/**
+	 * Application structure
+	 * @var \Exedra\Application\Structure
+	 */
+	public $structure = null;
+
+	/**
+	 * Application based loader.
+	 * @var \Exedra\Application\Loader
+	 */
+	public $loader = null;
+
+	/**
+	 * Route for general exception handling.
+	 * @var string
+	 */
 	private $executionFailRoute	= null;
-	private $currentRoute		= null;
-	private $currentExe 		= null;
+
+	/**
+	 * Current executed route.
+	 * @var \Exedra\Application\Map\Route
+	 */
+	private $currentRoute = null;
+
+	/**
+	 * Current exec instance.
+	 * @var \Exedra\Application\Execution\Exec
+	 */
+	private $exe = null;
 
 	/**
 	 * Create a new application
@@ -82,12 +109,6 @@ class Application
 		return $this->name;
 	}
 
-	## return current execution result.
-	public function getResult()
-	{
-		return $this->currentResult;
-	}
-
 	/**
 	 * Get exedra instance
 	 * @return \Exedra\Exedra
@@ -107,8 +128,80 @@ class Application
 	{
 		try
 		{
+			if(is_string($query))
+			{
+				$route = $this->map->findByName($query);
+			}
+			else
+			{
+				$result = $this->map->find($query);
+				$route = $result['route'];
+
+				$parameter = count($result['parameter']) ? array_merge($parameter, $result['parameter']) : $parameter;
+			}
+
+			// route not found.
+			if(!$route)
+			{
+				if(is_array($query))
+				{
+					$q	= Array();
+					foreach($query as $k=>$v)
+						$q[] = $k.' : '.$v;
+
+					$msg = 'Query :<br>'.implode("<br>",$q);
+				}
+				else
+				{
+					$msg = 'Route : '.$query;
+				}
+
+				return $this->exception->create('Route not found. '.$msg);
+			}
+
+			$this->currentRoute = $route;
+			$subapp = null;
+			$binds = array();
+			$config = new \Exedra\Application\Config;
+
+			// loop all the related route. initiate subapp, bind and config.
+			foreach($route->getFullRoutes() as $route)
+			{
+				$subapp = $route->hasParameter('subapp') ? $route->getParameter('subapp') : $subapp;
+
+				// has middleware.
+				if($route->hasParameter('bind:middleware'))
+				{
+					$binds['middleware'][] = $route->getParameter('bind:middleware');
+				}
+
+				// initialize config
+				if($route->hasParameter('config'))
+				{
+					foreach($route->getParameter('config') as $key=>$val)
+						$config->set($key, $val);
+				}
+			}
+
+			// Prepare result parameter and automatically create controller and view builder.
+			$exe	= new Execution\Exec($route, $this, $parameter, $config, $subapp);
+
+			$this->exe	= $exe;
+			$executor	= new Execution\Executor(new Execution\Binder($binds), $this->loader);
+			$execution	= $executor->execute($route->getParameter('execute'),$exe);
+
+			// clear flash on every application execution (only if it has started).
+			if(\Exedra\Application\Session\Session::hasStarted())
+				$this->exe->flash->clear();
+			
+			return $execution;
+			/*
 			$query	= !is_array($query) && is_string($query) ?Array("route"=>$query):$query;
-			$result	= $this->map->find($query);
+
+			$result	= $this->map->finda($query);
+
+			echo "<pre>Original<br>";
+			print_r($result);die;
 
 			if(!$result)
 			{
@@ -120,6 +213,7 @@ class Application
 
 			$route		= $result['route'];
 			$routename	= $result['name'];
+
 			$parameter	= array_merge($result['parameters'],$parameter);
 
 			// save current route result.
@@ -164,7 +258,7 @@ class Application
 			if(\Exedra\Application\Session\Session::hasStarted())
 				$this->exe->flash->clear();
 			
-			return $execution;
+			return $execution;*/
 		}
 		catch(\Exception $e)
 		{
@@ -178,7 +272,7 @@ class Application
 			}
 			else
 			{
-				$routeName	= $this->currentRoute['name'];
+				$routeName	= $this->currentRoute->getAbsoluteName();
 				return "<pre><hr><u>Execution Exception :</u>\n".$e->getMessage()."<hr>";
 			}
 		}

@@ -57,17 +57,20 @@ class Url
 			$routeName		= $routePrefix?$routePrefix.".".$routeName:$routeName;
 		}*/
 
+
 		$routeName = $this->exe->prefixRoute($routeName);
 
 		## get route data by this name.
-		$route	= $this->app->map->getRoute($routeName);
+		$route	= $this->app->map->findByName($routeName);
 
 		if(!$route)
-		{
 			return $this->exe->exception->create("Unable to find route '$routeName'");
-		}
 
-		$uris	= Array();
+		$uri = $route->getAbsoluteUri($data);
+
+		return $this->baseUrl ? trim($this->baseUrl, '/') .'/'. $uri : $uri;
+
+		/*$uris	= Array();
 		foreach($route['route'] as $routeLevel=>$routeData)
 		{
 			$uri	= isset($routeData['uri'])?$routeData['uri']:false;
@@ -83,7 +86,7 @@ class Url
 		if($this->baseUrl)
 			$url	= trim($this->baseUrl,"/")."/".$url;
 
-		return $url;
+		return $url;*/
 	}
 
 	private function replaceSegments($segments,$data)
