@@ -29,7 +29,7 @@ class Level extends \ArrayIterator
 	 */
 	public function findRouteByName($routeName)
 	{
-		$routeNames = !is_array($routeName) ? explode(".", $routeName) : $routeName;
+		$routeNames = !is_array($routeName) ? explode(Route::$notation, $routeName) : $routeName;
 		$routeName = array_shift($routeNames);
 
 		$this->rewind();

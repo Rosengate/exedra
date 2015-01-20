@@ -8,18 +8,32 @@ class Route
 	/* array */
 	protected $absoluteName;
 
-	/* route parameters */
+	/* full routes. initiated by getFullRoutes() */
+	protected $fullRoutes = null;
+
+	/**
+	 * Route parameters
+	 * - method
+	 * - uri
+	 * - subapp
+	 * - middleware
+	 * - execute
+	 * - config
+	 */
 	protected $parameters = array();
 
 	/* level it's bound to */
 	protected $level;
 
+	/* notation */
+	public static $notation = '.';
+
 	public function __construct(Level $level, $name, array $parameters = array())
 	{
-		$notation = '.';
+		$notation = self::$notation;
 
 		$this->name = $name;
-		$this->absoluteName = $level->route ? $level->route->getAbsoluteName().$notation.$name : $name;
+		$this->absoluteName = $level->getUpperRoute() ? $level->getUpperRoute()->getAbsoluteName().$notation.$name : $name;
 		$this->level = $level;
 
 		// default uri.
@@ -29,9 +43,25 @@ class Route
 		{
 			foreach($parameters as $key=>$value)
 			{
-				$this->setParameter($key, $value);
+				$this->parseParameter($key, $value);
 			}
 		}
+	}
+
+	/**
+	 * Manual setter based on string.
+	 * @param string key
+	 * @param mixed value
+	 * @return this->set'Key'
+	 */
+	public function parseParameter($key, $value)
+	{
+		if($key == 'bind:middleware')
+			$key = 'middleware';
+
+		$method = 'set'.ucwords($key);
+
+		$this->$method($value);
 	}
 
 	/**
@@ -61,7 +91,9 @@ class Route
 	}
 
 	/**
-	 * @return uri of all of the related routes to this.
+	 * Get an absolute uri
+	 * @param params param for named parameter.
+	 * @return uri of all of the related routes to this, with replaced named parameter.
 	 */
 	public function getAbsoluteUri($params = array())
 	{
@@ -82,6 +114,10 @@ class Route
 	 */
 	public function getFullRoutes()
 	{
+		// if has saved already, return that.
+		if($this->fullRoutes != null)
+			return $this->fullRoutes;
+
 		$routes = array();
 		$routes[] = $this;
 		$level = $this->level;
@@ -94,7 +130,24 @@ class Route
 			$level = $route->getLevel();
 		}
 
-		return array_reverse($routes);
+		$this->fullRoutes = array_reverse($routes);
+
+		return $this->fullRoutes;
+	}
+
+	public function getParentRoute()
+	{
+		$notation = self::$notation;
+
+		$absoluteRoute	= $this->getAbsoluteRoute();
+		$absoluteRoutes	= explode($notation,$absoluteRoute);
+
+		if(count($absoluteRoutes) == 1)
+			return null;
+
+		array_pop($absoluteRoutes);
+		$parentRoute	= implode($notation,$absoluteRoutes);
+		return $parentRoute;
 	}
 
 	/**
@@ -178,7 +231,7 @@ class Route
 				$result = $this->validateURI($value);
 
 				if(!$result['matched'])
-					return array('route'=>false);
+					return array('route'=>false, 'parameter'=> array());
 
 				return array('route'=> $this, 'parameter'=> $result['parameter']);
 				break;
@@ -408,6 +461,63 @@ class Route
 	}
 
 	/**
+	 * Set method for this route.
+	 * @param mixed method (array of method, or /)
+	 */
+	public function setMethod($method)
+	{
+		$method = !is_array($method) ? explode(',', $method) : $method;
+		$this->setParameter('method', $method);
+	}
+
+	/**
+	 * Set config for this route.
+	 * @param array value
+	 */
+	public function setConfig(array $value)
+	{
+		return $this->setParameter('config', $value);
+	}
+
+	/**
+	 * Set execution parameter
+	 * @param mixed execute
+	 */
+	public function setExecute($execute)
+	{
+		$this->setParameter('execute', $execute);
+		return $this;
+	}
+
+	/**
+	 * Add new level on for this route.
+	 * @param array subroutes
+	 */
+	public function setSubroute(array $subroutes)
+	{
+		$subroutes = new Level($this, $subroutes);
+		return $this->setParameter('subroute', $subroutes);
+	}
+
+	/**
+	 * Set middleware on this route.
+	 * @param mixed middleware
+	 */
+	public function setMiddleware($middleware)
+	{
+		return $this->setParameter('middleware', $middleware);
+	}
+
+	/**
+	 * Set sub application under this route.
+	 * @param subapp
+	 */
+	public function setSubapp($subapp)
+	{
+		return $this->setParameter('subapp', $subapp);
+	}
+
+	/**
 	 * Generally get parameter.
 	 * @param string key
 	 * @return parameter value
@@ -441,7 +551,7 @@ class Route
 					$value = array('get', 'post', 'put', 'delete');
 			break;
 			case 'subroute':
-				$value = new Level($this, $value);
+				// $value = new Level($this, $value);
 			break;
 		}
 

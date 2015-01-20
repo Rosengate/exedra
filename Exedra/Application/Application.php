@@ -170,9 +170,9 @@ class Application
 				$subapp = $route->hasParameter('subapp') ? $route->getParameter('subapp') : $subapp;
 
 				// has middleware.
-				if($route->hasParameter('bind:middleware'))
+				if($route->hasParameter('middleware'))
 				{
-					$binds['middleware'][] = $route->getParameter('bind:middleware');
+					$binds['middleware'][] = $route->getParameter('middleware');
 				}
 
 				// initialize config

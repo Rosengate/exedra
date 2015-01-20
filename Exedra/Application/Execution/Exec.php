@@ -64,6 +64,9 @@ class Exec
 		}
 	}
 
+	/**
+	 * Point to the next handler, and execute that handler.
+	 */
 	public function next()
 	{
 		// move to next middleware
@@ -71,6 +74,11 @@ class Exec
 		return call_user_func_array($this->middlewares->current(), func_get_args());
 	}
 
+	/**
+	 * Get execution parameter(s)
+	 * @param string name
+	 * @return value
+	 */
 	public function param($name = null)
 	{
 		if(!$name) return $this->params;
@@ -98,7 +106,10 @@ class Exec
 		return $this->params;
 	}
 
-	/* absolute route substracted by prefix, return absoluteRoute if passed true. */
+	/**
+	 * absolute route substracted by prefix, return absoluteRoute if passed true.
+	 * @param boolean absolute, if true. will directly return absolute route.
+	 */
 	public function getRoute($absolute = false)
 	{
 		if(!$absolute)
@@ -120,14 +131,20 @@ class Exec
 
 	/** 
 	* get absolute route. 
+	* @return current route absolute name.
 	*/
 	private function getAbsoluteRoute()
 	{
-		return $this->route->absoluteRoute;
+		return $this->route->getAbsoluteName();
 	}
 
-	public function getParentRoute()
+	/**
+	 * Get parent route. For example, route for public.main.index will return public.main.
+	 * Used on getRoutePrefix()
+	 */
+	private function getParentRoute()
 	{
+		return $this->route->getParentRoute();
 		$absoluteRoute	= $this->getAbsoluteRoute();
 		$absoluteRoutes	= explode(".",$absoluteRoute);
 
@@ -180,6 +197,7 @@ class Exec
 
 		return $route;
 	}
+
 
 	public function addParameter($key,$val = null)
 	{
