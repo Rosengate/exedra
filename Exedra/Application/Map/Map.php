@@ -45,6 +45,27 @@ class Map
 	}
 
 	/**
+	 * Add a route on top of other route.
+	 * @param string name of the route.
+	 * @param array routes
+	 */
+	public function addOnRoute($name, array $routes)
+	{
+		$route = $this->findByName($name);
+
+		if(!$route)
+			throw new \Exception('Route by name '. $name .' was not found.');
+		
+		// if has subroute, use the that subroute, else, create a new subroute.
+		if($route->hasSubroute())
+			$route->getSubroute()->addRoutesByArray($routes);
+		else
+			$route->setSubroute($routes);
+
+		return $this;
+	}
+
+	/**
 	 * Find route by the absolute name.
 	 * @param string name.
 	 * @return route or false.

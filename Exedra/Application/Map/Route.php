@@ -139,7 +139,7 @@ class Route
 	{
 		$notation = self::$notation;
 
-		$absoluteRoute	= $this->getAbsoluteRoute();
+		$absoluteRoute	= $this->getAbsoluteName();
 		$absoluteRoutes	= explode($notation,$absoluteRoute);
 
 		if(count($absoluteRoutes) == 1)
@@ -147,6 +147,7 @@ class Route
 
 		array_pop($absoluteRoutes);
 		$parentRoute	= implode($notation,$absoluteRoutes);
+		
 		return $parentRoute;
 	}
 

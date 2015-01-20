@@ -8,9 +8,8 @@ class Level extends \ArrayIterator
 	public function __construct(Route $route = null, array $routes = array())
 	{
 		$this->route = $route;
-		if(count($routes) > 0) 
-			foreach($routes as $name=>$routeData)
-				$this->addRoute(new Route($this, $name, $routeData));
+		if(count($routes) > 0)
+			$this->addRoutesByArray($routes);
 	}
 
 	/**
@@ -100,6 +99,18 @@ class Level extends \ArrayIterator
 
 		// false default.
 		return array('route'=> false, 'parameter'=> array());
+	}
+
+	/**
+	 * Add routes by the given array.
+	 * @param array routes
+	 */
+	public function addRoutesByArray(array $routes)
+	{
+		foreach($routes as $name=>$routeData)
+			$this->addRoute(new Route($this, $name, $routeData));
+
+		return $this;
 	}
 
 	/**

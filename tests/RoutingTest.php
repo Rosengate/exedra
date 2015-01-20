@@ -50,6 +50,27 @@ class RoutingTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals('one', $result['route']->getAbsoluteName());
 	}
 
+	public function testAddOnRoute()
+	{
+		// add routes on route 'two'
+		$this->map->addOnRoute('two', array(
+			'three'=>['uri'=>'something', 'execute'=> 'controller=hello@world']
+			));
+
+		$result = $this->map->find(['uri'=> 'uri-two/something']);
+
+		$this->assertEquals('two.three', $result['route']->getAbsoluteName());
+
+		// complex. add routes on route 'two.two.one'
+		$this->map->addOnRoute('two.two.one', array(
+			'two'=>['uri'=>'another-thing', 'execute'=> 'controller=hello@world']
+			));
+
+		$result = $this->map->find(['uri'=> 'uri-two/sub-two/deep-one/another-thing']);
+
+		$this->assertEquals('two.two.one.two', $result['route']->getAbsoluteName());
+	}
+
 	public function testNestedRoute()
 	{
 		// 2 level
