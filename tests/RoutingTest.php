@@ -170,4 +170,19 @@ class RoutingTest extends PHPUnit_Framework_TestCase
 		$response3 = $this->app->execute(['uri'=> 'hello/rita/world']);
 		$this->assertEquals('something', $response3);
 	}
+
+	public function testPrioritizeExecution()
+	{
+		$this->map->addRoute(array(
+			'r1'=> ['uri'=> 'uri1', 'subroute'=> array(
+				'sr2'=> ['uri'=> 'uri2', 'execute'=> 'controller=somewhere@something', 'subroute'=> array(
+					'ssr3'=> ['uri'=> 'uri3', 'execute'=>'controller=something@somewhere']
+					)]
+				)]
+			));
+
+		$result = $this->map->find(['uri'=> 'uri1/uri2']);
+		
+		$this->assertEquals('r1.sr2', $result['route']->getAbsoluteName());
+	}
 }

@@ -158,7 +158,6 @@ class Application
 
 				return $this->exception->create('Route not found. '.$msg);
 			}
-
 			$this->currentRoute = $route;
 			$subapp = null;
 			$binds = array();
@@ -272,7 +271,6 @@ class Application
 			}
 			else
 			{
-				$routeName	= $this->currentRoute->getAbsoluteName();
 				return "<pre><hr><u>Execution Exception :</u>\n".$e->getMessage()."<hr>";
 			}
 		}

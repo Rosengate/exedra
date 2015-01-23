@@ -63,12 +63,18 @@ class Level extends \ArrayIterator
 		while($this->valid())
 		{
 			$route = $this->current();
+
 			$result = $route->validate($query);
 
-			if($result['route'] != false)
+			$remainingUri = $route->getRemainingUri($query['uri']);
+
+			if($result['route'] != false || ($remainingUri != '' && $route->hasSubroute()))
 			{
-				// if has no subroute OR has subsroute but have execution and remaining uri is ''
-				if(!$route->hasSubroute() || ($route->hasSubroute() && $route->hasExecution() && $route->getRemainingUri($query['uri']) == ''))
+				$executionPriority = $route->hasSubroute() && $route->hasExecution() && $remainingUri == '';
+
+				// 1. if found. and no more subroute. OR
+				// 2. has subroutes but, has execution, 
+				if(!$route->hasSubroute() || $executionPriority)
 				{
 					// prepare the final parameter by merging the passed parameter, with result parameter.
 					$params = array_merge($passedParameters, $result['parameter']);
@@ -83,14 +89,13 @@ class Level extends \ArrayIterator
 					$passedParameters = count($result['parameter']) > 0 ? $result['parameter'] : array();
 
 					$queryUpdated = $query;
-					$queryUpdated['uri'] = $route->getRemainingUri($query['uri']);
+					$queryUpdated['uri'] = $remainingUri;
 
 					$subrouteResult = $route->getSubroute()->query($queryUpdated, $passedParameters);
 
 					// if found. else. continue on this level.
 					if($subrouteResult['route'] != false)
 						return $subrouteResult;
-
 				}
 			}
 

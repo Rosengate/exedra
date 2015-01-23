@@ -215,24 +215,31 @@ class Route
 	public function validate(array $query)
 	{
 		// print_r($query);die;
-		foreach($query as $key=>$value)
+		foreach(array('method', 'uri', 'ajax') as $key)
 		{
+			// by default, if parameter was set, but query not provided anything.
+			if($this->hasParameter($key) && !isset($query[$key]))
+				return array('route'=> false, 'parameter'=> false);
+			
+			// if this parameter wasn't set, skip validation.
+			else if(!$this->hasParameter($key))
+				continue;
+
+			$value = $query[$key];
+
 			switch($key)
 			{
 				case "method":
-				// method not set. wildcard.
-				if(!$this->hasParameter('method'))
-					continue;
-
 				// return false because method doesn't exist.
 				if(!in_array($value, $this->getParameter('method')))
-					return false;
+					return array('route'=> false, 'parameter'=> false);
+
 				break;
 				case "uri":
 				$result = $this->validateURI($value);
 
 				if(!$result['matched'])
-					return array('route'=>false, 'parameter'=> array());
+					return array('route'=>false, 'parameter'=> $result['parameter']);
 
 				return array('route'=> $this, 'parameter'=> $result['parameter']);
 				break;
@@ -253,7 +260,6 @@ class Route
 	private function validateURI($uri)
 	{
 		$routeURI = $this->getParameter('uri');
-		$hasSubroute = $this->hasSubroute();
 
 		if($routeURI === false)
 			return false;
@@ -272,11 +278,6 @@ class Route
 
 		foreach($segments as $no=>$segment)
 		{
-			if($segment == null && $hasSubroute)
-			{
-				break;
-			}
-
 			## 2.1 non-pattern comparation.
 			// if($segment[0] != "[" || $segment[strlen($segment) - 1] != "]") gives notice due to uninitialized segment.
 			if($segment == "" || ($segment[0] != "[" || $segment[strlen($segment) - 1] != "]"))
@@ -372,35 +373,35 @@ class Route
 		## build result.
 		$result 	= Array();
 
-		## set matched into result.
+		## pattern matched.
 		$result['matched']	= $matched;
 
 		## pass parameter.
 		$result['parameter'] = $uriParams;
 
-		if($hasSubroute && ($equal === null || $equal === true))
+		/*if($hasSubroute && ($equal === null || $equal === true))
 		{
 			## set as true.
-			$result['matched'] = true;
+			// $result['matched'] = true;
 
 			## since trailing would sedut the remaining uri, just return empty.
 			// if($isTrailing)
 				// return "";
 
 			## normal. just substract and return the remaining uri.
-			/*$total	= count($segments);
+			$total	= count($segments);
 
 			## rebuild. since i don't have internet currently.
 			$new_uriR	= Array();
 			for($i=$total;$i<count($uris);$i++)
 			{
 				$new_uriR[]	= $uris[$i];
-			}*/
+			}
 
 			## pass remaining uri.
 			// $result['remaining_uri']	= implode("/",$new_uriR);  # old 
 			// $result['remaining_uri']	= $routeURI != ""?implode("/",$new_uriR):$uri;
-		}
+		}*/
 
 		## return matched, parameter founds, and remaining_uri (if deeproute)
 		return $result;
