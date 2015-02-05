@@ -8,7 +8,7 @@ class View
 	private $dir;
 	private $defaultData = array();
 
-	public function __construct(\Exedra\Application\Exec $exe/*, $loader,$dir = null*/)
+	public function __construct(\Exedra\Application\Execution\Exec $exe/*, $loader,$dir = null*/)
 	{
 		$this->loader = $exe->loader;
 		$this->structure = $exe->app->structure;
