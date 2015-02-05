@@ -8,7 +8,7 @@ class Url
 	private $baseUrl		= false;
 	private $assetUrl		= false;
 
-	public function __construct(\Exedra\Application\Application $app,\Exedra\Application\Execution\Exec $exe = null)
+	public function __construct(\Exedra\Application\Application $app, \Exedra\Application\Execution\Exec $exe = null)
 	{
 		$this->app	= $app;
 
@@ -48,6 +48,12 @@ class Url
 		$this->assetUrl	= $assetUrl;
 	}
 
+	// get current url
+	public function current()
+	{
+		return $this->create('@'.$this->exe->route->getAbsoluteName(), $this->exe->param());
+	}
+
 	public function create($routeName,$data = Array())
 	{
 		## base the routename, either on parent route or the configured routePrefix
@@ -56,7 +62,6 @@ class Url
 			$routePrefix = $this->exe->getRoutePrefix();
 			$routeName		= $routePrefix?$routePrefix.".".$routeName:$routeName;
 		}*/
-
 
 		$routeName = $this->exe->prefixRoute($routeName);
 
@@ -67,6 +72,8 @@ class Url
 			return $this->exe->exception->create("Unable to find route '$routeName'");
 
 		$uri = $route->getAbsoluteUri($data);
+
+
 
 		return $this->baseUrl ? trim($this->baseUrl, '/') .'/'. $uri : $uri;
 

@@ -21,6 +21,8 @@ class Di
 	public function register($key, $val = null)
 	{
 		if(is_array($key)) foreach($key as $k=>$v) $this->register($k, $v); else $this->registry[$key] = $val;
+
+		return $this;
 	}
 
 	/**

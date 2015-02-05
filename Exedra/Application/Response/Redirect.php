@@ -30,6 +30,7 @@ class Redirect
 			return $this->refresh();
 
 		$url = $this->exe->url->create($route, $params);
+
 		return $this->toUrl($url);
 	}
 }
