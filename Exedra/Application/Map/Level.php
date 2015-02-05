@@ -68,7 +68,9 @@ class Level extends \ArrayIterator
 
 			$remainingUri = $route->getRemainingUri($query['uri']);
 
-			if($result['route'] != false || ($remainingUri != '' && $route->hasSubroute()))
+			$hasSubroute = $route->hasSubroute();
+
+			if(($result['route'] != false) || (($result['equal'] == true || $result['equal'] === null) && ($remainingUri != '' && $hasSubroute)))
 			{
 				$executionPriority = $route->hasSubroute() && $route->hasExecution() && $remainingUri == '';
 
@@ -81,7 +83,8 @@ class Level extends \ArrayIterator
 
 					return array(
 						'route'=> $result['route'], 
-						'parameter'=> $params);
+						'parameter'=> $params,
+						'equal'=> $result['equal']);
 				}
 				else
 				{
@@ -103,7 +106,7 @@ class Level extends \ArrayIterator
 		}
 
 		// false default.
-		return array('route'=> false, 'parameter'=> array());
+		return array('route'=> false, 'parameter'=> array(), 'equal'=> false);
 	}
 
 	/**

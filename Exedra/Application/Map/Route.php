@@ -210,7 +210,10 @@ class Route
 
 	/**
 	 * Query the route. return with uri parameter.
-	 * @param array query;
+	 * @param associative array of result :
+	 * - route \Exedra\Application\Map\Route or false
+	 * - parameter array
+	 * - equal boolean
 	 */
 	public function validate(array $query)
 	{
@@ -232,16 +235,16 @@ class Route
 				case "method":
 				// return false because method doesn't exist.
 				if(!in_array($value, $this->getParameter('method')))
-					return array('route'=> false, 'parameter'=> false);
+					return array('route'=> false, 'parameter'=> false, 'equal'=> false);
 
 				break;
 				case "uri":
 				$result = $this->validateURI($value);
 
 				if(!$result['matched'])
-					return array('route'=>false, 'parameter'=> $result['parameter']);
+					return array('route'=>false, 'parameter'=> $result['parameter'], 'equal'=> $result['equal']);
 
-				return array('route'=> $this, 'parameter'=> $result['parameter']);
+				return array('route'=> $this, 'parameter'=> $result['parameter'], 'equal'=> $result['equal']);
 				break;
 				case "ajax":
 
@@ -249,7 +252,7 @@ class Route
 			}
 		}
 
-		return array('route'=>false, 'parameter'=> array());
+		return array('route'=>false, 'parameter'=> array(), 'equal'=> false);
 	}
 
 	/**
@@ -263,6 +266,12 @@ class Route
 
 		if($routeURI === false)
 			return false;
+
+		if($routeURI === "")
+		{
+			return array('matched'=> ($uri === "" ? true : false), 'equal'=> null, 'parameter'=> array());
+		}
+
 
 		## 2. route check.
 		$segments	= explode("/",$routeURI);
@@ -372,6 +381,8 @@ class Route
 
 		## build result.
 		$result 	= Array();
+
+		$result['equal'] = $equal;
 
 		## pattern matched.
 		$result['matched']	= $matched;

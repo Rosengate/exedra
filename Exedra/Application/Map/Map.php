@@ -88,6 +88,16 @@ class Map
 	}
 
 	/**
+	 * Alias to findByName
+	 * @param string name.
+	 * @return route or false.
+	 */
+	public function getRoute($name)
+	{
+		return $this->findByName($name);
+	}
+
+	/**
 	 * Find route by parameters.
 	 * @param array query
 	 * @return array(
