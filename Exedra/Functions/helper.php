@@ -107,10 +107,10 @@ function refine_path($path)
 	switch(PHP_OS)
 	{
 		case "WINNT":
-		return str_replace("/","\\",$path);
+		return str_replace("/", DIRECTORY_SEPARATOR,$path);
 		break;
 		case "Linux":
-		return str_replace("\\", "/", $path);
+		return str_replace("\\", DIRECTORY_SEPARATOR, $path);
 		break;
 	}
 }

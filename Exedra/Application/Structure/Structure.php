@@ -67,16 +67,16 @@ class Structure
 	public function get($name,$suffix = null,$prefix = null)
 	{
 		$paths = array();
-		$paths[] = $this->basePath;
+		// $paths[] = $this->basePath;
 
 		if($prefix)
 		{
 			foreach($prefix = explode("/",$prefix) as $no=>$p)
 			{
-				$paths[]	= $p;
+				$paths[]	= $p;/*
 
 				if(!is_dir($temp = $this->refinePath($paths)) && count($additionals) < $no)
-					throw new \Exception("Structure : Directory for path ($temp) does not exist");
+					throw new \Exception("Structure : Directory for path ($temp) does not exist");*/
 			}
 		}
 
@@ -86,8 +86,8 @@ class Structure
 		$paths[]	= $this->paths[$name];
 
 		## Exception : directory for this path does not exists.
-		if(!is_dir($temp = $this->refinePath($paths)))
-			throw new \Exception("Structure : Directory for path ($temp) does not exist");
+		/*if(!is_dir($temp = $this->refinePath($paths)))
+			throw new \Exception("Structure : Directory for path ($temp) does not exist");*/
 
 		if($suffix)
 		{
@@ -166,6 +166,8 @@ class Structure
 
 		return $this;
 	}
+
+	
 }
 
 

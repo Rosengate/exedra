@@ -1,43 +1,67 @@
 <?php
 namespace Exedra;
-require_once "ExedraLoader.php";
+require_once "Loader.php";
 
 class Exedra
 {
-	## Required objects.
-	var $response			= null;
+	/**
+	 * An array of \Exedra\Application\Application
+	 */
 	var $apps				= Array();
-	private $exedraLoader 	= null;
 
-	## Executed application.
-	var $executionResult	= null;
+	/**
+	 * A brand new general loader.
+	 */
+	public $loader = null;
 
+	/**
+	 * The original \Exedra\HTTP\Request object.
+	 */
+	public $httpRequest;
+
+	/**
+	 * The original \Exedra\HTTP\Response object.
+	 */
+	public $httpResponse;
+
+	/**
+	 * Base directory of your application.
+	 */
 	private $baseDir;
+
+	// private $exedraLoader 	= null;
 
 	public function __construct($dir)
 	{
-		$this->exedraLoader	= new ExedraLoader();
+		// $this->exedraLoader	= new ExedraLoader();
+
+		$this->loader = new Loader($dir);
 		
-		## helper functions.
-		$this->exedraLoader->loadFunctions("helper");
+		// helper functions.
+		// $this->loader->load("functions/helper.php");
 
-		## register autoload.
-		// $this->exedraLoader->registerAutoload();
-		$this->exedraLoader->registerAutoload($dir);
+		// register autoload.
+		$this->loader->registerAutoload($dir);
 
-		## create http request.
+		// create http request.
 		$this->httpRequest	= new \Exedra\HTTP\Request;
 		$this->httpResponse = new \Exedra\HTTP\Response;
 
-		## baseDir
+		// baseDir
 		$this->baseDir = $dir;
 	}
 
+	/**
+	 * The interface to autoloading.
+	 */
 	public function registerAutoload($dir)
 	{
-		$this->exedraLoader->registerAutoload($dir);
+		$this->loader->registerAutoload($dir);
 	}
 
+	/**
+	 * Return the dir the exedra was based on.
+	 */
 	public function getBaseDir()
 	{
 		return $this->baseDir;
@@ -54,17 +78,17 @@ class Exedra
 	{
 		try
 		{
-			## inject this components into the application.
+			// inject this components into the application.
 			if(isset($this->apps[$app_name]))
 				return $this->apps[$app_name];
 
-			## register autoload for this app_name.
-			$this->exedraLoader->registerAutoload($app_name);
+			// register autoload for this app_name.
+			$this->registerAutoload($app_name);
 
-			## create new application with an injected Map (with an injected map, request (an injected http request), and configuration handler.).
+			// create new application with an injected Map (with an injected map, request (an injected http request), and configuration handler.).
 			$this->apps[$app_name] = new \Exedra\Application\Application($app_name,$this);
 				
-			## Execute in instant.
+			// Execute in instant.
 			$execution($this->apps[$app_name]);
 
 			return $this->apps[$app_name];

@@ -6,7 +6,7 @@ class Executor
 	protected $controller;
 	protected $middlewares;
 	
-	public function __construct(\Exedra\Application\Execution\Binder $binder, \Exedra\Application\Structure\Loader $loader)
+	public function __construct(\Exedra\Application\Execution\Binder $binder, \Exedra\Loader $loader)
 	{
 		$this->binder = $binder;
 		$this->loader = $loader;
@@ -18,7 +18,7 @@ class Executor
 		{
 			if(is_string($middlewares[$no]))
 			{
-				if($this->loader->isLoadable($middlewares[$no]))
+				if(strpos($middlewares[$no], ":") !== false)
 				{
 					$closure = $this->loader->load($middlewares[$no]);
 					if($closure instanceof \Closure)

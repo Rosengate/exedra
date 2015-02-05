@@ -39,9 +39,10 @@ class Exec
 		}
 
 		$this->di = new \Exedra\Application\DI(array(
-			"controller"=> array("\Exedra\Application\Builder\Controller", array($this, $this->app->loader, $this->subapp)),
-			"view"=> array("\Exedra\Application\Builder\View", array($this, $this->app->loader, $this->subapp)),
-			"middleware"=> array("\Exedra\Application\Builder\Middleware", array($this, $this->app->loader, $this->subapp)),
+			"loader"=> array("\Exedra\Loader", array($app->getAppName().'/'.$subapp, $this->app->structure)),
+			"controller"=> array("\Exedra\Application\Builder\Controller", array($this)),
+			"view"=> array("\Exedra\Application\Builder\View", array($this)),
+			"middleware"=> array("\Exedra\Application\Builder\Middleware", array($this)),
 			"url"=> array("\Exedra\Application\Builder\Url", array($this->app,$this)),
 			"request"=>$this->app->request,
 			"response"=>$this->app->exedra->httpResponse,
@@ -238,16 +239,14 @@ class Exec
 		}
 	}
 
-	/*public function addVariable($varName,$data)
+	/**
+	 * check whether this exec has subapp
+	 * @return boolean flag
+	 */
+	public function hasSubapp()
 	{
-		if(!isset($this->$varName))
-			$this->$varName	= Array();
-
-		foreach($data as $key=>$val)
-		{
-			\Exedra\Functions\Arrays::setByNotation($this->$varName,$key,$val);
-		}
-	}*/
+		return $this->subapp === null ? false : true;
+	}
 
 	public function execute($route,$parameter = array())
 	{

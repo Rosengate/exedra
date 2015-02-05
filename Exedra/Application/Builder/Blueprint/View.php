@@ -41,6 +41,14 @@ class View
 	}
 
 	/**
+	 * Alias to setRequired
+	 */
+	public function setRequiredData($keys)
+	{
+		return $this->setRequired($keys);
+	}
+
+	/**
 	 * Set callback for the given data key
 	 * @param string key
 	 * @param callback callback
@@ -99,6 +107,7 @@ class View
 	}
 
 	/**
+	 * Check required data for rendering use.
 	 * @return mixed
 	 */
 	private function requirementCheck()
@@ -138,9 +147,9 @@ class View
 		if($this->path == null)
 			return $this->exe->exception->create('View.render : path was not set (null)');
 
-		if(!file_exists($this->path))
-			return $this->exe->exception->create('View.render : Path "'. $this->path .'"" does not exist');
+		/*if(!file_exists($this->path))
+			return $this->exe->exception->create('View.render : Path "'. $this->path .'" does not exist');*/
 
-		$this->loader->load($this->path,$this->data);
+		$this->loader->load(array('structure'=> 'view', 'path'=> $this->path) ,$this->data);
 	}
 }

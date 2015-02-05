@@ -8,11 +8,10 @@ class View
 	private $dir;
 	private $defaultData = array();
 
-	public function __construct($exe, $loader,$dir = null)
+	public function __construct(\Exedra\Application\Exec $exe/*, $loader,$dir = null*/)
 	{
-		$this->loader = $loader;
-		$this->structure = $loader->structure;
-		$this->dir = $dir;
+		$this->loader = $exe->loader;
+		$this->structure = $exe->app->structure;
 		$this->exe = $exe;
 	}
 
@@ -24,10 +23,15 @@ class View
 	 */
 	public function create($path,$data = array())
 	{
-		$path = $this->buildPath($path);
-		
-		if(!$this->has($path, false))
+		// $path = $this->buildPath($path);
+		if(!$this->has($path))
 			$this->exe->exception->create("Unable to find view '$path'");
+		
+		// append .php extension.
+		$path = $this->buildPath($path);
+
+		/*if(!$this->has($path, false))
+			$this->exe->exception->create("Unable to find view '$path'");*/
 
 		if(count($this->defaultData) > 0)
 			$data = array_merge($data, $this->defaultData);
@@ -40,7 +44,13 @@ class View
 	private function buildPath($path)
 	{
 		$path	= $path.".php";
-		$path	= $this->structure->get("view",$path,$this->dir);
+		/*$dir = $this->dir;
+
+		if(strpos($path, '@') === 0)
+		{
+			$path = substr($path, 1);
+			$dir = null;
+		}*/
 
 		return $path;
 	}
@@ -51,11 +61,9 @@ class View
 	public function has($path, $build = true)
 	{
 		if($build)
-		{
 			$path = $this->buildPath($path);
-		}
 
-		return file_exists($path);
+		return $this->loader->has(array('structure'=> 'view', 'path'=> $path));
 	}
 
 	/**

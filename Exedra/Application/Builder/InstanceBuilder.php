@@ -5,11 +5,11 @@ Abstract Class InstanceBuilder
 {
 	protected $builderName;
 
-	public function __construct($exe, $loader, $subapp)
+	public function __construct(\Exedra\Application\Execution\Exec $exe, $subapp = null)
 	{
 		$this->exe = $exe;
-		$this->loader = $loader;
-		$this->structure = $loader->structure;
+		$this->loader = $exe->loader;
+		$this->structure = $exe->app->structure;
 		$this->subapp = $subapp;
 	}
 
@@ -18,13 +18,14 @@ Abstract Class InstanceBuilder
 		$builderName = $this->builderName;
 
 		## loader.
-		$path	= $this->structure->get($builderName,$className.".php",$this->subapp);
+		// $path	= $this->structure->get($builderName,$className.".php",$this->subapp);
+		$path = $className.'.php';
 
 		## Exception : file not found.
-		if(!file_exists($path))
+		if(!$this->loader->has(array('structure'=> $builderName, 'path'=> $path)))
 			$this->exe->exception->create("Unable to find file '".$path."' for ".$builderName." : ".$className.($this->subapp?" (subapp : ".$this->subapp.")":"").".");
 
-		$this->loader->load($path);
+		$this->loader->load(array('structure'=> $builderName, 'path'=> $path));
 
 		## prepare class name by pattern.
 		$className		= $this->structure->getPattern($this->patternName,$className);
