@@ -13,8 +13,8 @@ class Structure
 		// application base path
 		$this->setBasePath($basePath);
 
-		// default path
-		$this->set(array(
+		// add default structure.
+		$this->add(array(
 			"controller"	=>"controller",
 			"model"			=>"model",
 			"config"		=>"config",
@@ -26,11 +26,13 @@ class Structure
 
 		$this->setCharacter('absolute', '@');
 
+		// class name for controller.
 		$this->setPattern('controller_name', function($val)
 		{
 			return "Controller".str_replace(" ","",ucwords(str_replace("/", " ", $val)));
 		});
 
+		// class name for middleware.
 		$this->setPattern('middleware_name', function($val)
 		{
 			return "Middleware".str_replace(" ", "", ucwords(str_replace("/", " ", $val)));
@@ -101,6 +103,17 @@ class Structure
 		}
 
 		return $this->refinePath($paths);
+	}
+
+	/**
+	 * Add a structure (an alias to set())
+	 * @param mixed key (if array, will recursively add by the loop)
+	 * @param mixed structure value
+	 * @return this
+	 */
+	public function add($key, $val = null)
+	{
+		return $this->set($key, $val);
 	}
 
 	/**
