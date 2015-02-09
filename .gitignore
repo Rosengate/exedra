@@ -1,3 +1,4 @@
 *.old
 vendor
 vendor/*
+composer.lock
