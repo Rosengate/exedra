@@ -1,5 +1,5 @@
 {
-	"name": "exedra/exedra",
+	"name": "rosengate/exedra",
 	"description": "Nestful route oriented PHP micro framework",
 	"license": "MIT",
 	"keywords": ["exedra", "rosengate", "framework", "microframework", "route"],
