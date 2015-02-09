@@ -16,6 +16,6 @@
         "phpunit/phpunit": "4.4.*"
     },
     "autoload": {
-        "psr-4": {"Exedra\\": ""}
+        "psr-0": {"Exedra\\": ""}
     }
 }
