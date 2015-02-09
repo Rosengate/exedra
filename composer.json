@@ -1,5 +1,23 @@
 {
+	"name": "exedra/exedra",
+	"description": "Nestful route oriented PHP micro framework",
+	"license": "MIT",
+	"keywords": ["exedra", "rosengate", "framework", "microframework", "route"],
+	"homepage": "http://github.com/rosengate/exedra",
+	"authors": [{
+		"name": "Ahmad Rahimie Ahmad Zailani",
+		"email": "newrehmi@gmail.com",
+		"role": "lead"
+	}],
+	"support": {
+        "issues": "https://github.com/rosengate/exedra/issues"
+    },
     "require": {
         "phpunit/phpunit": "4.4.*"
+    },
+    "autoload": {
+        "classmap": [
+            "Exedra/"
+        ]
     }
 }
