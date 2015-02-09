@@ -16,8 +16,6 @@
         "phpunit/phpunit": "4.4.*"
     },
     "autoload": {
-        "classmap": [
-            "Exedra/"
-        ]
+        "psr-4": {"Exedra": "."}
     }
 }
