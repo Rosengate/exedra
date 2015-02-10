@@ -185,6 +185,14 @@ class Loader
 		return file_get_contents($file);
 	}
 
+	public function buildPath($path)
+	{
+		$path = is_array($path) ? $this->configure($path) : $path;
+		$path = $this->refinePath($this->prefixPath($path));
+
+		return $path;
+	}
+
 	/**
 	 * Refine path, replace with the right directory separator.
 	 * @param string path

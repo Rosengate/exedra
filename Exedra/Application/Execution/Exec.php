@@ -39,7 +39,7 @@ class Exec
 		}
 
 		$this->di = new \Exedra\Application\DI(array(
-			"loader"=> array("\Exedra\Loader", array($app->getAppName().'/'.$subapp, $this->app->structure)),
+			"loader"=> array("\Exedra\Loader", array($app->getExedra()->getBaseDir().'/'.$app->getAppName().'/'.$subapp, $this->app->structure)),
 			"controller"=> array("\Exedra\Application\Builder\Controller", array($this)),
 			"view"=> array("\Exedra\Application\Builder\View", array($this)),
 			"middleware"=> array("\Exedra\Application\Builder\Middleware", array($this)),
@@ -54,6 +54,11 @@ class Exec
 			"session"=> function() use($app) {return $app->session;},
 			"file"=> array("\Exedra\Application\Builder\File", array($app, $this->subapp))
 			));
+	}
+
+	public function getSubapp()
+	{
+		return $this->subapp;
 	}
 
 	public function __get($property)

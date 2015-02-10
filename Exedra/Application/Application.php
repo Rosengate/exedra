@@ -78,7 +78,7 @@ class Application
 		$app = $this;
 
 		$this->structure = new \Exedra\Application\Structure\Structure($this->name);
-		$this->loader = new \Exedra\Loader($this->name, $this->structure);
+		$this->loader = new \Exedra\Loader($this->exedra->getBaseDir().'/'.$this->name, $this->structure);
 
 		$this->di = new \Exedra\Application\DI(array(
 			"request"=>$this->exedra->httpRequest,

@@ -23,7 +23,11 @@ Abstract Class InstanceBuilder
 
 		## Exception : file not found.
 		if(!$this->loader->has(array('structure'=> $builderName, 'path'=> $path)))
+		{
+			$structure = $this->structure->get($builderName);
+			$path = $this->exe->app->getAppName().'/'.($this->exe->getSubapp()?$this->exe->getSubapp().'/':'').$structure.'/'.$path;
 			$this->exe->exception->create("Unable to find file '".$path."' for ".$builderName." : ".$className.($this->subapp?" (subapp : ".$this->subapp.")":"").".");
+		}
 
 		$this->loader->load(array('structure'=> $builderName, 'path'=> $path));
 
