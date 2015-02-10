@@ -80,7 +80,7 @@ class Application
 		$this->structure = new \Exedra\Application\Structure\Structure($this->name);
 		$this->loader = new \Exedra\Loader($this->exedra->getBaseDir().'/'.$this->name, $this->structure);
 
-		$this->di = new \Exedra\Application\DI(array(
+		$this->di = new \Exedra\Application\Dic(array(
 			"request"=>$this->exedra->httpRequest,
 			"response"=>$this->exedra->httpResponse,
 			"map"=> function() use($app) {return new \Exedra\Application\Map\Map($app);},

@@ -38,7 +38,7 @@ class Exec
 			$this->params[$key]	= $val;
 		}
 
-		$this->di = new \Exedra\Application\DI(array(
+		$this->di = new \Exedra\Application\Dic(array(
 			"loader"=> array("\Exedra\Loader", array($app->getExedra()->getBaseDir().'/'.$app->getAppName().'/'.$subapp, $this->app->structure)),
 			"controller"=> array("\Exedra\Application\Builder\Controller", array($this)),
 			"view"=> array("\Exedra\Application\Builder\View", array($this)),
