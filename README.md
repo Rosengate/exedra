@@ -11,8 +11,37 @@ History
 ======
 The first unreleased version of exedra has quite constraining ungroupable routing capability, and has a lot of static usage. This version was intended to fix them, give more (self-proclaimed) powerful multi-tier nestable routing ability and hopefully will adapt to modern web development practices.
 
-Documentation
+Installation
 ======
+Clone
+========
+~~~
+git clone https://github.com/rosengate/exedra project_name
+~~~
+and in your front-controller file (index.php), just include Exedra.php wherever you can find it. For more information, refer documentation.
+~~~
+require_once "Exedra\Exedra.php";
+$exedra = new \Exedra\Exedra(__DIR__);
+~~~
+
+Composer
+===
+Your composer.json
+~~~
+{
+    "require": {
+        "rosengate/exedra": "dev-master"
+    }
+}
+~~~
+and then, use composer autoloader, in your front-controller file. (index.php)
+~~~
+require_once "vendor/autoload.php";
+$exedra = new \Exedra\Exedra(__DIR__);
+~~~
+
+Documentation
+===
 Documentation and the homebase for exedra is currently hosted here : http://exedra.rosengate.com
 
 Examples
