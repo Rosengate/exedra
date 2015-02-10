@@ -28,7 +28,7 @@ Composer
 ===
 Install rosengate/exedra through your console, in your project folder.
 ~~~
-require rosengate/exedra dev-master
+composer require rosengate/exedra dev-master
 ~~~
 
 Or install/update manually
