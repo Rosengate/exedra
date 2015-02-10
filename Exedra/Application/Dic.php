@@ -1,6 +1,6 @@
 <?php namespace Exedra\Application;
 
-class Di
+class Dic
 {
 	protected $storage;
 	protected $registry = array();
