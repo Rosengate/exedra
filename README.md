@@ -26,7 +26,12 @@ $exedra = new \Exedra\Exedra(__DIR__);
 
 Composer
 ===
-Your composer.json
+Install rosengate/exedra through your console, in your project folder.
+~~~
+require rosengate/exedra dev-master
+~~~
+
+Or install/update manually
 ~~~
 {
     "require": {
@@ -34,6 +39,11 @@ Your composer.json
     }
 }
 ~~~
+and do 
+~~~
+composer update
+~~~
+
 and then, use composer autoloader, in your front-controller file. (index.php)
 ~~~
 require_once "vendor/autoload.php";
@@ -50,7 +60,7 @@ Some of the projects built on top of exedra :
 
 http://github.com/rosengate/exedra-web (hosted at exedra.rosengate.com)
 
-http://github.com/eimihar/persona (hosted at persona.rosengate.com)
+http://github.com/eimihar/persona (hosted at persona.rosengate.com or eimihar.rosengate.com)
 
 Development
 ======
