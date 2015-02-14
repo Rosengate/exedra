@@ -3,6 +3,7 @@
 class Form
 {
 	public $data;
+	public $optionData;
 
 	public function __construct(\Exedra\Application\Execution\Exec $exe)
 	{
@@ -80,6 +81,48 @@ class Form
 	}
 
 	/**
+	 * Set option type of input with list of array.
+	 * @param mixed key string of the input name, or array (to be recursive.)
+	 * @param list array of list.
+	 * @return this
+	 */
+	public function setOption($key, array $list = null)
+	{
+		if(is_array($key))
+		{
+			foreach($key as $k=> $v)
+				$this->setOption($k, $v);
+		}
+		else
+		{
+			$this->optionData[$key] = $list;
+		}
+
+		return $this;
+	}
+
+	/**
+	 * Check whether has option with the given key or not.
+	 * @param string key
+	 * @return boolean
+	 */
+	public function hasOption($key)
+	{
+		return isset($this->optionData[$key]);
+	}
+
+	/**
+	 * Get the options
+	 * @param string key
+	 * @return array
+	 */
+	public function getOption($key)
+	{
+		return $this->optionData[$key];
+	}
+
+	/**
+	 * Get form data.
 	 * @param mixed key
 	 * @return mixed $this->data
 	 */
@@ -197,7 +240,7 @@ class Form
 	 */
 	public function select($name,$array = array(),$attr = null,$value = null, $firstOpt = '[Please select]')
 	{
-		$array = is_array($array)?$array:array();
+		$array = is_array($array) && count($array) > 0 ? $array : ($this->hasOption($name) ? $this->getOption($name) : array() );
 		$firstOpt = $firstOpt !== false?'<option value="">'. $firstOpt .'</option>':'';
 
 		$attr = $this->buildAttr($attr);
@@ -227,7 +270,7 @@ class Form
 	 */
 	public function radio($name,$array = array(),$attr = null,$value = null,$wrapper = "")
 	{
-		$array		= is_array($array)? $array : array();
+		$array = is_array($array) && count($array) > 0 ? $array : ($this->hasOption($name) ? $this->getOption($name) : array() );
 		$result		= "";
 
 		$attr = $this->buildParameter($name, $attr);

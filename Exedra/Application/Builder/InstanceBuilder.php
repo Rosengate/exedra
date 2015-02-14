@@ -1,19 +1,34 @@
-<?php namespace Exedra\Application\Builder;
-
+<?php
+namespace Exedra\Application\Builder;
 
 Abstract Class InstanceBuilder
 {
+	/**
+	 * Builder name.
+	 * @var string
+	 */
 	protected $builderName;
+
+	/**
+	 * Structure pattern to be used by \Exedra\Application\Structure\Structure
+	 * @var string
+	 */
+	protected $patternName;
 
 	public function __construct(\Exedra\Application\Execution\Exec $exe, $subapp = null)
 	{
 		$this->exe = $exe;
 		$this->loader = $exe->loader;
 		$this->structure = $exe->app->structure;
-		$this->subapp = $subapp;
+		$this->subapp = $exe->getSubapp();
 	}
 
-	public function create($className,$constructorParam = null)
+	/**
+	 * Create the builder
+	 * @param string className
+	 * @param array constructorParam
+	 */
+	public function create($className, array $constructorParam = array())
 	{
 		$builderName = $this->builderName;
 
@@ -57,7 +72,7 @@ Abstract Class InstanceBuilder
 	}
 
 	/**
-	 * Execute controller, 
+	 * Execute the instance.
 	 * - if cname is string, create controller based on that string.
 	 * - if cname is array, take first element as controller name, and second as construct parameters
 	 * - else, expect it as the controller object.

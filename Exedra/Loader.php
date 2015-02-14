@@ -7,40 +7,40 @@ namespace Exedra;
 class Loader
 {
 	/**
-	 * Path is prefixed with dirPrefix depending on which instance it's based on.
+	 * Based directory this loader is based on.
+	 * @var string
 	 */
-	protected $dirPrefix;
+	protected $baseDir;
 
 	/**
 	 * Available only for application and exec instance.
-	 * \Exedra\Application\Structure\Structure
+	 * @var \Exedra\Application\Structure\Structure
 	 */
-	protected $structure;
+	protected $structure = null;
 
 	/**
 	 * List of custom configuration
+	 * @var array
 	 */
 	protected $configurations;
 
-	public function __construct($dirPrefix = null, \Exedra\Application\Structure\Structure $structure = null)
+	public function __construct($baseDir = null, \Exedra\Application\Structure\Structure $structure = null)
 	{
-		$this->dirPrefix = !$dirPrefix ? null : trim($dirPrefix, '/');
-
-		if($structure)
-			$this->structure = $structure;
+		$this->baseDir = !$baseDir ? null : trim($baseDir, '/');
+		$this->structure = $structure;
 	}
 
 	/**
-	 * Prefix path with the configured dirPrefix
+	 * Prefix path with the configured $baseDir
 	 * @param string path
 	 * @return string
 	 */
 	private function prefixPath($path)
 	{
-		if(!$this->dirPrefix === null)
+		if(!$this->baseDir === null)
 			return $path;
 
-		return trim($this->dirPrefix, '/').'/'.$path;
+		return trim($this->baseDir, '/').'/'.$path;
 	}
 
 	/**
@@ -68,23 +68,27 @@ class Loader
 	}
 
 	/**
-	 * Add custom configuration to path.
+	 * Add custom configuration to path parameter.
 	 * @param string name
 	 * @param callback callback (will pass path, and file[key]), requre the same string of path as return.
 	 */
-	private function addConfiguration($name, $callback)
+	protected function addConfiguration($name, $callback)
 	{
 		$this->configurations[$name] = $callback;
 	}
 
-	private function configure(array $file)
+	/**
+	 * Get the configured path with the given options.
+	 * @param array options
+	 */
+	protected function configure(array $options)
 	{
-		if(!isset($file['path']))
+		if(!isset($options['path']))
 			throw new \Exception('Path parameter missing.');
 
-		$path = $file['path'];
+		$path = $options['path'];
 
-		foreach($file as $key=>$val)
+		foreach($options as $key=>$val)
 		{
 			switch($key)
 			{
@@ -112,7 +116,9 @@ class Loader
 	}
 
 	/**
-	 * File exists.
+	 * Check whether file exists.
+	 * @param string path to file.
+	 * @return boolean
 	 */
 	public function has($path)
 	{
@@ -128,6 +134,7 @@ class Loader
 	 */
 	public function registerAutoload($dir)
 	{
+		// if by list
 		if(is_array($dir))
 		{
 			foreach($dir as $d)
@@ -172,7 +179,7 @@ class Loader
 	/**
 	 * Get the content of file of the path
 	 * @param string file name
-	 * @return file content
+	 * @return mixed file contents
 	 */
 	public function getContent($file)
 	{
@@ -185,6 +192,11 @@ class Loader
 		return file_get_contents($file);
 	}
 
+	/**
+	 * Usable public function to help with building the path.
+	 * @param mixed path
+	 * @param string
+	 */
 	public function buildPath($path)
 	{
 		$path = is_array($path) ? $this->configure($path) : $path;
@@ -214,6 +226,7 @@ class Loader
 	/**
 	 * Short syntax checking for structure and path string.
 	 * @param string file
+	 * @return string
 	 */
 	public function isLoadable($file)
 	{

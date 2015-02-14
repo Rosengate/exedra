@@ -37,7 +37,7 @@ class Flash
 	 * Get the flash by the given key
 	 * @param string key
 	 * @param mixed default value
-	 * @param mixed flash value
+	 * @return mixed
 	 */
 	public function get($key = null, $default = null)
 	{
@@ -53,6 +53,7 @@ class Flash
 	/**
 	 * Check if has the key
 	 * @param string key
+	 * @return boolean
 	 */
 	public function has($key)
 	{
@@ -61,10 +62,12 @@ class Flash
 
 	/**
 	 * Clear the flash.
+	 * @return this;
 	 */
 	public function clear()
 	{
-		return $this->session->destroy(self::KEY);
+		$this->session->destroy(self::KEY);
+		return $this;
 	}
 }
 

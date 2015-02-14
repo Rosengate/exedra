@@ -6,53 +6,54 @@ class Exedra
 {
 	/**
 	 * An array of \Exedra\Application\Application
+	 * @var array
 	 */
-	var $apps				= Array();
+	var $apps = array();
 
 	/**
 	 * A brand new general loader.
+	 * @var \Exedra\Loader
 	 */
-	public $loader = null;
+	public $loader;
 
 	/**
-	 * The original \Exedra\HTTP\Request object.
+	 * The original HTTP Request object.
+	 * @var \Exedra\HTTP\Request
 	 */
 	public $httpRequest;
 
 	/**
-	 * The original \Exedra\HTTP\Response object.
+	 * The original HTTP Response object (more likely a service object)
+	 * @var \Exedra\HTTP\Response
 	 */
 	public $httpResponse;
 
 	/**
-	 * Base directory of your application.
+	 * Base directory exedra is mainly on.
+	 * @var string
 	 */
 	private $baseDir;
 
 	// private $exedraLoader 	= null;
 
-	public function __construct($dir)
+	public function __construct($baseDir)
 	{
-		// $this->exedraLoader	= new ExedraLoader();
-
-		$this->loader = new Loader($dir);
+		$this->loader = new Loader($baseDir);
 		
-		// helper functions.
-		// $this->loader->load("functions/helper.php");
-
 		// register autoload.
-		$this->loader->registerAutoload($dir);
+		$this->loader->registerAutoload($baseDir);
 
-		// create http request.
+		// create http request and response.
 		$this->httpRequest	= new \Exedra\HTTP\Request;
 		$this->httpResponse = new \Exedra\HTTP\Response;
 
 		// baseDir
-		$this->baseDir = $dir;
+		$this->baseDir = $baseDir;
 	}
 
 	/**
 	 * The interface to autoloading.
+	 * @param string directory
 	 */
 	public function registerAutoload($dir)
 	{
@@ -123,12 +124,14 @@ class Exedra
 		return $closure($this,$parameter);
 	}
 
-	## dispatch request as a query for application execution.
+	/**
+	 * Dispatch request as query for application execution.
+	 */
 	public function dispatch()
 	{
-		foreach($this->apps as $app_name=>$build)
+		foreach($this->apps as $app_name => $app)
 		{
-			echo $build->execute(Array(
+			echo $app->execute(Array(
 				"method"=>$this->httpRequest->getMethod(),
 				"uri"=>$this->httpRequest->getURI(),
 				"ajax"=>$this->httpRequest->isAjax(),

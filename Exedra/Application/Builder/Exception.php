@@ -1,6 +1,10 @@
 <?php
 namespace Exedra\Application\Builder;
 
+/**
+ * Simple exception builder.
+ */
+
 class Exception
 {
 	public function __construct($exe = null)
@@ -8,7 +12,10 @@ class Exception
 		$this->exe = $exe;
 	}
 
-	## Build an exception.
+	/**
+	 * Create exception message.
+	 * @param string message
+	 */
 	public function create($message)
 	{
 		if($this->exe)

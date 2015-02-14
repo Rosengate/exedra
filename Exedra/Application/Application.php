@@ -27,16 +27,17 @@ class Application
 	private $executionFailRoute	= null;
 
 	/**
+	 * // commented, can retrieve from currentExe if got.
 	 * Current executed route.
 	 * @var \Exedra\Application\Map\Route
 	 */
-	private $currentRoute = null;
+	// private $currentRoute = null;
 
 	/**
-	 * Current exec instance.
-	 * @var \Exedra\Application\Execution\Exec
+	 * List of executions
+	 * @var array of \Exedra\Application\Execution\Exec
 	 */
-	private $exe = null;
+	protected $executions = array();
 
 	/**
 	 * Create a new application
@@ -78,7 +79,7 @@ class Application
 		$app = $this;
 
 		$this->structure = new \Exedra\Application\Structure\Structure($this->name);
-		$this->loader = new \Exedra\Loader($this->exedra->getBaseDir().'/'.$this->name, $this->structure);
+		$this->loader = new \Exedra\Loader($this->getBaseDir(), $this->structure);
 
 		$this->di = new \Exedra\Application\Dic(array(
 			"request"=>$this->exedra->httpRequest,
@@ -87,7 +88,8 @@ class Application
 			"config"=> array("\Exedra\Application\Config"),
 			"session"=> array("\Exedra\Application\Session\Session"),
 			"exception"=> array("\Exedra\Application\Builder\Exception"),
-			'file'=> array('\Exedra\Application\Builder\File', array($this))
+			'file'=> array('\Exedra\Application\Builder\File', array($this)),
+			'exeRegistry'=> array('\Exedra\Application\Registry', array($this))
 			));
 	}
 
@@ -110,6 +112,15 @@ class Application
 	}
 
 	/**
+	 * Return base directory for this app
+	 * @return string.
+	 */
+	public function getBaseDir()
+	{
+		return $this->exedra->getBaseDir().'/'.$this->getAppName();
+	}
+
+	/**
 	 * Get exedra instance
 	 * @return \Exedra\Exedra
 	 */
@@ -119,145 +130,87 @@ class Application
 	}
 
 	/**
+	 * Get last exec instance if have.
+	 * @return \Exedra\Application\Execution\Exec
+	 */
+	public function getLastExecution()
+	{
+		if(($totalExec = count($this->executions)) == 0)
+			return null;
+
+		return $this->executions[$totalExec - 1];
+	}
+
+	/**
 	 * Execute application
 	 * @param mixed query
 	 * @param array parameter
 	 * @return mixed
 	 */
-	public function execute($query,$parameter = Array())
+	public function execute($query, $parameter = Array())
 	{
 		try
 		{
 			if(is_string($query))
 			{
-				$route = $this->map->findByName($query);
+				// $route = $this->map->findByName($query);
+				$finding = $this->map->findByName($query, $parameter);
 			}
 			else
 			{
-				$result = $this->map->find($query);
-				$route = $result['route'];
-
-				$parameter = count($result['parameter']) ? array_merge($parameter, $result['parameter']) : $parameter;
+				// $result = $this->map->find($query);
+				$finding = $this->map->find($query);
+				$finding->addParameter($parameter);
 			}
+
+			// $route = $finding->route;
+
+			// $parameter = count($result['parameter']) ? array_merge($parameter, $result['parameter']) : $parameter;
+			// $parameter = count($finding->parameters) ? array_merge($parameter, $finding->parameters) : $parameter;
 
 			// route not found.
-			if(!$route)
+			if(!$finding->success())
+				return $this->throwFailedExecution($query, $parameter);
+
+			// $route = $finding->route;
+			// $this->currentRoute = $route;
+
+			$exe = new Execution\Exec($this, $finding);
+
+			// save to the stack of execution.
+			$this->executions[] = $exe;
+
+			// echo $this->exe->route->getAbsoluteName()."<br>";
+
+			$execution = $finding->route->getParameter('execute');
+			$execution = $this->exeRegistry->pattern->resolve($execution);
+
+			// execute the stacked middleware.
+			if($exe->middlewares->count() > 0)
 			{
-				if(is_array($query))
-				{
-					$q	= Array();
-					foreach($query as $k=>$v)
-						$q[] = $k.' : '.$v;
+				// $exe->middlewares = new \ArrayIterator($this->registry->getMiddlewares());
+				$exe->middlewares->resolve($exe);
 
-					$msg = 'Query :<br>'.implode("<br>",$q);
-				}
-				else
-				{
-					$msg = 'Route : '.$query;
-				}
+				// set the last of the container as execution.
+				$exe->middlewares->offsetSet($exe->middlewares->count(), $execution);
 
-				return $this->exception->create('Route not found. '.$msg);
-			}
-			$this->currentRoute = $route;
-			$subapp = null;
-			$binds = array();
-			$config = new \Exedra\Application\Config;
+				// and reset.
+				$exe->middlewares->rewind();
 
-			// loop all the related route. initiate subapp, bind and config.
-			foreach($route->getFullRoutes() as $route)
-			{
-				$subapp = $route->hasParameter('subapp') ? $route->getParameter('subapp') : $subapp;
-
-				// has middleware.
-				if($route->hasParameter('middleware'))
-				{
-					$binds['middleware'][] = $route->getParameter('middleware');
-				}
-
-				// initialize config
-				if($route->hasParameter('config'))
-				{
-					foreach($route->getParameter('config') as $key=>$val)
-						$config->set($key, $val);
-				}
+				// execute.
+				$execution = $exe->middlewares->current();
 			}
 
-			// Prepare result parameter and automatically create controller and view builder.
-			$exe	= new Execution\Exec($route, $this, $parameter, $config, $subapp);
+			$response = Execution\Resolver::resolve($execution($exe));
 
-			$this->exe	= $exe;
-			$executor	= new Execution\Executor(new Execution\Binder($binds), $this->loader);
-			$execution	= $executor->execute($route->getParameter('execute'),$exe);
+			// $executor	= new Execution\Executor($this->exeRegistry, $exe);
+			// $execution	= $executor->execute($route->getParameter('execute'));
 
 			// clear flash on every application execution (only if it has started).
 			if(\Exedra\Application\Session\Session::hasStarted())
-				$this->exe->flash->clear();
+				$exe->flash->clear();
 			
-			return $execution;
-			/*
-			$query	= !is_array($query) && is_string($query) ?Array("route"=>$query):$query;
-
-			$result	= $this->map->finda($query);
-
-			echo "<pre>Original<br>";
-			print_r($result);die;
-
-			if(!$result)
-			{
-				$q	= Array();
-				foreach($query as $k=>$v) $q[]	= $k." : ".$v;
-
-				return $this->exception->create("Route not found. Query :<br>".implode("<br>",$q));
-			}
-
-			$route		= $result['route'];
-			$routename	= $result['name'];
-
-			$parameter	= array_merge($result['parameters'],$parameter);
-
-			// save current route result.
-			$this->currentRoute	= &$result;	
-
-			$subapp = null;
-			$binds = Array();
-			$config	= new \Exedra\Application\Config;
-
-			foreach($route as $routeName=>$routeData)
-			{
-				// Sub app
-				$subapp	= isset($routeData['subapp'])?$routeData['subapp']:$subapp;
-
-				// Binds
-				if(isset($this->map->binds[$routeName]))
-				{
-					foreach($this->map->binds[$routeName] as $bindName=>$callback)
-					{
-						$binds[$bindName][]	= $callback;
-					}
-				}
-
-				// Initialize config
-				if(isset($this->map->config[$routeName]))
-				{
-					foreach($this->map->config[$routeName] as $paramName=>$val)
-					{
-						$config->set($paramName, $val);
-					}
-				}
-			}
-
-			// Prepare result parameter and automatically create controller and view builder.
-			$exe	= new Execution\Exec($routename, $this, $parameter, $config, $subapp);
-
-			$this->exe	= $exe;
-			$executor	= new Execution\Executor(new Execution\Binder($binds), $this->loader);
-			$execution	= $executor->execute($route[$routename]['execute'],$exe);
-
-			// clear flash on every application execution (only if it has started).
-			if(\Exedra\Application\Session\Session::hasStarted())
-				$this->exe->flash->clear();
-			
-			return $execution;*/
+			return $response;
 		}
 		catch(\Exception $e)
 		{
@@ -274,6 +227,31 @@ class Application
 				return "<pre><hr><u>Execution Exception :</u>\n".$e->getMessage()."<hr>";
 			}
 		}
+	}
+
+	/**
+	 * Throw failed execution if no route was found.
+	 * @param mixed query
+	 * @param array parameter
+	 * @throws \Exception.
+	 */
+	protected function throwFailedExecution($query, array $parameter = array())
+	{
+		// prepare message.
+		if(is_array($query))
+		{
+			$q	= Array();
+			foreach($query as $k=>$v)
+				$q[] = $k.' : '.$v;
+
+			$msg = 'Query :<br>'.implode("<br>",$q);
+		}
+		else
+		{
+			$msg = 'Route : '.$query;
+		}
+
+		return $this->exception->create('Route not found. '.$msg);
 	}
 }
 ?>

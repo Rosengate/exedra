@@ -1,6 +1,10 @@
 <?php
 namespace Exedra\Application\Builder\Blueprint;
 
+/**
+ * Simple class for object oriented based file.
+ */
+
 class File
 {
 	private $path;
@@ -10,15 +14,21 @@ class File
 		$this->path = $path;
 	}
 
+	/**
+	 * Check whether this file exist or not.
+	 * @return boolean
+	 */
 	public function isExist()
 	{
 		return file_exists($this->path);
 	}
 
 	/**
-	 * Load the given path.
+	 * Require this instance's file path extracted with the given data (optional)
+	 * @param array data
+	 * @param mixed
 	 */
-	public function load($data = array())
+	public function load(array $data = array())
 	{
 		if(count($data) > 0)
 			extract($data);
@@ -26,6 +36,10 @@ class File
 		return require $this->path;
 	}
 
+	/**
+	 * Require this file content.
+	 * @return mixed
+	 */
 	public function getContent()
 	{
 		if(!$this->isExist())

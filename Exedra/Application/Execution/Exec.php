@@ -3,43 +3,86 @@ namespace Exedra\Application\Execution;
 
 class Exec
 {
-	/* application instance */
+	/**
+	 * Application instance
+	 * @var \Exedra\Application\Application
+	 */
 	public $app;
 
-	/* route information */
+	/**
+	 * Route instance.
+	 * @var \Exedra\Application\Map\Route
+	 */
 	public $route;
+
+	/**
+	 * Array of (referenced) parameters for this execution.
+	 * @var array
+	 */
 	public $params	= Array();
+
+	/**
+	 * Route prefix to be appended on every execution scope based functionality.
+	 * @var string
+	 */
 	private $routePrefix = null;
 
-	/* pointer each time  */
-	// private $middlewarePointer	= 1;
-
-	/* registered objects */
-	private $registered	= Array();
-
-	/* sub application */
-	private $subapp;
-
-	/* di container */
+	/**
+	 * Dependecy injection container
+	 * @var \Exedra\Application\Dic
+	 */
 	public $di;
 
+	/**
+	 * Map finding result
+	 * @var \Exedra\Application\Map\Finding
+	 */
+	public $finding;
+
+	/**
+	 * Execution config instance
+	 * @var \Exedra\Application\Config
+	 */
 	public $config;
 
-	public function __construct(\Exedra\Application\Map\Route $route, $app, $params, $config, $subapp = null)
+	// public function __construct(\Exedra\Application\Map\Route $route, $app, $params, $config, $subapp = null)
+	public function __construct(\Exedra\Application\Application $app, \Exedra\Application\Map\Finding $finding)
 	{
-		$this->route = $route;
+		$this->finding = $finding;
 		$this->app = $app;
-		$this->subapp = $subapp;
-		$this->config = $config;
 
-		## Create params
-		foreach($params as $key=>$val)
-		{
-			$this->params[$key]	= $val;
-		}
+		// initiate properties
+		$this->initiateProperties($app, $finding);
+
+		// initiate dependencies
+		$this->initiateContainer();
+
+		// Initiate middlewares
+		$this->initiateMiddlewares();
+	}
+
+	/**
+	 * Initiate execution properties
+	 */
+	protected function initiateProperties()
+	{
+		// Initiate.
+		$this->registry = $this->app->exeRegistry;
+		$this->route = $this->finding->route;
+		$this->config = &$this->finding->getConfig();
+		$this->params = &$this->finding->getParameter();
+	}
+
+	/**
+	 * Initiate dependency injection container
+	 */
+	protected function initiateContainer()
+	{
+		$app = $this->app;
+		$subapp = $this->getSubapp();
 
 		$this->di = new \Exedra\Application\Dic(array(
-			"loader"=> array("\Exedra\Loader", array($app->getExedra()->getBaseDir().'/'.$app->getAppName().'/'.$subapp, $this->app->structure)),
+			"loader"=> array("\Exedra\Loader", array($this->getBaseDir(), $this->app->structure)),
 			"controller"=> array("\Exedra\Application\Builder\Controller", array($this)),
 			"view"=> array("\Exedra\Application\Builder\View", array($this)),
 			"middleware"=> array("\Exedra\Application\Builder\Middleware", array($this)),
@@ -52,15 +95,47 @@ class Exec
 			"exception"=> array("\Exedra\Application\Builder\Exception", array($this)),
 			"form"=> array("\Exedra\Application\Utilities\Form", array($this)),
 			"session"=> function() use($app) {return $app->session;},
-			"file"=> array("\Exedra\Application\Builder\File", array($app, $this->subapp))
+			"file"=> array("\Exedra\Application\Builder\File", array($app, $subapp)),
+			'middlewares'=> array('\Exedra\Application\Execution\Middlewares')
 			));
 	}
 
-	public function getSubapp()
+	/**
+	 * Get base dir for this execution instance. A concenated app base directory and this subapp.
+	 * @return string.
+	 */
+	public function getBaseDir()
 	{
-		return $this->subapp;
+		return trim($this->app->getBaseDir(), '/'). '/' . $subapp;
 	}
 
+	/**
+	 * Initiate execution middlewares.
+	 */
+	protected function initiateMiddlewares()
+	{
+		// if there's middlewares in registry.
+		if($this->registry->hasMiddlewares())
+			$this->middlewares->addByArray($this->registry->getMiddlewares());
+
+		// finding' middleware
+		if($this->finding->hasMiddlewares())
+			$this->middlewares->addByArray($this->finding->getMiddlewares());
+	}
+
+	/**
+	 * Get subapplication name.
+	 * @return string
+	 */
+	public function getSubapp()
+	{
+		return $this->finding->getSubapp();
+	}
+
+	/**
+	 * Resolve dependency from dependency injection dependency injection container, off property $di.
+	 * @return mixed.
+	 */
 	public function __get($property)
 	{
 		if($this->di->has($property))
@@ -77,44 +152,44 @@ class Exec
 	{
 		// move to next middleware
 		$this->middlewares->next();
+
+		// and execute
 		return call_user_func_array($this->middlewares->current(), func_get_args());
 	}
 
 	/**
-	 * Get execution parameter(s)
+	 * Get execution parameter
 	 * @param string name
-	 * @return value
+	 * @return mixed or default if not found.
 	 */
-	public function param($name = null)
+	public function param($name, $default = null)
 	{
 		if(!$name) return $this->params;
 
-		$params	= is_array($name)?$name:explode(",",$name);
-
-		if(count($params) > 1)
-		{
-			$new	= Array();
-			foreach($params as $k)
-			{
-				$new[] = $this->params[$k];
-			}
-
-			return $new;
-		}
-		else
-		{
-			return isset($this->params[$params[0]]) ? $this->params[$params[0]] : null;
-		}
-	}
-
-	public function getParams()
-	{
-		return $this->params;
+		return isset($this->params[$name]) ? $this->params[$name] : $default;
 	}
 
 	/**
-	 * absolute route substracted by prefix, return absoluteRoute if passed true.
+	 * Get parameter by the given list of key
+	 * @return array
+	 */
+	public function params(array $keys = array())
+	{
+		if(count($keys) == 0)
+			return $this->params;
+
+		$params = array();
+
+		foreach($keys as $key)
+			$params[] = $this->params[trim($key)];
+
+		return $params;
+	}
+
+	/**
+	 * absolute route substracted prefix, return absoluteRoute if passed true.
 	 * @param boolean absolute, if true. will directly return absolute route.
+	 * @return string
 	 */
 	public function getRoute($absolute = false)
 	{
@@ -204,8 +279,7 @@ class Exec
 		return $route;
 	}
 
-
-	public function addParameter($key,$val = null)
+	/*public function addParameter($key,$val = null)
 	{
 		if(is_array($key))
 		{
@@ -240,9 +314,8 @@ class Exec
 			{
 				\Exedra\Functions\Arrays::setByNotation($this->params,$key,$val);
 			}
-
 		}
-	}
+	}*/
 
 	/**
 	 * check whether this exec has subapp
@@ -250,10 +323,15 @@ class Exec
 	 */
 	public function hasSubapp()
 	{
-		return $this->subapp === null ? false : true;
+		return $this->getSubapp() === null ? false : true;
 	}
 
-	public function execute($route,$parameter = array())
+	/**
+	 * Execute route but scope based route.
+	 * @param string route
+	 * @param array parameter.
+	 */
+	public function execute($route, array $parameter = array())
 	{
 		$route = $this->prefixRoute($route);
 		return $this->app->execute($route, $parameter);

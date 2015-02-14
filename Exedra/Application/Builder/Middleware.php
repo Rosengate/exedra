@@ -1,4 +1,9 @@
-<?php namespace Exedra\Application\Builder;
+<?php
+namespace Exedra\Application\Builder;
+
+/**
+ * A Middleware builder.
+ */
 
 class Middleware extends \Exedra\Application\Builder\InstanceBuilder
 {

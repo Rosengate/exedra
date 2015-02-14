@@ -42,6 +42,8 @@ class View
 
 	/**
 	 * Alias to setRequired
+	 * @param mixed key
+	 * @return this
 	 */
 	public function setRequiredData($keys)
 	{
@@ -64,7 +66,7 @@ class View
 	 * Resolve callback in rendering
 	 * @return null
 	 */
-	private function callbackResolve()
+	protected function callbackResolve()
 	{
 		foreach($this->data as $key=>$val)
 		{
@@ -134,6 +136,7 @@ class View
 	/**
 	 * Main rendering function, load the with loader function.
 	 * @return null
+	 * @throws \Exedra\Application\Exception\Exception
 	 */
 	public function render()
 	{
@@ -146,9 +149,6 @@ class View
 
 		if($this->path == null)
 			return $this->exe->exception->create('View.render : path was not set (null)');
-
-		/*if(!file_exists($this->path))
-			return $this->exe->exception->create('View.render : Path "'. $this->path .'" does not exist');*/
 
 		$this->loader->load(array('structure'=> 'view', 'path'=> $this->path) ,$this->data);
 	}

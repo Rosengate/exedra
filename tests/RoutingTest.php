@@ -37,17 +37,17 @@ class RoutingTest extends PHPUnit_Framework_TestCase
 
 	public function testEmptyUri()
 	{
-		$result = $this->map->find(['uri'=> '']);
+		$finding = $this->map->find(['uri'=> '']);
 
-		$this->assertEquals('empty', $result['route']->getAbsoluteName());
+		$this->assertEquals('empty', $finding->route->getAbsoluteName());
 	}
 
 	public function testRouteOneLevel()
 	{
-		$result = $this->map->find(['uri'=> 'uri-one']);
+		$finding = $this->map->find(['uri'=> 'uri-one']);
 
 		// confirm by route name.
-		$this->assertEquals('one', $result['route']->getAbsoluteName());
+		$this->assertEquals('one', $finding->route->getAbsoluteName());
 	}
 
 	public function testAddOnRoute()
@@ -57,37 +57,37 @@ class RoutingTest extends PHPUnit_Framework_TestCase
 			'three'=>['uri'=>'something', 'execute'=> 'controller=hello@world']
 			));
 
-		$result = $this->map->find(['uri'=> 'uri-two/something']);
+		$finding = $this->map->find(['uri'=> 'uri-two/something']);
 
-		$this->assertEquals('two.three', $result['route']->getAbsoluteName());
+		$this->assertEquals('two.three', $finding->route->getAbsoluteName());
 
 		// complex. add routes on route 'two.two.one'
 		$this->map->addOnRoute('two.two.one', array(
 			'two'=>['uri'=>'another-thing', 'execute'=> 'controller=hello@world']
 			));
 
-		$result = $this->map->find(['uri'=> 'uri-two/sub-two/deep-one/another-thing']);
+		$finding = $this->map->find(['uri'=> 'uri-two/sub-two/deep-one/another-thing']);
 
-		$this->assertEquals('two.two.one.two', $result['route']->getAbsoluteName());
+		$this->assertEquals('two.two.one.two', $finding->route->getAbsoluteName());
 	}
 
 	public function testNestedRoute()
 	{
 		// 2 level
-		$result = $this->map->find(['uri'=> 'uri-two/sub-one']);
-		$this->assertEquals('two.one', $result['route']->getAbsoluteName());
+		$finding = $this->map->find(['uri'=> 'uri-two/sub-one']);
+		$this->assertEquals('two.one', $finding->route->getAbsoluteName());
 
 		// 3 level
-		$result = $this->map->find(['uri'=> 'uri-two/sub-two/deep-one']);
-		$this->assertEquals('two.two.one', $result['route']->getAbsoluteName());
+		$finding = $this->map->find(['uri'=> 'uri-two/sub-two/deep-one']);
+		$this->assertEquals('two.two.one', $finding->route->getAbsoluteName());
 	}
 
 	public function testParam()
 	{
 		$this->map->addRoute(array('paramtest'=>['uri'=>'[:param1]/[:param2]', 'execute'=> 'controller=hello@world']));
 
-		$result = $this->map->find(['uri'=> 'ahmad/rahimie']);
-		$param = $result['parameter'];
+		$finding = $this->map->find(['uri'=> 'ahmad/rahimie']);
+		$param = $finding->parameters;
 
 		$this->assertEquals(array('ahmad', 'rahimie'), array($param['param1'], $param['param2']));
 	}
@@ -103,18 +103,18 @@ class RoutingTest extends PHPUnit_Framework_TestCase
 			)]));
 
 		// test route r1.sr2
-		$result = $this->map->find(['uri'=> 'ahmad/rahimie/eimihar']);
-		$param = $result['parameter'];
+		$finding = $this->map->find(['uri'=> 'ahmad/rahimie/eimihar']);
+		$param = $finding->parameters;
 
 		// test route r1.sr3.ssr4
-		$this->assertEquals('r1.sr2', $result['route']->getAbsoluteName());
+		$this->assertEquals('r1.sr2', $finding->route->getAbsoluteName());
 		$this->assertEquals('ahmad', $param['param1']);
 		$this->assertEquals('eimihar', $param['param3']);
 
-		$result = $this->map->find(['uri'=> 'ahmad/rahimie/eimihar/rosengate/uri-ssr4/exedra']);
-		$param = $result['parameter'];
+		$finding = $this->map->find(['uri'=> 'ahmad/rahimie/eimihar/rosengate/uri-ssr4/exedra']);
+		$param = $finding->parameters;
 
-		$this->assertEquals('r1.sr3.ssr4', $result['route']->getAbsoluteName());
+		$this->assertEquals('r1.sr3.ssr4', $finding->route->getAbsoluteName());
 		$this->assertEquals('rosengate', $param['param5']);
 		$this->assertEquals('exedra', $param['param6']);
 	}
@@ -127,9 +127,9 @@ class RoutingTest extends PHPUnit_Framework_TestCase
 				)]
 			));
 
-		$route = $this->map->findByName('r1.sr2');
+		$finding = $this->map->findByName('r1.sr2');
 
-		$this->assertEquals('r1.sr2', $route->getAbsoluteName());
+		$this->assertEquals('r1.sr2', $finding->route->getAbsoluteName());
 	}
 
 	public function testExecution()
@@ -181,8 +181,8 @@ class RoutingTest extends PHPUnit_Framework_TestCase
 				)]
 			));
 
-		$result = $this->map->find(['uri'=> 'uri1/uri2']);
+		$finding = $this->map->find(['uri'=> 'uri1/uri2']);
 		
-		$this->assertEquals('r1.sr2', $result['route']->getAbsoluteName());
+		$this->assertEquals('r1.sr2', $finding->route->getAbsoluteName());
 	}
 }

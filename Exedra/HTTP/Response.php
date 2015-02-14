@@ -2,20 +2,35 @@
 namespace Exedra\HTTP;
 
 /**
- * Simple class to deal with http response 
+ * Simple service class to help dealing with http response 
  */
+
 class Response
 {
-	private $protocol = "HTTP/1.1";
-	private $status = 200;
-	private $message = null;
+	/**
+	 * HTTP Protocol
+	 * @var string
+	 */
+	protected $protocol = "HTTP/1.1";
+
+	/**
+	 * HTTP Response status message
+	 * @var int
+	 */
+	protected $status = 200;
+
+	/**
+	 * HTTP Response message
+	 * @var string
+	 */
+	protected $message;
 
 	/**
 	 * Get status message
 	 * @param int status
 	 * @return string
 	 */
-	private function statusMessages($status)
+	protected function statusMessages($status)
 	{
 		$statusMessages = array(
 			100 => "continue",
@@ -95,6 +110,12 @@ class Response
 		return $this;
 	}
 
+	/**
+	 * Set status code
+	 * @param int code
+	 * @param string message (optional)
+	 * @return this
+	 */
 	public function setStatus($code, $message = null)
 	{
 		if($message)
@@ -159,14 +180,5 @@ class Response
 	{
 		$this->header('Content-Disposition', 'attachment; filename="'.$filename.'"');
 		return $this;
-	}
-
-	/**
-	 * Send header on object destruct
-	 */
-	public function __destruct()
-	{/*
-		if(!headers_sent())
-			$this->send();*/
 	}
 }

@@ -1,14 +1,37 @@
 <?php
 namespace Exedra\Application\Builder;
 
+/**
+ * Exedra View Builder
+ */
+
 class View
 {
-	private $structure;
-	private $loader;
-	private $dir;
-	private $defaultData = array();
+	/**
+	 * Instance of structure.
+	 * @var \Exedra\Application\Structure\Structure
+	 */
+	protected $structure;
 
-	public function __construct(\Exedra\Application\Execution\Exec $exe/*, $loader,$dir = null*/)
+	/**
+	 * Intance of execution based loader.
+	 * @var \Exedra\Loader
+	 */
+	protected $loader;
+
+	/**
+	 * Default datas for this view.
+	 * @var array
+	 */
+	protected $defaultData = array();
+
+	/**
+	 * View default extension.
+	 * @var string
+	 */
+	protected $ext = 'php';
+
+	public function __construct(\Exedra\Application\Execution\Exec $exe)
 	{
 		$this->loader = $exe->loader;
 		$this->structure = $exe->app->structure;
@@ -30,9 +53,7 @@ class View
 		// append .php extension.
 		$path = $this->buildPath($path);
 
-		/*if(!$this->has($path, false))
-			$this->exe->exception->create("Unable to find view '$path'");*/
-
+		// merge with default data.
 		if(count($this->defaultData) > 0)
 			$data = array_merge($data, $this->defaultData);
 
@@ -41,22 +62,23 @@ class View
 		return $view;
 	}
 
-	private function buildPath($path)
+	/**
+	 * Build path with extension
+	 * @param string path
+	 * @return string
+	 */
+	protected function buildPath($path)
 	{
-		$path	= $path.".php";
-		/*$dir = $this->dir;
-
-		if(strpos($path, '@') === 0)
-		{
-			$path = substr($path, 1);
-			$dir = null;
-		}*/
+		$path	= $path. '.' .$this->ext;
 
 		return $path;
 	}
 
 	/**
-	 * Return boolean of existence for the given path name.
+	 * Check file's path existence.
+	 * @param string path
+	 * @param boolean build
+	 * @return boolean
 	 */
 	public function has($path, $build = true)
 	{
@@ -67,7 +89,7 @@ class View
 	}
 
 	/**
-	 * Set default data for every view created.
+	 * Set default data for every view created through this builder.
 	 * @param mixed name
 	 * @param data string
 	 * @return this

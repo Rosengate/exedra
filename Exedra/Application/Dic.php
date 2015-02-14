@@ -2,9 +2,22 @@
 
 class Dic
 {
-	protected $storage;
+	/**
+	 * Storage for saved dependecies
+	 * @var array
+	 */
+	protected $storage = array();
+
+	/**
+	 * Registry of dependency(s)
+	 * @var array
+	 */
 	protected $registry = array();
-	protected $dependency = array();
+
+	/**
+	 * Flag whether to save the dependency or not.
+	 * @var boolean
+	 */
 	public $save = true;
 
 	public function __construct($registries = null)

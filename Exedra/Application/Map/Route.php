@@ -40,12 +40,8 @@ class Route
 		$this->setUri('');
 
 		if(count($parameters) > 0)
-		{
 			foreach($parameters as $key=>$value)
-			{
 				$this->parseParameter($key, $value);
-			}
-		}
 	}
 
 	/**
@@ -74,7 +70,8 @@ class Route
 	}
 
 	/**
-	 * @return current level this route was bound to.
+	 * Get current level this route was bound to.
+	 * @return \Exedra\Application\Map\Level
 	 */
 	public function getLevel()
 	{
@@ -82,7 +79,7 @@ class Route
 	}
 
 	/**
-	 * Get fullname.
+	 * Get route fullname.
 	 * @return string with dotted notation.
 	 */
 	public function getAbsoluteName()
@@ -135,6 +132,9 @@ class Route
 		return $this->fullRoutes;
 	}
 
+	/**
+	 * Get parent route after substracted the current route name.
+	 */
 	public function getParentRoute()
 	{
 		$notation = self::$notation;
@@ -531,11 +531,11 @@ class Route
 	}
 
 	/**
-	 * Generally get parameter.
+	 * Generally get a referenced parameter.
 	 * @param string key
 	 * @return parameter value
 	 */
-	public function getParameter($key)
+	public function &getParameter($key)
 	{
 		return $this->parameters[$key];
 	}

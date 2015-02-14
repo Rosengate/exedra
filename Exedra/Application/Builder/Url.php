@@ -1,148 +1,131 @@
 <?php
 namespace Exedra\Application\Builder;
 
+/**
+ * A Url builder.
+ */
+
 class Url
 {
-	private $result			= null;
-	private $routePrefix	= false;
-	private $baseUrl		= false;
-	private $assetUrl		= false;
+	/**
+	 * Base url
+	 * @var string
+	 */
+	protected $baseUrl;
 
-	public function __construct(\Exedra\Application\Application $app, \Exedra\Application\Execution\Exec $exe = null)
+	/**
+	 * Asset url
+	 * @var string
+	 */
+	protected $assetUrl;
+
+	public function __construct(\Exedra\Application\Application $app, \Exedra\Application\Execution\Exec $exe)
 	{
 		$this->app	= $app;
+		$this->exe	= $exe;
 
-		if($exe)
-			$this->exe	= $exe;
-
-		// if app.config has both base url and asset url.
-		if($app->config->has('url.base'))
-			$this->setBase($app->config->get('url.base'));
-
-		if($app->config->has('url.asset'))
-			$this->setAsset($app->config->get('url.asset'));
+		// initiate base and asset url
+		$this->initiateUrl();
 	}
 
-	/*public function setRoutePrefix($prefix)
+	/**
+	 * Initiate url, prioritize exec instance.
+	 */
+	protected function initiateUrl()
 	{
-		$this->routePrefix = $prefix;
-	}*/
+		// base url
+		if($this->exe->config->has('url.base'))
+			$this->setBase($this->exe->config->get('url.base'));
+		else if($this->app->config->has('url.base'))
+			$this->setBase($this->app->config->get('url.base'));
 
+		// asset url
+		if($this->exe->config->has('url.asset'))
+			$this->setAsset($this->exe->config->get('url.asset'));
+		else if($this->app->config->has('url.asset'))
+			$this->setAsset($this->app->config->get('url.asset'));
+	}
+
+	/**
+	 * Get url prefixed with $baseUrl
+	 * @param string uri (optional)
+	 * @return string
+	 */
 	public function base($uri = null)
 	{
 		return trim($this->baseUrl, '/' ).($uri ? '/' . trim($uri, '/') : '');
 	}
 
+	/**
+	 * Get asset url prefixed with $assetUrl
+	 * @param string asset uri (optonal)
+	 * @return string
+	 */
 	public function asset($asset = null)
 	{
 		return trim($this->assetUrl,"/").($asset ? "/". trim($asset, '/') : '');
 	}
 
+	/**
+	 * Set $baseUrl
+	 * @param string baseUrl
+	 * @return this
+	 */
 	public function setBase($baseUrl)
 	{
 		$this->baseUrl = $baseUrl;
+		return $this;
 	}
 
+	/**
+	 * Set $assetUrl
+	 * @param string assetUrl
+	 * @return this
+	 */
 	public function setAsset($assetUrl)
 	{
 		$this->assetUrl	= $assetUrl;
+		return $this;
 	}
 
-	// get current url
+	/**
+	 * Rebuild current route
+	 * @return string
+	 */
 	public function current()
 	{
-		return $this->create('@'.$this->exe->route->getAbsoluteName(), $this->exe->param());
+		return $this->create('@'.$this->exe->getRoute(true), $this->exe->param());
 	}
 
-	public function create($routeName,$data = Array())
+	/**
+	 * Create url by route name.
+	 * @param string routeName
+	 * @param array data
+	 * @param mixed query (uri query)
+	 */
+	public function create($routeName, array $data = array(), $query = null)
 	{
-		## base the routename, either on parent route or the configured routePrefix
-		/*if($this->exe)
+		// build query
+		if(is_array($query) && count($query) > 0)
 		{
-			$routePrefix = $this->exe->getRoutePrefix();
-			$routeName		= $routePrefix?$routePrefix.".".$routeName:$routeName;
-		}*/
-
+			$queries = array();
+			foreach($query as $k=>$v)
+			{
+				$queries[] = $k.'='.$v;
+			}
+			$query = implode('&', $queries);
+		}
+		
 		$routeName = $this->exe->prefixRoute($routeName);
 
-		## get route data by this name.
-		$route	= $this->app->map->findByName($routeName);
+		// get \Exedra\Application\Map\Route by name.
+		$route = $this->app->map->getRoute($routeName);
 
 		if(!$route)
-			return $this->exe->exception->create("Unable to find route '$routeName'");
+			return $this->exe->exception->create('Unable to find route '.$routeName.' while creating a url');
 
 		$uri = $route->getAbsoluteUri($data);
 
-
-
-		return $this->baseUrl ? trim($this->baseUrl, '/') .'/'. $uri : $uri;
-
-		/*$uris	= Array();
-		foreach($route['route'] as $routeLevel=>$routeData)
-		{
-			$uri	= isset($routeData['uri'])?$routeData['uri']:false;
-			## build uri.
-			if($uri && $uri != "")
-			{
-				$uris[]	= $this->replaceSegments($routeData['uri'],$data);
-			}
-		}
-
-		$url	= trim(implode("/",$uris),"/");
-
-		if($this->baseUrl)
-			$url	= trim($this->baseUrl,"/")."/".$url;
-
-		return $url;*/
-	}
-
-	private function replaceSegments($segments,$data)
-	{
-		$segments	= explode("/",$segments);
-
-		$newSegments	= Array();
-		foreach($segments as $segment)
-		{
-			if(strpos($segment,"[") === false && strpos($segment, "]") === false)
-			{
-				$newSegments[]	= $segment;
-				continue;
-			}
-
-			## strip.
-			$segment	= trim($segment,"[]");
-			list($key,$segment)	= explode(":",$segment);
-
-			$isOptional	= $segment[strlen($segment)-1] == "?"?true:false;
-			$segment	= $isOptional?substr($segment, 0,strlen($segment)-1):$segment;
-
-			## is mandatory, but no parameter passed.
-			if(!$isOptional && !isset($data[$segment]))
-			{
-				if($this->exe)
-					$this->exe->exception->create("Url.Create : Required parameter not passed ($segment).");
-				else
-					throw new \Exedra\Application\Exception\Exception("Url.Create : Required parameter not passed ($segment).",null,null);
-			}
-
-			## trailing capture.
-			if($key == "**")
-			{
-				if(is_array($data[$segment]))
-				{
-					$data[$segment] = implode("/",$data[$segment]);
-				}
-			}
-				
-			if(!$isOptional)
-				$newSegments[]	= $data[$segment];
-			else
-				if(isset($data[$segment]))
-					$newSegments[]	= $data[$segment];
-				else
-					$newSegments[]	= "";
-		}
-
-		return implode("/",$newSegments);
+		return ($this->baseUrl ? trim($this->baseUrl, '/') .'/'. $uri : $uri) . ($query ? '?'. $query : null);
 	}
 }

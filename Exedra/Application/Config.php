@@ -2,7 +2,11 @@
 
 class Config
 {
-	private $storage = array();
+	/**
+	 * Config storage
+	 * @var array
+	 */
+	protected $storage = array();
 
 	/**
 	 * Set config value

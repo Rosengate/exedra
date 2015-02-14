@@ -20,18 +20,6 @@ class Map
 		$this->level = new Level;
 	}
 
-	/*public function onRoute($routeName,$action,$param)
-	{
-		list($action,$actionExecution)	= explode(":",$action);
-
-		switch($action)
-		{
-			case "bind":
-			$this->bindRoute($routeName,$actionExecution,$param);
-			break;
-		}
-	}*/
-
 	/**
 	 * Add route to the first level on this map.
 	 * @param array $routes
@@ -51,10 +39,12 @@ class Map
 	 */
 	public function addOnRoute($name, array $routes)
 	{
-		$route = $this->findByName($name);
+		$finding = $this->findByName($name);
 
-		if(!$route)
+		if(!$finding->success())
 			throw new \Exception('Route by name '. $name .' was not found.');
+
+		$route = $finding->route;
 		
 		// if has subroute, use the that subroute, else, create a new subroute.
 		if($route->hasSubroute())
@@ -68,9 +58,24 @@ class Map
 	/**
 	 * Find route by the absolute name.
 	 * @param string name.
-	 * @return route or false.
+	 * @return \Exedra\Application\Map\Finding or false boolean.
 	 */
-	public function findByName($name)
+	public function findByName($name, $parameter = array())
+	{
+		$route = $this->getRoute($name);
+
+		return new \Exedra\Application\Map\Finding($route?:null, $parameter);
+
+		// CURRENTLY HERE, DOING SOME FINDING CLASS!
+		return $route ? $route : false ;
+	}
+
+	/**
+	 * Alias to findByName
+	 * @param string name.
+	 * @return \Exedra\Application\Map\Route or false boolean.
+	 */
+	public function getRoute($name)
 	{
 		if(isset($this->cache[$name]))
 		{
@@ -80,34 +85,23 @@ class Map
 		{
 			$route = $this->level->findRouteByName($name);
 
-			// save this finding.
+			// save this route.
 			$this->cache[$name] = $route;
 		}
 
-		return $route ? $route : false ;
-	}
-
-	/**
-	 * Alias to findByName
-	 * @param string name.
-	 * @return route or false.
-	 */
-	public function getRoute($name)
-	{
-		return $this->findByName($name);
+		return $route;
 	}
 
 	/**
 	 * Find route by parameters.
 	 * @param array query
-	 * @return array(
-	 *  	route => \Exedra\Application\Map\Route OR false if not found
-	 *		parameter => array
-	 *				)
+	 * @return \Exedra\Application\Map\Finding
 	 */
 	public function find(array $query)
 	{
 		$result = $this->level->query($query);
+
+		return new \Exedra\Application\Map\Finding($result['route']?:null, $result['parameter']);
 
 		// rebuild
 		return array(
