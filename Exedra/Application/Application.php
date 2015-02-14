@@ -15,12 +15,6 @@ class Application
 	public $structure = null;
 
 	/**
-	 * Application based loader.
-	 * @var \Exedra\Application\Loader
-	 */
-	public $loader = null;
-
-	/**
 	 * Route for general exception handling.
 	 * @var string
 	 */
@@ -40,26 +34,36 @@ class Application
 	protected $executions = array();
 
 	/**
+	 * Dependency injection container
+	 * @var \Exedra\Application\Dic
+	 */
+	public $di;
+
+	/**
 	 * Create a new application
 	 * @param string name (application name)
 	 * @param \Exedra\Exedra exedra instance
 	 */
-	public function __construct($name, $exedra)
+	public function __construct($name, \Exedra\Exedra $exedra)
 	{
+		// initiate application name and save \Exedra\Exedra reference.
 		$this->name = $name;
 		$this->exedra = $exedra;
 
-		## register dependency.
+		// create application structure
+		$this->structure = new \Exedra\Application\Structure\Structure();
+
+		// register dependency.
 		$this->register();
 	}
 
 	/**
-	 * Set route for execution exception
+	 * Register route for execution exception
 	 * @param string routename
 	 */
 	public function setExecutionFailRoute($routename)
 	{
-		$this->executionFailRoute	= $routename;
+		$this->executionFailRoute = $routename;
 	}
 
 	/**
@@ -78,10 +82,8 @@ class Application
 	{
 		$app = $this;
 
-		$this->structure = new \Exedra\Application\Structure\Structure($this->name);
-		$this->loader = new \Exedra\Loader($this->getBaseDir(), $this->structure);
-
 		$this->di = new \Exedra\Application\Dic(array(
+			"loader"=> array("\Exedra\Loader", array($this->getBaseDir(), $this->structure)),
 			"request"=>$this->exedra->httpRequest,
 			"response"=>$this->exedra->httpResponse,
 			"map"=> function() use($app) {return new \Exedra\Application\Map\Map($app);},

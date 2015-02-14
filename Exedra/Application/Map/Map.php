@@ -6,7 +6,7 @@ class Map
 	 * Cache storage.
 	 * @var array
 	 */
-	private $cache = array();
+	protected $cache = array();
 
 	/**
 	 * First level of this map.
@@ -36,15 +36,11 @@ class Map
 	 * Add a route on top of other route.
 	 * @param string name of the route.
 	 * @param array routes
+	 * @return this
 	 */
 	public function addOnRoute($name, array $routes)
 	{
-		$finding = $this->findByName($name);
-
-		if(!$finding->success())
-			throw new \Exception('Route by name '. $name .' was not found.');
-
-		$route = $finding->route;
+		$route = $this->getRoute($name);
 		
 		// if has subroute, use the that subroute, else, create a new subroute.
 		if($route->hasSubroute())
@@ -58,20 +54,17 @@ class Map
 	/**
 	 * Find route by the absolute name.
 	 * @param string name.
-	 * @return \Exedra\Application\Map\Finding or false boolean.
+	 * @return \Exedra\Application\Map\Finding
 	 */
 	public function findByName($name, $parameter = array())
 	{
 		$route = $this->getRoute($name);
 
 		return new \Exedra\Application\Map\Finding($route?:null, $parameter);
-
-		// CURRENTLY HERE, DOING SOME FINDING CLASS!
-		return $route ? $route : false ;
 	}
 
 	/**
-	 * Alias to findByName
+	 * Get route by the given absolute name.
 	 * @param string name.
 	 * @return \Exedra\Application\Map\Route or false boolean.
 	 */
@@ -102,12 +95,6 @@ class Map
 		$result = $this->level->query($query);
 
 		return new \Exedra\Application\Map\Finding($result['route']?:null, $result['parameter']);
-
-		// rebuild
-		return array(
-			'route'=>$result['route'],
-			'parameter'=>isset($result['parameter']) ? $result['parameter'] : array()
-			);
 	}
 }
 

@@ -8,28 +8,49 @@ class Redirect
 		$this->exe = $exe;
 	}
 
+	/**
+	 * Redirect to url
+	 * @param string url
+	 * @return redirection
+	 */
 	final public function toUrl($url)
 	{
 		return $this->exe->response->redirect($url);
 	}
 
+	/**
+	 * Do a session flash
+	 * @param mixed key
+	 * @param mixed val
+	 * @return this
+	 */
 	public function flash($key, $val = null)
 	{
 		$this->exe->flash->set($key, $val);
 		return $this;
 	}
 
+	/**
+	 * Refresh the page.
+	 * @return redirection
+	 */
 	final public function refresh()
 	{
 		return $this->to($this->exe->getRoute(), $this->exe->getParams());
 	}
 
-	final public function to($route = null, $params = array())
+	/**
+	 * Redirect by given route's name.
+	 * @param string route
+	 * @param array params
+	 * @param mixed query
+	 */
+	final public function to($route = null, $params = array(), $query = null)
 	{
 		if(!$route)
 			return $this->refresh();
 
-		$url = $this->exe->url->create($route, $params);
+		$url = $this->exe->url->create($route, $params, $query);
 
 		return $this->toUrl($url);
 	}

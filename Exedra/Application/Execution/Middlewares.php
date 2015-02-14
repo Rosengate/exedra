@@ -8,7 +8,8 @@ namespace Exedra\Application\Execution;
 class Middlewares extends \ArrayIterator
 {
 	/**
-	 * Append a new middleware to the collection.
+	 * Append a middleware to the collection.
+	 * @param mixed middleware
 	 */
 	public function add($middleware)
 	{
@@ -26,7 +27,8 @@ class Middlewares extends \ArrayIterator
 	}
 
 	/**
-	 * Resolve middleware.
+	 * Resolve middlewares all into usable callbacks.
+	 * @param \Exedra\Application\Execution\Exec
 	 */
 	public function resolve(\Exedra\Application\Execution\Exec $exe)
 	{

@@ -1,15 +1,42 @@
 <?php
 namespace Exedra\Application\Builder\Blueprint;
 
+/**
+ * Blueprint for View
+ */
+
 class View
 {
-	private $path;
-	public $data = Array();
-	private $loader		= null;
-	private $required 	= Array();
-	private $callbacks	= Array();
+	/**
+	 * Path for this view.
+	 * @var string
+	 */
+	protected $path;
 
-	public function __construct($exe, $path = null,$data = null,$loader)
+	/**
+	 * Data for this view
+	 * @var array
+	 */
+	public $data = array();
+
+	/**
+	 * Loader to be used.
+	 * @var \Exedra\Loader
+	 */
+	protected $loader		= null;
+
+	/**
+	 * List of key of data required, before view can be rendered.
+	 * @var array 
+	 */
+	protected $required 	= array();
+
+	/**
+	 * List of callbacks, of what can be done with the data, on callbackResolve()
+	 */
+	protected $callbacks	= array();
+
+	public function __construct(\Exedra\Application\Execution\Exec $exe, $path = null, $data = null, \Exedra\Loader $loader)
 	{
 		$this->exe = $exe;
 		if($path) $this->setPath($path);

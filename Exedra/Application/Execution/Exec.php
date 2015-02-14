@@ -45,7 +45,6 @@ class Exec
 	 */
 	public $config;
 
-	// public function __construct(\Exedra\Application\Map\Route $route, $app, $params, $config, $subapp = null)
 	public function __construct(\Exedra\Application\Application $app, \Exedra\Application\Map\Finding $finding)
 	{
 		$this->finding = $finding;
@@ -79,7 +78,7 @@ class Exec
 	protected function initiateContainer()
 	{
 		$app = $this->app;
-		$subapp = $this->getSubapp();
+		$exe = $this;
 
 		$this->di = new \Exedra\Application\Dic(array(
 			"loader"=> array("\Exedra\Loader", array($this->getBaseDir(), $this->app->structure)),
@@ -95,7 +94,7 @@ class Exec
 			"exception"=> array("\Exedra\Application\Builder\Exception", array($this)),
 			"form"=> array("\Exedra\Application\Utilities\Form", array($this)),
 			"session"=> function() use($app) {return $app->session;},
-			"file"=> array("\Exedra\Application\Builder\File", array($app, $subapp)),
+			"file"=> function() use($exe) {return new \Exedra\Application\Builder\File($exe->loader);},
 			'middlewares'=> array('\Exedra\Application\Execution\Middlewares')
 			));
 	}
@@ -106,7 +105,7 @@ class Exec
 	 */
 	public function getBaseDir()
 	{
-		return trim($this->app->getBaseDir(), '/'). '/' . $subapp;
+		return trim($this->app->getBaseDir(), '/'). '/' . $this->getSubapp();
 	}
 
 	/**

@@ -2,7 +2,10 @@
 
 class Level extends \ArrayIterator
 {
-	/* The route it's bound to */
+	/**
+	 * Reference to the route this level was bound to.
+	 * @var \Exedra\Application\Map\Route
+	 */
 	public $route;
 
 	public function __construct(Route $route = null, array $routes = array())

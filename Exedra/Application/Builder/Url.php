@@ -2,7 +2,7 @@
 namespace Exedra\Application\Builder;
 
 /**
- * A Url builder.
+ * A Route Oriented Url builder.
  */
 
 class Url

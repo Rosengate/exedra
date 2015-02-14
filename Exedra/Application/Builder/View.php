@@ -8,12 +8,6 @@ namespace Exedra\Application\Builder;
 class View
 {
 	/**
-	 * Instance of structure.
-	 * @var \Exedra\Application\Structure\Structure
-	 */
-	protected $structure;
-
-	/**
 	 * Intance of execution based loader.
 	 * @var \Exedra\Loader
 	 */
@@ -34,7 +28,6 @@ class View
 	public function __construct(\Exedra\Application\Execution\Exec $exe)
 	{
 		$this->loader = $exe->loader;
-		$this->structure = $exe->app->structure;
 		$this->exe = $exe;
 	}
 
@@ -44,7 +37,7 @@ class View
 	 * @param array data
 	 * @return \Exedra\Application\Response\View view
 	 */
-	public function create($path,$data = array())
+	public function create($path, $data = array())
 	{
 		// $path = $this->buildPath($path);
 		if(!$this->has($path))
@@ -57,7 +50,7 @@ class View
 		if(count($this->defaultData) > 0)
 			$data = array_merge($data, $this->defaultData);
 
-		$view	= new Blueprint\View($this->exe, $path,$data,$this->loader);
+		$view	= new Blueprint\View($this->exe, $path, $data, $this->loader);
 		
 		return $view;
 	}

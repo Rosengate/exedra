@@ -1,19 +1,33 @@
 <?php
 namespace Exedra\Application\Structure;
 
+/**
+ * A class to handle application structure
+ */
+
 class Structure
 {
-	protected $paths;
-	protected $patterns;
-	protected $characters;
-	protected $basePath;
+	/**
+	 * List of structure paths
+	 * @var array
+	 */
+	protected $paths = array();
 
-	public function __construct($basePath)
+	/**
+	 * List of patterns like controller_name, and middleware_name
+	 * @var array
+	 */
+	protected $patterns = array();
+
+	/**
+	 * List of characters, like absolute character, for routing.
+	 * @var array
+	 */
+	protected $characters = array();
+
+	public function __construct()
 	{
-		// application base path
-		$this->setBasePath($basePath);
-
-		// add default structure.
+		// Initiate default
 		$this->add(array(
 			"controller"	=>"controller",
 			"model"			=>"model",
@@ -24,6 +38,7 @@ class Structure
 			"middleware"	=>"middleware",
 			"storage"		=>"storage"));
 
+		//  Absolute character
 		$this->setCharacter('absolute', '@');
 
 		// class name for controller.
@@ -39,34 +54,29 @@ class Structure
 		});
 	}
 
-	private function refinePath($paths)
-	{
-		return implode("/",$paths);
-	}
-
 	/**
-	 * Set base directory. basically this framework will default it to 'app'.
+	 * Get structure path
+	 * @param string name
+	 * @return string
 	 */
-	public function setBasePath($path)
+	public function get($name)
 	{
-		$this->basePath = $path != null ? $path : 'app';
+		if(!isset($this->paths[$name]))
+			throw new \Exception("Structure '$name' does not exist");
+
+		return $this->paths[$name];
 	}
-
-
-	/*public function getAppName()
-	{
-		return $this->appName;
-	}*/
 
 	## prefix, add just after the app name. suffix add at the end of structure value.
 	/**
+	 * DEPRECATED : NO LONGER USED
 	 * Get the structure path.
 	 * @param string name of the structure
 	 * @param string additional suffix 
 	 * @param string prefix before the suffix.
 	 * @return string path.
 	 */
-	public function get($name,$suffix = null,$prefix = null)
+	public function getOld($name,$suffix = null,$prefix = null)
 	{
 		$paths = array();
 		// $paths[] = $this->basePath;
@@ -146,6 +156,12 @@ class Structure
 		return $this->characters[$key];
 	}
 
+	/**
+	 * Set character
+	 * @param string key
+	 * @param mixed val
+	 * @return this
+	 */
 	public function setCharacter($key, $val)
 	{
 		$this->characters[$key] = $val;
