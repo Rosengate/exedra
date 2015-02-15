@@ -114,18 +114,21 @@ class Request
 	 * @param mixed default
 	 * @return mixed
 	 */
-	public function paramBag($method, $key, $default = null)
+	public function paramBag($method, $key = null, $default = null)
 	{
-		return isset($this->parameters[$method][$key]) ? $this->get[$key] : $default;
+		if($key === null)
+			return $this->parameters[$method];
+		else
+			return isset($this->parameters[$method][$key]) ? $this->get[$key] : $default;
 	}
 
 	/**
 	 * Get _get parameter
 	 * @param string key
-	 * @param string default
+	 * @param mixed default
 	 * @return mixed 
 	 */
-	public function paramGet($key, $default = null)
+	public function paramGet($key = null, $default = null)
 	{
 		return $this->paramBag('get', $key, $default);
 	}
@@ -133,10 +136,10 @@ class Request
 	/**
 	 * Get _post parameter
 	 * @param string key
-	 * @param string default
+	 * @param mixed default
 	 * @return mixed 
 	 */
-	public function paramPost($key, $default = null)
+	public function paramPost($key = null, $default = null)
 	{
 		return $this->paramBag('post', $key, $default);
 	}
@@ -172,6 +175,28 @@ class Request
 	}
 
 	/**
+	 * Alias to paramGet
+	 * @param string key
+	 * @param mixed default
+	 * @param mixed
+	 */
+	public function get($key = null, $default = null)
+	{
+		return $this->paramGet($key, $default);
+	}
+
+	/**
+	 * Alias to paramPost
+	 * @param string key
+	 * @param mixed default
+	 * @return mixed
+	 */
+	public function post($key = null, $default = null)
+	{
+		return $this->paramPost($key, $default);
+	}
+
+	/**
 	 * Return uri of the request
 	 * @return string
 	 */
@@ -193,7 +218,7 @@ class Request
 	 * Return request _header
 	 * @return array
 	 */
-	public function getHeaders()
+	public function getHeader()
 	{
 		return $this->header;
 	}
