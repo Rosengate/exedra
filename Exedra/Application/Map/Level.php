@@ -8,8 +8,15 @@ class Level extends \ArrayIterator
 	 */
 	public $route;
 
-	public function __construct(Route $route = null, array $routes = array())
+	/**
+	 * Factory injected to this level.
+	 * @var \Exedra\Application\Map\Factory
+	 */
+	public $factory;
+
+	public function __construct(Factory $factory, Route $route = null, array $routes = array())
 	{
+		$this->factory = $factory;
 		$this->route = $route;
 		if(count($routes) > 0)
 			$this->addRoutesByArray($routes);
@@ -119,7 +126,8 @@ class Level extends \ArrayIterator
 	public function addRoutesByArray(array $routes)
 	{
 		foreach($routes as $name=>$routeData)
-			$this->addRoute(new Route($this, $name, $routeData));
+			// $this->addRoute(new Route($this, $name, $routeData));
+			$this->addRoute($this->factory->createRoute($this, $name, $routeData));
 
 		return $this;
 	}

@@ -508,7 +508,8 @@ class Route
 	 */
 	public function setSubroute(array $subroutes)
 	{
-		$subroutes = new Level($this, $subroutes);
+		$subroutes = $this->level->factory->createLevel($this, $subroutes);
+		// $subroutes = new Level($this, $subroutes);
 		return $this->setParameter('subroute', $subroutes);
 	}
 

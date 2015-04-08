@@ -25,7 +25,6 @@ class Application
 	 * Current executed route.
 	 * @var \Exedra\Application\Map\Route
 	 */
-	// private $currentRoute = null;
 
 	/**
 	 * List of executions
@@ -86,7 +85,7 @@ class Application
 			"loader"=> array("\Exedra\Loader", array($this->getBaseDir(), $this->structure)),
 			"request"=>$this->exedra->httpRequest,
 			"response"=>$this->exedra->httpResponse,
-			"map"=> function() use($app) {return new \Exedra\Application\Map\Map($app);},
+			"map"=> function() use($app) {return new \Exedra\Application\Map\Map($app, new \Exedra\Application\Map\Factory);},
 			"config"=> array("\Exedra\Application\Config"),
 			"session"=> array("\Exedra\Application\Session\Session"),
 			"exception"=> array("\Exedra\Application\Builder\Exception"),
@@ -165,17 +164,9 @@ class Application
 				$finding->addParameter($parameter);
 			}
 
-			// $route = $finding->route;
-
-			// $parameter = count($result['parameter']) ? array_merge($parameter, $result['parameter']) : $parameter;
-			// $parameter = count($finding->parameters) ? array_merge($parameter, $finding->parameters) : $parameter;
-
 			// route not found.
 			if(!$finding->success())
 				return $this->throwFailedExecution($query, $parameter);
-
-			// $route = $finding->route;
-			// $this->currentRoute = $route;
 
 			$exe = new Execution\Exec($this, $finding);
 
@@ -205,9 +196,6 @@ class Application
 
 			$response = Execution\Resolver::resolve($execution($exe));
 
-			// $executor	= new Execution\Executor($this->exeRegistry, $exe);
-			// $execution	= $executor->execute($route->getParameter('execute'));
-
 			// clear flash on every application execution (only if it has started).
 			if(\Exedra\Application\Session\Session::hasStarted())
 				$exe->flash->clear();
@@ -226,6 +214,7 @@ class Application
 			}
 			else
 			{
+				// simple customer error msg.
 				return "<pre><hr><u>Execution Exception :</u>\n".$e->getMessage()."<hr>";
 			}
 		}

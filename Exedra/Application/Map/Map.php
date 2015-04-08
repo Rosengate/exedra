@@ -14,10 +14,17 @@ class Map
 	 */
 	protected $level;
 
-	public function __construct(\Exedra\Application\Application $app)
+	/**
+	 * Route and Level factory.
+	 * @var \Exedra\Application\Map\Factory
+	 */
+	public $factory;
+
+	public function __construct(\Exedra\Application\Application $app, \Exedra\Application\Map\Factory $factory)
 	{
 		$this->app = $app;
-		$this->level = new Level;
+		$this->factory = $factory;
+		$this->level = $factory->createLevel();
 	}
 
 	/**
@@ -27,7 +34,7 @@ class Map
 	public function addRoute(array $routes)
 	{
 		foreach($routes as $name=>$routeData)
-			$this->level->addRoute(new Route($this->level, $name, $routeData));
+			$this->level->addRoute($this->factory->createRoute($this->level, $name, $routeData));
 
 		return $this;
 	}
