@@ -33,7 +33,7 @@ class Structure
 			"model"			=>"model",
 			"config"		=>"config",
 			"view"			=>"view",
-			"route"			=>"routes",
+			"routes"		=>"routes",
 			"documents"		=>"documents",
 			"middleware"	=>"middleware",
 			"storage"		=>"storage"));

@@ -450,7 +450,13 @@ class Route
 	 */
 	public function getSubroute()
 	{
-		return $this->parameters['subroute'];
+		$level = $this->parameters['subroute'];
+
+		// is a string based level.
+		if(is_string($level))
+			return $this->level->factory->createLevelByPattern($this, $level);
+
+		return $level;
 	}
 
 	/**
@@ -504,12 +510,12 @@ class Route
 
 	/**
 	 * Add new level on for this route.
-	 * @param array subroutes
+	 * @param array or pattern subroutes
 	 */
-	public function setSubroute(array $subroutes)
+	public function setSubroute($subroutes)
 	{
-		$subroutes = $this->level->factory->createLevel($this, $subroutes);
-		// $subroutes = new Level($this, $subroutes);
+		// only create Level if the argument is array. else, just save the pattern.
+		$subroutes = is_array($subroutes) ? $this->level->factory->createLevel($this, $subroutes) : $subroutes;
 		return $this->setParameter('subroute', $subroutes);
 	}
 

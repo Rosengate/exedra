@@ -9,6 +9,16 @@ namespace Exedra\Application\Map;
 class Factory
 {
 	/**
+	 * Loader for lazy loading functionality
+	 */
+	protected $loader;
+
+	public function __construct(\Exedra\Loader $loader)
+	{
+		$this->loader = $loader;
+	}
+
+	/**
 	 * Create route object
 	 * @param \Exedra\Application\Map\Level level of where the route is based on
 	 * @param string route name
@@ -29,5 +39,32 @@ class Factory
 	public function createLevel(Route $route = null, array $routes = array())
 	{
 		return new Level($this, $route, $routes);
+	}
+
+	/**
+	 * Create level by pattern
+	 * @param \Exedra\Application\Map\Route
+	 * @param string pattern
+	 * @return \Exedra\Application\Map\Level
+	 */
+	public function createLevelByPattern(Route $route = null, $pattern)
+	{
+		// has structure based path
+		if(strpos($pattern, ':') !== FALSE)
+		{
+			list($structure, $path) = explode(':', $pattern);
+			$loadParameter = array(
+				'structure' => $structure,
+				'path' => $path
+				);
+		}
+		else
+		{
+			$loadParameter = $pattern;
+		}
+
+		$subroutes = $this->loader->load($loadParameter);
+
+		return $this->createLevel($route, $subroutes);
 	}
 }

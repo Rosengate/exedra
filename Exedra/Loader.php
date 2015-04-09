@@ -64,7 +64,7 @@ class Loader
 		if($data && is_array($data))
 			extract($data);
 
-		return require_once $file;
+		return require $file;
 	}
 
 	/**
