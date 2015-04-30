@@ -2,17 +2,23 @@
 
 class Route
 {
-	/* route name */
+	/**
+	 * @var string name
+	 */
 	protected $name;
 
-	/* array */
+	/**
+	 * @var string absolute name
+	 */
 	protected $absoluteName;
 
-	/* full routes. initiated by getFullRoutes() */
+	/**
+	 * @var array stored full routes
+	 */
 	protected $fullRoutes = null;
 
 	/**
-	 * Route parameters
+	 * @var array parameters
 	 * - method
 	 * - uri
 	 * - subapp
@@ -22,10 +28,16 @@ class Route
 	 */
 	protected $parameters = array();
 
-	/* level it's bound to */
+	/**
+	 * Level this route is bound to
+	 * @var \Exedra\Application\Map\Level
+	 */
 	protected $level;
 
-	/* notation */
+	/**
+	 * Route notation stored in static form
+	 * @var string notation
+	 */
 	public static $notation = '.';
 
 	public function __construct(Level $level, $name, array $parameters = array())
@@ -133,7 +145,8 @@ class Route
 	}
 
 	/**
-	 * Get parent route after substracted the current route name.
+	 * Get parent route name after substracted the current route name.
+	 * @return string | null
 	 */
 	public function getParentRoute()
 	{
@@ -214,6 +227,7 @@ class Route
 	 * - route \Exedra\Application\Map\Route or false
 	 * - parameter array
 	 * - equal boolean
+	 * @return array struct of {route, parameter, equal}
 	 */
 	public function validate(array $query)
 	{
@@ -234,7 +248,7 @@ class Route
 			{
 				case "method":
 				// return false because method doesn't exist.
-				if(!in_array($value, $this->getParameter('method')))
+				if(!in_array(strtolower($value), $this->getParameter('method')))
 					return array('route'=> false, 'parameter'=> false, 'equal'=> false);
 
 				break;
@@ -390,30 +404,6 @@ class Route
 		## pass parameter.
 		$result['parameter'] = $uriParams;
 
-		/*if($hasSubroute && ($equal === null || $equal === true))
-		{
-			## set as true.
-			// $result['matched'] = true;
-
-			## since trailing would sedut the remaining uri, just return empty.
-			// if($isTrailing)
-				// return "";
-
-			## normal. just substract and return the remaining uri.
-			$total	= count($segments);
-
-			## rebuild. since i don't have internet currently.
-			$new_uriR	= Array();
-			for($i=$total;$i<count($uris);$i++)
-			{
-				$new_uriR[]	= $uris[$i];
-			}
-
-			## pass remaining uri.
-			// $result['remaining_uri']	= implode("/",$new_uriR);  # old 
-			// $result['remaining_uri']	= $routeURI != ""?implode("/",$new_uriR):$uri;
-		}*/
-
 		## return matched, parameter founds, and remaining_uri (if deeproute)
 		return $result;
 	}
@@ -486,6 +476,7 @@ class Route
 	public function setMethod($method)
 	{
 		$method = !is_array($method) ? explode(',', $method) : $method;
+		$method = array_map('strtolower', $method);
 		$this->setParameter('method', $method);
 	}
 

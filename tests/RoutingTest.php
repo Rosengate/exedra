@@ -145,7 +145,7 @@ class RoutingTest extends PHPUnit_Framework_TestCase
 						return $exe->param('test');
 					}]
 				)],
-			'r3'=>['uri'=>'[:huga]/rita','bind:middleware'=> function($exe){
+			'r3'=>['uri'=>'[:huga]/rita','middleware'=> function($exe){
 
 				$exe->somethingFromMiddleware = 'something';
 

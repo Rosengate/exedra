@@ -33,11 +33,11 @@ class Pattern
 
 		foreach($this->registry as $key=>$array)
 		{
-			if($array['condition'] == true)
+			if($array['condition'] === true)
 				return $array['resolve']($value);
 		}
 
-		return $this->app->create('No executional pattern matched.');
+		return $this->app->exception->create('No executional pattern matched.');
 	}
 
 	/**

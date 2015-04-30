@@ -4,17 +4,17 @@ namespace Exedra\Application\Map;
 class Finding
 {
 	/**
-	 * \Exedra\Application\Map\Route route
+	 * @var \Exedra\Application\Map\Route route
 	 */
 	public $route;
 
 	/**
-	 * array middlewares
+	 * @var array middlewares
 	 */
 	public $middlewares = array();
 
 	/**
-	 * array parameters
+	 * @var array parameters
 	 */
 	public $parameters = array();
 
@@ -24,7 +24,7 @@ class Finding
 	protected $subapp = null;
 
 	/**
-	 * \Exedra\Application\Config Configs
+	 * @var \Exedra\Application\Config Configs
 	 */
 	public $configs;
 
