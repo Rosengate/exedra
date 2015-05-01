@@ -33,8 +33,10 @@ class Pattern
 
 		foreach($this->registry as $key=>$array)
 		{
-			if($array['condition'] === true)
+			if($array['condition']($value) === true)
+			{
 				return $array['resolve']($value);
+			}
 		}
 
 		return $this->app->exception->create('No executional pattern matched.');
@@ -43,10 +45,10 @@ class Pattern
 	/**
 	 * Register a new pattern
 	 * @param string key
-	 * @param mixed condition
-	 * @param mixed resolution
+	 * @param \Closure condition
+	 * @param \Closure resolution
 	 */
-	public function register($key, $condition, $resolution)
+	public function register($key, \Closure $condition, \Closure $resolution)
 	{
 		$this->registry[$key] = array(
 			'condition'=> $condition,
@@ -59,7 +61,7 @@ class Pattern
 	 */
 	protected function conditionControllerBuilder($value)
 	{
-		if(strpos($execution, "controller=") === 0)
+		if(strpos($value, "controller=") === 0)
 			return true;
 
 		return false;
