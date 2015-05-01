@@ -44,7 +44,7 @@ Abstract Class InstanceBuilder
 			$this->exe->exception->create("Unable to find file '".$path."' for ".$builderName." : ".$className.($this->subapp?" (subapp : ".$this->subapp.")":"").".");
 		}
 
-		$this->loader->load(array('structure'=> $builderName, 'path'=> $path));
+		$this->loader->loadOnce(array('structure'=> $builderName, 'path'=> $path));
 
 		## prepare class name by pattern.
 		$className		= $this->structure->getPattern($this->patternName,$className);

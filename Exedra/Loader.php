@@ -51,20 +51,45 @@ class Loader
 	 * @param array data
 	 * @return required file
 	 */
-	public function load($file,$data = null)
+	public function load($file, array $data = array())
+	{
+		return $this->loadFile($file, $data, false);
+	}
+
+	/**
+	 * Similar with load, but only require the file once.
+	 * @param mixed file
+	 * @param array data
+	 * @return required file
+	 */
+	public function loadOnce($file, array $data = array())
+	{
+		return $this->loadFile($file, $data, true);
+	}
+
+	/**
+	 * Abstract function for load and loadOnce
+	 * @param mixed file
+	 * @param array data
+	 * @param boolean once
+	 * @return required file
+	 */
+	protected function loadFile($file, $data, $once = false)
 	{
 		$file = is_array($file) ? $this->configure($file) : $file;
-		$file = $this->refinePath($this->prefixPath($file));
 
-		if(isset($loaded[$file])) return false;
+		$file = $this->refinePath($this->prefixPath($file));
 
 		if(!file_exists($file))
 			throw new \Exception("File not found : $file");
 
-		if($data && is_array($data))
-			extract($data);
+		extract($data);
 
-		return require $file;
+		if($once)
+			require_once $file;
+		else
+			require $file;
+
 	}
 
 	/**
