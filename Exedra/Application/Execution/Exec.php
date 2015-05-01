@@ -105,7 +105,7 @@ class Exec
 	 */
 	public function getBaseDir()
 	{
-		return trim($this->app->getBaseDir(), '/'). '/' . $this->getSubapp();
+		return rtrim($this->app->getBaseDir(), '/'). '/' . $this->getSubapp();
 	}
 
 	/**

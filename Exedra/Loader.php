@@ -26,7 +26,7 @@ class Loader
 
 	public function __construct($baseDir = null, \Exedra\Application\Structure\Structure $structure = null)
 	{
-		$this->baseDir = !$baseDir ? null : trim($baseDir, '/');
+		$this->baseDir = !$baseDir ? null : rtrim($baseDir, '/');
 		$this->structure = $structure;
 	}
 
@@ -40,7 +40,7 @@ class Loader
 		if(!$this->baseDir === null)
 			return $path;
 
-		return trim($this->baseDir, '/').'/'.$path;
+		return rtrim($this->baseDir, '/').'/'.$path;
 	}
 
 	/**
