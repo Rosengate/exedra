@@ -65,7 +65,8 @@ class Middlewares extends \ArrayIterator
 					$method = isset($atoms[1]) ? $atoms[1] : "handle";
 
 					// create a handler.
-					$this[$this->key()] = function($exe) use($middleware, $method) {$exe->middleware->create($middleware)->$method($exe);};
+					$this[$this->key()] = function($exe) use($middleware, $method) {
+						return $exe->middleware->create($middleware)->$method($exe);};
 				}
 			}
 
