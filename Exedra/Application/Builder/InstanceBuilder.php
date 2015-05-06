@@ -15,18 +15,29 @@ Abstract Class InstanceBuilder
 	 */
 	protected $patternName;
 
+	/**
+	 * Namespaced instance flag
+	 * @var boolean
+	 */
+	protected $isNamespaced = true;
+
 	public function __construct(\Exedra\Application\Execution\Exec $exe, $subapp = null)
 	{
 		$this->exe = $exe;
 		$this->loader = $exe->loader;
 		$this->structure = $exe->app->structure;
 		$this->subapp = $exe->getSubapp();
+
+		// if the execution instance has this config.
+		if($exe->config->has('namespaced_builder'))
+			$this->isNamespaced = $exe->config->get('namespaced_builder'); 
 	}
 
 	/**
 	 * Create the builder
 	 * @param string className
 	 * @param array constructorParam
+	 * @return Object
 	 */
 	public function create($className, array $constructorParam = array())
 	{
@@ -46,9 +57,12 @@ Abstract Class InstanceBuilder
 
 		$this->loader->loadOnce(array('structure'=> $builderName, 'path'=> $path));
 
-		## prepare class name by pattern.
-		$className		= $this->structure->getPattern($this->patternName,$className);
-		
+		// namespace based builder.
+		if($this->isNamespaced)
+			$className = $this->exe->app->getAppname().'\\'.($this->exe->getSubapp() ? $this->exe->getSubapp().'\\' : '' ).$builderName.'\\'.$className;
+		else
+			$className		= $this->structure->getPattern($this->patternName,$className);
+
 		## Exception : class name not found.
 		if(!class_exists($className))
 			$this->exe->exception->create("Class named '$className' does not exists in file ".$path);
