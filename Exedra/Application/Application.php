@@ -160,14 +160,18 @@ class Application
 			// expect it either \Exedra\HTTP\Request or array
 			else
 			{
-				$data = $query;
-				$query = array();
-				\Exedra\Functions\Arrays::initiateByNotation($query, $data);
-
 				if($query instanceof \Exedra\HTTP\Request)
+				{
 					$request = $query;
+				}
 				else
+				{
+					$data = $query;
+					$query = array();
+					\Exedra\Functions\Arrays::initiateByNotation($query, $data);
+					
 					$request = new \Exedra\HTTP\Request($query);
+				}
 
 				$finding = $this->map->findByRequest($request);
 				$finding->addParameter($parameter);
