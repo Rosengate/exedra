@@ -3,9 +3,22 @@ namespace Exedra\Functions;
 
 abstract class Arrays
 {
-	public static function setByNotation(&$storage,$key,$value,$notation = ".")
+	public static function initiateByNotation(&$storage, $data, $notation = '.')
 	{
-		## temporary replacement for escaped dot.
+		foreach($data as $key => $value)
+		{
+			unset($storage[$key]);
+			$next = &self::setByNotation($storage, $key, $value, $notation);
+
+			// recursive.
+			if(is_array($value))
+				self::initiate($next, $value, $notation);
+		}
+	}
+
+	public static function &setByNotation(&$storage, $key, $value, $notation = '.')
+	{
+		// temporary replacement for escaped dot.
 		$key	= str_replace("\.", "z#G1", $key);
 		$keys	= explode($notation,$key);
 		foreach($keys as $key)
@@ -15,12 +28,15 @@ abstract class Arrays
 				$storage[$key]	= Array();
 
 			$storage = &$storage[$key];
+			$laststorage = &$storage;
 		}
 
 		$storage	= $value;
+
+		return $laststorage;
 	}
 
-	public static function getByNotation($myarray,$key,$notation = ".")
+	public static function getByNotation($myarray, $key, $notation = '.')
 	{
 		$keys	= explode($notation,$key);
 
@@ -32,7 +48,7 @@ abstract class Arrays
 		return $myarray;
 	}
 
-	public static function hasByNotation($storage,$key,$notation = ".")
+	public static function hasByNotation($storage,$key,$notation = '.')
 	{
 		$keys	= explode($notation,$key);
 
@@ -49,7 +65,7 @@ abstract class Arrays
 		return true;
 	}
 
-	public static function deleteByNotation(&$storage,$key,$notation = ".")
+	public static function deleteByNotation(&$storage,$key,$notation = '.')
 	{
 		if($key == null)
 		{
