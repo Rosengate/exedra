@@ -12,7 +12,7 @@ abstract class Arrays
 
 			// recursive.
 			if(is_array($value))
-				self::initiate($next, $value, $notation);
+				self::initiateByNotation($next, $value, $notation);
 		}
 	}
 
