@@ -65,7 +65,7 @@ class Level extends \ArrayIterator
 	 * @param array passedParameters - highly otional.
 	 * @return {route: \Exedra\Application\Map\Route OR false, parameter: array}
 	 */
-	public function query(array $query, array $passedParameters = array())
+	public function query(\Exedra\HTTP\Request $request, $levelUri, array $passedParameters = array())
 	{
 		$this->rewind();
 
@@ -74,9 +74,9 @@ class Level extends \ArrayIterator
 		{
 			$route = $this->current();
 
-			$result = $route->validate($query);
+			$result = $route->validate($request, $levelUri);
 
-			$remainingUri = $route->getRemainingUri($query['uri']);
+			$remainingUri = $route->getRemainingUri($levelUri);
 
 			$hasSubroute = $route->hasSubroute();
 
@@ -101,10 +101,11 @@ class Level extends \ArrayIterator
 					// if has passed parameter.
 					$passedParameters = count($result['parameter']) > 0 ? $result['parameter'] : array();
 
-					$queryUpdated = $query;
-					$queryUpdated['uri'] = $remainingUri;
+					// $queryUpdated = $query;
+					// $queryUpdated['uri'] = $remainingUri;
 
-					$subrouteResult = $route->getSubroute()->query($queryUpdated, $passedParameters);
+					// $subrouteResult = $route->getSubroute()->query($queryUpdated, $passedParameters);
+					$subrouteResult = $route->getSubroute()->query($request, $remainingUri, $passedParameters);
 
 					// if found. else. continue on this level.
 					if($subrouteResult['route'] != false)

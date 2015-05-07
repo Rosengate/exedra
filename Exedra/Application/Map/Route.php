@@ -229,30 +229,32 @@ class Route
 	 * - equal boolean
 	 * @return array struct of {route, parameter, equal}
 	 */
-	public function validate(array $query)
+	public function validate(\Exedra\HTTP\Request $query, $uri)
 	{
 		// print_r($query);die;
 		foreach(array('method', 'uri', 'ajax') as $key)
 		{
 			// by default, if parameter was set, but query not provided anything.
-			if($this->hasParameter($key) && !isset($query[$key]))
-				return array('route'=> false, 'parameter'=> false);
+			// if($this->hasParameter($key) && !isset($query[$key]))
+			// 	return array('route'=> false, 'parameter'=> false);
 			
 			// if this parameter wasn't set, skip validation.
-			else if(!$this->hasParameter($key))
+			if(!$this->hasParameter($key))
 				continue;
 
-			$value = $query[$key];
+			// $value = $query[$key];
 
 			switch($key)
 			{
 				case "method":
+				$value = $query->getMethod();
 				// return false because method doesn't exist.
 				if(!in_array(strtolower($value), $this->getParameter('method')))
 					return array('route'=> false, 'parameter'=> false, 'equal'=> false);
 
 				break;
 				case "uri":
+				$value = $uri;
 				$result = $this->validateURI($value);
 
 				if(!$result['matched'])

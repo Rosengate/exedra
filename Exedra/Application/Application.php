@@ -148,19 +148,28 @@ class Application
 	 * @param array parameter
 	 * @return mixed
 	 */
-	public function execute($query, $parameter = Array())
+	public function execute($query, array $parameter = array())
 	{
 		try
 		{
+			// expect it as route name
 			if(is_string($query))
 			{
-				// $route = $this->map->findByName($query);
 				$finding = $this->map->findByName($query, $parameter);
 			}
+			// expect it either \Exedra\HTTP\Request or array
 			else
 			{
-				// $result = $this->map->find($query);
-				$finding = $this->map->find($query);
+				$data = $query;
+				$query = array();
+				\Exedra\Functions\Arrays::initiateByNotation($query, $data);
+
+				if($query instanceof \Exedra\HTTP\Request)
+					$request = $query;
+				else
+					$request = new \Exedra\HTTP\Request($query);
+
+				$finding = $this->map->findByRequest($request);
 				$finding->addParameter($parameter);
 			}
 

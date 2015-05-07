@@ -75,7 +75,7 @@ class Exedra
 	 * @return \Exedra\Application\Application
 	 * @throws \Exception
 	 */
-	public function build($app_name,$execution = null)
+	public function build($app_name,\Closure $execution = null)
 	{
 		try
 		{
@@ -90,7 +90,8 @@ class Exedra
 			$this->apps[$app_name] = new \Exedra\Application\Application($app_name,$this);
 				
 			// Execute in instant.
-			$execution($this->apps[$app_name]);
+			if($execution)
+				$execution($this->apps[$app_name]);
 
 			return $this->apps[$app_name];
 
@@ -131,11 +132,7 @@ class Exedra
 	{
 		foreach($this->apps as $app_name => $app)
 		{
-			echo $app->execute(Array(
-				"method"=>$this->httpRequest->getMethod(),
-				"uri"=>$this->httpRequest->getURI(),
-				"ajax"=>$this->httpRequest->isAjax(),
-				));
+			echo $app->execute($this->httpRequest);
 		}
 	}
 }

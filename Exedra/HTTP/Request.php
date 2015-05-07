@@ -66,11 +66,11 @@ class Request
 	protected function buildRequest(array $param = array())
 	{
 		// initiate basic request data into properties.
-		$this->parameters	= isset($param['parameters'])?$param['parameters']:Array("get"=>$_GET,"post"=>$_POST);
-		$this->header		= isset($param['header'])?$param['header']:(function_exists("getallheaders")?getallheaders():null);
-		$this->server		= isset($param['server'])?$param['server']:$_SERVER;
-		$this->method		= isset($param['method'])?$param['method']:(isset($this->server['REQUEST_METHOD'])?$this->server['REQUEST_METHOD'] : null);
-		$this->uri			= isset($param['uri'])?$param['uri']:(isset($this->server['REQUEST_URI']) ? $this->buildURI($this->server['REQUEST_URI']) : null );
+		$this->parameters	= isset($param['parameters']) ? $param['parameters'] : array("get"=>$_GET,"post"=>$_POST);
+		$this->header		= isset($param['header'])?$param['header'] : (function_exists("getallheaders")?getallheaders():null);
+		$this->server		= isset($param['server'])?$param['server'] : $_SERVER;
+		$this->method		= isset($param['method'])?$param['method'] : (isset($this->server['REQUEST_METHOD'])?$this->server['REQUEST_METHOD'] : null);
+		$this->uri			= isset($param['uri'])?$param['uri'] : (isset($this->server['REQUEST_URI']) ? $this->buildURI($this->server['REQUEST_URI']) : null );
 
 		// refer post and get in a new variable.
 		$this->post			= &$this->parameters['post'];
@@ -145,6 +145,40 @@ class Request
 	}
 
 	/**
+	 * Check has the given parameter(s) or not, with current method as priority
+	 * @return boolean
+	 */
+	public function hasParam($key)
+	{
+		$method= $this->getMethod();
+
+		if(isset($this->parameters[$method][$key]))
+			return true;
+		else if(isset($this->parameters[$inversedMethod = ($method == 'get' ? 'post' : 'get')][$key]))
+			return true;
+
+		return false;
+	}
+
+	/**
+	 * Has the given GET parameter
+	 * @return boolean
+	 */
+	public function hasGet($key)
+	{
+		return isset($this->parameters['get'][$key]);
+	}
+
+	/**
+	 * Has the given POST parameter
+	 * @return boolean
+	 */
+	public function hasPost($key)
+	{
+		return isset($this->parameters['post'][$key]);
+	}
+
+	/**
 	 * Get request parameter with current method as priority.
 	 * @param string key
 	 * @param mixed default
@@ -152,24 +186,12 @@ class Request
 	 */
 	public function param($key, $default = null)
 	{
-		$method = $this->paramMethod;
+		$method = $this->getMethod();
 
 		if(isset($this->parameters[$method][$key]))
-		{
 			return $this->parameters[$method][$key];
-		}
-		else
-		{
-			// loop the priority order
-			foreach(array('get', 'post') as $m)
-			{
-				if($method != $m)
-				{
-					if(isset($this->parameters[$method][$key]))
-						return $this->parameters[$method][$key];
-				}
-			}
-		}
+		else if(isset($this->parameters[$inversedMethod = ($method == 'get' ? 'post' : 'get')][$key]))
+			return $this->parameters[$inversedMethod][$key];
 
 		return $default;
 	}
@@ -273,7 +295,7 @@ class Request
 	 */
 	public function getMethod()
 	{
-		return strtolower($this->server['REQUEST_METHOD']);
+		return strtolower($this->paramMethod);
 	}
 }
 

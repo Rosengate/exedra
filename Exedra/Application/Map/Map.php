@@ -12,7 +12,7 @@ class Map
 	 * First level of this map.
 	 * @var \Exedra\Application\Map\Level
 	 */
-	protected $level;
+	public $level;
 
 	/**
 	 * Route and Level factory.
@@ -93,13 +93,25 @@ class Map
 	}
 
 	/**
-	 * Find route by parameters.
+	 * Find route by array parameters.
 	 * @param array query
 	 * @return \Exedra\Application\Map\Finding
 	 */
 	public function find(array $query)
 	{
-		$result = $this->level->query($query);
+		$request = new \Exedra\HTTP\Request($query);
+
+		return $this->findByRequest($request, $request->getUri());
+	}
+
+	/**
+	 * Find route by \Exedra\HTTP\request
+	 * @param \Exedra\HTTP\Request
+	 * @return \Exedra\Application\Map\Finding
+	 */
+	public function findByRequest(\Exedra\HTTP\Request $request)
+	{
+		$result = $this->level->query($request, $request->getUri());
 
 		return new \Exedra\Application\Map\Finding($result['route']?:null, $result['parameter']);
 	}
