@@ -34,16 +34,16 @@ class Url
 	protected function initiateUrl()
 	{
 		// base url
-		if($this->exe->config->has('url.base'))
-			$this->setBase($this->exe->config->get('url.base'));
-		else if($this->app->config->has('url.base'))
-			$this->setBase($this->app->config->get('url.base'));
+		if($this->exe->config->has('app.url'))
+			$this->setBase($this->exe->config->get('app.url'));
+		else if($this->app->config->has('app.url'))
+			$this->setBase($this->app->config->get('app.url'));
 
 		// asset url
-		if($this->exe->config->has('url.asset'))
-			$this->setAsset($this->exe->config->get('url.asset'));
-		else if($this->app->config->has('url.asset'))
-			$this->setAsset($this->app->config->get('url.asset'));
+		if($this->exe->config->has('asset.url'))
+			$this->setAsset($this->exe->config->get('asset.url'));
+		else if($this->app->config->has('asset.url'))
+			$this->setAsset($this->app->config->get('asset.url'));
 	}
 
 	/**
@@ -53,7 +53,7 @@ class Url
 	 */
 	public function base($uri = null)
 	{
-		return trim($this->baseUrl, '/' ).($uri ? '/' . trim($uri, '/') : '');
+		return rtrim($this->baseUrl, '/' ).($uri ? '/' . trim($uri, '/') : '');
 	}
 
 	/**
@@ -63,7 +63,7 @@ class Url
 	 */
 	public function asset($asset = null)
 	{
-		return trim($this->assetUrl,"/").($asset ? "/". trim($asset, '/') : '');
+		return rtrim($this->assetUrl,"/").($asset ? "/". trim($asset, '/') : '');
 	}
 
 	/**
