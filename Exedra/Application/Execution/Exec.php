@@ -86,7 +86,7 @@ class Exec
 			"view"=> array("\Exedra\Application\Builder\View", array($this)),
 			"middleware"=> array("\Exedra\Application\Builder\Middleware", array($this)),
 			"url"=> array("\Exedra\Application\Builder\Url", array($this->app,$this)),
-			"request"=>$this->app->request,
+			"request"=>$this->finding->request ? : $this->app->request, // use finding based request if found, else, use the original http request one.
 			"response"=>$this->app->exedra->httpResponse,
 			"validator"=> array("\Exedra\Application\Utilities\Validator"),
 			"flash"=> function() use($app) {return new \Exedra\Application\Session\Flash($app->session);},

@@ -229,7 +229,7 @@ class Route
 	 * - equal boolean
 	 * @return array struct of {route, parameter, equal}
 	 */
-	public function validate(\Exedra\HTTP\Request $query, $uri)
+	public function validate(\Exedra\HTTP\Request $request, $uri)
 	{
 		// print_r($query);die;
 		foreach(array('method', 'uri', 'ajax') as $key)
@@ -247,7 +247,7 @@ class Route
 			switch($key)
 			{
 				case "method":
-				$value = $query->getMethod();
+				$value = $request->getMethod();
 				// return false because method doesn't exist.
 				if(!in_array(strtolower($value), $this->getParameter('method')))
 					return array('route'=> false, 'parameter'=> false, 'equal'=> false);
@@ -263,7 +263,9 @@ class Route
 				return array('route'=> $this, 'parameter'=> $result['parameter'], 'equal'=> $result['equal']);
 				break;
 				case "ajax":
-
+				if($request->isAjax() != $this->getParameter('ajax'))
+					return array('route' => false, 'parameter' => false, 'equal' => false);
+				
 				break;
 			}
 		}

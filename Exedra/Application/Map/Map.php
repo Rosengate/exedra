@@ -67,7 +67,7 @@ class Map
 	{
 		$route = $this->getRoute($name);
 
-		return new \Exedra\Application\Map\Finding($route?:null, $parameter);
+		return new \Exedra\Application\Map\Finding($route ? : null, $parameter);
 	}
 
 	/**
@@ -113,7 +113,7 @@ class Map
 	{
 		$result = $this->level->query($request, $request->getUri());
 
-		return new \Exedra\Application\Map\Finding($result['route']?:null, $result['parameter']);
+		return new \Exedra\Application\Map\Finding($result['route']?:null, $result['parameter'], $request);
 	}
 }
 

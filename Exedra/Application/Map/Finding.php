@@ -20,8 +20,15 @@ class Finding
 
 	/**
 	 * string of subapplication name.
+	 * @var string|null
 	 */
 	protected $subapp = null;
+
+	/**
+	 * Request instance
+	 * @var \Exedra\HTTP\Request|null
+	 */
+	public $request = null;
 
 	/**
 	 * @var \Exedra\Application\Config Configs
@@ -32,9 +39,10 @@ class Finding
 	 * @param \Exedra\Application\Map\Route or null
 	 * @param array parameters
 	 */
-	public function __construct(\Exedra\Application\Map\Route $route = null, array $parameters = array())
+	public function __construct(\Exedra\Application\Map\Route $route = null, array $parameters = array(), \Exedra\HTTP\Request $request = null)
 	{
 		$this->route = $route;
+		$this->request = $request;
 
 		if($route)
 		{

@@ -36,7 +36,7 @@ class Exedra
 
 	// private $exedraLoader 	= null;
 
-	public function __construct($baseDir)
+	public function __construct($baseDir, \Exedra\HTTP\Request $request = null)
 	{
 		$this->loader = new Loader($baseDir);
 		
@@ -44,7 +44,7 @@ class Exedra
 		$this->loader->registerAutoload($baseDir);
 
 		// create http request and response.
-		$this->httpRequest	= new \Exedra\HTTP\Request;
+		$this->httpRequest	= $request ? : new \Exedra\HTTP\Request;
 		$this->httpResponse = new \Exedra\HTTP\Response;
 
 		// baseDir
