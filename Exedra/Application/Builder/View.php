@@ -20,6 +20,12 @@ class View
 	protected $defaultData = array();
 
 	/**
+	 * Base dir
+	 * @var string|null
+	 */
+	protected $baseDir = null;
+
+	/**
 	 * View default extension.
 	 * @var string
 	 */
@@ -39,6 +45,8 @@ class View
 	 */
 	public function create($path, $data = array())
 	{
+		$path = $this->baseDir ? $this->baseDir . '/' . ltrim($path) : $path;
+
 		// $path = $this->buildPath($path);
 		if(!$this->has($path))
 			$this->exe->exception->create("Unable to find view '$path'");
@@ -53,6 +61,16 @@ class View
 		$view	= new Blueprint\View($this->exe, $path, $data, $this->loader);
 		
 		return $view;
+	}
+
+	/**
+	 * Set base dir to be concenatted at the beginning of view path.
+	 * @param string dir
+	 *
+	 */
+	public function setBaseDir($dir)
+	{
+		$this->baseDir = $dir;
 	}
 
 	/**
