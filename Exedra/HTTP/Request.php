@@ -286,7 +286,7 @@ class Request
 		if(!isset($this->header['X_REQUESTED_WITH']))
 			return false;
 		
-		return $this->header['X_REQUESTED_WITH'] === 'XMLHttpRequest';
+		return strtolower($this->header['X_REQUESTED_WITH']) == 'xmlhttprequest';
 	}
 
 	/**
