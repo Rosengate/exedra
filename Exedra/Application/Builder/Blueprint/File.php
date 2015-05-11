@@ -7,10 +7,15 @@ namespace Exedra\Application\Builder\Blueprint;
 
 class File
 {
-	private $path;
+	/**
+	 * Path of the file.
+	 * @var string
+	 */
+	protected $path;
 
-	public function __construct($path)
+	public function __construct(\Exedra\Loader $loader, $path)
 	{
+		$this->loader = $loader;
 		$this->path = $path;
 	}
 
@@ -20,20 +25,17 @@ class File
 	 */
 	public function isExist()
 	{
-		return file_exists($this->path);
+		return $this->loader->has($this->path);
 	}
 
 	/**
 	 * Require this instance's file path extracted with the given data (optional)
 	 * @param array data
-	 * @param mixed
+	 * @return mixed
 	 */
 	public function load(array $data = array())
 	{
-		if(count($data) > 0)
-			extract($data);
-		
-		return require $this->path;
+		return $this->loader->load($this->path, $data);
 	}
 
 	/**
@@ -45,7 +47,7 @@ class File
 		if(!$this->isExist())
 			return false;
 
-		return file_get_contents($this->path);
+		return $this->loader->getContent($this->path);
 	}
 }
 

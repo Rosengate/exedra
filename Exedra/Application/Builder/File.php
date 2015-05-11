@@ -3,19 +3,22 @@ namespace Exedra\Application\Builder;
 
 class File
 {
-	public function __construct($app, $dirPrefix = null)
+	/**
+	 * @param \Exedra\Loader
+	 */
+	public function __construct(\Exedra\Loader $loader)
 	{
-		$this->app = $app;
-		$this->dirPrefix = $dirPrefix;
+		$this->loader = $loader;
 	}
 
-	public function load($firstArg, $secondArg = null)
+	/**
+	 * Create File Instance
+	 * @param string path
+	 * @return Exedra\Application\Blueprint\File
+	 */
+	public function get($path)
 	{
-		if(!$secondArg)
-			$path = $firstArg;
-		else
-			$path = $this->app->structure->get($firstArg, $secondArg, $this->dirPrefix);
-
-		return new Blueprint\File($path);
+		return new Blueprint\File($this->loader, $path)
 	}
 }
+

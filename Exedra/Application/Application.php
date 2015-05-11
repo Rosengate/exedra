@@ -85,11 +85,11 @@ class Application
 			"loader"=> array("\Exedra\Loader", array($this->getBaseDir(), $this->structure)),
 			"request"=>$this->exedra->httpRequest,
 			"response"=>$this->exedra->httpResponse,
-			"map"=> function() use($app) {return new \Exedra\Application\Map\Map($app, new \Exedra\Application\Map\Factory($app->loader));},
+			"map"=> function() use($app) { return new \Exedra\Application\Map\Map($app, new \Exedra\Application\Map\Factory($app->loader));},
 			"config"=> array("\Exedra\Application\Config"),
 			"session"=> array("\Exedra\Application\Session\Session"),
 			"exception"=> array("\Exedra\Application\Builder\Exception"),
-			'file'=> array('\Exedra\Application\Builder\File', array($this)),
+			'file'=> function() use($app) { return new \Exedra\Application\Builder\File($app->loader);},
 			'exeRegistry'=> array('\Exedra\Application\Registry', array($this))
 			));
 	}
