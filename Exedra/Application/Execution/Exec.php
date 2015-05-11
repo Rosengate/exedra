@@ -95,7 +95,8 @@ class Exec
 			"form"=> array("\Exedra\Application\Utilities\Form", array($this)),
 			"session"=> function() use($app) {return $app->session;},
 			"file"=> function() use($exe) {return new \Exedra\Application\Builder\File($exe->loader);},
-			'middlewares'=> array('\Exedra\Application\Execution\Middlewares')
+			'middlewares'=> array('\Exedra\Application\Execution\Middlewares'),
+			'asset' => array('\Exedra\Application\Builder\Asset', array($this))
 			));
 	}
 

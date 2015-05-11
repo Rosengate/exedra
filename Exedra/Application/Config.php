@@ -24,7 +24,7 @@ class Config
 			return $this;
 		}
 
-		\Exedra\Functions\Arrays::setByNotation($this->storage,$key,$value);
+		\Exedra\Functions\Arrays::setByNotation($this->storage,$key, $value);
 		return $this;
 	}
 
@@ -33,9 +33,12 @@ class Config
 	 * @param key
 	 * @return value
 	 */
-	public function get($key)
+	public function get($key, $default = null)
 	{
-		return \Exedra\Functions\Arrays::getByNotation($this->storage,$key);
+		if(!$this->has($key))
+			return $default;
+
+		return \Exedra\Functions\Arrays::getByNotation($this->storage, $key);
 	}
 
 	/**
@@ -44,6 +47,6 @@ class Config
 	 */
 	public function has($key)
 	{
-		return \Exedra\Functions\Arrays::hasByNotation($this->storage,$key);
+		return \Exedra\Functions\Arrays::hasByNotation($this->storage, $key);
 	}
 }
