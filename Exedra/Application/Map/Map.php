@@ -20,27 +20,25 @@ class Map
 	 */
 	public $factory;
 
-	public function __construct(\Exedra\Application\Application $app, \Exedra\Application\Map\Factory $factory)
+	public function __construct(\Exedra\Application\Map\Factory $factory)
 	{
-		$this->app = $app;
 		$this->factory = $factory;
 		$this->level = $factory->createLevel();
 	}
 
 	/**
-	 * Add route to the first level on this map.
-	 * @param array $routes
+	 * Add list of routes by array to the first level on this map.
+	 * @param array routes
 	 */
-	public function addRoute(array $routes)
+	public function addRoutes(array $routes)
 	{
-		foreach($routes as $name=>$routeData)
-			$this->level->addRoute($this->factory->createRoute($this->level, $name, $routeData));
+		$this->level->addRoutes($routes);
 
 		return $this;
 	}
 
 	/**
-	 * Add a route on top of other route.
+	 * Add subroutes on other route.
 	 * @param string name of the route.
 	 * @param array routes
 	 * @return this
@@ -51,7 +49,7 @@ class Map
 		
 		// if has subroute, use the that subroute, else, create a new subroute.
 		if($route->hasSubroute())
-			$route->getSubroute()->addRoutesByArray($routes);
+			$route->getSubroute()->addRoutes($routes);
 		else
 			$route->setSubroute($routes);
 
@@ -63,17 +61,17 @@ class Map
 	 * @param string name.
 	 * @return \Exedra\Application\Map\Finding
 	 */
-	public function findByName($name, $parameter = array())
+	public function findByName($name, $parameters = array())
 	{
 		$route = $this->getRoute($name);
 
-		return new \Exedra\Application\Map\Finding($route ? : null, $parameter);
+		return $this->factory->createFinding($route ? : null, $parameters);
 	}
 
 	/**
-	 * Get route by the given absolute name.
+	 * Get Route by the given absolute name.
 	 * @param string name.
-	 * @return \Exedra\Application\Map\Route or false boolean.
+	 * @return \Exedra\Application\Map\Route|false
 	 */
 	public function getRoute($name)
 	{
@@ -93,27 +91,21 @@ class Map
 	}
 
 	/**
-	 * Find route by array parameters.
-	 * @param array query
+	 * Find route by \Exedra\HTTP\request or array
+	 * @param \Exedra\HTTP\Request|array
 	 * @return \Exedra\Application\Map\Finding
 	 */
-	public function find(array $query)
+	public function find($request)
 	{
-		$request = new \Exedra\HTTP\Request($query);
+		if(!($request instanceof \Exedra\HTTP\Request))
+			if(is_array($request))
+				$request = $this->factory->createRequest($request);
+			else
+				return $this->factory->throwException('Argument for map::find() must be either array or \Exedra\HTTP\Request');
+				
+		$result = $this->level->findRoute($request, $request->getUri());
 
-		return $this->findByRequest($request, $request->getUri());
-	}
-
-	/**
-	 * Find route by \Exedra\HTTP\request
-	 * @param \Exedra\HTTP\Request
-	 * @return \Exedra\Application\Map\Finding
-	 */
-	public function findByRequest(\Exedra\HTTP\Request $request)
-	{
-		$result = $this->level->query($request, $request->getUri());
-
-		return new \Exedra\Application\Map\Finding($result['route']?:null, $result['parameter'], $request);
+		return $this->factory->createFinding($result['route'] ? : null, $result['parameter'], $request);
 	}
 }
 

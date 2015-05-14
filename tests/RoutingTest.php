@@ -10,7 +10,7 @@ class RoutingTest extends PHPUnit_Framework_TestCase
 		// build a basic case
 		$this->app = $this->exedra->build('app', function($app)
 		{
-			$app->map->addRoute(array(
+			$app->map->addRoutes(array(
 				'one'=>['uri'=>'uri-one', 'execute'=> 'controller=hello@world'],
 				'two'=>['uri'=>'uri-two', 'subroute'=> array(
 					'one'=> ['uri'=>'sub-one', 'execute'=> 'controller=hello@world'],
@@ -20,7 +20,7 @@ class RoutingTest extends PHPUnit_Framework_TestCase
 					)]
 				));
 
-			$app->map->addRoute(array(
+			$app->map->addRoutes(array(
 				'empty'=>['uri'=>'', 'execute'=> 'controller=hello@world']
 				));
 		});
@@ -84,7 +84,7 @@ class RoutingTest extends PHPUnit_Framework_TestCase
 
 	public function testParam()
 	{
-		$this->map->addRoute(array('paramtest'=>['uri'=>'[:param1]/[:param2]', 'execute'=> 'controller=hello@world']));
+		$this->map->addRoutes(array('paramtest'=>['uri'=>'[:param1]/[:param2]', 'execute'=> 'controller=hello@world']));
 
 		$finding = $this->map->find(['uri'=> 'ahmad/rahimie']);
 		$param = $finding->parameters;
@@ -94,7 +94,7 @@ class RoutingTest extends PHPUnit_Framework_TestCase
 
 	public function testNestedParam()
 	{
-		$this->map->addRoute(array(
+		$this->map->addRoutes(array(
 		'r1'=>['uri'=>'[:param1]/[:param2]', 'subroute'=> array(
 			'sr2'=>['uri'=>'[:param3]'],
 			'sr3'=>['uri'=>'[:param4]/[:param5]', 'subroute'=> array(
@@ -121,7 +121,7 @@ class RoutingTest extends PHPUnit_Framework_TestCase
 
 	public function testFindByName()
 	{
-		$this->map->addRoute(array(
+		$this->map->addRoutes(array(
 			'r1'=>['uri'=>'[:param1]', 'subroute'=> array(
 				'sr2'=> ['uri'=>'test', 'execute'=>function(){ }]
 				)]
@@ -134,7 +134,7 @@ class RoutingTest extends PHPUnit_Framework_TestCase
 
 	public function testExecution()
 	{
-		$this->map->addRoute(array(
+		$this->map->addRoutes(array(
 			'r1'=>['uri'=>'[:param1]', 'execute'=> function($exe)
 				{
 					return $exe->param('param1');
@@ -173,7 +173,7 @@ class RoutingTest extends PHPUnit_Framework_TestCase
 
 	public function testPrioritizeExecution()
 	{
-		$this->map->addRoute(array(
+		$this->map->addRoutes(array(
 			'r1'=> ['uri'=> 'uri1', 'subroute'=> array(
 				'sr2'=> ['uri'=> 'uri2', 'execute'=> 'controller=somewhere@something', 'subroute'=> array(
 					'ssr3'=> ['uri'=> 'uri3', 'execute'=>'controller=something@somewhere']

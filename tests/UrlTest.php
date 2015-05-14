@@ -17,7 +17,7 @@ class UrlTest extends PHPUnit_Framework_TestCase
 
 	public function testUrlCreate()
 	{
-		$this->map->addRoute(array(
+		$this->map->addRoutes(array(
 			'tester'=>['uri'=> 'tester/[:route]', 'execute'=>function($exe)
 				{
 					$params = $exe->param('params') ? : array();

@@ -19,7 +19,19 @@ class Level extends \ArrayIterator
 		$this->factory = $factory;
 		$this->route = $route;
 		if(count($routes) > 0)
-			$this->addRoutesByArray($routes);
+			$this->addRoutes($routes);
+	}
+
+	/**
+	 * Add routes by the given array.
+	 * @param array routes
+	 */
+	public function addRoutes(array $routes)
+	{
+		foreach($routes as $name=>$routeData)
+			$this->addRoute($this->factory->createRoute($this, $name, $routeData));
+
+		return $this;
 	}
 
 	/**
@@ -60,12 +72,12 @@ class Level extends \ArrayIterator
 	}
 
 	/**
-	 * Query the route under his level, with the given parameter.
+	 * A recursivable functionality to find route under this level, by the given request instance.
 	 * @param array of result containing parameter 
 	 * @param array passedParameters - highly otional.
-	 * @return {route: \Exedra\Application\Map\Route OR false, parameter: array}
+	 * @return array {route: \Exedra\Application\Map\Route|false, parameter: array}
 	 */
-	public function query(\Exedra\HTTP\Request $request, $levelUri, array $passedParameters = array())
+	public function findRoute(\Exedra\HTTP\Request $request, $levelUri, array $passedParameters = array())
 	{
 		$this->rewind();
 
@@ -101,11 +113,8 @@ class Level extends \ArrayIterator
 					// if has passed parameter.
 					$passedParameters = count($result['parameter']) > 0 ? $result['parameter'] : array();
 
-					// $queryUpdated = $query;
-					// $queryUpdated['uri'] = $remainingUri;
-
 					// $subrouteResult = $route->getSubroute()->query($queryUpdated, $passedParameters);
-					$subrouteResult = $route->getSubroute()->query($request, $remainingUri, $passedParameters);
+					$subrouteResult = $route->getSubroute()->findRoute($request, $remainingUri, $passedParameters);
 
 					// if found. else. continue on this level.
 					if($subrouteResult['route'] != false)
@@ -118,19 +127,6 @@ class Level extends \ArrayIterator
 
 		// false default.
 		return array('route'=> false, 'parameter'=> array(), 'equal'=> false);
-	}
-
-	/**
-	 * Add routes by the given array.
-	 * @param array routes
-	 */
-	public function addRoutesByArray(array $routes)
-	{
-		foreach($routes as $name=>$routeData)
-			// $this->addRoute(new Route($this, $name, $routeData));
-			$this->addRoute($this->factory->createRoute($this, $name, $routeData));
-
-		return $this;
 	}
 
 	/**

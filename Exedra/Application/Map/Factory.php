@@ -2,8 +2,8 @@
 namespace Exedra\Application\Map;
 
 /**
- * A factory that handle the route creation
- * This instance is injected into both of each route and level.
+ * A factory that handle the route/level/finding and http request creation
+ * This instance is injected into each level created
  */
 
 class Factory
@@ -16,6 +16,41 @@ class Factory
 	public function __construct(\Exedra\Loader $loader)
 	{
 		$this->loader = $loader;
+		$this->initiate();
+	}
+
+	/**
+	 * Initiate default classes
+	 */
+	protected function initiate()
+	{
+		$this->register('route', '\Exedra\Application\Map\Route');
+		$this->register('level', '\Exedra\Application\Map\Level');
+		$this->register('finding', '\Exedra\Application\Map\Finding');
+		$this->register('request', '\Exedra\HTTP\Request');
+		$this->register('exception', '\Exception');
+	}
+
+	/**
+	 * Register classname
+	 * @param string name
+	 * @param string classname
+	 */
+	public function register($name, $classname)
+	{
+		$this->registries[$name] = new \ReflectionClass($classname);
+	}
+
+	/**
+	 * General method to create classes from the registered list.
+	 * @param string name
+	 * @param array arguments
+	 */
+	public function create($name, array $arguments = array())
+	{
+		$reflection = $this->registries[$name];
+
+		return $reflection->newInstanceArgs($arguments);
 	}
 
 	/**
@@ -27,7 +62,7 @@ class Factory
 	 */
 	public function createRoute(Level $level, $name, array $parameters)
 	{
-		return new Route($level, $name, $parameters);
+		return $this->create('route', array($level, $name, $parameters));
 	}
 
 	/**
@@ -38,6 +73,7 @@ class Factory
 	 */
 	public function createLevel(Route $route = null, array $routes = array())
 	{
+		return $this->create('level', array($this, $route, $routes));
 		return new Level($this, $route, $routes);
 	}
 
@@ -66,5 +102,33 @@ class Factory
 		$subroutes = $this->loader->load($loadParameter);
 
 		return $this->createLevel($route, $subroutes);
+	}
+
+	/**
+	 * Create finding object
+	 * @param \Exedra\Application\Map\Route result's route.
+	 * @param array parameters
+	 * @param \Exedra\HTTP\Request
+	 * @return \Exedra\Application\Map\Finding
+	 */
+	public function createFinding(Route $route = null, array $parameters = null, \Exedra\HTTP\Request $request = null)
+	{
+		return $this->create('finding', array($route, $parameters, $request));
+		return new Finding($route, $parameters, $request);
+	}
+
+	/**
+	 * Create request required by map-routing related matters.
+	 * @return \Exedra\HTTP\Request
+	 */
+	public function createRequest(array $query = array())
+	{
+		return $this->create('request', array($query));
+		return new \Exedra\HTTP\Request($query);
+	}
+
+	public function throwException($message)
+	{
+		throw $this->create('exception', array($message));
 	}
 }

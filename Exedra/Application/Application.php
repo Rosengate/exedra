@@ -77,7 +77,7 @@ class Application
 	/**
 	 * Register dependencies.
 	 */
-	private function register()
+	protected function register()
 	{
 		$app = $this;
 
@@ -85,7 +85,7 @@ class Application
 			"loader"=> array("\Exedra\Loader", array($this->getBaseDir(), $this->structure)),
 			"request"=>$this->exedra->httpRequest,
 			"response"=>$this->exedra->httpResponse,
-			"map"=> function() use($app) { return new \Exedra\Application\Map\Map($app, new \Exedra\Application\Map\Factory($app->loader));},
+			"map"=> function() use($app) { return new \Exedra\Application\Map\Map(new \Exedra\Application\Map\Factory($app->loader));},
 			"config"=> array("\Exedra\Application\Config"),
 			"session"=> array("\Exedra\Application\Session\Session"),
 			"exception"=> array("\Exedra\Application\Builder\Exception"),
@@ -173,7 +173,7 @@ class Application
 					$request = new \Exedra\HTTP\Request($query);
 				}
 
-				$finding = $this->map->findByRequest($request);
+				$finding = $this->map->find($request);
 				$finding->addParameter($parameter);
 			}
 
