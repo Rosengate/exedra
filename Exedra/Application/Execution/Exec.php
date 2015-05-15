@@ -160,6 +160,7 @@ class Exec
 	/**
 	 * Get execution parameter
 	 * @param string name
+	 * @param mixed default value (optional)
 	 * @return mixed or default if not found.
 	 */
 	public function param($name, $default = null)
@@ -170,7 +171,8 @@ class Exec
 	}
 
 	/**
-	 * Get parameter by the given list of key
+	 * Get parameters by the given list of key
+	 * @param array keys (optional)
 	 * @return array
 	 */
 	public function params(array $keys = array())

@@ -36,7 +36,7 @@ class Redirect
 	 */
 	final public function refresh()
 	{
-		return $this->to($this->exe->getRoute(), $this->exe->getParams());
+		return $this->to($this->exe->getRoute(), $this->exe->params());
 	}
 
 	/**
