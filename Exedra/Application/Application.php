@@ -179,7 +179,7 @@ class Application
 
 			// route not found.
 			if(!$finding->success())
-				return $this->throwFailedExecution($query, $parameter);
+				return $this->throwFailedExecution($finding, $query, $parameter);
 
 			$exe = new Execution\Exec($this, $finding);
 
@@ -239,20 +239,18 @@ class Application
 	 * @param array parameter
 	 * @throws \Exception.
 	 */
-	protected function throwFailedExecution($query, array $parameter = array())
+	protected function throwFailedExecution(\Exedra\Application\Map\Finding $finding, $query, array $parameter = array())
 	{
-		// prepare message.
-		if(is_array($query))
+		if($HTTPrequest = $finding->request)
 		{
-			$q	= Array();
-			foreach($query as $k=>$v)
-				$q[] = $k.' : '.$v;
-
-			$msg = 'Query :<br>'.implode("<br>",$q);
+			$msg = 'Querying Request :'."\n";
+			$msg .= 'Method : '.strtoupper($HTTPrequest->getMethod())."\n";
+			$msg .= 'Request URI : '.$HTTPrequest->getUri()."\n";
+			$msg .= 'Ajax : '.($HTTPrequest->isAjax() ? 'ya' : 'no');
 		}
 		else
 		{
-			$msg = 'Route : '.$query;
+			$msg = 'Querying Route : '.$query;
 		}
 
 		return $this->exception->create('Route not found. '.$msg);
