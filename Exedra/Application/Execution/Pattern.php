@@ -81,7 +81,7 @@ class Pattern
 
 			$parameter	= Array();
 
-			foreach($exe->params as $key=>$val)
+			foreach($exe->params() as $key=>$val)
 			{
 				if(is_array($val))
 				{

@@ -15,18 +15,6 @@ class Application
 	public $structure = null;
 
 	/**
-	 * Route for general exception handling.
-	 * @var string
-	 */
-	private $executionFailRoute	= null;
-
-	/**
-	 * // commented, can retrieve from currentExe if got.
-	 * Current executed route.
-	 * @var \Exedra\Application\Map\Route
-	 */
-
-	/**
 	 * List of executions
 	 * @var array of \Exedra\Application\Execution\Exec
 	 */
@@ -60,19 +48,20 @@ class Application
 	 * Register route for execution exception
 	 * @param string routename
 	 */
-	public function setExecutionFailRoute($routename)
+	/*public function setExecutionFailRoute($routename)
 	{
-		$this->executionFailRoute = $routename;
-	}
+		// $this->executionFailRoute = $routename;
+		$this->registry->setFailRoute($routename);
+	}*/
 
 	/**
 	 * Alias for above method.
 	 * @param string routename
 	 */
-	public function setFailRoute($routename)
+	/*public function setFailRoute($routename)
 	{
 		$this->setExecutionFailRoute($routename);
-	}
+	}*/
 
 	/**
 	 * Register dependencies.
@@ -82,6 +71,7 @@ class Application
 		$app = $this;
 
 		$this->di = new \Exedra\Application\Dic(array(
+			'registry'=> array('\Exedra\Application\Registry', array($this)),
 			"loader"=> array("\Exedra\Loader", array($this->getBaseDir(), $this->structure)),
 			"request"=>$this->exedra->httpRequest,
 			"response"=>$this->exedra->httpResponse,
@@ -89,8 +79,7 @@ class Application
 			"config"=> array("\Exedra\Application\Config"),
 			"session"=> array("\Exedra\Application\Session\Session"),
 			"exception"=> array("\Exedra\Application\Builder\Exception"),
-			'file'=> function() use($app) { return new \Exedra\Application\Builder\File($app->loader);},
-			'exeRegistry'=> array('\Exedra\Application\Registry', array($this))
+			'file'=> function() use($app) { return new \Exedra\Application\Builder\File($app->loader);}
 			));
 	}
 
@@ -173,6 +162,7 @@ class Application
 					$request = new \Exedra\HTTP\Request($query);
 				}
 
+				// \Exedra\Application\Map\Finding
 				$finding = $this->map->find($request);
 				$finding->addParameter($parameter);
 			}
@@ -186,10 +176,8 @@ class Application
 			// save to the stack of execution.
 			$this->executions[] = $exe;
 
-			// echo $this->exe->route->getAbsoluteName()."<br>";
-
 			$execution = $finding->route->getParameter('execute');
-			$execution = $this->exeRegistry->pattern->resolve($execution);
+			$execution = $this->registry->pattern->resolve($execution);
 
 			// execute the stacked middleware.
 			if($exe->middlewares->count() > 0)
@@ -217,13 +205,11 @@ class Application
 		}
 		catch(\Exception $e)
 		{
-			if($this->executionFailRoute)
+			if($failRoute = $this->registry->getFailRoute())
 			{
-				$failRoute = $this->executionFailRoute;
-
 				// set this false, so that it wont loop if later this fail route doesn't exists.
-				$this->executionFailRoute = false;
-				return $this->execute($failRoute,Array("exception"=>$e));
+				$this->registry->setFailRoute(null);
+				return $this->execute($failRoute, array("exception"=>$e));
 			}
 			else
 			{

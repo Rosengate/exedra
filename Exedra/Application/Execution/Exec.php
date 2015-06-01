@@ -19,7 +19,7 @@ class Exec
 	 * Array of (referenced) parameters for this execution.
 	 * @var array
 	 */
-	public $params	= Array();
+	protected $params = array();
 
 	/**
 	 * Route prefix to be appended on every execution scope based functionality.
@@ -66,7 +66,7 @@ class Exec
 	protected function initiateProperties()
 	{
 		// Initiate.
-		$this->registry = $this->app->exeRegistry;
+		$this->registry = $this->app->registry;
 		$this->route = $this->finding->route;
 		$this->config = &$this->finding->getConfig();
 		$this->params = &$this->finding->getParameter();
@@ -168,6 +168,30 @@ class Exec
 		if(!$name) return $this->params;
 
 		return isset($this->params[$name]) ? $this->params[$name] : $default;
+	}
+
+	/**
+	 * A public functionality to add parameter(s) to $exe.
+	 * @param string name
+	 * @param mixed value
+	 * @return this;
+	 */
+	public function addParam($key, $value = null)
+	{
+		if(is_array($key))
+		{
+			foreach($key as $k=>$v)
+				$this->addParam($k, $v);
+		}
+		else
+		{
+			if(isset($this->params[$key]))
+				$this->exception->create('The given key \''.$key.'\' has already exists.');
+				
+			$this->params[$key] = $value;
+		}
+
+		return $this;
 	}
 
 	/**
@@ -280,44 +304,6 @@ class Exec
 
 		return $route;
 	}
-
-	/*public function addParameter($key,$val = null)
-	{
-		if(is_array($key))
-		{
-			foreach($key as $k=>$v)
-			{
-				$this->addParameter($k,$v);
-			}
-		}
-		else
-		{
-			## resolve the parameter.
-			foreach($this->params as $k=>$v)
-			{
-				$key	= str_replace('{'.$k.'}',$v,$key);
-				$val	= str_replace('{'.$k.'}', $v, $val);
-			}
-
-			// $this->params[$key]	= $val;
-
-			## pointer.
-			if(strpos($val, "&") === 0)
-			{
-				### create array by notation.
-				$val	= str_replace("&","",$val);
-				if(\Exedra\Functions\Arrays::hasByNotation($this->params,$val))
-				{
-					$ref	= \Exedra\Functions\Arrays::getByNotation($this->params,$val);
-					\Exedra\Functions\Arrays::setByNotation($this->params,$key,$ref);
-				}
-			}
-			else
-			{
-				\Exedra\Functions\Arrays::setByNotation($this->params,$key,$val);
-			}
-		}
-	}*/
 
 	/**
 	 * check whether this exec has subapp
