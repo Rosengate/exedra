@@ -2,10 +2,10 @@
 namespace Exedra\Application\Builder\Blueprint;
 
 /**
- * Simple class for object oriented based file.
+ * Simple class for object oriented based path.
  */
 
-class File
+class Path
 {
 	/**
 	 * Path of the file.
@@ -20,12 +20,30 @@ class File
 	}
 
 	/**
-	 * Check whether this file exist or not.
+	 * Check whether this file exists or not.
 	 * @return boolean
 	 */
-	public function isExist()
+	public function isExists()
 	{
 		return $this->loader->has($this->path);
+	}
+
+	/**
+	 * Magic function as if this is used for string.
+	 * @return string
+	 */
+	public function __toString()
+	{
+		return $this->asString();
+	}
+
+	/**
+	 * Get full and usable path for this file.
+	 * @return string
+	 */
+	public function asString()
+	{
+		return $this->loader->buildPath($this->path);
 	}
 
 	/**
@@ -44,13 +62,11 @@ class File
 	 */
 	public function getContent()
 	{
-		if(!$this->isExist())
+		if(!$this->isExists())
 			return false;
 
 		return $this->loader->getContent($this->path);
 	}
 }
-
-
 
 ?>

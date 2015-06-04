@@ -1,7 +1,7 @@
 <?php
 namespace Exedra\Application\Builder;
 
-class File
+class Path
 {
 	/**
 	 * @param \Exedra\Loader
@@ -12,13 +12,14 @@ class File
 	}
 
 	/**
-	 * Create File Instance
+	 * Create Path Instance
 	 * @param string path
 	 * @return Exedra\Application\Blueprint\File
 	 */
-	public function get($path)
+	public function create($path)
 	{
-		return new Blueprint\File($this->loader, $path)
+		return new Blueprint\Path($this->loader, $path);
 	}
 }
+
 
