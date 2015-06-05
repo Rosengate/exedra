@@ -1,15 +1,14 @@
 Exédra
 ======
-A multi-tier ~~nestable~~ nestful routing oriented PHP Framework.
-p/s : still in development.
+A multi-tier nestful routing oriented PHP Framework.
 
 Introduction
 ======
-This ~~simple nano (smaller than micro?)~~ framework will first focus mainly on nestable route mapping, route-parameter based execution and which hopefully will provide much much modular application execution. Features and example will soon be provided.
+This PHP framework focuses mainly on nestable route mapping, route oriented based execution and which hopefully will provide much modular application execution. Route is unique, and identified by name. Imagine developing an application hierarchically down the depth without losing the identity of the executions you planned, while stacking middlewares down the path on every possible node of route.
 
 History
 ======
-The first unreleased version of exedra has quite constraining ungroupable routing capability, and has a lot of static usage. This version was intended to fix them, give more (self-proclaimed) powerful multi-tier nestable routing ability and hopefully will adapt to modern web development practices.
+The first unreleased version of exedra has so much constraining ungroupable routing capability, and has a lot of static usages (which is extremely violating). This version was intended to fix them, give more controllable multi-tier nestable routing ability and hopefully would adapt to modern web development practices, while staying simple, flexible and contextual at the same time.
 
 Installation
 ======
@@ -18,7 +17,7 @@ Clone
 ~~~
 git clone https://github.com/rosengate/exedra project_name
 ~~~
-and in your front-controller file (index.php), just include Exedra.php wherever you can find it. For more information, refer documentation.
+and in your front-controller file (like index.php), just include Exedra.php wherever you can find it. For more information, refer documentation.
 ~~~
 require_once "Exedra\Exedra.php";
 $exedra = new \Exedra\Exedra(__DIR__);
@@ -52,7 +51,7 @@ $exedra = new \Exedra\Exedra(__DIR__);
 
 Documentation
 ===
-Documentation and the homebase for exedra is currently hosted here : http://exedra.rosengate.com
+Documentation and the homebase for exedra is currently hosted here : http://exedra.rosengate.com.
 
 Examples
 ======
@@ -62,13 +61,7 @@ http://github.com/rosengate/exedra-web (hosted at exedra.rosengate.com)
 
 http://github.com/eimihar/persona (hosted at persona.rosengate.com or eimihar.rosengate.com)
 
-Development
-======
-Some components have been built, such as MVC and URL builder, session, validator, form helper et cetera. Refer documentation for latest updates.
 
-Receptions
+Suggestion and issues
 ======
-I am not sure if developers like this kind of routing (multi-tier nestable groupable route-mapping buzz w). Please do send me email at newrehmi@gmail.com whether you like it or not, or mail me there too if there're any suggestions. Thank you. ;D
-
-Link to the former unreleased version : https://github.com/eimihar/exedra (excuse the emptiness and dirtiness of my github profile >..< )
-Or visit my newly built homebase at : http://eimihar.rosengate.com/about
+I am not sure if developers like this kind of routing. Please do send me email at newrehmi@gmail.com whether you like it or not, or mail me there too if there're any suggestions. Thank you.
