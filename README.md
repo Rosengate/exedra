@@ -12,8 +12,7 @@ The first unreleased version of exedra has so much constraining ungroupable rout
 
 Installation
 ======
-Clone
-========
+### Clone
 ~~~
 git clone https://github.com/rosengate/exedra project_name
 ~~~
@@ -23,7 +22,7 @@ require_once "Exedra\Exedra.php";
 $exedra = new \Exedra\Exedra(__DIR__);
 ~~~
 
-Composer
+### Composer
 ===
 Install rosengate/exedra through your console, in your project folder.
 ~~~
@@ -62,6 +61,6 @@ http://github.com/rosengate/exedra-web (hosted at exedra.rosengate.com)
 http://github.com/eimihar/persona (hosted at persona.rosengate.com or eimihar.rosengate.com)
 
 
-Suggestion and issues
+Thank you!
 ======
-I am not sure if developers like this kind of routing. Please do send me email at newrehmi@gmail.com whether you like it or not, or mail me there too if there're any suggestions. Thank you.
+I hope you guys like it!
