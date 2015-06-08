@@ -57,6 +57,14 @@ class Url
 	}
 
 	/**
+	 * Get url of parent route
+	 */
+	public function parent()
+	{
+		return $this->create('@'.$this->exe->getParentRoute());
+	}
+
+	/**
 	 * Get asset url prefixed with $assetUrl
 	 * @param string asset uri (optonal)
 	 * @return string
@@ -126,6 +134,7 @@ class Url
 
 		$uri = $route->getAbsoluteUri($data);
 
+		// return ($this->baseUrl ? trim($this->baseUrl, '/') .'/'. $uri : $uri) . ($query ? '?'. $query : null);
 		return ($this->baseUrl ? trim($this->baseUrl, '/') .'/'. $uri : $uri) . ($query ? '?'. $query : null);
 	}
 }

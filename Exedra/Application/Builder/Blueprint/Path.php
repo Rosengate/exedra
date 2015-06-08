@@ -9,7 +9,7 @@ class Path
 {
 	/**
 	 * Path of the file.
-	 * @var string
+	 * @var string|array
 	 */
 	protected $path;
 
@@ -41,7 +41,7 @@ class Path
 	 * Get full and usable path for this file.
 	 * @return string
 	 */
-	public function asString()
+	public function toString()
 	{
 		return $this->loader->buildPath($this->path);
 	}
