@@ -12,9 +12,9 @@ class RoutingTest extends PHPUnit_Framework_TestCase
 		{
 			$app->map->addRoutes(array(
 				'one'=>['uri'=>'uri-one', 'execute'=> 'controller=hello@world'],
-				'two'=>['uri'=>'uri-two', 'subroute'=> array(
+				'two'=>['uri'=>'uri-two', 'subroutes'=> array(
 					'one'=> ['uri'=>'sub-one', 'execute'=> 'controller=hello@world'],
-					'two'=> ['uri'=>'sub-two', 'subroute'=> array(
+					'two'=> ['uri'=>'sub-two', 'subroutes'=> array(
 						'one'=> ['uri'=>'deep-one', 'execute'=> 'controller=hello@world'],
 						)]
 					)]
@@ -95,9 +95,9 @@ class RoutingTest extends PHPUnit_Framework_TestCase
 	public function testNestedParam()
 	{
 		$this->map->addRoutes(array(
-		'r1'=>['uri'=>'[:param1]/[:param2]', 'subroute'=> array(
+		'r1'=>['uri'=>'[:param1]/[:param2]', 'subroutes'=> array(
 			'sr2'=>['uri'=>'[:param3]'],
-			'sr3'=>['uri'=>'[:param4]/[:param5]', 'subroute'=> array(
+			'sr3'=>['uri'=>'[:param4]/[:param5]', 'subroutes'=> array(
 				'ssr4'=>['uri'=>'uri-ssr4/[:param6]']
 				)]
 			)]));
@@ -122,7 +122,7 @@ class RoutingTest extends PHPUnit_Framework_TestCase
 	public function testFindByName()
 	{
 		$this->map->addRoutes(array(
-			'r1'=>['uri'=>'[:param1]', 'subroute'=> array(
+			'r1'=>['uri'=>'[:param1]', 'subroutes'=> array(
 				'sr2'=> ['uri'=>'test', 'execute'=>function(){ }]
 				)]
 			));
@@ -139,7 +139,7 @@ class RoutingTest extends PHPUnit_Framework_TestCase
 				{
 					return $exe->param('param1');
 				}],
-			'r2'=>['uri'=>'[:param1]', 'subroute'=> array(
+			'r2'=>['uri'=>'[:param1]', 'subroutes'=> array(
 				'sr3'=>['uri'=>'[:test]', 'execute'=>function($exe)
 					{
 						return $exe->param('test');
@@ -150,7 +150,7 @@ class RoutingTest extends PHPUnit_Framework_TestCase
 				$exe->somethingFromMiddleware = 'something';
 
 				return $exe->next($exe);
-			}, 'subroute'=> array(
+			}, 'subroutes'=> array(
 				'sr4'=>['uri'=>'[:teracotta]', 'execute'=> function($exe)
 					{
 						return $exe->somethingFromMiddleware;
@@ -174,8 +174,8 @@ class RoutingTest extends PHPUnit_Framework_TestCase
 	public function testPrioritizeExecution()
 	{
 		$this->map->addRoutes(array(
-			'r1'=> ['uri'=> 'uri1', 'subroute'=> array(
-				'sr2'=> ['uri'=> 'uri2', 'execute'=> 'controller=somewhere@something', 'subroute'=> array(
+			'r1'=> ['uri'=> 'uri1', 'subroutes'=> array(
+				'sr2'=> ['uri'=> 'uri2', 'execute'=> 'controller=somewhere@something', 'subroutes'=> array(
 					'ssr3'=> ['uri'=> 'uri3', 'execute'=>'controller=something@somewhere']
 					)]
 				)]

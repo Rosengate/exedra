@@ -47,11 +47,11 @@ class Map
 	{
 		$route = $this->getRoute($name);
 		
-		// if has subroute, use the that subroute, else, create a new subroute.
-		if($route->hasSubroute())
-			$route->getSubroute()->addRoutes($routes);
+		// if has subroutes, use the that subroutes, else, create a new subroute.
+		if($route->hasSubroutes())
+			$route->getSubroutes()->addRoutes($routes);
 		else
-			$route->setSubroute($routes);
+			$route->setSubroutes($routes);
 
 		return $this;
 	}

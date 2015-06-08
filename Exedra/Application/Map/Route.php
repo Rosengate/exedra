@@ -430,21 +430,21 @@ class Route
 	}
 
 	/**
-	 * Check whether has subroute or not.
+	 * Check whether has subroutes or not.
 	 * @return boolean of existence.
 	 */
-	public function hasSubroute()
+	public function hasSubroutes()
 	{
-		return isset($this->parameters['subroute']);
+		return isset($this->parameters['subroutes']);
 	}
 
 	/**
-	 * Get subroute (Map\Level)
+	 * Get subroutes (Map\Level)
 	 * @return \Exedra\Application\Map\Level
 	 */
-	public function getSubroute()
+	public function getSubroutes()
 	{
-		$level = $this->parameters['subroute'];
+		$level = $this->parameters['subroutes'];
 
 		// is a string based level.
 		if(is_string($level))
@@ -507,11 +507,11 @@ class Route
 	 * Add new level on for this route.
 	 * @param array or pattern subroutes
 	 */
-	public function setSubroute($subroutes)
+	public function setSubroutes($subroutes)
 	{
 		// only create Level if the argument is array. else, just save the pattern.
 		$subroutes = is_array($subroutes) ? $this->level->factory->createLevel($this, $subroutes) : $subroutes;
-		return $this->setParameter('subroute', $subroutes);
+		return $this->setParameter('subroutes', $subroutes);
 	}
 
 	/**
@@ -565,7 +565,7 @@ class Route
 				if($value == 'any')
 					$value = array('get', 'post', 'put', 'delete');
 			break;
-			case 'subroute':
+			case 'subroutes':
 				// $value = new Level($this, $value);
 			break;
 		}

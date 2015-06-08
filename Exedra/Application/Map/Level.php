@@ -60,8 +60,8 @@ class Level extends \ArrayIterator
 			$route = $this->current();
 
 			if($route->getName() == $routeName)
-				if(count($routeNames) > 0 && $route->hasSubroute())
-					return $route->getSubroute()->findRouteByName($routeNames);
+				if(count($routeNames) > 0 && $route->hasSubroutes())
+					return $route->getSubroutes()->findRouteByName($routeNames);
 				else
 					return $route;
 
@@ -90,15 +90,15 @@ class Level extends \ArrayIterator
 
 			$remainingUri = $route->getRemainingUri($levelUri);
 
-			$hasSubroute = $route->hasSubroute();
+			$hasSubroutes = $route->hasSubroutes();
 
-			if(($result['route'] != false) || (($result['equal'] == true || $result['equal'] === null) && ($remainingUri != '' && $hasSubroute)))
+			if(($result['route'] != false) || (($result['equal'] == true || $result['equal'] === null) && ($remainingUri != '' && $hasSubroutes)))
 			{
-				$executionPriority = $route->hasSubroute() && $route->hasExecution() && $remainingUri == '';
+				$executionPriority = $route->hasSubroutes() && $route->hasExecution() && $remainingUri == '';
 
 				// 1. if found. and no more subroute. OR
 				// 2. has subroutes but, has execution, 
-				if(!$route->hasSubroute() || $executionPriority)
+				if(!$route->hasSubroutes() || $executionPriority)
 				{
 					// prepare the final parameter by merging the passed parameter, with result parameter.
 					$params = array_merge($passedParameters, $result['parameter']);
@@ -113,8 +113,8 @@ class Level extends \ArrayIterator
 					// if has passed parameter.
 					$passedParameters = count($result['parameter']) > 0 ? $result['parameter'] : array();
 
-					// $subrouteResult = $route->getSubroute()->query($queryUpdated, $passedParameters);
-					$subrouteResult = $route->getSubroute()->findRoute($request, $remainingUri, $passedParameters);
+					// $subrouteResult = $route->getSubroutes()->query($queryUpdated, $passedParameters);
+					$subrouteResult = $route->getSubroutes()->findRoute($request, $remainingUri, $passedParameters);
 
 					// if found. else. continue on this level.
 					if($subrouteResult['route'] != false)
