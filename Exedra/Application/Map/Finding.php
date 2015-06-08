@@ -19,10 +19,10 @@ class Finding
 	public $parameters = array();
 
 	/**
-	 * string of subapplication name.
+	 * string of module name.
 	 * @var string|null
 	 */
-	protected $subapp = null;
+	protected $module = null;
 
 	/**
 	 * Request instance
@@ -74,12 +74,12 @@ class Finding
 
 	public function resolve()
 	{
-		$this->subapp = null;
+		$this->module = null;
 
 		foreach($this->route->getFullRoutes() as $r)
 		{
-			// get the latest subapp.
-			$this->subapp = $r->hasParameter('subapp') ? $r->getParameter('subapp') : $this->subapp;
+			// get the latest module.
+			$this->module = $r->hasParameter('module') ? $r->getParameter('module') : $this->module;
 
 			// has middleware.
 			if($r->hasParameter('middleware'))
@@ -131,11 +131,11 @@ class Finding
 	}
 
 	/**
-	 * @return string referenced subapp
+	 * @return string referenced module name
 	 */
-	public function &getSubapp()
+	public function &getModule()
 	{
-		return $this->subapp;
+		return $this->module;
 	}
 
 	/**

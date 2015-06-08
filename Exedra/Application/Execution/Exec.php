@@ -101,12 +101,12 @@ class Exec
 	}
 
 	/**
-	 * Get base dir for this execution instance. A concenated app base directory and this subapp.
+	 * Get base dir for this execution instance. A concenated app base directory and this module.
 	 * @return string.
 	 */
 	public function getBaseDir()
 	{
-		return rtrim($this->app->getBaseDir(), '/'). '/' . $this->getSubapp();
+		return rtrim($this->app->getBaseDir(), '/'). '/' . $this->getModule();
 	}
 
 	/**
@@ -124,12 +124,12 @@ class Exec
 	}
 
 	/**
-	 * Get subapplication name.
+	 * Get module name.
 	 * @return string
 	 */
-	public function getSubapp()
+	public function getModule()
 	{
-		return $this->finding->getSubapp();
+		return $this->finding->getModule();
 	}
 
 	/**
@@ -248,8 +248,9 @@ class Exec
 	/**
 	 * Get parent route. For example, route for public.main.index will return public.main.
 	 * Used on getRoutePrefix()
+	 * @return string of parent route name.
 	 */
-	private function getParentRoute()
+	public function getParentRoute()
 	{
 		return $this->route->getParentRoute();
 		$absoluteRoute	= $this->getAbsoluteRoute();
@@ -306,12 +307,12 @@ class Exec
 	}
 
 	/**
-	 * check whether this exec has subapp
+	 * check whether this exec has module
 	 * @return boolean flag
 	 */
-	public function hasSubapp()
+	public function hasModule()
 	{
-		return $this->getSubapp() === null ? false : true;
+		return $this->getModule() === null ? false : true;
 	}
 
 	/**

@@ -21,12 +21,12 @@ Abstract Class InstanceBuilder
 	 */
 	protected $isNamespaced = true;
 
-	public function __construct(\Exedra\Application\Execution\Exec $exe, $subapp = null)
+	public function __construct(\Exedra\Application\Execution\Exec $exe, $module = null)
 	{
 		$this->exe = $exe;
 		$this->loader = $exe->loader;
 		$this->structure = $exe->app->structure;
-		$this->subapp = $exe->getSubapp();
+		$this->module = $exe->getModule();
 
 		// if the execution instance has this config.
 		if($exe->config->has('namespaced_builder'))
@@ -44,22 +44,22 @@ Abstract Class InstanceBuilder
 		$builderName = $this->builderName;
 
 		## loader.
-		// $path	= $this->structure->get($builderName,$className.".php",$this->subapp);
+		// $path	= $this->structure->get($builderName,$className.".php",$this->module);
 		$path = $className.'.php';
 
 		## Exception : file not found.
 		if(!$this->loader->has(array('structure'=> $builderName, 'path'=> $path)))
 		{
 			$structure = $this->structure->get($builderName);
-			$path = $this->exe->app->getAppName().'/'.($this->exe->getSubapp()?$this->exe->getSubapp().'/':'').$structure.'/'.$path;
-			$this->exe->exception->create("Unable to find file '".$path."' for ".$builderName." : ".$className.($this->subapp?" (subapp : ".$this->subapp.")":"").".");
+			$path = $this->exe->app->getAppName().'/'.($this->exe->getModule()?$this->exe->getModule().'/':'').$structure.'/'.$path;
+			$this->exe->exception->create("Unable to find file '".$path."' for ".$builderName." : ".$className.($this->module?" (module : ".$this->module.")":"").".");
 		}
 
 		$this->loader->loadOnce(array('structure'=> $builderName, 'path'=> $path));
 
 		// namespace based builder.
 		if($this->isNamespaced)
-			$className = $this->exe->app->getAppname().'\\'.($this->exe->getSubapp() ? $this->exe->getSubapp().'\\' : '' ).$builderName.'\\'.$className;
+			$className = $this->exe->app->getAppname().'\\'.($this->exe->getModule() ? $this->exe->getModule().'\\' : '' ).$builderName.'\\'.$className;
 		else
 			$className		= $this->structure->getPattern($this->patternName,$className);
 

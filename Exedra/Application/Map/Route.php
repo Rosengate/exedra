@@ -21,7 +21,7 @@ class Route
 	 * @var array parameters
 	 * - method
 	 * - uri
-	 * - subapp
+	 * - module
 	 * - middleware
 	 * - execute
 	 * - config
@@ -524,12 +524,12 @@ class Route
 	}
 
 	/**
-	 * Set sub application under this route.
-	 * @param subapp
+	 * Set module under this route.
+	 * @param module
 	 */
-	public function setSubapp($subapp)
+	public function setModule($module)
 	{
-		return $this->setParameter('subapp', $subapp);
+		return $this->setParameter('module', $module);
 	}
 
 	/**
