@@ -12,7 +12,7 @@ class Application
 	 * Exedra
 	 * @var \Exedra\Exedra
 	 */
-	protected $exedra;
+	public $exedra;
 
 	/**
 	 * Application structure
