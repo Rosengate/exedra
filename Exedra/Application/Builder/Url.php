@@ -124,7 +124,7 @@ class Url
 			$query = implode('&', $queries);
 		}
 		
-		$routeName = $this->exe->prefixRoute($routeName);
+		$routeName = $this->exe->baseRoute($routeName);
 
 		// get \Exedra\Application\Map\Route by name.
 		$route = $this->app->map->getRoute($routeName);

@@ -21,10 +21,13 @@ class Route
 	 * @var array parameters
 	 * - method
 	 * - uri
-	 * - module
-	 * - middleware
+	 * - ajax
 	 * - execute
+	 * - middleware
+	 * - subroutes
+	 * - module
 	 * - config
+	 * - base
 	 */
 	protected $parameters = array();
 
@@ -278,7 +281,7 @@ class Route
 	 * @param string uri
 	 * @return array of matched flag, and parameter.
 	 */
-	private function validateURI($uri)
+	protected function validateURI($uri)
 	{
 		$routeURI = $this->getParameter('uri');
 
@@ -462,6 +465,12 @@ class Route
 		return isset($this->parameters['execute']);
 	}
 
+	public function setBase($baseRoute)
+	{
+		$this->setParameter('base', $baseRoute);
+		return $this;
+	}
+
 	/**
 	 * Set uri pattern for this route.
 	 * @param string uri
@@ -511,6 +520,7 @@ class Route
 	{
 		// only create Level if the argument is array. else, just save the pattern.
 		$subroutes = is_array($subroutes) ? $this->level->factory->createLevel($this, $subroutes) : $subroutes;
+
 		return $this->setParameter('subroutes', $subroutes);
 	}
 
@@ -557,7 +567,7 @@ class Route
 	 * @param string key
 	 * @param mixed value
 	 */
-	public function setParameter($key, $value)
+	protected function setParameter($key, $value)
 	{
 		switch($key)
 		{

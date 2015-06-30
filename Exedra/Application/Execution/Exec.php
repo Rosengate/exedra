@@ -22,10 +22,16 @@ class Exec
 	protected $params = array();
 
 	/**
-	 * Route prefix to be appended on every execution scope based functionality.
+	 * Base route to be appended on every execution scope based functionality.
 	 * @var string
 	 */
-	private $routePrefix = null;
+	protected $baseRoute = null;
+
+	/**
+	 * Route for handling exception
+	 * @var string
+	 */
+	protected $failRoute = null;
 
 	/**
 	 * Dependecy injection container
@@ -61,6 +67,24 @@ class Exec
 	}
 
 	/**
+	 * Set route for handling exception
+	 * @var string route
+	 */
+	public function setFailRoute($route)
+	{
+		$this->failRoute = $route;
+	}
+
+	/**
+	 * Get route for handling exception
+	 * @return string
+	 */
+	public function getFailRoute()
+	{
+		return $this->failRoute;
+	}
+
+	/**
 	 * Initiate execution properties
 	 */
 	protected function initiateProperties()
@@ -70,6 +94,7 @@ class Exec
 		$this->route = $this->finding->route;
 		$this->config = &$this->finding->getConfig();
 		$this->params = &$this->finding->getParameter();
+		$this->setBaseRoute($this->finding->getBaseRoute());
 	}
 
 	/**
@@ -133,7 +158,7 @@ class Exec
 	}
 
 	/**
-	 * Resolve dependency from dependency injection dependency injection container, off property $di.
+	 * Resolve dependency from dependency injection container, off property $di.
 	 * @return mixed.
 	 */
 	public function __get($property)
@@ -213,20 +238,20 @@ class Exec
 	}
 
 	/**
-	 * absolute route substracted prefix, return absoluteRoute if passed true.
+	 * Route name relative to the current base route, return absolute route if true boolean is given as argument.
 	 * @param boolean absolute, if true. will directly return absolute route.
 	 * @return string
 	 */
 	public function getRoute($absolute = false)
 	{
-		if(!$absolute)
+		if($absolute !== true)
 		{
-			$routePrefix = $this->getRoutePrefix();
+			$baseRoute = $this->getBaseRoute();
 			$absoluteRoute = $this->getAbsoluteRoute();
 
-			if(!$routePrefix) return $absoluteRoute;
+			if(!$baseRoute) return $absoluteRoute;
 
-			$route	= substr($absoluteRoute, strlen($routePrefix)+1, strlen($absoluteRoute));
+			$route	= substr($absoluteRoute, strlen($baseRoute)+1, strlen($absoluteRoute));
 
 			return $route;
 		}
@@ -240,58 +265,49 @@ class Exec
 	* get absolute route. 
 	* @return current route absolute name.
 	*/
-	private function getAbsoluteRoute()
+	public function getAbsoluteRoute()
 	{
 		return $this->route->getAbsoluteName();
 	}
 
 	/**
 	 * Get parent route. For example, route for public.main.index will return public.main.
-	 * Used on getRoutePrefix()
+	 * Used on getBaseRoute()
 	 * @return string of parent route name.
 	 */
 	public function getParentRoute()
 	{
 		return $this->route->getParentRoute();
-		$absoluteRoute	= $this->getAbsoluteRoute();
-		$absoluteRoutes	= explode(".",$absoluteRoute);
-
-		if(count($absoluteRoutes) == 1)
-			return null;
-
-		array_pop($absoluteRoutes);
-		$routePrefix	= implode(".",$absoluteRoutes);
-		return $routePrefix;
 	}
 
 	/**
-	 * Set a route prefix for this execution.
-	 * @param string prefix
-	 */
-	public function setRoutePrefix($prefix)
-	{
-		$this->routePrefix = $prefix;
-	}
-
-	/**
-	 * Get a prefix for this execution. Return null, if not set.
-	 * @return string prefix.
-	 */
-	public function getRoutePrefix()
-	{
-		if($this->routePrefix)
-			$routePrefix	= $this->routePrefix;
-		else
-			$routePrefix	= $this->getParentRoute();
-
-		return $routePrefix?$routePrefix:null;
-	}
-
-	/**
-	 * Prefix the given route. Or return an absolute route, if absolute character was given at the beginning of the given string.
+	 * Set a base route for this execution
 	 * @param string route
 	 */
-	public function prefixRoute($route)
+	public function setBaseRoute($route)
+	{
+		$this->baseRoute = $route;
+	}
+
+	/**
+	 * Get base route for this execution
+	 * @return string|null
+	 */
+	public function getBaseRoute()
+	{
+		if($this->baseRoute)
+			$baseRoute	= $this->baseRoute;
+		else
+			$baseRoute	= $this->getParentRoute();
+
+		return $baseRoute ? $baseRoute : null;
+	}
+
+	/**
+	 * Base the given route. Or return an absolute route, if absolute character was given at the beginning of the given string.
+	 * @param string route
+	 */
+	public function baseRoute($route)
 	{
 		if(strpos($route, $this->app->structure->getCharacter('absolute')) === 0)
 		{
@@ -299,8 +315,8 @@ class Exec
 		}
 		else
 		{
-			$routePrefix = $this->getRoutePrefix();
-			$route		= $routePrefix?$routePrefix.".".$route:$route;
+			$baseRoute = $this->getBaseRoute();
+			$route		= $baseRoute ? $baseRoute.'.'.$route : $route;
 		}
 
 		return $route;
@@ -316,13 +332,13 @@ class Exec
 	}
 
 	/**
-	 * Execute route but scope based route.
+	 * Execute a scope based route
 	 * @param string route
 	 * @param array parameter.
 	 */
 	public function execute($route, array $parameter = array())
 	{
-		$route = $this->prefixRoute($route);
+		$route = $this->baseRoute($route);
 		return $this->app->execute($route, $parameter);
 	}
 }

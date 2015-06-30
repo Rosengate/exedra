@@ -3,10 +3,16 @@
 class Application
 {
 	/**
-	 * Application name. Reflected as your directory name.
+	 * Application name. Reflected as your application directory name.
 	 * @var string
 	 */
-	private $name = null;
+	protected $name = null;
+
+	/**
+	 * Exedra
+	 * @var \Exedra\Exedra
+	 */
+	protected $exedra;
 
 	/**
 	 * Application structure
@@ -27,6 +33,12 @@ class Application
 	public $di;
 
 	/**
+	 * Current execution instance.
+	 * @var \Exedra\Application\Execution\Exec
+	 */
+	protected $exe = null;
+
+	/**
 	 * Create a new application
 	 * @param string name (application name)
 	 * @param \Exedra\Exedra exedra instance
@@ -45,23 +57,13 @@ class Application
 	}
 
 	/**
-	 * Register route for execution exception
-	 * @param string routename
-	 */
-	/*public function setExecutionFailRoute($routename)
-	{
-		// $this->executionFailRoute = $routename;
-		$this->registry->setFailRoute($routename);
-	}*/
-
-	/**
 	 * Alias for above method.
 	 * @param string routename
 	 */
-	/*public function setFailRoute($routename)
+	public function setFailRoute($routename)
 	{
-		$this->setExecutionFailRoute($routename);
-	}*/
+		$this->registry->setFailRoute($routename);
+	}
 
 	/**
 	 * Register dependencies.
@@ -173,6 +175,8 @@ class Application
 
 			$exe = new Execution\Exec($this, $finding);
 
+			$this->exe = $exe;
+
 			// save to the stack of execution.
 			$this->executions[] = $exe;
 
@@ -205,10 +209,15 @@ class Application
 		}
 		catch(\Exception $e)
 		{
-			if($failRoute = $this->registry->getFailRoute())
+			// prioritieze the current $exe first.
+			if(($this->exe && $failRoute = $this->exe->getFailRoute()) || $failRoute = $this->registry->getFailRoute())
 			{
+				if($this->exe)
+					$this->exe->setFailRoute(null);
+				else
+					$this->set->setFailRoute(null);
+
 				// set this false, so that it wont loop if later this fail route doesn't exists.
-				$this->registry->setFailRoute(null);
 				return $this->execute($failRoute, array("exception"=>$e));
 			}
 			else

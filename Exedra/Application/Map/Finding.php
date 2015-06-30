@@ -25,6 +25,12 @@ class Finding
 	protected $module = null;
 
 	/**
+	 * string of route base
+	 * @var string|null
+	 */
+	protected $baseRoute = null;
+
+	/**
 	 * Request instance
 	 * @var \Exedra\HTTP\Request|null
 	 */
@@ -75,23 +81,25 @@ class Finding
 	public function resolve()
 	{
 		$this->module = null;
+		$this->baseRoute = null;
 
 		foreach($this->route->getFullRoutes() as $r)
 		{
-			// get the latest module.
-			$this->module = $r->hasParameter('module') ? $r->getParameter('module') : $this->module;
+			// get the latest module and route base
+			if($r->hasParameter('module'))
+				$this->module = $r->getParameter('module');
+
+			// if has parameter base, and it's true, set base route to the current route.
+			if($r->hasParameter('base') && $r->getParameter('base') === true)
+				$this->baseRoute = $r->getAbsoluteName();
 
 			// has middleware.
 			if($r->hasParameter('middleware'))
-			{
 				$this->middlewares[$r->getName()] = &$r->getParameter('middleware');
-			}
 
 			// pass conig.
 			if($r->hasParameter('config'))
-			{
 				$this->configs->set($r->getParameter('config'));
-			}
 		}
 	}
 
@@ -136,6 +144,15 @@ class Finding
 	public function &getModule()
 	{
 		return $this->module;
+	}
+
+	/**
+	 * Get base route configured for this Finding.
+	 * @return string
+	 */
+	public function getBaseRoute()
+	{
+		return $this->baseRoute;
 	}
 
 	/**

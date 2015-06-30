@@ -3,6 +3,11 @@ namespace Exedra\Application\Session;
 
 class Session
 {
+	/**
+	 * Referenced storage for session data
+	 */
+	protected $storage;
+
 	public function __construct(&$storage = null)
 	{
 		## set storage. default use php _SESSION, if not passed through constructor param.
@@ -43,6 +48,15 @@ class Session
 	public function get($key)
 	{
 		return \Exedra\Functions\Arrays::getByNotation($this->storage,$key);
+	}
+
+	/**
+	 * Get everything within storage
+	 * @return mixed
+	 */
+	public function getAll()
+	{
+		return $this->storage;
 	}
 
 	/**

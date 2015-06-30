@@ -42,6 +42,15 @@ class Config
 	}
 
 	/**
+	 * Get everything within storage.
+	 * @return array
+	 */
+	public function getAll()
+	{
+		return $this->storage;
+	}
+
+	/**
 	 * Check key existence.
 	 * @param string key.
 	 */

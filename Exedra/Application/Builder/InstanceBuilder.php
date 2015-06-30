@@ -30,7 +30,7 @@ Abstract Class InstanceBuilder
 
 		// if the execution instance has this config.
 		if($exe->config->has('namespaced_builder'))
-			$this->isNamespaced = $exe->config->get('namespaced_builder'); 
+			$this->isNamespaced = $exe->config->get('namespaced_builder');
 	}
 
 	/**
