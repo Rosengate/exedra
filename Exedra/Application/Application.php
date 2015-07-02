@@ -215,7 +215,7 @@ class Application
 				if($this->exe)
 					$this->exe->setFailRoute(null);
 				else
-					$this->set->setFailRoute(null);
+					$this->setFailRoute(null);
 
 				// set this false, so that it wont loop if later this fail route doesn't exists.
 				return $this->execute($failRoute, array("exception"=>$e));
