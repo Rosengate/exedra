@@ -46,6 +46,12 @@ class Exec
 	public $finding;
 
 	/**
+	 * Referenced registry
+	 * @var \Exedra\Application\Registry
+	 */
+	protected $registry;
+
+	/**
 	 * Execution config instance
 	 * @var \Exedra\Application\Config
 	 */
@@ -57,13 +63,78 @@ class Exec
 		$this->app = $app;
 
 		// initiate properties
-		$this->initiateProperties($app, $finding);
+		$this->initiateProperties();
 
 		// initiate dependencies
 		$this->initiateContainer();
 
 		// Initiate middlewares
 		$this->initiateMiddlewares();
+	}
+
+	/**
+	 * Initiate execution properties
+	 */
+	protected function initiateProperties()
+	{
+		// Initiate loader, registry, route, config, params, and set base route based on finding.
+		$this->loader = new \Exedra\Loader($this->getBaseDir(), $this->app->structure);
+		$this->registry = $this->app->registry;
+		$this->route = $this->finding->route;
+		$this->config = $this->finding->getConfig();
+		$this->params = &$this->finding->getParameter(); // array
+		$this->setBaseRoute($this->finding->getBaseRoute());
+	}
+
+	/**
+	 * Initiate dependency injection container
+	 */
+	protected function initiateContainer()
+	{
+		$app = $this->app;
+		$exe = $this;
+
+		$this->di = new \Exedra\Application\Dic(array(
+			"controller"=> array("\Exedra\Application\Builder\Controller", array($this)),
+			"view"=> array("\Exedra\Application\Builder\View", array($this)),
+			"middleware"=> array("\Exedra\Application\Builder\Middleware", array($this)),
+			"url"=> array("\Exedra\Application\Builder\Url", array($this->app,$this)),
+			"request"=>$this->finding->request ? : $this->app->request, // use finding based request if found, else, use the original http request one.
+			"response"=>$this->app->exedra->httpResponse,
+			"validator"=> array("\Exedra\Application\Utilities\Validator"),
+			"flash"=> function() use($app) {return new \Exedra\Application\Session\Flash($app->session);},
+			"redirect"=> array("\Exedra\Application\Response\Redirect", array($this)),
+			"exception"=> array("\Exedra\Application\Builder\Exception", array($this)),
+			"form"=> array("\Exedra\Application\Utilities\Form", array($this)),
+			"session"=> function() use($app) {return $app->session;},
+			// "file"=> function() use($exe) {return new \Exedra\Application\Builder\File($exe->loader);},
+			'middlewares'=> array('\Exedra\Application\Execution\Middlewares'),
+			'asset' => array('\Exedra\Application\Builder\Asset', array($this)),
+			'path' => array('\Exedra\Application\Builder\Path', array($this->loader))
+			));
+	}
+
+	/**
+	 * Initiate execution middlewares.
+	 */
+	protected function initiateMiddlewares()
+	{
+		// if there's middlewares in registry.
+		if($this->registry->hasMiddlewares())
+			$this->middlewares->addByArray($this->registry->getMiddlewares());
+
+		// finding' middleware
+		if($this->finding->hasMiddlewares())
+			$this->middlewares->addByArray($this->finding->getMiddlewares());
+	}
+
+	/**
+	 * Get base dir for this execution instance. A concenated app base directory and this module.
+	 * @return string.
+	 */
+	public function getBaseDir()
+	{
+		return rtrim($this->app->getBaseDir(), '/'). '/' . $this->getModule();
 	}
 
 	/**
@@ -82,79 +153,6 @@ class Exec
 	public function getFailRoute()
 	{
 		return $this->failRoute;
-	}
-
-	/**
-	 * Initiate execution properties
-	 */
-	protected function initiateProperties()
-	{
-		// Initiate.
-		$this->registry = $this->app->registry;
-		$this->route = $this->finding->route;
-		$this->config = &$this->finding->getConfig();
-		$this->params = &$this->finding->getParameter();
-		$this->setBaseRoute($this->finding->getBaseRoute());
-	}
-
-	/**
-	 * Initiate dependency injection container
-	 */
-	protected function initiateContainer()
-	{
-		$app = $this->app;
-		$exe = $this;
-
-		$this->di = new \Exedra\Application\Dic(array(
-			"loader"=> array("\Exedra\Loader", array($this->getBaseDir(), $this->app->structure)),
-			"controller"=> array("\Exedra\Application\Builder\Controller", array($this)),
-			"view"=> array("\Exedra\Application\Builder\View", array($this)),
-			"middleware"=> array("\Exedra\Application\Builder\Middleware", array($this)),
-			"url"=> array("\Exedra\Application\Builder\Url", array($this->app,$this)),
-			"request"=>$this->finding->request ? : $this->app->request, // use finding based request if found, else, use the original http request one.
-			"response"=>$this->app->exedra->httpResponse,
-			"validator"=> array("\Exedra\Application\Utilities\Validator"),
-			"flash"=> function() use($app) {return new \Exedra\Application\Session\Flash($app->session);},
-			"redirect"=> array("\Exedra\Application\Response\Redirect", array($this)),
-			"exception"=> array("\Exedra\Application\Builder\Exception", array($this)),
-			"form"=> array("\Exedra\Application\Utilities\Form", array($this)),
-			"session"=> function() use($app) {return $app->session;},
-			"file"=> function() use($exe) {return new \Exedra\Application\Builder\File($exe->loader);},
-			'middlewares'=> array('\Exedra\Application\Execution\Middlewares'),
-			'asset' => array('\Exedra\Application\Builder\Asset', array($this))
-			));
-	}
-
-	/**
-	 * Get base dir for this execution instance. A concenated app base directory and this module.
-	 * @return string.
-	 */
-	public function getBaseDir()
-	{
-		return rtrim($this->app->getBaseDir(), '/'). '/' . $this->getModule();
-	}
-
-	/**
-	 * Initiate execution middlewares.
-	 */
-	protected function initiateMiddlewares()
-	{
-		// if there's middlewares in registry.
-		if($this->registry->hasMiddlewares())
-			$this->middlewares->addByArray($this->registry->getMiddlewares());
-
-		// finding' middleware
-		if($this->finding->hasMiddlewares())
-			$this->middlewares->addByArray($this->finding->getMiddlewares());
-	}
-
-	/**
-	 * Get module name.
-	 * @return string
-	 */
-	public function getModule()
-	{
-		return $this->finding->getModule();
 	}
 
 	/**
@@ -239,7 +237,7 @@ class Exec
 
 	/**
 	 * Route name relative to the current base route, return absolute route if true boolean is given as argument.
-	 * @param boolean absolute, if true. will directly return absolute route.
+	 * @param boolean absolute, if true. will directly return absolute route. The same use of getAbsoluteRoute
 	 * @return string
 	 */
 	public function getRoute($absolute = false)
@@ -320,6 +318,15 @@ class Exec
 		}
 
 		return $route;
+	}
+
+	/**
+	 * Get module name.
+	 * @return string
+	 */
+	public function getModule()
+	{
+		return $this->finding->getModule();
 	}
 
 	/**

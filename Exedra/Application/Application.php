@@ -49,11 +49,11 @@ class Application
 		$this->name = $name;
 		$this->exedra = $exedra;
 
-		// create application structure
-		$this->structure = new \Exedra\Application\Structure\Structure();
+		// initialize properties
+		$this->initiateProperties();
 
-		// register dependency.
-		$this->register();
+		// register dependencies.
+		$this->initiateContainer();
 	}
 
 	/**
@@ -65,23 +65,30 @@ class Application
 		$this->registry->setFailRoute($routename);
 	}
 
+	protected function initiateProperties()
+	{
+		// create application structure and loader
+		$this->structure = new \Exedra\Application\Structure\Structure();
+		$this->loader = new \Exedra\Loader($this->getBaseDir(), $this->structure);
+	}
+
 	/**
 	 * Register dependencies.
 	 */
-	protected function register()
+	protected function initiateContainer()
 	{
 		$app = $this;
 
 		$this->di = new \Exedra\Application\Dic(array(
 			'registry'=> array('\Exedra\Application\Registry', array($this)),
-			"loader"=> array("\Exedra\Loader", array($this->getBaseDir(), $this->structure)),
 			"request"=>$this->exedra->httpRequest,
 			"response"=>$this->exedra->httpResponse,
 			"map"=> function() use($app) { return new \Exedra\Application\Map\Map(new \Exedra\Application\Map\Factory($app->loader));},
 			"config"=> array("\Exedra\Application\Config"),
 			"session"=> array("\Exedra\Application\Session\Session"),
 			"exception"=> array("\Exedra\Application\Builder\Exception"),
-			'file'=> function() use($app) { return new \Exedra\Application\Builder\File($app->loader);}
+			'path' => array('\Exedra\Application\Builder\Path', array($this->loader))
+			// 'file'=> function() use($app) { return new \Exedra\Application\Builder\File($app->loader);}
 			));
 	}
 

@@ -130,18 +130,19 @@ class Finding
 	}
 
 	/**
-	 * Get a referenced config bag of this finding
+	 * Config bag of this finding
 	 * @return \Exedra\Application\Config
 	 */
-	public function &getConfig()
+	public function getConfig()
 	{
 		return $this->configs;
 	}
 
 	/**
+	 * Module on this finding.
 	 * @return string referenced module name
 	 */
-	public function &getModule()
+	public function getModule()
 	{
 		return $this->module;
 	}

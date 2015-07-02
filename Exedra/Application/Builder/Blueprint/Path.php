@@ -34,7 +34,7 @@ class Path
 	 */
 	public function __toString()
 	{
-		return $this->asString();
+		return $this->toString();
 	}
 
 	/**
