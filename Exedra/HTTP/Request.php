@@ -296,6 +296,15 @@ class Request
 	{
 		return strtolower($this->paramMethod);
 	}
+
+	/**
+	 * Equate with the current method
+	 * @return boolean
+	 */
+	public function isMethod($method)
+	{
+		return $this->getMethod() == strtolower($method);
+	}
 }
 
 
