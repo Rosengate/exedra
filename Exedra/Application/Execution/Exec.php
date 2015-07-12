@@ -82,8 +82,8 @@ class Exec
 		$this->registry = $this->app->registry;
 		$this->route = $this->finding->route;
 		$this->config = $this->finding->getConfig();
-		$this->params = &$this->finding->getParameter(); // array
 		$this->setBaseRoute($this->finding->getBaseRoute());
+		\Exedra\Functions\Arrays::initiateByNotation($this->params, $this->finding->param());
 	}
 
 	/**
@@ -190,7 +190,18 @@ class Exec
 	{
 		if(!$name) return $this->params;
 
-		return isset($this->params[$name]) ? $this->params[$name] : $default;
+		return \Exedra\Functions\Arrays::hasByNotation($this->params, $name) ? \Exedra\Functions\Arrays::getByNotation($this->params, $name) : $default;
+	}
+
+	/**
+	 * Update the given param
+	 * @param string key
+	 * @param mixed value
+	 * @return this
+	 */
+	public function setParam($key, $value = null)
+	{
+		\Exedra\Functions\Arrays::setByNotation($this->params, $key, $value);
 	}
 
 	/**
@@ -204,7 +215,7 @@ class Exec
 		if(is_array($key))
 		{
 			foreach($key as $k=>$v)
-				$this->addParam($k, $v);
+				$this->setParam($k, $v);
 		}
 		else
 		{

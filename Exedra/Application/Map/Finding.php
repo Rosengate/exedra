@@ -71,6 +71,19 @@ class Finding
 	}
 
 	/**
+	 * Get findings parameter
+	 * Return all if no argument passed
+	 * @return array|mixed
+	 */
+	public function param($name = null)
+	{
+		if($name === null)
+			return $this->parameters;
+
+		return $this->parameters[$name];
+	}
+
+	/**
 	 * @return boolean, whether this finding is success or not.
 	 */
 	public function success()
@@ -154,14 +167,6 @@ class Finding
 	public function getBaseRoute()
 	{
 		return $this->baseRoute;
-	}
-
-	/**
-	 * @return array referenced parameters
-	 */
-	public function &getParameter()
-	{
-		return $this->parameters;
 	}
 }
 

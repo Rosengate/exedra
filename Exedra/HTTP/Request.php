@@ -41,7 +41,7 @@ class Request
 	 * Parameter method, to help dealing on retrieving param by order.
 	 * @var string
 	 */
-	protected $paramMethod;
+	// protected $paramMethod;
 
 	/**
 	 * Accessible referenced _GET parameter
@@ -67,16 +67,32 @@ class Request
 	{
 		// initiate basic request data into properties.
 		$this->parameters	= isset($param['parameters']) ? $param['parameters'] : array("get"=>$_GET,"post"=>$_POST);
+		
+		// refer post and get in a new variable.
+		// $this->post			= &$this->parameters['post'];
+		// $this->get			= &$this->parameters['get'];
+		
 		$this->header		= isset($param['header'])?$param['header'] : (function_exists("getallheaders")?getallheaders():null);
 		$this->server		= isset($param['server'])?$param['server'] : $_SERVER;
 		$this->method		= isset($param['method'])?$param['method'] : (isset($this->server['REQUEST_METHOD'])?$this->server['REQUEST_METHOD'] : null);
-		$this->uri			= isset($param['uri'])?$param['uri'] : (isset($this->server['REQUEST_URI']) ? $this->buildURI($this->server['REQUEST_URI']) : null );
+		// $this->uri			= isset($param['uri'])?$param['uri'] : (isset($this->server['REQUEST_URI']) ? $this->buildURI($this->server['REQUEST_URI']) : null );
 
-		// refer post and get in a new variable.
-		$this->post			= &$this->parameters['post'];
-		$this->get			= &$this->parameters['get'];
+		if(isset($param['uri']))
+		{
+			// check if in uri there're still a query string. pass as method's parameter.
+			$uris = explode('?', $param['uri']);
+			$this->uri = $uris[0];
+			
+			// if has some query string passed on uri, treat it as get parameter.
+			if(isset($uris[1]))
+				parse_str($uris[1], $this->parameters['get']);
+		}
+		else
+		{
+			$this->uri = $this->buildURI($this->server['REQUEST_URI']);
+		}
 
-		$this->paramMethod = in_array($this->method, array('put', 'delete')) ? 'post' : $this->method;
+		
 	}
 
 	/**
@@ -119,7 +135,7 @@ class Request
 		if($key === null)
 			return $this->parameters[$method];
 		else
-			return isset($this->parameters[$method][$key]) ? $this->get[$key] : $default;
+			return isset($this->parameters[$method][$key]) ? $this->parameters[$method][$key] : $default;
 	}
 
 	/**
@@ -150,7 +166,7 @@ class Request
 	 */
 	public function hasParam($key)
 	{
-		$method= $this->getMethod();
+		$method = $this->isMethod('get') ? 'get' : 'post';
 
 		if(isset($this->parameters[$method][$key]))
 			return true;
@@ -184,9 +200,13 @@ class Request
 	 * @param mixed default
 	 * @return mixed value
 	 */
-	public function param($key, $default = null)
+	public function param($key = null, $default = null)
 	{
-		$method = $this->getMethod();
+		$method = $this->isMethod('get') ? 'get' : 'post';
+		
+		// if no key at all, pass the current method's parameters.
+		if(!$key)
+			return $this->parameters[$method];
 
 		if(isset($this->parameters[$method][$key]))
 			return $this->parameters[$method][$key];
@@ -294,7 +314,7 @@ class Request
 	 */
 	public function getMethod()
 	{
-		return strtolower($this->paramMethod);
+		return strtolower($this->method);
 	}
 
 	/**

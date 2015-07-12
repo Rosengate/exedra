@@ -100,9 +100,12 @@ class Url
 	 * Rebuild current route
 	 * @return string
 	 */
-	public function current()
+	public function current(array $data = array(), array $query = array())
 	{
-		return $this->create('@'.$this->exe->getRoute(true), $this->exe->param());
+		// merge both finding parameters and the given data (prioritized)
+		$data = array_merge($this->exe->finding->param(), $data);
+
+		return $this->create('@'.$this->exe->getRoute(true), $data, $query);
 	}
 
 	/**
@@ -111,18 +114,10 @@ class Url
 	 * @param array data
 	 * @param mixed query (uri query)
 	 */
-	public function create($routeName, array $data = array(), $query = null)
+	public function create($routeName, array $data = array(), array $query = array())
 	{
 		// build query
-		if(is_array($query) && count($query) > 0)
-		{
-			$queries = array();
-			foreach($query as $k=>$v)
-			{
-				$queries[] = $k.'='.$v;
-			}
-			$query = implode('&', $queries);
-		}
+		$query = http_build_query($query);
 		
 		$routeName = $this->exe->baseRoute($routeName);
 
