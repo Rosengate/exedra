@@ -303,9 +303,7 @@ class Request
 	 */
 	public function isAjax()
 	{
-		$xRequestedWith = isset($this->server['X_REQUESTED_WITH']) ? $this->server['X_REQUESTED_WITH'] : (!isset($this->header['X-Requested-With']) ? false : $this->header['X-Requested-With']);
-		
-		return strtolower($xRequestedWith) == 'xmlhttprequest';
+		return isset($this->server['HTTP_X_REQUESTED_WITH']) && strtolower($this->server['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest';
 	}
 
 	/**
