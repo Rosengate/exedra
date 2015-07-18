@@ -86,9 +86,9 @@ class Loader
 		extract($data);
 
 		if($once)
-			require_once $file;
+			return require_once $file;
 		else
-			require $file;
+			return require $file;
 
 	}
 
