@@ -45,7 +45,7 @@ class Redirect
 	 * @param array params
 	 * @param mixed query
 	 */
-	final public function to($route = null, $params = array(), $query = null)
+	final public function to($route = null, $params = array(), $query = array())
 	{
 		if(!$route)
 			return $this->refresh();
