@@ -157,7 +157,7 @@ class Loader
 	 * Register autoload.
 	 * @param string dir
 	 */
-	public function registerAutoload($dir)
+	public function registerAutoload($dir, $absolute = false)
 	{
 		// if by list
 		if(is_array($dir))
@@ -167,6 +167,9 @@ class Loader
 
 			return;
 		}
+
+		if(!$absolute)
+			$dir = $this->prefixPath($dir);
 
 		spl_autoload_register(function($class) use($dir)
 		{

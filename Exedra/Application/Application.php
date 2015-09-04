@@ -220,9 +220,14 @@ class Application
 			if(($this->exe && $failRoute = $this->exe->getFailRoute()) || $failRoute = $this->registry->getFailRoute())
 			{
 				if($this->exe)
+				{
 					$this->exe->setFailRoute(null);
+					$this->exe = null;
+				}
 				else
+				{
 					$this->setFailRoute(null);
+				}
 
 				// set this false, so that it wont loop if later this fail route doesn't exists.
 				return $this->execute($failRoute, array("exception"=>$e));

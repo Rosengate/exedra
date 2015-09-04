@@ -41,7 +41,7 @@ class Exedra
 		$this->loader = new Loader($baseDir);
 		
 		// register autoload.
-		$this->loader->registerAutoload($baseDir);
+		$this->loader->registerAutoload('');
 
 		// create http request and response.
 		$this->httpRequest	= $request ? : new \Exedra\HTTP\Request;
