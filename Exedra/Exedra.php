@@ -41,7 +41,7 @@ class Exedra
 		$this->loader = new Loader($baseDir);
 		
 		// register autoload.
-		$this->loader->registerAutoload('');
+		$this->loader->registerAutoload(__DIR__, 'Exedra', false);
 
 		// create http request and response.
 		$this->httpRequest	= $request ? : new \Exedra\HTTP\Request;
@@ -49,15 +49,6 @@ class Exedra
 
 		// baseDir
 		$this->baseDir = $baseDir;
-	}
-
-	/**
-	 * The interface to autoloading.
-	 * @param string directory
-	 */
-	public function registerAutoload($dir)
-	{
-		$this->loader->registerAutoload($dir);
 	}
 
 	/**
@@ -84,7 +75,7 @@ class Exedra
 				return $this->apps[$app_name];
 
 			// register autoload for this app_name.
-			$this->registerAutoload($app_name);
+			$this->loader->registerAutoload($app_name);
 
 			// create new application with an injected Map (with an injected map, request (an injected http request), and configuration handler.).
 			$this->apps[$app_name] = new \Exedra\Application\Application($app_name,$this);

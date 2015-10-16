@@ -24,10 +24,17 @@ class Loader
 	 */
 	protected $configurations;
 
+	/**
+	 * List of autoloaded dirs and namespaces
+	 * @var array
+	 */
+	protected $autoloadingRegistry = array();
+
 	public function __construct($baseDir = null, \Exedra\Application\Structure\Structure $structure = null)
 	{
 		$this->baseDir = !$baseDir ? null : rtrim($baseDir, '/');
 		$this->structure = $structure;
+		$this->autoloadRegister();
 	}
 
 	/**
@@ -154,52 +161,67 @@ class Loader
 	}
 
 	/**
-	 * Register autoload.
-	 * @param string dir
+	 * PSR-4 autoloader path register
+	 * @param string basePath
+	 * @param string prefix (optional), a namespace prefix
+	 * @param boolean relative (optional, default : true), if false, will consider the basePath given as absolute.
 	 */
-	public function registerAutoload($dir, $absolute = false)
+	public function registerAutoload($basePath, $prefix = '', $relative = true)
 	{
-		// if by list
-		if(is_array($dir))
+		$this->autoloadingRegistry[] = array($basePath, $prefix, $relative);
+	}
+
+	/**
+	 * Alias to registerAutoload
+	 * @param string basePath
+	 * @param string prefix (optional), a namespace prefix
+	 * @param boolean relative (optional, default : true), if false, will consider the basePath given as absolute.
+	 */
+	public function autoload($basePath, $prefix = '', $relative = true)
+	{
+		return $this->registerAutoload($basePath, $prefix, $relative);
+	}
+
+	/**
+	 * Get base directory this loader is based on
+	 * @return string
+	 */
+	public function getBaseDir()
+	{
+		return $this->baseDir;
+	}
+
+	/**
+	 * Register autoloading
+	 * @return null
+	 */
+	protected function autoloadRegister()
+	{
+		$loader = $this;
+
+		spl_autoload_register(function($class) use($loader)
 		{
-			foreach($dir as $d)
-				$this->registerAutoload($d);
+			$baseDir = $this->getBaseDir();
 
-			return;
-		}
-
-		if(!$absolute)
-			$dir = $this->prefixPath($dir);
-
-		spl_autoload_register(function($class) use($dir)
-		{
-			$path			= $dir."/".$class.".php";
-			$originalPath	= strtolower($path);
-
-			## extract both class name and vendor from the called name.
-			$explodes = explode("\\", $class, 2);
-			if(count($explodes) > 1)
-				 list($vendor,$class)	= $explodes;
-			else
-				list($vendor) = $explodes;
-
-			## check the vendor based class.
-			$class	= ucfirst($class);
-
-			if($vendor == "Exedra")
-				$path	= __DIR__."/".$class.".php";
-			else
-				$path	= rtrim($dir,"/")."/".$vendor."/".$class.".php";
-
-			$path	= $this->refinePath($path);
-
-			if(file_exists($path))
+			foreach($this->autoloadingRegistry as $structs)
 			{
-				require_once $path;
-			}
-			else if(file_exists($this->refinePath($originalPath)))
-			{
-				require_once $this->refinePath($originalPath);
+				$dir = $structs[0];
+				$prefix = $structs[1];
+				$relative = $structs[2];
+
+				if($prefix != '' && strpos($class, $prefix) !== 0)
+					continue;
+
+				// remove prefix from path.
+				$classDir = substr($class, strlen($prefix));
+
+				$filename = $dir.DIRECTORY_SEPARATOR.(str_replace('\\', DIRECTORY_SEPARATOR, $classDir)).'.php';
+
+				if($relative)
+					$filename = $baseDir.DIRECTORY_SEPARATOR.$filename;
+
+				if(file_exists($filename))
+					return require_once $filename;
 			}
 		});
 	}
