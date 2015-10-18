@@ -3,11 +3,21 @@ namespace Exedra\Application\Session;
 
 class Flash
 {
-	const KEY = 'flash';
+	const BASE_KEY = 'flash';
 
 	public function __construct(\Exedra\Application\Session\Session $session)
 	{
 		$this->session = $session;
+	}
+
+	/**
+	 * Get base key for session
+	 * @return string
+	 */
+	public function getBaseKey()
+	{
+		// hash to avoid conflict
+		return md5(self::BASE_KEY);
 	}
 
 	/**
@@ -27,7 +37,7 @@ class Flash
 		}
 		else
 		{
-			$this->session->set(self::KEY.'.'.$key,$val);
+			$this->session->set($this->getBaseKey().'.'.$key,$val);
 		}
 
 		return $this;
@@ -42,12 +52,12 @@ class Flash
 	public function get($key = null, $default = null)
 	{
 		if(!$key)
-			return $this->session->get(self::KEY);
+			return $this->session->get($this->getBaseKey());
 
 		if($default && !$this->has($key))
 			return $default;
 		
-		return $this->session->get(self::KEY.'.'.$key);
+		return $this->session->get($this->getBaseKey().'.'.$key);
 	}
 
 	/**
@@ -57,7 +67,7 @@ class Flash
 	 */
 	public function has($key)
 	{
-		return $this->session->has(self::KEY.'.'.$key);
+		return $this->session->has($this->getBaseKey().'.'.$key);
 	}
 
 	/**
@@ -66,7 +76,7 @@ class Flash
 	 */
 	public function clear()
 	{
-		$this->session->destroy(self::KEY);
+		$this->session->destroy($this->getBaseKey());
 		return $this;
 	}
 }
