@@ -48,6 +48,16 @@ abstract class Arrays
 		return $myarray;
 	}
 
+	public static function &getReferenceByNotation(&$storage, $key, $notation = '.')
+	{
+		$keys = explode($notation, $key);
+
+		foreach($keys as $key)
+			$storage = &$storage[$key];
+
+		return $storage;
+	}
+
 	public static function hasByNotation($storage,$key,$notation = '.')
 	{
 		$keys	= explode($notation,$key);
