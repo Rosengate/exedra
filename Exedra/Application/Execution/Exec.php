@@ -96,7 +96,8 @@ class Exec
 
 		$this->di = new \Exedra\Application\Dic(array(
 			"controller"=> array("\Exedra\Application\Builder\Controller", array($this)),
-			"view"=> array("\Exedra\Application\Builder\View", array($this)),
+			// "view"=> array("\Exedra\Application\Builder\View", array($this->exception, $this->loader)),
+			"view" => function() use($exe) {return new \Exedra\Application\Builder\View($exe->exception, $exe->loader);},
 			"middleware"=> array("\Exedra\Application\Builder\Middleware", array($this)),
 			"url"=> array("\Exedra\Application\Builder\Url", array($this->app,$this)),
 			"request"=>$this->finding->request ? : $this->app->request, // use finding based request if found, else, use the original http request one.

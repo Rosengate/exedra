@@ -8,6 +8,12 @@ namespace Exedra\Application\Builder\Blueprint;
 class View
 {
 	/**
+	 * An Exception manager.
+	 * @var \Exedra\Application\Builder\Exception
+	 */
+	protected $exceptionBuilder;
+
+	/**
 	 * Path for this view.
 	 * @var string
 	 */
@@ -36,9 +42,9 @@ class View
 	 */
 	protected $callbacks	= array();
 
-	public function __construct(\Exedra\Application\Execution\Exec $exe, $path = null, $data = null, \Exedra\Loader $loader)
+	public function __construct(\Exedra\Application\Builder\Exception $exceptionBuilder, $path = null, $data = null, \Exedra\Loader $loader)
 	{
-		$this->exe = $exe;
+		$this->exceptionBuilder = $exceptionBuilder;
 		if($path) $this->setPath($path);
 		if($data) $this->set($data);
 		$this->loader = $loader;
@@ -103,6 +109,15 @@ class View
 	}
 
 	/**
+	 * Return view current full path
+	 * @return string
+	 */
+	public function getPath()
+	{
+		return $this->path;
+	}
+
+	/**
 	 * Set view path
 	 * @param string path
 	 * @return this
@@ -139,7 +154,7 @@ class View
 	 * Check required data for rendering use.
 	 * @return mixed
 	 */
-	private function requirementCheck()
+	protected function requirementCheck()
 	{
 		if(count($this->required) > 0)
 		{
@@ -169,13 +184,13 @@ class View
 	{
 		## has required.
 		if($requiredArgs = $this->requirementCheck())
-			return $this->exe->exception->create('View.render : Missing required argument(s) for view ("'. $this->path .'") : '. $requiredArgs .'</b>');
+			return $this->exceptionBuilder->create('View.render : Missing required argument(s) for view ("'. $this->path .'") : '. $requiredArgs .'</b>');
 
 		## resolve any related callback.
 		$this->callbackResolve();
 
 		if($this->path == null)
-			return $this->exe->exception->create('View.render : path was not set (null)');
+			return $this->exceptionBuilder->create('View.render : path was not set (null)');
 
 		$this->loader->load(array('structure'=> 'view', 'path'=> $this->path) ,$this->data);
 	}
