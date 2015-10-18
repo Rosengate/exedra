@@ -89,7 +89,8 @@ class Request
 		}
 		else
 		{
-			$this->uri = $this->buildURI($this->server['REQUEST_URI']);
+			if(isset($this->server['REQUEST_URI']))
+				$this->uri = $this->buildURI($this->server['REQUEST_URI']);
 		}
 
 		
