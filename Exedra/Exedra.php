@@ -75,7 +75,7 @@ class Exedra
 				return $this->apps[$app_name];
 
 			// register autoload for this app_name.
-			$this->loader->registerAutoload($app_name);
+			$this->loader->registerAutoload($app_name, $app_name);
 
 			// create new application with an injected Map (with an injected map, request (an injected http request), and configuration handler.).
 			$this->apps[$app_name] = new \Exedra\Application\Application($app_name,$this);
