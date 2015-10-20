@@ -28,9 +28,9 @@ class Application
 
 	/**
 	 * Dependency injection container
-	 * @var \Exedra\Application\Dic
+	 * @var \Exedra\Application\Container
 	 */
-	public $di;
+	public $container;
 
 	/**
 	 * Current execution instance.
@@ -79,7 +79,7 @@ class Application
 	{
 		$app = $this;
 
-		$this->di = new \Exedra\Application\Dic(array(
+		$this->container = new \Exedra\Application\Container(array(
 			'registry'=> array('\Exedra\Application\Registry', array($this)),
 			"request"=>$this->exedra->httpRequest,
 			"response"=>$this->exedra->httpResponse,
@@ -94,9 +94,9 @@ class Application
 
 	public function __get($property)
 	{
-		if($this->di->has($property))
+		if($this->container->has($property))
 		{
-			$this->$property = $this->di->get($property);
+			$this->$property = $this->container->get($property);
 			return $this->$property;
 		}
 	}

@@ -1,6 +1,6 @@
 <?php namespace Exedra\Application;
 
-class Dic
+class Container
 {
 	/**
 	 * Storage for saved dependecies

@@ -35,9 +35,9 @@ class Exec
 
 	/**
 	 * Dependecy injection container
-	 * @var \Exedra\Application\Dic
+	 * @var \Exedra\Application\Container
 	 */
-	public $di;
+	public $container;
 
 	/**
 	 * Map finding result
@@ -94,7 +94,7 @@ class Exec
 		$app = $this->app;
 		$exe = $this;
 
-		$this->di = new \Exedra\Application\Dic(array(
+		$this->container = new \Exedra\Application\Container(array(
 			"controller"=> array("\Exedra\Application\Builder\Controller", array($this)),
 			// "view"=> array("\Exedra\Application\Builder\View", array($this->exception, $this->loader)),
 			"view" => function() use($exe) {return new \Exedra\Application\Builder\View($exe->exception, $exe->loader);},
@@ -162,9 +162,9 @@ class Exec
 	 */
 	public function __get($property)
 	{
-		if($this->di->has($property))
+		if($this->container->has($property))
 		{
-			$this->$property = $this->di->get($property);
+			$this->$property = $this->container->get($property);
 			return $this->$property;
 		}
 	}
