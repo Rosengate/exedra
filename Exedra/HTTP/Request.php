@@ -62,20 +62,15 @@ class Request
 
 	/**
 	 * Build request with given parameter.
+	 * @return void
 	 */
 	protected function buildRequest(array $param = array())
 	{
 		// initiate basic request data into properties.
 		$this->parameters	= isset($param['parameters']) ? $param['parameters'] : array("get"=>$_GET,"post"=>$_POST);
-		
-		// refer post and get in a new variable.
-		// $this->post			= &$this->parameters['post'];
-		// $this->get			= &$this->parameters['get'];
-		
-		$this->header		= isset($param['header'])?$param['header'] : (function_exists("getallheaders")?getallheaders():null);
-		$this->server		= isset($param['server'])?$param['server'] : $_SERVER;
-		$this->method		= isset($param['method'])?$param['method'] : (isset($this->server['REQUEST_METHOD'])?$this->server['REQUEST_METHOD'] : null);
-		// $this->uri			= isset($param['uri'])?$param['uri'] : (isset($this->server['REQUEST_URI']) ? $this->buildURI($this->server['REQUEST_URI']) : null );
+		$this->header		= isset($param['header']) ? $param['header'] : (function_exists("getallheaders")?getallheaders():null);
+		$this->server		= isset($param['server']) ? $param['server'] : $_SERVER;
+		$this->method		= isset($param['method']) ? $param['method'] : (isset($this->server['REQUEST_METHOD'])?$this->server['REQUEST_METHOD'] : null);
 
 		if(isset($param['uri']))
 		{
@@ -90,38 +85,50 @@ class Request
 		else
 		{
 			if(isset($this->server['REQUEST_URI']))
-				$this->uri = $this->buildURI($this->server['REQUEST_URI']);
+				$this->buildUri();
 		}
-
-		
 	}
 
 	/**
-	 * Build URI.
-	 * @param string request_uri
+	 * This functionality may be useful when your application files located farther from root directory.
+	 * For example let say, you have request uri like : /www/myapps/exedra-web/
+	 * You can use this method to resolve and base your URI accordingly
+	 * Actually i wrote this for XAMPP-like build.
+	 * @return void
 	 */
-	protected function buildURI($request_uri)
+	public function resolveUri()
 	{
-		list($request_uri) = explode("?",$request_uri);
+		list($request_uri) = explode("?",$this->server['REQUEST_URI']);
 
 		// get base path from php_self
-		if(strpos($request_uri,$_SERVER['SCRIPT_NAME']) === 0)
+		if(strpos($request_uri, $_SERVER['SCRIPT_NAME']) === 0)
 		{
 			$base_path = $_SERVER['SCRIPT_NAME'];
 		}
 		else
 		{
-			$base_path	= explode("/",$_SERVER['SCRIPT_NAME']);
+			$base_path	= explode("/", $_SERVER['SCRIPT_NAME']);
 			array_pop($base_path);
 			$base_path	= implode("/",$base_path);
 		}
 
 		$request_uri = trim($request_uri,"/");
 		
-		// substring base_path
+		// remove base_path
 		$request_uri = trim(substr($request_uri,strlen(trim($base_path,"/"))),"/");
 
-		return $request_uri;
+		$this->setUri($request_uri);
+	}
+
+	/**
+	 * Build URI.
+	 * @param string request_uri
+	 */
+	protected function buildURI()
+	{
+		list($request_uri) = explode('?', $this->server['REQUEST_URI']);
+
+		$this->setUri(trim($request_uri, '/'));
 	}
 
 	/**
@@ -176,7 +183,7 @@ class Request
 
 		return false;
 	}
-
+	
 	/**
 	 * Has the given GET parameter
 	 * @return boolean
@@ -237,6 +244,15 @@ class Request
 	public function post($key = null, $default = null)
 	{
 		return $this->paramPost($key, $default);
+	}
+
+	/**
+	 * Set uri of the request
+	 * @return void
+	 */
+	public function setUri($uri)
+	{
+		$this->uri = $uri;
 	}
 
 	/**
