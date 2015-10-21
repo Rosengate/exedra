@@ -33,7 +33,11 @@ class Container
 	 */
 	public function register($key, $val = null)
 	{
-		if(is_array($key)) foreach($key as $k=>$v) $this->register($k, $v); else $this->registry[$key] = $val;
+		if(is_array($key))
+			foreach($key as $k=>$v)
+				$this->register($k, $v);
+		else
+			$this->registry[$key] = $val;
 
 		return $this;
 	}
@@ -60,6 +64,7 @@ class Container
 
 	/**
 	 * Magically you can pass additional argument you want to the dependency constructor.
+	 * It won't be cached
 	 */
 	public function __call($dependency, $args = array())
 	{
@@ -70,24 +75,31 @@ class Container
 	}
 
 	/**
-	 * Resolve the dependency
-	 * @param string property
+	 * Resolve the dependecy
+	 * Definitely Won't be cached.
+	 * Likely an alias to resolve, but well i fancy a cool name.
 	 * @return mixed
 	 */
-	public function get($dependency, $args = false)
+	public function create($dependency, array $args = array())
 	{
-		if(isset($this->storage[$dependency]))
-			return $this->storage[$dependency];
+		return $this->resolve($dependency, $args);
+	}
 
+	/**
+	 * Resolve the dependency
+	 * @return mixed
+	 */
+	public function resolve($dependency, $args = false)
+	{
 		$class	= $this->registry[$dependency];
 
 		if($class instanceof \Closure)
 		{
-			$val	= is_array($args) ? call_user_func_array($class, $args) : $class();
+			$value	= is_array($args) ? call_user_func_array($class, $args) : $class();
 		}
 		else if(is_object($class))
 		{
-			$val	= $class;
+			$value	= $class;
 		}
 		else if(!isset($class[1]))
 		{
@@ -96,11 +108,11 @@ class Container
 				$reflection	= new \ReflectionClass($class[0]);
 				$obj	= $reflection->newInstanceArgs($args);
 
-				$val	= $obj;
+				$value	= $obj;
 			}
 			else
 			{
-				$val = new $class[0];
+				$value = new $class[0];
 			}
 		}
 		else
@@ -114,15 +126,30 @@ class Container
 			$reflection	= new \ReflectionClass($class[0]);
 			$obj	= $reflection->newInstanceArgs($classArgs);
 
-			$val	= $obj;
+			$value	= $obj;
 		}
 
+		return $value;
+	}
+
+	/**
+	 * Resolve the dependency
+	 * Will cache only if no additional argument was passed
+	 * @param string property
+	 * @return mixed
+	 */
+	public function get($dependency, $args = false)
+	{
+		if(isset($this->storage[$dependency]))
+			return $this->storage[$dependency];
+
+		$value = $this->resolve($dependency, $args);
+
 		// only save if the flag is true, and no constructer was passed. (args === false)
-		if($this->save && $args === false)
-			$this->storage[$dependency] = $val;
+		if($this->save)
+			$this->storage[$dependency] = $value;
 
 		return $this->storage[$dependency];
-
 	}
 }
 
