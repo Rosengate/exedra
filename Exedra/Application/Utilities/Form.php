@@ -159,7 +159,7 @@ class Form
 	public function flash($data = array())
 	{
 		## re-flash with post data, if $data wasn't set.
-		$data = count($data) == 0?$this->exe->request->post:$data;
+		$data = count($data) == 0?$this->exe->request->post():$data;
 
 		if(count($data) == 0) return $this;
 
