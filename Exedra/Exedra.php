@@ -70,18 +70,18 @@ class Exedra
 	{
 		try
 		{
-			// inject this components into the application.
+			// throw exception if name exists
 			if(isset($this->apps[$app_name]))
-				return $this->apps[$app_name];
-
-			// register autoload for this app_name.
-			$this->loader->registerAutoload($app_name, $app_name);
+				throw new \Exception("Application with name ".$app_name.' already exists.');
 
 			// create new application with an injected Map (with an injected map, request (an injected http request), and configuration handler.).
 			$this->apps[$app_name] = new \Exedra\Application\Application($app_name,$this);
+
+			// register autoload for this app_name.
+			$this->loader->registerAutoload($app_name, $app_name);
 				
 			// Execute in instant.
-			if($execution)
+			if(!is_null($execution))
 				$execution($this->apps[$app_name]);
 
 			return $this->apps[$app_name];
