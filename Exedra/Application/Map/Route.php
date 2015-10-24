@@ -362,21 +362,24 @@ class Route
 			### type matching.
 			switch($type)
 			{
-				case "":# match all, so do nothing.
+				// match all, so do nothing.
+				case "":
 				if($uris[$no] == "" && !$isOptional)
 				{
 					$matched	= false;
 					break 2;
 				}
 				break;
-				case "i":# Integer
+				// integer
+				case "i":
 					if(!is_numeric($uris[$no]))
 					{
 						$matched = false;
 						break 2;
 					}
 				break;
-				case "**":# trailing!
+				// remainder segments into array
+				case "**":
 					## get all the rest of uri for param, and explode it so it return as list of segment.
 					$explodes = explode("/",$uri,$no+1);
 					$uriParams[$segmentParamName]	= explode("/",array_pop($explodes));
@@ -454,6 +457,20 @@ class Route
 			return $this->level->factory->createLevelByPattern($this, $level);
 
 		return $level;
+	}
+
+	/**
+	 * Get methods for this route.
+	 * @return array
+	 */
+	public function getMethods()
+	{
+		$methods = $this->getParameter('method');
+
+		if(!isset($methods))
+			return array('get', 'post', 'put', 'delete');
+
+		return $methods;
 	}
 
 	/**

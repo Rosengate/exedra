@@ -188,7 +188,7 @@ class Application
 			$this->executions[] = $exe;
 
 			$execution = $finding->route->getParameter('execute');
-			$execution = $this->registry->pattern->resolve($execution);
+			$execution = $this->registry->pattern->resolve($exe, $execution);
 
 			// execute the stacked middleware.
 			if($exe->middlewares->count() > 0)
@@ -261,6 +261,15 @@ class Application
 		}
 
 		return $this->exception->create('Route not found. '.$msg);
+	}
+
+	public function wizard($argv)
+	{
+		$wizard = new \Exedra\Console\Wizard\Arcanist($this->getExedra(), $this);
+
+		array_shift($argv);
+
+		$wizard->run($argv);
 	}
 }
 ?>

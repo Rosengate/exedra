@@ -18,24 +18,24 @@ class Pattern
 		$this->app = $app;
 
 		$this->register('controllerBuilder', 
-			function($value){ return $this->conditionControllerBuilder($value); }, 
-			function($value) { return $this->buildController($value); });
+			function($exe, $value){ return $this->conditionControllerBuilder($value); }, 
+			function($exe, $value) { return $this->buildController($value); });
 	}
 
 	/**
 	 * Resolve pattern
 	 * @param mixed value
 	 */
-	public function resolve($value)
+	public function resolve(\Exedra\Application\Execution\Exec $exe, $value)
 	{
 		if(is_callable($value))
 			return $value;
 
 		foreach($this->registry as $key=>$array)
 		{
-			if($array['condition']($value) === true)
+			if($array['condition']($exe, $value) === true)
 			{
-				return $array['resolve']($value);
+				return $array['resolve']($exe, $value);
 			}
 		}
 

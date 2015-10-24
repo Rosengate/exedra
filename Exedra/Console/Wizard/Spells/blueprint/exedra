@@ -1,0 +1,6 @@
+<?php
+require_once '../exedra/Exedra/Exedra.php';
+
+$exedra = new \Exedra\Exedra(__DIR__);
+
+return $exedra;

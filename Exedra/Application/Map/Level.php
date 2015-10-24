@@ -44,6 +44,29 @@ class Level extends \ArrayIterator
 	}
 
 	/**
+	 * Loop the routes within this level.
+	 */
+	public function each($closure)
+	{
+		$this->rewind();
+
+		while($this->valid())
+		{
+			$route = $this->current();
+
+			$closure($route);
+			
+			if($route->hasSubroutes())
+				$route->getSubroutes()->each($closure);
+
+
+			$this->next();
+		}
+
+		return false;
+	}
+
+	/**
 	 * Get route by it's absolute name.
 	 * @param mixed routeName by dot notation or array.
 	 * @return false if not found. else \Exedra\Application\Map\Route
