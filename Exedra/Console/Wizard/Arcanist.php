@@ -88,7 +88,7 @@ class Arcanist extends Wizardry
 			$data = array(
 				'route' => $route->getAbsoluteName(), 
 				'method' => $methods,
-				'uri' => $route->getAbsoluteUri()
+				'uri' => $route->getUri(true)
 				);
 			foreach($header as $col)
 			{

@@ -103,7 +103,7 @@ class Route
 	}
 
 	/**
-	 * Get an absolute uri
+	 * Get an absolutely resolved uri
 	 * @param params param for named parameter.
 	 * @return uri of all of the related routes to this, with replaced named parameter.
 	 */
@@ -116,6 +116,26 @@ class Route
 		{
 			$uris[] = $route->uriParameterReplace($params);
 		}
+
+		return trim(implode('/', $uris), '/');
+	}
+
+	/**
+	 * Get url parameter for this route.
+	 * @param boolean absolute
+	 * @return string
+	 */
+	public function getUri($absolute = false)
+	{
+		if(!$absolute)
+			return $this->getParameter('uri');
+
+		$routes = $this->getFullRoutes();
+
+		$uris = array();
+
+		foreach($routes as $route)
+			$uris[] = $route->getParameter('uri');
 
 		return trim(implode('/', $uris), '/');
 	}
@@ -197,7 +217,7 @@ class Route
 			## is mandatory, but no parameter passed.
 			if(!$isOptional && !isset($data[$segment]))
 			{
-				if($this->exe)
+				if(isset($this->exe))
 					$this->exe->exception->create("Url.Create : Required parameter not passed ($segment).");
 				else
 					throw new \Exedra\Application\Exception\Exception("Url.Create : Required parameter not passed ($segment).",null,null);
