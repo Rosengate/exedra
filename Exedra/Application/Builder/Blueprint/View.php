@@ -99,13 +99,15 @@ class View
 	 * Resolve callback in rendering
 	 * @return null
 	 */
-	protected function callbackResolve()
+	protected function callbackResolve($data)
 	{
-		foreach($this->data as $key=>$val)
+		foreach($data as $key=>$val)
 		{
 			if(isset($this->callbacks[$key]))
-				$this->data[$key]	= $this->callbacks[$key]($val);
+				$data[$key]	= $this->callbacks[$key]($val);
 		}
+
+		return $data;
 	}
 
 	/**
@@ -151,6 +153,35 @@ class View
 	}
 
 	/**
+	 * Get view data
+	 * @param string key
+	 * @return mixed
+	 */
+	public function get($key = null)
+	{
+		if($key === null)
+			return $this->data;
+
+		return $this->data[$key];
+	}
+
+	/**
+	 * Get view content
+	 * @throws \Exedra\Application\Exception\Exception
+	 */
+	public function getContents()
+	{
+		if(!$this->isReady())
+			return;
+
+		$data = $this->callbackResolve($this->data);
+
+		ob_start();
+		$this->loader->load(array('structure' => 'view', 'path' => $this->path), $data);
+		return ob_get_clean();
+	}
+
+	/**
 	 * Check required data for rendering use.
 	 * @return mixed
 	 */
@@ -158,7 +189,7 @@ class View
 	{
 		if(count($this->required) > 0)
 		{
-			## non-exists list
+			// non-exists list
 			$nonExist	= Array();
 			foreach($this->required as $k)
 			{
@@ -176,22 +207,34 @@ class View
 	}
 
 	/**
+	 * Check if view is ready
+	 * @return boolean
+	 * @throws \Exedra\Application\Exception\Exception
+	 */
+	protected function isReady()
+	{
+		if($requiredArgs = $this->requirementCheck())
+			return $this->exceptionBuilder->create('View.render : Missing required argument(s) for view ("'. $this->path .'") : '. $requiredArgs .'</b>');
+
+		if($this->path == null)
+			return $this->exceptionBuilder->create('View.render : path was not set (null)');
+
+		return true;
+	}
+
+	/**
 	 * Main rendering function, load the with loader function.
 	 * @return null
 	 * @throws \Exedra\Application\Exception\Exception
 	 */
 	public function render()
 	{
-		## has required.
-		if($requiredArgs = $this->requirementCheck())
-			return $this->exceptionBuilder->create('View.render : Missing required argument(s) for view ("'. $this->path .'") : '. $requiredArgs .'</b>');
+		if(!$this->isReady())
+			return;
 
-		## resolve any related callback.
-		$this->callbackResolve();
+		// resolve any related callback.
+		$data = $this->callbackResolve($this->data);
 
-		if($this->path == null)
-			return $this->exceptionBuilder->create('View.render : path was not set (null)');
-
-		$this->loader->load(array('structure'=> 'view', 'path'=> $this->path) ,$this->data);
+		$this->loader->load(array('structure'=> 'view', 'path'=> $this->path), $data);
 	}
 }
