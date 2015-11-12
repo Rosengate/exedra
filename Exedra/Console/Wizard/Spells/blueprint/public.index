@@ -1,5 +1,5 @@
 <?php
 
-require_once __DIR__.'{DS}{app_file_name}';
+require_once __DIR__.'{DS}..{DS}{app_file_name}';
 
 $exedra->dispatch();
