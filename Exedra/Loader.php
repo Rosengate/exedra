@@ -230,6 +230,7 @@ class Loader
 	 * Get the content of file of the path
 	 * @param string file name
 	 * @return mixed file contents
+	 * @throws \Exception
 	 */
 	public function getContent($file)
 	{
@@ -240,6 +241,32 @@ class Loader
 			throw new \Exception("File not found : $file");
 
 		return file_get_contents($file);
+	}
+
+	/**
+	 * Alias to getContent
+	 * @param string file name
+	 * @return string file contents
+	 * @throws \Exception
+	 */
+	public function getContents($file)
+	{
+		return $this->getContent($file);
+	}
+
+	/**
+	 * Put the content of file of the path
+	 * @param string file name
+	 * @return mixed file contents
+	 */
+	public function putContents($file, $contents)
+	{
+		$file = $this->buildPath($file);
+
+		if(!file_exists($file))
+			throw new \Exception("File not found : ".$file);
+
+		return file_put_contents($file, $contents);
 	}
 
 	/**

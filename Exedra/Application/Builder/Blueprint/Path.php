@@ -67,6 +67,28 @@ class Path
 
 		return $this->loader->getContent($this->path);
 	}
+
+	/**
+	 * Alias to getContent()
+	 * @return mixed
+	 */
+	public function getContents()
+	{
+		return $this->getContent();
+	}
+
+	/**
+	 * Put contents to the given path if it's file
+	 * @param string data
+	 * @return mixed
+	 */
+	public function putContents($data = null)
+	{
+		if(!$this->isExists())
+			return false;
+
+		return $this->loader->putContents($this->path, $data);
+	}
 }
 
 ?>
