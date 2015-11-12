@@ -1,7 +1,7 @@
 <?php
 $exedra = require_once __DIR__.'/../exedra';
 
-return $exedra->build({app_build}, function($app)
+return $exedra->build('{app_build}', function($app)
 {
 
 });
