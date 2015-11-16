@@ -379,27 +379,47 @@ class Route
 				break;
 			}
 
+			if($uris[$no] === '' && !$isOptional)
+			{
+				$matched = false;
+				break;
+			}
+
 			### type matching.
 			switch($type)
 			{
 				// match all, so do nothing.
 				case "":
-				if($uris[$no] == "" && !$isOptional)
-				{
-					$matched	= false;
-					break 2;
-				}
+					if($uris[$no] == "" && !$isOptional)
+					{
+						$matched = false;
+						break 2;
+					}
+
 				break;
 				// integer
 				case "i":
-					if(!is_numeric($uris[$no]))
+					// segment value isn't numeric. OR is cumpulsory.
+					if(!is_numeric($uris[$no]) || !$isOptional)
 					{
 						$matched = false;
 						break 2;
 					}
 				break;
+				// segments remainder
+				case '*':
+					$uriParams[$segmentParamName] = $uri;
+					$matched = true;
+					$isTrailing = true;
+					break 2;
+				break;
 				// remainder segments into array
 				case "**":
+					/*if(!$isOptional && $no === 0 && $uri === '')
+					{
+						$matched = false;
+						break 2;
+					}*/
 					## get all the rest of uri for param, and explode it so it return as list of segment.
 					$explodes = explode("/",$uri,$no+1);
 					$uriParams[$segmentParamName]	= explode("/",array_pop($explodes));
@@ -408,16 +428,14 @@ class Route
 					break 2; ## break the param loop, and set matched directly to true.
 				break;
 				default:
-					$matched	= false;
+					$matched = false;
 					break 2;
 				break;
 			}
 
 			## need to move this logic outside perhaps.
 			if(count($segments) != count($uris))
-			{
 				$matched = false;
-			}
 
 			## set parameter.
 			$uriParams[$segmentParamName]	= $uris[$no];
