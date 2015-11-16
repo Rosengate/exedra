@@ -2,6 +2,8 @@ Exédra
 ======
 A multi-tier nestful routing oriented PHP Framework.
 
+p/s : Expect an often b.c. breaks.
+
 Introduction
 ======
 This PHP framework focuses mainly on nestable route mapping, route oriented based execution and which hopefully will provide much modular application execution. Route is unique, and identified by name. Imagine developing an application hierarchically down the depth without losing the identity of the executions you planned, while stacking middlewares down the path on every possible node of route.
