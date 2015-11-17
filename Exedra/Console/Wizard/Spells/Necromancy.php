@@ -27,7 +27,7 @@ class Necromancy
 
 	protected function createDir($dir)
 	{
-		$dir = $this->exedra->getBaseDir().DIRECTORY_SEPARATOR.$dir;
+		$dir = $this->exedra->getBaseDir().'/'.$dir;
 
 		$result = mkdir($dir, 0775);
 
@@ -39,12 +39,12 @@ class Necromancy
 
 	protected function createFile($filename, $content)
 	{
-		return file_put_contents($this->exedra->getBaseDir().DIRECTORY_SEPARATOR.$filename, $content);
+		return file_put_contents($this->exedra->getBaseDir().'/'.$filename, $content);
 	}
 
 	protected function fileExists($path)
 	{
-		return file_exists($this->exedra->getBaseDir().DIRECTORY_SEPARATOR.$path);
+		return file_exists($this->exedra->getBaseDir().'/'.$path);
 	}
 
 	public function createApp($name, $namespace = null)
@@ -63,10 +63,10 @@ class Necromancy
 			->say("Can you somehow check the permission first for this directory?");
 
 		$param = array(
-			'app_file_name' => $appPath.DIRECTORY_SEPARATOR.'app.php',
+			'app_file_name' => $appPath.'/'.'app.php',
 			'app_name' => $name,
 			'bootstrap_file_name' => strtolower($name).'.bootstrap',
-			'DS' => DIRECTORY_SEPARATOR
+			'DS' => '/'
 			);
 
 		if($name === $namespace)
@@ -101,7 +101,7 @@ class Necromancy
 		$this->createDir($public_dir);
 
 		$blueprintIndex = $this->loadBlueprint('public.index', $param);
-		$this->createFile($public_dir.DIRECTORY_SEPARATOR.'index.php', $blueprintIndex);
+		$this->createFile($public_dir.'/'.'index.php', $blueprintIndex);
 
 		// create wizard for app.
 		$blueprintWizard = $this->loadBlueprint('app.wizard', $param);
