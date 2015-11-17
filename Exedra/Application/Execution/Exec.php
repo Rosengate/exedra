@@ -182,6 +182,32 @@ class Exec
 	}
 
 	/**
+	 * Check if the given route exists within the current route
+	 * @param string route
+	 * @return boolean
+	 */
+	public function isRoute($route, array $params = array())
+	{
+		if(strpos($route, $this->app->structure->getCharacter('absolute')) === 0)
+			$isRoute = $this->getAbsoluteRoute() == substr($route, 1);
+		else
+			$isRoute = $this->getRoute() == $route;
+
+		if(!$isRoute)
+			return false;
+
+		if(count($params) === 0)
+			return true;
+
+		// check params against current.
+		foreach($params as $key => $value)
+			if($this->param($key) != $value)
+				return false;
+
+		return true;
+	}
+
+	/**
 	 * Get execution parameter
 	 * @param string name
 	 * @param mixed default value (optional)
@@ -192,6 +218,16 @@ class Exec
 		if(!$name) return $this->params;
 
 		return \Exedra\Functions\Arrays::hasByNotation($this->params, $name) ? \Exedra\Functions\Arrays::getByNotation($this->params, $name) : $default;
+	}
+
+	/**
+	 * Check whether given param key exists
+	 * @param string name
+	 * @return boolean
+	 */
+	public function hasParam($name)
+	{
+		return \Exedra\Functions\Arrays::hasByNotation($this->params, $name);
 	}
 
 	/**
