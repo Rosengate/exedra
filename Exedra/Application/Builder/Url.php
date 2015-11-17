@@ -53,7 +53,7 @@ class Url
 	 */
 	public function base($uri = null)
 	{
-		return rtrim($this->baseUrl, '/' ).($uri ? '/' . trim($uri, '/') : '');
+		return ($this->baseUrl ? rtrim($this->baseUrl, '/' ).'/' : '/').($uri ? trim($uri, '/') : '');
 	}
 
 	/**
@@ -130,6 +130,7 @@ class Url
 		$uri = $route->getAbsoluteUri($data);
 
 		// return ($this->baseUrl ? trim($this->baseUrl, '/') .'/'. $uri : $uri) . ($query ? '?'. $query : null);
-		return ($this->baseUrl ? trim($this->baseUrl, '/') .'/'. $uri : $uri) . ($query ? '?'. $query : null);
+		return $this->base($uri).($query ? '?'.$query : null);
+		// return ($this->baseUrl ? trim($this->baseUrl, '/') .'/'. $uri : '/'.$uri) . ($query ? '?'. $query : null);
 	}
 }
