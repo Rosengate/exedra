@@ -182,8 +182,45 @@ class Exec
 	}
 
 	/**
-	 * Check if the given route exists within the current route
+	 * Validate against given parameters
+	 * @param array params
+	 * @return boolean
+	 */
+	public function isParams(array $params)
+	{
+		foreach($params as $key => $value)
+			if($this->param($key) != $value)
+				return false;
+
+		return false;
+	}
+
+	/**
+	 * Check if the given route exists within the current route.
 	 * @param string route
+	 * @param array params (optional)
+	 * @return boolean
+	 */
+	public function hasRoute($route, array $params = array())
+	{
+		if(strpos($route, $this->app->structure->getCharacter('absolute')) === 0)
+			$isRoute = strpos($this->getAbsoluteRoute(), substr($route, 1)) === 0;
+		else
+			$isRoute = strpos($this->getRoute(), $route) === 0;
+
+		if(!$isRoute)
+			return false;
+
+		if(count($params) === 0)
+			return true;
+
+		return $this->isParams($params);
+	}
+
+	/**
+	 * Check if the given route is equal
+	 * @param string route
+	 * @param array params (optional)
 	 * @return boolean
 	 */
 	public function isRoute($route, array $params = array())
@@ -199,12 +236,7 @@ class Exec
 		if(count($params) === 0)
 			return true;
 
-		// check params against current.
-		foreach($params as $key => $value)
-			if($this->param($key) != $value)
-				return false;
-
-		return true;
+		return $this->isParams($params);
 	}
 
 	/**

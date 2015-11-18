@@ -28,9 +28,9 @@ class UrlTest extends PHPUnit_Framework_TestCase
 			));
 
 		// simple uri
-		$this->assertEquals('uri1/uri2', $this->app->execute('tester', array('route'=> 'r1')));
+		$this->assertEquals('/uri1/uri2', $this->app->execute('tester', array('route'=> 'r1')));
 
-		$this->assertEquals('uri1/simple-param', $this->app->execute('tester', 
+		$this->assertEquals('/uri1/simple-param', $this->app->execute('tester', 
 			array(
 				'route'=> 'r2',
 				'params'=> array('param'=> 'simple-param'))
