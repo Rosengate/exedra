@@ -192,7 +192,7 @@ class Exec
 			if($this->param($key) != $value)
 				return false;
 
-		return false;
+		return true;
 	}
 
 	/**
