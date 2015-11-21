@@ -1,5 +1,8 @@
 <?php namespace Exedra\Application\Utilities;
-
+/**
+ * Old form
+ * For new one refer to \Exedra\Application\Builder\Form\Form
+ */
 class Form
 {
 	public $data;
