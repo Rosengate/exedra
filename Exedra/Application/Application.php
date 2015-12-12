@@ -228,12 +228,12 @@ class Application
 
 			return $this->execute($failRoute, array('exception' => $exception));
 		}
-		catch(\Exedra\Application\Exception\Exception $exception)
+		catch(\Exception $exception)
 		{
 			if($failRoute = $this->registry->getFailRoute())
 				$this->setFailRoute(null);
 			else
-				return $this->exitWithMessage($exception->getMessage(), 'Application Exception');
+				return $this->exitWithMessage($exception->getMessage(), get_class($exception));
 			
 			return $this->execute($failRoute, array('exception' => $exception));
 		}
