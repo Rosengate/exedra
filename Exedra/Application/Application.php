@@ -84,6 +84,7 @@ class Application
 			"request"=>$this->exedra->httpRequest,
 			"response"=>$this->exedra->httpResponse,
 			"map"=> function() use($app) { return new \Exedra\Application\Map\Map(new \Exedra\Application\Map\Factory($app->loader));},
+			"url" => array("\Exedra\Application\Builder\Url", array($this)),
 			"config"=> array("\Exedra\Application\Config"),
 			"session"=> array("\Exedra\Application\Session\Session"),
 			"exception"=> array("\Exedra\Application\Builder\Exception"),

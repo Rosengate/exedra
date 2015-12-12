@@ -99,7 +99,7 @@ class Exec
 			// "view"=> array("\Exedra\Application\Builder\View", array($this->exception, $this->loader)),
 			"view" => function() use($exe) {return new \Exedra\Application\Builder\View($exe->exception, $exe->loader);},
 			"middleware"=> array("\Exedra\Application\Builder\Middleware", array($this)),
-			"url"=> array("\Exedra\Application\Builder\Url", array($this->app,$this)),
+			"url"=> array("\Exedra\Application\Execution\Builder\Url", array($this)),
 			"request"=>$this->finding->request ? : $this->app->request, // use finding based request if found, else, use the original http request one.
 			"response"=>$this->app->exedra->httpResponse,
 			"validator"=> array("\Exedra\Application\Utilities\Validator"),

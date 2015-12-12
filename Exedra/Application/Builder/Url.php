@@ -19,10 +19,9 @@ class Url
 	 */
 	protected $assetUrl;
 
-	public function __construct(\Exedra\Application\Application $app, \Exedra\Application\Execution\Exec $exe)
+	public function __construct(\Exedra\Application\Application $app)
 	{
 		$this->app	= $app;
-		$this->exe	= $exe;
 
 		// initiate base and asset url
 		$this->initiateUrl();
@@ -34,15 +33,11 @@ class Url
 	protected function initiateUrl()
 	{
 		// base url
-		if($this->exe->config->has('app.url'))
-			$this->setBase($this->exe->config->get('app.url'));
-		else if($this->app->config->has('app.url'))
+		if($this->app->config->has('app.url'))
 			$this->setBase($this->app->config->get('app.url'));
 
 		// asset url
-		if($this->exe->config->has('asset.url'))
-			$this->setAsset($this->exe->config->get('asset.url'));
-		else if($this->app->config->has('asset.url'))
+		if($this->app->config->has('asset.url'))
 			$this->setAsset($this->app->config->get('asset.url'));
 	}
 
@@ -54,14 +49,6 @@ class Url
 	public function base($uri = null)
 	{
 		return ($this->baseUrl ? rtrim($this->baseUrl, '/' ).'/' : '/').($uri ? trim($uri, '/') : '');
-	}
-
-	/**
-	 * Get url of parent route
-	 */
-	public function parent()
-	{
-		return $this->create('@'.$this->exe->getParentRoute());
 	}
 
 	/**
@@ -96,16 +83,9 @@ class Url
 		return $this;
 	}
 
-	/**
-	 * Rebuild current route
-	 * @return string
-	 */
-	public function current(array $data = array(), array $query = array())
+	public function getExceptionBuilder()
 	{
-		// merge both finding parameters and the given data (prioritized)
-		$data = array_merge($this->exe->finding->param(), $data);
-
-		return $this->create('@'.$this->exe->getRoute(true), $data, $query);
+		return $this->app->exception;
 	}
 
 	/**
@@ -118,14 +98,12 @@ class Url
 	{
 		// build query
 		$query = http_build_query($query);
-		
-		$routeName = $this->exe->baseRoute($routeName);
 
 		// get \Exedra\Application\Map\Route by name.
 		$route = $this->app->map->getRoute($routeName);
 
 		if(!$route)
-			return $this->exe->exception->create('Unable to find route '.$routeName.' while creating a url');
+			return $this->getExceptionBuilder()->create('Unable to find route '.$routeName.' while creating a url');
 
 		$uri = $route->getAbsoluteUri($data);
 
