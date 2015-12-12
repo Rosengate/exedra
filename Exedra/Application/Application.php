@@ -87,7 +87,7 @@ class Application
 			"url" => array("\Exedra\Application\Builder\Url", array($this)),
 			"config"=> array("\Exedra\Application\Config"),
 			"session"=> array("\Exedra\Application\Session\Session"),
-			"exception"=> array("\Exedra\Application\Builder\Exception"),
+			"exception"=> array("\Exedra\Application\Builder\Exception", array($this)),
 			'path' => array('\Exedra\Application\Builder\Path', array($this->loader))
 			// 'file'=> function() use($app) { return new \Exedra\Application\Builder\File($app->loader);}
 			));
@@ -215,30 +215,38 @@ class Application
 			
 			return $response;
 		}
-		catch(\Exception $e)
+		catch(\Exedra\Application\Execution\Exception\Exception $exception)
 		{
-			// prioritieze the current $exe first.
-			if(($this->exe && $failRoute = $this->exe->getFailRoute()) || $failRoute = $this->registry->getFailRoute())
-			{
-				if($this->exe)
-				{
-					$this->exe->setFailRoute(null);
-					$this->exe = null;
-				}
-				else
-				{
-					$this->setFailRoute(null);
-				}
+			$exe = $exception->exe;
 
-				// set this false, so that it wont loop if later this fail route doesn't exists.
-				return $this->execute($failRoute, array("exception"=>$e));
-			}
+			if($failRoute = $exe->getFailRoute())
+				$exe->setFailRoute(null);
+			else if($failRoute = $this->registry->getFailRoute())
+				$this->setFailRoute(null);
 			else
-			{
-				// simple customer error msg.
-				return "<pre><hr><u>Execution Exception :</u>\n".$e->getMessage()."<hr>";
-			}
+				return $this->exitWithMessage($exception->getMessage(), 'Execution Exception [Route : '.$exception->getRouteName().']');
+
+			return $this->execute($failRoute, array('exception' => $exception));
 		}
+		catch(\Exedra\Application\Exception\Exception $exception)
+		{
+			if($failRoute = $this->registry->getFailRoute())
+				$this->setFailRoute(null);
+			else
+				return $this->exitWithMessage($exception->getMessage(), 'Application Exception');
+			
+			return $this->execute($failRoute, array('exception' => $exception));
+		}
+	}
+
+	/**
+	 * Exit script with given message and title
+	 * @param string message
+	 * @param string title
+	 */
+	protected function exitWithMessage($message, $title = null)
+	{
+		echo "<pre><hr>".($title ? "<u>".$title."</u>\n" : '').$message."<hr>";exit;
 	}
 
 	/**

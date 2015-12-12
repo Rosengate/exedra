@@ -10,7 +10,7 @@ class BuilderViewTest extends PHPUnit_Framework_TestCase
 
 		$app = $exedra->build('TestApp');
 
-		$this->builderView = new \Exedra\Application\Builder\View(new \Exedra\Application\Builder\Exception, $app->loader);
+		$this->builderView = new \Exedra\Application\Builder\View(new \Exedra\Application\Builder\Exception($app), $app->loader);
 	}
 
 	public function viewCreate()
