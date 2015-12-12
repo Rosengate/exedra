@@ -44,9 +44,12 @@ class Level extends \ArrayIterator
 	}
 
 	/**
-	 * Loop the routes within this level.
+	 * Loop the routes within this level and it's sublevel
+	 * Break on other closure result not equal to null
+	 * @param \Closure closure
+	 * @return null|mixed
 	 */
-	public function each($closure)
+	public function each(\Closure $closure)
 	{
 		$this->rewind();
 
@@ -54,44 +57,89 @@ class Level extends \ArrayIterator
 		{
 			$route = $this->current();
 
-			$closure($route);
+			$result = $closure($route);
+
+			if($result !== null)
+				return $result;
 			
 			if($route->hasSubroutes())
-				$route->getSubroutes()->each($closure);
+			{
+				$result = $route->getSubroutes()->each($closure);
 
+				if($result !== null)
+					return $result;
+			}
 
 			$this->next();
+		}
+
+		return null;
+	}
+
+	/**
+	 * Find route given by an absolute search string relative to this level
+	 * Example :
+	 * - general.books.detail
+	 * - general.#bookDetail.comments
+	 * @param mixed routeName by dot notation or array.
+	 * @return false if not found. else \Exedra\Application\Map\Route
+	 */
+	public function findRoute($routeName)
+	{
+		$routeNames = !is_array($routeName) ? explode(Route::$notation, $routeName) : $routeName;
+		$routeName = array_shift($routeNames);
+		$isTag = strpos($routeName, '#') === 0;
+
+		$this->rewind();
+
+		// search by route name
+		if(!$isTag)
+		{
+			// loop this level, and find the route.
+			while($this->valid())
+			{
+				$route = $this->current();
+
+				if($route->getName() == $routeName)
+					if(count($routeNames) > 0 && $route->hasSubroutes())
+						return $route->getSubroutes()->findRoute($routeNames);
+					else
+						return $route;
+
+				$this->next();
+			}
+		}
+		// search by route tag under this level.
+		else
+		{
+			$route = $this->findRouteByTag(substr($routeName, 1));
+
+			if($route)
+			{
+				if(count($routeNames) > 0 && $route->hasSubroutes())
+					return $route->getSubroutes()->findRoute($routeNames);
+				else
+					return $route;
+			}
 		}
 
 		return false;
 	}
 
 	/**
-	 * Get route by it's absolute name.
-	 * @param mixed routeName by dot notation or array.
-	 * @return false if not found. else \Exedra\Application\Map\Route
+	 * @param string tag
+	 * @return \Exedra\Application\Map\Route|null
 	 */
-	public function findRouteByName($routeName)
+	public function findRouteByTag($tag)
 	{
-		$routeNames = !is_array($routeName) ? explode(Route::$notation, $routeName) : $routeName;
-		$routeName = array_shift($routeNames);
-
-		$this->rewind();
-		// loop this level, and find the route.
-		while($this->valid())
+		$match = false;
+		$route = $this->each(function($route) use($tag, &$match)
 		{
-			$route = $this->current();
+			if($route->getParameter('tag') == $tag)
+				return $route;
+		});
 
-			if($route->getName() == $routeName)
-				if(count($routeNames) > 0 && $route->hasSubroutes())
-					return $route->getSubroutes()->findRouteByName($routeNames);
-				else
-					return $route;
-
-			$this->next();
-		}
-
-		return false;
+		return $route;
 	}
 
 	/**
@@ -100,7 +148,7 @@ class Level extends \ArrayIterator
 	 * @param array passedParameters - highly otional.
 	 * @return array {route: \Exedra\Application\Map\Route|false, parameter: array}
 	 */
-	public function findRoute(\Exedra\HTTP\Request $request, $levelUri, array $passedParameters = array())
+	public function findRouteByRequest(\Exedra\HTTP\Request $request, $levelUri, array $passedParameters = array())
 	{
 		$this->rewind();
 
@@ -137,7 +185,7 @@ class Level extends \ArrayIterator
 					$passedParameters = count($result['parameter']) > 0 ? $result['parameter'] : array();
 
 					// $subrouteResult = $route->getSubroutes()->query($queryUpdated, $passedParameters);
-					$subrouteResult = $route->getSubroutes()->findRoute($request, $remainingUri, $passedParameters);
+					$subrouteResult = $route->getSubroutes()->findRouteByRequest($request, $remainingUri, $passedParameters);
 
 					// if found. else. continue on this level.
 					if($subrouteResult['route'] != false)

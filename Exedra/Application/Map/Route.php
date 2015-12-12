@@ -490,11 +490,23 @@ class Route
 	{
 		$level = $this->parameters['subroutes'];
 
+		if($level instanceof \Exedra\Application\Map\Level)
+			return $level;
+
 		// is a string based level.
 		if(is_string($level))
-			return $this->level->factory->createLevelByPattern($this, $level);
-
-		return $level;
+		{
+			$this->parameters['subroutes'] = $this->level->factory->createLevelByPattern($this, $level);
+			return $this->getSubroutes();
+		}
+		
+		if($level instanceof \Closure)
+		{
+			$level = $this->level->factory->createLevel($level);
+			$closure($level);
+			$this->parameters['subroutes'] = $level;
+			return $this->getSubroutes();
+		}
 	}
 
 	/**
@@ -595,6 +607,11 @@ class Route
 	public function setModule($module)
 	{
 		return $this->setParameter('module', $module);
+	}
+
+	public function setTag($tag)
+	{
+		return $this->setParameter('tag', $tag);
 	}
 
 	/**

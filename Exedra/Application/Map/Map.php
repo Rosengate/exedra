@@ -81,7 +81,7 @@ class Map
 		}
 		else
 		{
-			$route = $this->level->findRouteByName($name);
+			$route = $this->level->findRoute($name);
 
 			// save this route.
 			$this->cache[$name] = $route;
@@ -103,7 +103,7 @@ class Map
 			else
 				return $this->factory->throwException('Argument for map::find() must be either array or \Exedra\HTTP\Request');
 				
-		$result = $this->level->findRoute($request, $request->getUri());
+		$result = $this->level->findRouteByRequest($request, $request->getUri());
 
 		return $this->factory->createFinding($result['route'] ? : null, $result['parameter'], $request);
 	}
