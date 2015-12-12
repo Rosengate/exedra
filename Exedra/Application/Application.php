@@ -188,7 +188,7 @@ class Application
 			$this->executions[] = $exe;
 
 			$execution = $finding->route->getParameter('execute');
-			$execution = $this->registry->pattern->resolve($exe, $execution);
+			$execution = $this->registry->handlers->resolve($exe, $execution);
 
 			// execute the stacked middleware.
 			if($exe->middlewares->count() > 0)

@@ -19,14 +19,25 @@ class Registry
 	protected $failRoute = null;
 
 	/**
-	 * Pattern class
-	 * @var \Exedra\Application\Execution\Pattern
+	 * Handlers registry class
+	 * @var \Exedra\Application\Execution\Handlers
 	 */
-	public $pattern;
+	public $handlers;
 
 	public function __construct(\Exedra\Application\Application $app)
 	{
-		$this->pattern = new \Exedra\Application\Execution\Pattern($app);
+		$this->handlers = new \Exedra\Application\Execution\Handlers($app);
+		$this->registerDefaultHandlers();
+	}
+
+	/**
+	 * Register default handlers
+	 * @return void
+	 */
+	protected function registerDefaultHandlers()
+	{
+		$this->handlers->register('closure', Execution\Handler\Closure::class);
+		$this->handlers->register('controller', Execution\Handler\Controller::class);
 	}
 
 	/**
@@ -72,6 +83,17 @@ class Registry
 	public function getMiddlewares()
 	{
 		return $this->middlewares;
+	}
+
+	/**
+	 * Alias to pattern->register(name, class)
+	 * @return self
+	 */
+	public function addHandler($name, $class)
+	{
+		$this->handlers->register($name, $class);
+
+		return $this;
 	}
 }
 
