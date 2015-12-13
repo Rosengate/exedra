@@ -83,13 +83,12 @@ class Application
 			'registry'=> array('\Exedra\Application\Registry', array($this)),
 			"request"=>$this->exedra->httpRequest,
 			"response"=>$this->exedra->httpResponse,
-			"map"=> function() use($app) { return new \Exedra\Application\Map\Map(new \Exedra\Application\Map\Factory($app->loader));},
+			"map"=> function() use($app) { return new \Exedra\Application\Map\Level(new \Exedra\Application\Map\Factory($app->loader));},
 			"url" => array("\Exedra\Application\Builder\Url", array($this)),
 			"config"=> array("\Exedra\Application\Config"),
 			"session"=> array("\Exedra\Application\Session\Session"),
 			"exception"=> array("\Exedra\Application\Builder\Exception", array($this)),
 			'path' => array('\Exedra\Application\Builder\Path', array($this->loader))
-			// 'file'=> function() use($app) { return new \Exedra\Application\Builder\File($app->loader);}
 			));
 	}
 

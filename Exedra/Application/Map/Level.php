@@ -9,6 +9,12 @@ class Level extends \ArrayIterator
 	public $route;
 
 	/**
+	 * Route finding cache
+	 * @var array routeCache
+	 */
+	protected $routeCache = array();
+
+	/**
 	 * Factory injected to this level.
 	 * @var \Exedra\Application\Map\Factory
 	 */
@@ -17,7 +23,9 @@ class Level extends \ArrayIterator
 	public function __construct(Factory $factory, Route $route = null, array $routes = array())
 	{
 		$this->factory = $factory;
+
 		$this->route = $route;
+
 		if(count($routes) > 0)
 			$this->addRoutes($routes);
 	}
@@ -35,12 +43,73 @@ class Level extends \ArrayIterator
 	}
 
 	/**
+	 * Add subroutes on other route.
+	 * @param string name of the route.
+	 * @param array routes
+	 * @return this
+	 */
+	public function addOnRoute($name, array $routes)
+	{
+		$route = $this->findRoute($name);
+		
+		// if has subroutes, use the that subroutes, else, create a new subroute.
+		if($route->hasSubroutes())
+			$route->getSubroutes()->addRoutes($routes);
+		else
+			$route->setSubroutes($routes);
+
+		return $this;
+	}
+
+	/**
+	 * Add route to this level.
+	 * @param \Exedra\Application\Map\Route
+	 * @return this
+	 */
+	public function addRoute(Route $route)
+	{
+		$this->append($route);
+
+		return $this;
+	}
+
+	/**
 	 * Get the route this level was bound to.
 	 * @return \Exedra\Application\Map\Route
 	 */
 	public function getUpperRoute()
 	{
 		return $this->route;
+	}
+
+	/**
+	 * Find route by \Exedra\HTTP\request or array
+	 * @param \Exedra\HTTP\Request
+	 * @return \Exedra\Application\Map\Finding
+	 */
+	public function find($request)
+	{
+		if(!($request instanceof \Exedra\HTTP\Request))
+			if(is_array($request))
+				$request = $this->factory->createRequest($request);
+			else
+				return $this->factory->throwException('Argument for map::find() must be either array or \Exedra\HTTP\Request');
+
+		$result = $this->findRouteByRequest($request, $request->getUri());
+
+		return $this->factory->createFinding($result['route'] ? : null, $result['parameter'], $request);
+	}
+
+	/**
+	 * Find route by the absolute name.
+	 * @param string name.
+	 * @return \Exedra\Application\Map\Finding
+	 */
+	public function findByName($name, $parameters = array())
+	{
+		$route = $this->findRoute($name);
+
+		return $this->factory->createFinding($route ? : null, $parameters);
 	}
 
 	/**
@@ -78,13 +147,27 @@ class Level extends \ArrayIterator
 
 	/**
 	 * Find route given by an absolute search string relative to this level
+	 * This method also cache the finding result
 	 * Example :
 	 * - general.books.detail
 	 * - general.#bookDetail.comments
 	 * @param mixed routeName by dot notation or array.
-	 * @return false if not found. else \Exedra\Application\Map\Route
+	 * @return \Exedra\Application\Map\Route|false
 	 */
-	public function findRoute($routeName)
+	public function findRoute($name)
+	{
+		if(isset($this->routeCache[$name]))
+			return $this->routeCache[$name];
+		else
+			return $this->routeCache[$name] = $this->findRouteRecursively($name);
+	}
+
+	/**
+	 * A recursive search of route given by an absolute search string relative to this level
+	 * @param string routeName
+	 * @return \Exedra\Application\Map\Route|false
+	 */
+	protected function findRouteRecursively($routeName)
 	{
 		$routeNames = !is_array($routeName) ? explode(Route::$notation, $routeName) : $routeName;
 		$routeName = array_shift($routeNames);
@@ -102,7 +185,7 @@ class Level extends \ArrayIterator
 
 				if($route->getName() == $routeName)
 					if(count($routeNames) > 0 && $route->hasSubroutes())
-						return $route->getSubroutes()->findRoute($routeNames);
+						return $route->getSubroutes()->findRouteRecursively($routeNames);
 					else
 						return $route;
 
@@ -117,7 +200,7 @@ class Level extends \ArrayIterator
 			if($route)
 			{
 				if(count($routeNames) > 0 && $route->hasSubroutes())
-					return $route->getSubroutes()->findRoute($routeNames);
+					return $route->getSubroutes()->findRouteRecursively($routeNames);
 				else
 					return $route;
 			}
@@ -132,14 +215,13 @@ class Level extends \ArrayIterator
 	 */
 	public function findRouteByTag($tag)
 	{
-		$match = false;
-		$route = $this->each(function($route) use($tag, &$match)
+		$route = $this->each(function($route) use($tag)
 		{
 			if($route->getParameter('tag') == $tag)
 				return $route;
 		});
 
-		return $route;
+		return $route ? : null;
 	}
 
 	/**
@@ -198,17 +280,5 @@ class Level extends \ArrayIterator
 
 		// false default.
 		return array('route'=> false, 'parameter'=> array(), 'equal'=> false);
-	}
-
-	/**
-	 * Add route to this level.
-	 * @param \Exedra\Application\Map\Route
-	 * @return this
-	 */
-	public function addRoute(Route $route)
-	{
-		$this->append($route);
-
-		return $this;
 	}
 }
