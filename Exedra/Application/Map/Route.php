@@ -502,7 +502,8 @@ class Route
 		
 		if($level instanceof \Closure)
 		{
-			$level = $this->level->factory->createLevel($level);
+			$closure = $level;
+			$level = $this->level->factory->createLevel($this);
 			$closure($level);
 			$this->parameters['subroutes'] = $level;
 			return $this->getSubroutes();

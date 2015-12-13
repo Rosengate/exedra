@@ -13,22 +13,41 @@ class Factory
 	 */
 	protected $loader;
 
+	protected $registry = array();
+
+	protected $reflections = array();
+
 	public function __construct(\Exedra\Loader $loader)
 	{
 		$this->loader = $loader;
-		$this->initiate();
+
+		$this->useDefaultRouting();
 	}
 
 	/**
-	 * Initiate default classes
+	 * Register default routing components
+	 * @return self
 	 */
-	protected function initiate()
+	public function useDefaultRouting()
 	{
-		$this->register('route', '\Exedra\Application\Map\Route');
-		$this->register('level', '\Exedra\Application\Map\Level');
-		$this->register('finding', '\Exedra\Application\Map\Finding');
-		$this->register('request', '\Exedra\HTTP\Request');
-		$this->register('exception', '\Exception');
+		return $this->register(array(
+			'route' => '\Exedra\Application\Map\Route',
+			'level' => '\Exedra\Application\Map\Level',
+			'finding' => '\Exedra\Application\Map\Finding',
+			'request' => '\Exedra\HTTP\Request',
+			'exception' => '\Exception'));
+	}
+
+	/**
+	 * Register Convenient routing components
+	 * @return self
+	 */
+	public function useConvenientRouting()
+	{
+		return $this->register(array(
+			'route' => '\Exedra\Application\Map\Convenient\Route',
+			'level' => '\Exedra\Application\Map\Convenient\Group'
+			));
 	}
 
 	/**
@@ -36,9 +55,15 @@ class Factory
 	 * @param string name
 	 * @param string classname
 	 */
-	public function register($name, $classname)
+	public function register(array $registry)
 	{
-		$this->registries[$name] = new \ReflectionClass($classname);
+		foreach($registry as $name => $classname)
+		{
+			$this->registry[$name] = $classname;
+			unset($this->reflections[$name]);
+		}
+
+		return $this;
 	}
 
 	/**
@@ -48,7 +73,10 @@ class Factory
 	 */
 	public function create($name, array $arguments = array())
 	{
-		$reflection = $this->registries[$name];
+		if(!isset($this->reflections[$name]))
+			$this->reflections[$name] = new \ReflectionClass($this->registry[$name]);
+
+		$reflection = $this->reflections[$name];
 
 		return $reflection->newInstanceArgs($arguments);
 	}

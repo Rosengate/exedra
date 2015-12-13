@@ -70,6 +70,7 @@ class Application
 		// create application structure and loader
 		$this->structure = new \Exedra\Application\Structure\Structure();
 		$this->loader = new \Exedra\Loader($this->getBaseDir(), $this->structure);
+		$this->mapFactory = new \Exedra\Application\Map\Factory($this->loader);
 	}
 
 	/**
@@ -83,7 +84,7 @@ class Application
 			'registry'=> array('\Exedra\Application\Registry', array($this)),
 			"request"=>$this->exedra->httpRequest,
 			"response"=>$this->exedra->httpResponse,
-			"map"=> function() use($app) { return new \Exedra\Application\Map\Level(new \Exedra\Application\Map\Factory($app->loader));},
+			"map"=> function() use($app) { return $app->mapFactory->createLevel();},
 			"url" => array("\Exedra\Application\Builder\Url", array($this)),
 			"config"=> array("\Exedra\Application\Config"),
 			"session"=> array("\Exedra\Application\Session\Session"),
