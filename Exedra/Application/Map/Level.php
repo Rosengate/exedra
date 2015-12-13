@@ -245,7 +245,8 @@ class Level extends \ArrayIterator
 
 			$hasSubroutes = $route->hasSubroutes();
 
-			if(($result['route'] != false) || (($result['equal'] == true || $result['equal'] === null) && ($remainingUri != '' && $hasSubroutes)))
+			// if have found, or to do a deeper search
+			if(($result['route'] != false) || ($result['continue'] === true && ($remainingUri != '' && $hasSubroutes)))
 			{
 				$executionPriority = $route->hasSubroutes() && $route->hasExecution() && $remainingUri == '';
 
@@ -259,7 +260,7 @@ class Level extends \ArrayIterator
 					return array(
 						'route'=> $result['route'], 
 						'parameter'=> $params,
-						'equal'=> $result['equal']);
+						'continue'=> $result['continue']);
 				}
 				else
 				{
@@ -279,6 +280,6 @@ class Level extends \ArrayIterator
 		}
 
 		// false default.
-		return array('route'=> false, 'parameter'=> array(), 'equal'=> false);
+		return array('route'=> false, 'parameter'=> array(), 'continue' => false);
 	}
 }

@@ -245,12 +245,10 @@ class Route
 	}
 
 	/**
-	 * Query the route. return with uri parameter.
-	 * @param associative array of result :
-	 * - route \Exedra\Application\Map\Route or false
-	 * - parameter array
-	 * - equal boolean
-	 * @return array struct of {route, parameter, equal}
+	 * Validate uri against the request
+	 * @param \Exedra\HTTP\Request request
+	 * @param string uri
+	 * @return array struct of {route, parameter, continue}
 	 */
 	public function validate(\Exedra\HTTP\Request $request, $uri)
 	{
@@ -273,7 +271,7 @@ class Route
 				$value = $request->getMethod();
 				// return false because method doesn't exist.
 				if(!in_array(strtolower($value), $this->getParameter('method')))
-					return array('route'=> false, 'parameter'=> false, 'equal'=> false);
+					return array('route'=> false, 'parameter'=> false, 'continue'=> false);
 
 				break;
 				case "uri":
@@ -281,19 +279,19 @@ class Route
 				$result = $this->validateURI($value);
 
 				if(!$result['matched'])
-					return array('route'=>false, 'parameter'=> $result['parameter'], 'equal'=> $result['equal']);
+					return array('route'=>false, 'parameter'=> $result['parameter'], 'continue'=> $result['continue']);
 
-				return array('route'=> $this, 'parameter'=> $result['parameter'], 'equal'=> $result['equal']);
+				return array('route'=> $this, 'parameter'=> $result['parameter'], 'continue'=> $result['continue']);
 				break;
 				case "ajax":
 				if($request->isAjax() != $this->getParameter('ajax'))
-					return array('route' => false, 'parameter' => false, 'equal' => false);
+					return array('route' => false, 'parameter' => false, 'continue' => false);
 				
 				break;
 			}
 		}
 
-		return array('route'=>false, 'parameter'=> array(), 'equal'=> false);
+		return array('route'=>false, 'parameter'=> array(), 'continue'=> false);
 	}
 
 	/**
@@ -303,6 +301,8 @@ class Route
 	 */
 	protected function validateURI($uri)
 	{
+		$continue = true;
+
 		$routeURI = $this->getParameter('uri');
 
 		if($routeURI === false)
@@ -310,7 +310,11 @@ class Route
 
 		if($routeURI === "")
 		{
-			return array('matched'=> ($uri === "" ? true : false), 'equal'=> null, 'parameter'=> array());
+			return array(
+				'matched'=> ($uri === "" ? true : false),
+				'parameter'=> array(),
+				'continue' => $continue
+				);
 		}
 
 
@@ -352,7 +356,7 @@ class Route
 
 			## 2.2 pattern comparation
 			$pattern	= trim($segment,"[]");
-			list($type,$segmentParamName) = explode(":",$pattern); # split by colon.
+			@list($type, $segmentParamName) = explode(":",$pattern); # split by colon.
 
 			## no color was passed. thus, could't retrieve second value.
 			if(!$segmentParamName)
@@ -395,13 +399,13 @@ class Route
 						$matched = false;
 						break 2;
 					}
-
 				break;
 				// integer
 				case "i":
 					// segment value isn't numeric. OR is cumpulsory.
-					if(!is_numeric($uris[$no]) || !$isOptional)
+					if(!is_numeric($uris[$no]) && !$isOptional)
 					{
+						$continue = false;
 						$matched = false;
 						break 2;
 					}
@@ -444,7 +448,7 @@ class Route
 		## build result.
 		$result 	= Array();
 
-		$result['equal'] = $equal;
+		$result['continue'] = $equal === false ? false : $continue;
 
 		## pattern matched.
 		$result['matched']	= $matched;
