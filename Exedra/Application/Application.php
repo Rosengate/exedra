@@ -188,7 +188,7 @@ class Application
 			// save to the stack of execution.
 			$this->executions[] = $exe;
 
-			$execution = $finding->route->getParameter('execute');
+			$execution = $finding->route->getProperty('execute');
 			$execution = $this->registry->handlers->resolve($exe, $execution);
 
 			// execute the stacked middleware.

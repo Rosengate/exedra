@@ -96,23 +96,23 @@ class Finding
 		$this->module = null;
 		$this->baseRoute = null;
 
-		foreach($this->route->getFullRoutes() as $r)
+		foreach($this->route->getFullRoutes() as $route)
 		{
 			// get the latest module and route base
-			if($r->hasParameter('module'))
-				$this->module = $r->getParameter('module');
+			if($route->hasProperty('module'))
+				$this->module = $route->getProperty('module');
 
 			// if has parameter base, and it's true, set base route to the current route.
-			if($r->hasParameter('base') && $r->getParameter('base') === true)
-				$this->baseRoute = $r->getAbsoluteName();
+			if($route->hasProperty('base') && $route->getProperty('base') === true)
+				$this->baseRoute = $route->getAbsoluteName();
 
 			// has middleware.
-			if($r->hasParameter('middleware'))
-				$this->middlewares[$r->getName()] = &$r->getParameter('middleware');
+			if($route->hasProperty('middleware'))
+				$this->middlewares[$route->getName()] = &$route->getProperty('middleware');
 
 			// pass conig.
-			if($r->hasParameter('config'))
-				$this->configs->set($r->getParameter('config'));
+			if($route->hasProperty('config'))
+				$this->configs->set($route->getProperty('config'));
 		}
 	}
 

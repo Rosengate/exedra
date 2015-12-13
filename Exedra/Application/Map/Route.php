@@ -18,7 +18,7 @@ class Route
 	protected $fullRoutes = null;
 
 	/**
-	 * @var array parameters
+	 * @var array properties
 	 * - method
 	 * - uri
 	 * - ajax
@@ -29,7 +29,7 @@ class Route
 	 * - config
 	 * - base
 	 */
-	protected $parameters = array();
+	protected $properties = array();
 
 	/**
 	 * Level this route is bound to
@@ -43,7 +43,7 @@ class Route
 	 */
 	public static $notation = '.';
 
-	public function __construct(Level $level, $name, array $parameters = array())
+	public function __construct(Level $level, $name, array $properties = array())
 	{
 		$notation = self::$notation;
 
@@ -54,9 +54,34 @@ class Route
 		// default uri.
 		$this->setUri('');
 
-		if(count($parameters) > 0)
-			foreach($parameters as $key=>$value)
-				$this->parseParameter($key, $value);
+		$this->registerAliases();
+
+		if(count($properties) > 0)
+			$this->setProperties($properties);
+	}
+
+	/**
+	 * Set multiple properties for this route
+	 * @param array properties
+	 * @return self
+	 */
+	public function setProperties(array $properties)
+	{
+		foreach($properties as $key=>$value)
+			$this->parseProperty($key, $value);
+
+		return $this;
+	}
+
+	/**
+	 * Register default aliases
+	 */
+	protected function registerAliases()
+	{
+		$this->aliases = array(
+			'bind:middleware' => 'middleware',
+			'path' => 'uri'
+			);
 	}
 
 	/**
@@ -65,10 +90,10 @@ class Route
 	 * @param mixed value
 	 * @return this->set'Key'
 	 */
-	public function parseParameter($key, $value)
+	public function parseProperty($key, $value)
 	{
-		if($key == 'bind:middleware')
-			$key = 'middleware';
+		if(isset($this->aliases[$key]))
+			$key = $this->aliases[$key];
 
 		$method = 'set'.ucwords($key);
 
@@ -121,21 +146,21 @@ class Route
 	}
 
 	/**
-	 * Get url parameter for this route.
+	 * Get uri property for this route.
 	 * @param boolean absolute
 	 * @return string
 	 */
 	public function getUri($absolute = false)
 	{
 		if(!$absolute)
-			return $this->getParameter('uri');
+			return $this->getProperty('uri');
 
 		$routes = $this->getFullRoutes();
 
 		$uris = array();
 
 		foreach($routes as $route)
-			$uris[] = $route->getParameter('uri');
+			$uris[] = $route->getProperty('uri');
 
 		return trim(implode('/', $uris), '/');
 	}
@@ -194,7 +219,7 @@ class Route
 	 */
 	public function uriParameterReplace(array $data)
 	{
-		$uri = $this->getParameter('uri');
+		$uri = $this->getProperty('uri');
 
 		$segments	= explode("/",$uri);
 
@@ -256,11 +281,11 @@ class Route
 		foreach(array('method', 'uri', 'ajax') as $key)
 		{
 			// by default, if parameter was set, but query not provided anything.
-			// if($this->hasParameter($key) && !isset($query[$key]))
+			// if($this->hasProperty($key) && !isset($query[$key]))
 			// 	return array('route'=> false, 'parameter'=> false);
 			
 			// if this parameter wasn't set, skip validation.
-			if(!$this->hasParameter($key))
+			if(!$this->hasProperty($key))
 				continue;
 
 			// $value = $query[$key];
@@ -270,7 +295,7 @@ class Route
 				case "method":
 				$value = $request->getMethod();
 				// return false because method doesn't exist.
-				if(!in_array(strtolower($value), $this->getParameter('method')))
+				if(!in_array(strtolower($value), $this->getProperty('method')))
 					return array('route'=> false, 'parameter'=> false, 'continue'=> false);
 
 				break;
@@ -284,7 +309,7 @@ class Route
 				return array('route'=> $this, 'parameter'=> $result['parameter'], 'continue'=> $result['continue']);
 				break;
 				case "ajax":
-				if($request->isAjax() != $this->getParameter('ajax'))
+				if($request->isAjax() != $this->getProperty('ajax'))
 					return array('route' => false, 'parameter' => false, 'continue' => false);
 				
 				break;
@@ -303,7 +328,7 @@ class Route
 	{
 		$continue = true;
 
-		$routeURI = ltrim($this->getParameter('uri'), '/');
+		$routeURI = ltrim($this->getProperty('uri'), '/');
 
 		if($routeURI === false)
 			return false;
@@ -469,12 +494,12 @@ class Route
 	{
 		$uris = explode("/", $uri);
 		$new_uriR	= Array();
-		for($i=count(explode("/", $this->parameters['uri']));$i<count($uris);$i++)
+		for($i=count(explode("/", $this->properties['uri']));$i<count($uris);$i++)
 		{
 			$new_uriR[]	= $uris[$i];
 		}
 
-		return $this->parameters['uri'] != '' ? implode("/", $new_uriR) : $uri;
+		return $this->properties['uri'] != '' ? implode("/", $new_uriR) : $uri;
 	}
 
 	/**
@@ -483,7 +508,7 @@ class Route
 	 */
 	public function hasSubroutes()
 	{
-		return isset($this->parameters['subroutes']);
+		return isset($this->properties['subroutes']);
 	}
 
 	/**
@@ -492,7 +517,7 @@ class Route
 	 */
 	public function getSubroutes()
 	{
-		$level = $this->parameters['subroutes'];
+		$level = $this->properties['subroutes'];
 
 		if($level instanceof \Exedra\Application\Map\Level)
 			return $level;
@@ -500,7 +525,7 @@ class Route
 		// is a string based level.
 		if(is_string($level))
 		{
-			$this->parameters['subroutes'] = $this->level->factory->createLevelByPattern($this, $level);
+			$this->properties['subroutes'] = $this->level->factory->createLevelByPattern($this, $level);
 			return $this->getSubroutes();
 		}
 		
@@ -509,7 +534,7 @@ class Route
 			$closure = $level;
 			$level = $this->level->factory->createLevel($this);
 			$closure($level);
-			$this->parameters['subroutes'] = $level;
+			$this->properties['subroutes'] = $level;
 			return $this->getSubroutes();
 		}
 	}
@@ -520,7 +545,7 @@ class Route
 	 */
 	public function getMethods()
 	{
-		$methods = $this->getParameter('method');
+		$methods = $this->getProperty('method');
 
 		if(!isset($methods))
 			return array('get', 'post', 'put', 'delete');
@@ -529,24 +554,24 @@ class Route
 	}
 
 	/**
-	 * Check if this route has execution parameter.
+	 * Check if this route has execution property.
 	 * @return boolean of existence.
 	 */
 	public function hasExecution()
 	{
-		return isset($this->parameters['execute']);
+		return isset($this->properties['execute']);
 	}
 
 	public function setName($name)
 	{
 		$this->name = $name;
-		
+
 		return $this;
 	}
 
 	public function setBase($baseRoute)
 	{
-		$this->setParameter('base', $baseRoute);
+		$this->setProperty('base', $baseRoute);
 		return $this;
 	}
 
@@ -557,7 +582,7 @@ class Route
 	 */
 	public function setUri($uri)
 	{
-		$this->setParameter('uri', $uri);
+		$this->setProperty('uri', $uri);
 		return $this;
 	}
 
@@ -569,7 +594,7 @@ class Route
 	{
 		$method = !is_array($method) ? explode(',', $method) : $method;
 		$method = array_map('strtolower', $method);
-		$this->setParameter('method', $method);
+		$this->setProperty('method', $method);
 	}
 
 	/**
@@ -578,16 +603,16 @@ class Route
 	 */
 	public function setConfig(array $value)
 	{
-		return $this->setParameter('config', $value);
+		return $this->setProperty('config', $value);
 	}
 
 	/**
-	 * Set execution parameter
+	 * Set execution property
 	 * @param mixed execute
 	 */
 	public function setExecute($execute)
 	{
-		$this->setParameter('execute', $execute);
+		$this->setProperty('execute', $execute);
 		return $this;
 	}
 
@@ -600,7 +625,7 @@ class Route
 		// only create Level if the argument is array. else, just save the pattern.
 		$subroutes = is_array($subroutes) ? $this->level->factory->createLevel($this, $subroutes) : $subroutes;
 
-		return $this->setParameter('subroutes', $subroutes);
+		return $this->setProperty('subroutes', $subroutes);
 	}
 
 	/**
@@ -609,49 +634,53 @@ class Route
 	 */
 	public function setMiddleware($middleware)
 	{
-		return $this->setParameter('middleware', $middleware);
+		return $this->setProperty('middleware', $middleware);
 	}
 
 	/**
 	 * Set module under this route.
-	 * @param module
+	 * @param string module
 	 */
 	public function setModule($module)
 	{
-		return $this->setParameter('module', $module);
+		return $this->setProperty('module', $module);
 	}
 
+	/**
+	 * Tag this route
+	 * @param string tag
+	 */
 	public function setTag($tag)
 	{
-		return $this->setParameter('tag', $tag);
+		return $this->setProperty('tag', $tag);
 	}
 
 	/**
-	 * Generally get a referenced parameter.
+	 * Get route property
 	 * @param string key
-	 * @return parameter value
+	 * @return mixed
 	 */
-	public function &getParameter($key)
+	public function getProperty($key)
 	{
-		return $this->parameters[$key];
+		return $this->properties[$key];
 	}
 
 	/**
-	 * Check whether parameter exist or not.
+	 * Check whether route property exist or not.
 	 * @param string key
 	 * @return boolean of existence
 	 */
-	public function hasParameter($key)
+	public function hasProperty($key)
 	{
-		return isset($this->parameters[$key]);
+		return isset($this->properties[$key]);
 	}
 
 	/**
-	 * Set parameter for this route.
+	 * Set property for this route.
 	 * @param string key
 	 * @param mixed value
 	 */
-	protected function setParameter($key, $value)
+	protected function setProperty($key, $value)
 	{
 		switch($key)
 		{
@@ -664,7 +693,7 @@ class Route
 			break;
 		}
 
-		$this->parameters[$key] = $value;
+		$this->properties[$key] = $value;
 
 		return $this;
 	}

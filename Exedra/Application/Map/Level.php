@@ -217,7 +217,7 @@ class Level extends \ArrayIterator
 	{
 		$route = $this->each(function($route) use($tag)
 		{
-			if($route->getParameter('tag') == $tag)
+			if($route->getProperty('tag') == $tag)
 				return $route;
 		});
 
