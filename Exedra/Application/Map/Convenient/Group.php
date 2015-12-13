@@ -11,7 +11,9 @@ class Group extends \Exedra\Application\Map\Level
 	 */
 	public function add($method = null, $path = null, $params = null)
 	{
-		$parameters = array('uri' => $path);
+		$parameters = array();
+
+		$parameters['uri'] = $path === null ? '' : $path;
 
 		if($method)
 			$parameters['method'] = $method;

@@ -303,7 +303,7 @@ class Route
 	{
 		$continue = true;
 
-		$routeURI = $this->getParameter('uri');
+		$routeURI = ltrim($this->getParameter('uri'), '/');
 
 		if($routeURI === false)
 			return false;
@@ -535,6 +535,13 @@ class Route
 	public function hasExecution()
 	{
 		return isset($this->parameters['execute']);
+	}
+
+	public function setName($name)
+	{
+		$this->name = $name;
+		
+		return $this;
 	}
 
 	public function setBase($baseRoute)
