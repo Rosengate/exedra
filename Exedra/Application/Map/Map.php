@@ -45,7 +45,7 @@ class Map
 	 */
 	public function addOnRoute($name, array $routes)
 	{
-		$route = $this->getRoute($name);
+		$route = $this->findRoute($name);
 		
 		// if has subroutes, use the that subroutes, else, create a new subroute.
 		if($route->hasSubroutes())
@@ -63,7 +63,7 @@ class Map
 	 */
 	public function findByName($name, $parameters = array())
 	{
-		$route = $this->getRoute($name);
+		$route = $this->findRoute($name);
 
 		return $this->factory->createFinding($route ? : null, $parameters);
 	}
@@ -73,7 +73,7 @@ class Map
 	 * @param string name.
 	 * @return \Exedra\Application\Map\Route|false
 	 */
-	public function getRoute($name)
+	public function findRoute($name)
 	{
 		if(isset($this->cache[$name]))
 		{

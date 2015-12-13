@@ -100,7 +100,7 @@ class Url
 		$query = http_build_query($query);
 
 		// get \Exedra\Application\Map\Route by name.
-		$route = $this->app->map->getRoute($routeName);
+		$route = $this->app->map->findRoute($routeName);
 
 		if(!$route)
 			return $this->getExceptionBuilder()->create('Unable to find route '.$routeName.' while creating a url');
