@@ -2,7 +2,7 @@ Exédra
 ======
 A multi-tier nestful routing oriented PHP Framework.
 
-p/s : Expect an often b.c. breaks.
+p/s : Development is still on-going. Expect some b.c. breaks.
 
 Introduction
 ======
@@ -17,11 +17,6 @@ Installation
 ### Clone
 ~~~
 git clone https://github.com/rosengate/exedra project_name
-~~~
-and in your front-controller file (like index.php), just include Exedra.php wherever you can find it. For more information, refer documentation.
-~~~
-require_once "Exedra\Exedra.php";
-$exedra = new \Exedra\Exedra(__DIR__);
 ~~~
 
 ### Composer
@@ -44,24 +39,52 @@ and do
 composer update
 ~~~
 
-and then, use composer autoloader, in your front-controller file. (index.php)
-~~~
-require_once "vendor/autoload.php";
-$exedra = new \Exedra\Exedra(__DIR__);
-~~~
-
 Documentation
 ===
 Documentation and the homebase for exedra is currently hosted here : http://exedra.rosengate.com.
 
 Examples
 ======
+##### Default routing
+~~~
+$app->map->addRoutes(array(
+    'book' => array(
+        'uri' => '/books',
+        'subroutes' => array(
+            'list' => array(
+                'uri' => '',
+                'method' => 'GET',
+                'execute' => 'controller=Book@List',
+            'view' => array(
+                'uri' => '[:id]',
+                'method' => 'get',
+                'execute' => ''controller=Book@View'
+                )
+            )
+        )
+    )
+));
+~~~
+##### Convenient routing
+~~~
+// specify the usage
+$app->mapFactory->useConvenientRouting();
+
+$app->map->any('/books')->group(function($group)
+{
+    $group->get('/')->execute('controller=Book@index');
+    
+    $group->any('[:id]')->group(function($group)
+    {
+        $group->get('/')->execute('controller=Book@view');
+        
+        $group->get('/authors', 'controller=Book/Author@index');
+    });
+});
+~~~
 Some of the projects built on top of exedra :
 
 http://github.com/rosengate/exedra-web (hosted at exedra.rosengate.com)
-
-http://github.com/eimihar/persona (hosted at persona.rosengate.com or eimihar.rosengate.com)
-
 
 Thank you!
 ======
