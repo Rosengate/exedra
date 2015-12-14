@@ -36,8 +36,8 @@ class Registry
 	 */
 	protected function registerDefaultHandlers()
 	{
-		$this->handlers->register('closure', Execution\Handler\Closure::class);
-		$this->handlers->register('controller', Execution\Handler\Controller::class);
+		$this->handlers->register('closure', '\Exedra\Application\Execution\Handler\Closure');
+		$this->handlers->register('controller', '\Exedra\Application\Execution\Handler\Controller');
 	}
 
 	/**

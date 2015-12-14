@@ -83,7 +83,7 @@ class Level extends \ArrayIterator
 	}
 
 	/**
-	 * Find route by \Exedra\HTTP\request or array
+	 * Make a finding by \Exedra\HTTP\Request or array
 	 * @param \Exedra\HTTP\Request
 	 * @return \Exedra\Application\Map\Finding
 	 */
@@ -101,7 +101,7 @@ class Level extends \ArrayIterator
 	}
 
 	/**
-	 * Find route by the absolute name.
+	 * Make a finding by given absolute name
 	 * @param string name.
 	 * @return \Exedra\Application\Map\Finding
 	 */

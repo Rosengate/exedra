@@ -43,6 +43,14 @@ class Route
 	 */
 	public static $notation = '.';
 
+	/**
+	 * List of default aliases
+	 * @var array aliases
+	 */
+	protected static $aliases = array(
+								'bind:middleware' => 'middleware',
+								'path' => 'uri');
+
 	public function __construct(Level $level, $name, array $properties = array())
 	{
 		$notation = self::$notation;
@@ -53,8 +61,6 @@ class Route
 
 		// default uri.
 		$this->setUri('');
-
-		$this->registerAliases();
 
 		if(count($properties) > 0)
 			$this->setProperties($properties);
@@ -74,17 +80,6 @@ class Route
 	}
 
 	/**
-	 * Register default aliases
-	 */
-	protected function registerAliases()
-	{
-		$this->aliases = array(
-			'bind:middleware' => 'middleware',
-			'path' => 'uri'
-			);
-	}
-
-	/**
 	 * Manual setter based on string.
 	 * @param string key
 	 * @param mixed value
@@ -92,8 +87,8 @@ class Route
 	 */
 	public function parseProperty($key, $value)
 	{
-		if(isset($this->aliases[$key]))
-			$key = $this->aliases[$key];
+		if(isset(self::$aliases[$key]))
+			$key = self::$aliases[$key];
 
 		$method = 'set'.ucwords($key);
 
@@ -512,7 +507,8 @@ class Route
 	}
 
 	/**
-	 * Get subroutes (Map\Level)
+	 * Get sublevel of this route
+	 * Resolve the level in case of Closure, string and array
 	 * @return \Exedra\Application\Map\Level
 	 */
 	public function getSubroutes()
@@ -522,20 +518,38 @@ class Route
 		if($level instanceof \Exedra\Application\Map\Level)
 			return $level;
 
-		// is a string based level.
-		if(is_string($level))
+		return $this->resolveLevel($level);
+	}
+
+	/**
+	 * Resolve level in case of Closure, string and array
+	 * @return \Exedra\Application\Map\Level
+	 * @throws \Exception
+	 */
+	public function resolveLevel($level)
+	{
+		$type = @get_class($level) ? : gettype($level);
+
+		switch($type)
 		{
-			$this->properties['subroutes'] = $this->level->factory->createLevelByPattern($this, $level);
-			return $this->getSubroutes();
-		}
-		
-		if($level instanceof \Closure)
-		{
-			$closure = $level;
-			$level = $this->level->factory->createLevel($this);
-			$closure($level);
-			$this->properties['subroutes'] = $level;
-			return $this->getSubroutes();
+			case 'Closure':
+				$closure = $level;
+				$level = $this->level->factory->createLevel($this);
+				$closure($level);
+				$this->properties['subroutes'] = $level;
+				return $level;
+			break;
+			case 'string':
+				$this->properties['subroutes'] = $level = $this->level->factory->createLevelByPattern($this, $level);
+				return $level;
+			break;
+			case 'array':
+				$this->properties['subroutes'] = $level = $this->level->factory->createLevel($this, $level);
+				return $level;
+			break;
+			default:
+				return $this->level->factory->throwException('Unable to resolve route level. It must be type of Closure, string, or array');
+			break;
 		}
 	}
 
@@ -592,8 +606,14 @@ class Route
 	 */
 	public function setMethod($method)
 	{
-		$method = !is_array($method) ? explode(',', $method) : $method;
-		$method = array_map('strtolower', $method);
+		if(!is_array($method))
+			$method = explode(',', $method);
+
+		$method = array_map(function($value){return trim(strtolower($value));}, $method);
+	
+		if($method == 'any')
+			$method = array('get', 'post', 'put', 'delete');
+	
 		$this->setProperty('method', $method);
 	}
 
@@ -623,8 +643,6 @@ class Route
 	public function setSubroutes($subroutes)
 	{
 		// only create Level if the argument is array. else, just save the pattern.
-		$subroutes = is_array($subroutes) ? $this->level->factory->createLevel($this, $subroutes) : $subroutes;
-
 		return $this->setProperty('subroutes', $subroutes);
 	}
 
@@ -682,17 +700,6 @@ class Route
 	 */
 	protected function setProperty($key, $value)
 	{
-		switch($key)
-		{
-			case 'method':
-				if($value == 'any')
-					$value = array('get', 'post', 'put', 'delete');
-			break;
-			case 'subroutes':
-				// $value = new Level($this, $value);
-			break;
-		}
-
 		$this->properties[$key] = $value;
 
 		return $this;
