@@ -364,7 +364,7 @@ class Route
 				if(!$equalUriLength)
 					$matched = false;
 
-				if($equalUriLength && $uris[$no] != $segment)
+				if(isset($uris[$no]) && $uris[$no] != $segment)
 				{
 					$matched	= false;
 					break;
