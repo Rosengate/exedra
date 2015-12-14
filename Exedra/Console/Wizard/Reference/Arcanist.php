@@ -10,6 +10,11 @@ class Arcanist extends Reference
 			'options' => array('name', 'params', 'scan')
 			));
 
+		$this->register('serve', array(
+			'description' => 'Start server',
+			'options' => array()
+			));
+
 		/*$this->register('config', array(
 			'description' => 'List all configuration',
 			'options' => array('scan')

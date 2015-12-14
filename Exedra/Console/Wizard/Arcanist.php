@@ -21,6 +21,40 @@ class Arcanist extends Wizardry
 		
 	}
 
+	public function executeServe()
+	{
+		$port = $this->ask('Run server at port 9000 ? [Or please specify] : ', function($answer, $wizard)
+		{
+			if($answer == '')
+				return true;
+
+			if(!is_numeric($answer))
+				return false;
+
+			if($answer < 7000)
+			{
+				$wizard->say('Please specify port greater than 7000');
+				return false;
+			}
+			else if($answer > 65500)
+			{
+				$wizard->say('Please specify port smaller than 65500');
+				return false;
+			}
+
+			return true;
+		});
+
+		$port = $port == '' ? 9000 : $port;
+
+		$public = $this->app->config->get('wizard.public_folder');
+
+		$dir = $this->exedra->getBaseDir().'/'.$public;
+		chdir($dir);
+		$this->say('php server started at localhost:'.$port);
+		exec('php -S localhost:'.$port);
+	}
+
 	/*protected function executeConfig(array $options = array())
 	{
 		$config = $this->app->config->getAll();

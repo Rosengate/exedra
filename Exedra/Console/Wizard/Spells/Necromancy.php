@@ -64,16 +64,17 @@ class Necromancy
 
 		$param = array(
 			'app_file_name' => $appPath.'/'.'app.php',
+			'wizard_config_name' => $appPath.'/'.'wizard.config.php',
+			'app_hello_view' => $appPath.'/'.'View/hello.php',
 			'app_name' => $name,
 			'bootstrap_file_name' => strtolower($name).'.bootstrap',
 			'DS' => '/'
 			);
 
 		if($name === $namespace)
-			$param['app_build'] = $name;
+			$param['app_build'] = "'$name'";
 		else
 			$param['app_build'] = "array('name' => '".$name."', 'namespace' => '".$namespace."')";
-
 
 		// create $app_name.php
 		$blueprintApp = $this->loadBlueprint('app', $param);
@@ -98,7 +99,7 @@ class Necromancy
 				$public_dir = $answer;
 		}
 
-		$this->createDir($public_dir);
+		$this->createDir($param['public_folder'] = $public_dir);
 
 		$blueprintIndex = $this->loadBlueprint('public.index', $param);
 		$this->createFile($public_dir.'/'.'index.php', $blueprintIndex);
@@ -106,6 +107,27 @@ class Necromancy
 		// create wizard for app.
 		$blueprintWizard = $this->loadBlueprint('app.wizard', $param);
 		$this->createFile(strtolower($param['app_name']).'.wizard', $blueprintWizard);
+
+		// wizard config
+		$config = array(
+			'wizard' => array(
+				'public_folder' => 'public'
+				)
+			);
+		$param['wizard_config'] = var_export($config, true);
+		$blueprintConfig = $this->loadBlueprint('wizard.config', $param);
+		$this->createFile($param['wizard_config_name'], $blueprintConfig);
+
+		// hello page
+		if($this->createDir($viewPath = $appPath.'/View'))
+		{
+			$blueprintHelloView = $this->loadBlueprint('app.view.hello', $param);
+			$this->createFile($param['app_hello_view'], $blueprintHelloView);
+		}
+		else
+		{
+			$this->wizard->say("Couldnt create folder with path ".$viewPath);
+		}
 	}
 }
 
