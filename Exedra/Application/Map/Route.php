@@ -597,7 +597,9 @@ class Route
 	 */
 	public function setUri($uri)
 	{
-		$uri = trim($uri, '/');
+		if($uri !== false)
+			$uri = trim($uri, '/');
+
 		$this->setProperty('uri', $uri);
 		return $this;
 	}
