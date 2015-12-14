@@ -67,7 +67,7 @@ class Arcanist extends Wizardry
 
 		$previousRoute = null;
 
-		$this->app->map->level->each(function(\Exedra\Application\Map\Route $route) use($table, $header, $options)
+		$this->app->map->each(function(\Exedra\Application\Map\Route $route) use($table, $header, $options)
 		{
 			$routeName = $route->getAbsoluteName();
 			$methods = $route->getMethods();
