@@ -70,7 +70,7 @@ class Arcanist extends Wizardry
 		$this->app->map->each(function(\Exedra\Application\Map\Route $route) use($table, $header, $options)
 		{
 			$routeName = $route->getAbsoluteName();
-			$methods = $route->getMethods();
+			$methods = $route->getMethod();
 			if(count($methods) == 4)
 				$methods = 'any';
 			else

@@ -557,14 +557,12 @@ class Route
 	 * Get methods for this route.
 	 * @return array
 	 */
-	public function getMethods()
+	public function getMethod()
 	{
-		$methods = $this->getProperty('method');
-
-		if(!isset($methods))
+		if(!$this->hasProperty('method'))
 			return array('get', 'post', 'put', 'delete');
 
-		return $methods;
+		return $this->getProperty('method');
 	}
 
 	/**
