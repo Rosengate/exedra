@@ -323,7 +323,7 @@ class Route
 	{
 		$continue = true;
 
-		$routeURI = ltrim($this->getProperty('uri'), '/');
+		$routeURI = $this->getProperty('uri');
 
 		if($routeURI === false)
 			return false;
@@ -596,6 +596,7 @@ class Route
 	 */
 	public function setUri($uri)
 	{
+		$uri = trim($uri, '/');
 		$this->setProperty('uri', $uri);
 		return $this;
 	}
