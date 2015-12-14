@@ -350,6 +350,8 @@ class Route
 		## route segment loop.
 		$equal	= null;
 
+		$equalUriLength = count($segments) == count($uris);
+
 		foreach($segments as $no=>$segment)
 		{
 			## 2.1 non-pattern comparation.
@@ -357,11 +359,12 @@ class Route
 			if($segment == "" || ($segment[0] != "[" || $segment[strlen($segment) - 1] != "]"))
 			{
 				$equal	= false;
+
 				## need to move this logic outside perhaps.
-				if(count($segments) != count($uris))
+				if(!$equalUriLength)
 					$matched = false;
 
-				if($uris[$no] != $segment)
+				if($equalUriLength && $uris[$no] != $segment)
 				{
 					$matched	= false;
 					break;
