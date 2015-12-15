@@ -183,7 +183,7 @@ class Level extends \ArrayIterator
 			{
 				$route = $this->current();
 
-				if($route->getName() == $routeName)
+				if($route->getName() === $routeName)
 					if(count($routeNames) > 0 && $route->hasSubroutes())
 						return $route->getSubroutes()->findRouteRecursively($routeNames);
 					else
