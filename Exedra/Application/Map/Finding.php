@@ -45,7 +45,7 @@ class Finding
 	 * @param \Exedra\Application\Map\Route or null
 	 * @param array parameters
 	 */
-	public function __construct(\Exedra\Application\Map\Route $route = null, array $parameters = array(), \Exedra\HTTP\Request $request = null)
+	public function __construct(\Exedra\Application\Map\Route $route = null, array $parameters = array(), \Exedra\HTTP\Request $request = null, \Exedra\Application\Config $config)
 	{
 		$this->route = $route;
 		$this->request = $request;
@@ -54,7 +54,8 @@ class Finding
 		{
 			$this->addParameter($parameters);
 			// $this->parameters = $parameters;
-			$this->configs = new \Exedra\Application\Config;
+			// $this->configs = new \Exedra\Application\Config;
+			$this->configs = clone $config;
 			$this->resolve();
 		}
 	}

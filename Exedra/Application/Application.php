@@ -70,7 +70,7 @@ class Application
 		// create application structure and loader
 		$this->structure = new \Exedra\Application\Structure\Structure();
 		$this->loader = new \Exedra\Loader($this->getBaseDir(), $this->structure);
-		$this->mapFactory = new \Exedra\Application\Map\Factory($this->loader);
+		$this->mapFactory = new \Exedra\Application\Map\Factory($this);
 	}
 
 	/**

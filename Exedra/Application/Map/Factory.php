@@ -13,15 +13,30 @@ class Factory
 	 */
 	protected $loader;
 
+	/**
+	 * Application instance
+	 * @var \Exedra\Application\Application app
+	 */
+	protected $app;
+
 	protected $registry = array();
 
 	protected $reflections = array();
 
-	public function __construct(\Exedra\Loader $loader)
+	public function __construct(\Exedra\Application\Application $app)
 	{
-		$this->loader = $loader;
+		$this->app = $app;
 
 		$this->useDefaultRouting();
+	}
+
+	/**
+	 * Get application loader
+	 * @return \Exedra\Loader
+	 */
+	public function getLoader()
+	{
+		return $this->app->loader;
 	}
 
 	/**
@@ -127,7 +142,7 @@ class Factory
 			$loadParameter = $pattern;
 		}
 
-		$subroutes = $this->loader->load($loadParameter);
+		$subroutes = $this->getLoader()->load($loadParameter);
 
 		return $this->createLevel($route, $subroutes);
 	}
@@ -141,7 +156,7 @@ class Factory
 	 */
 	public function createFinding(Route $route = null, array $parameters = null, \Exedra\HTTP\Request $request = null)
 	{
-		return $this->create('finding', array($route, $parameters, $request));
+		return $this->create('finding', array($route, $parameters, $request, $this->app->config));
 		return new Finding($route, $parameters, $request);
 	}
 
