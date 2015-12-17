@@ -86,6 +86,12 @@ Some of the projects built on top of exedra :
 
 http://github.com/rosengate/exedra-web (hosted at exedra.rosengate.com)
 
+Roadmap to 0.3.0
+======
+- Adapt several PSR's styles and standards
+- Internal Routing Improvements
+- More clarity on application structure
+
 Thank you!
 ======
 I hope you guys like it!
