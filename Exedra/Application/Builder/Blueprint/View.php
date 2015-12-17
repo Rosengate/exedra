@@ -29,7 +29,13 @@ class View
 	 * Loader to be used.
 	 * @var \Exedra\Loader
 	 */
-	protected $loader		= null;
+	protected $loader = null;
+
+	/**
+	 * Prepared flag whether content have been rendered internally
+	 * @var boolean flag
+	 */
+	protected $prepared = false;
 
 	/**
 	 * List of key of data required, before view can be rendered.
@@ -89,7 +95,7 @@ class View
 	 * @param callback callback
 	 * @return this
 	 */
-	public function setCallback($key,$callback)
+	public function setCallback($key, $callback)
 	{
 		$this->callbacks[$key]	= $callback;
 		return $this;
@@ -131,12 +137,22 @@ class View
 	}
 
 	/**
+	 * Check whether view has this data or not
+	 * @param string key
+	 * @return boolean
+	 */
+	public function has($key)
+	{
+		return isset($this->data[$key]);
+	}
+
+	/**
 	 * Set view data
 	 * @param mixed key
 	 * @param mixed value
 	 * @return this
 	 */
-	public function set($key,$value = null)
+	public function set($key, $value = null)
 	{
 		if(!$value && is_array($key))
 		{
@@ -157,12 +173,20 @@ class View
 	 * @param string key
 	 * @return mixed
 	 */
-	public function get($key = null)
+	public function get($key = null, $default = null)
 	{
 		if($key === null)
 			return $this->data;
 
-		return $this->data[$key];
+		return isset($this->data[$key]) ? $this->data[$key] : $default;
+	}
+
+	/**
+	 * Handle invoked instance
+	 */
+	public function __invoke()
+	{
+		return $this->render();
 	}
 
 	/**
@@ -174,10 +198,12 @@ class View
 		if(!$this->isReady())
 			return;
 
-		$data = $this->callbackResolve($this->data);
-
 		ob_start();
-		$this->loader->load(array('structure' => 'view', 'path' => $this->path), $data);
+
+		extract($this->callbackResolve($this->data));
+
+		require $this->loader->buildPath(array('structure' => 'view', 'path' => $this->path));
+
 		return ob_get_clean();
 	}
 
@@ -207,6 +233,20 @@ class View
 	}
 
 	/**
+	 * Prepare the contents to be rendered
+	 * Or execute any required variable
+	 * @return null
+	 */
+	public function prepare()
+	{
+		$this->prepared = true;
+
+		$this->contents = $this->getContents();
+
+		return $this;
+	}
+
+	/**
 	 * Check if view is ready
 	 * @return boolean
 	 * @throws \Exedra\Application\Exception\Exception
@@ -224,17 +264,15 @@ class View
 
 	/**
 	 * Main rendering function, load the with loader function.
-	 * @return null
+	 * Print the 
+	 * @return mixed
 	 * @throws \Exedra\Application\Exception\Exception
 	 */
 	public function render()
 	{
-		if(!$this->isReady())
-			return;
+		if($this->prepared === false)
+			$this->prepare();
 
-		// resolve any related callback.
-		$data = $this->callbackResolve($this->data);
-
-		$this->loader->load(array('structure'=> 'view', 'path'=> $this->path), $data);
+		return $this->contents;
 	}
 }
