@@ -89,8 +89,13 @@ http://github.com/rosengate/exedra-web (hosted at exedra.rosengate.com)
 Roadmap to 0.3.0
 ======
 - Adapt several PSR's styles and standards
+  - PSR-7 Message Interfaces especially
+  - PSR-2 4 spaces indent ?
 - Internal Routing Improvements
 - More clarity on application structure
+- Container based \Exedra\Application\Application and \Exedra\Application\Execution\Exec ?
+- Move \Exedra\Application\Execution\ and all the related namespaces outsides ?
+- Do more tests
 
 Thank you!
 ======
