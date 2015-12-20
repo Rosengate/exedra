@@ -106,7 +106,7 @@ class Exec
 			"flash"=> function() use($app) {return new \Exedra\Application\Session\Flash($app->session);},
 			"redirect"=> array("\Exedra\Application\Response\Redirect", array($this)),
 			"exception"=> array("\Exedra\Application\Execution\Builder\Exception", array($this)),
-			"form"=> array("\Exedra\Application\Utilities\Form", array($this)),
+			"form"=> array("\Exedra\Application\Execution\Builder\Form", array($this)),
 			"session"=> function() use($app) {return $app->session;},
 			// "file"=> function() use($exe) {return new \Exedra\Application\Builder\File($exe->loader);},
 			'middlewares'=> array('\Exedra\Application\Execution\Middlewares'),
