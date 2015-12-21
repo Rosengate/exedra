@@ -40,17 +40,20 @@ class Asset
 		$content = ob_get_clean();
 
 		// trim empty spaces and strip only <script> tags.
-		$content = trim(preg_replace('/<\/?' . $typeTags[$this->type] . '(.|\s)*?>/', '', $content));
+		$content = trim(preg_replace('/<\/?' . $this->getTypeTag() . '(.|\s)*?>/', '', $content));
 
 		$dirs = explode(DIRECTORY_SEPARATOR, $this->filepath);
 		array_pop($dirs);
 		$dirs = implode(DIRECTORY_SEPARATOR, $dirs);
 
 		if(!is_dir($dirs))
+		{
 			mkdir($dirs, '755', true);
+		}
 
 		// keep replacing those content
 		file_put_contents($this->filepath, $content);
+
 
 		return $this;
 	}
