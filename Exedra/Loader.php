@@ -263,9 +263,6 @@ class Loader
 	{
 		$file = $this->buildPath($file);
 
-		if(!file_exists($file))
-			throw new \Exception("File not found : ".$file);
-
 		return file_put_contents($file, $contents);
 	}
 
