@@ -84,9 +84,6 @@ class Path
 	 */
 	public function putContents($data = null)
 	{
-		if(!$this->isExists())
-			return false;
-
 		return $this->loader->putContents($this->path, $data);
 	}
 }
