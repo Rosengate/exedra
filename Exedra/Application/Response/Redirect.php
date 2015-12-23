@@ -34,9 +34,20 @@ class Redirect
 	 * Refresh the page.
 	 * @return redirection
 	 */
-	final public function refresh()
+	public function refresh()
 	{
 		return $this->to($this->exe->getRoute(), $this->exe->params());
+	}
+
+	/**
+	 * Alias to toRoute
+	 * @param string route
+	 * @param array route named params
+	 * @param mixed query string
+	 */
+	public function to($route = null, $params = array(), $query = array())
+	{
+		return $this->toRoute($route, $params, $query);
 	}
 
 	/**
@@ -45,7 +56,7 @@ class Redirect
 	 * @param array params
 	 * @param mixed query
 	 */
-	final public function to($route = null, $params = array(), $query = array())
+	public function toRoute($route = null, $params = array(), $query = array())
 	{
 		if(!$route)
 			return $this->refresh();

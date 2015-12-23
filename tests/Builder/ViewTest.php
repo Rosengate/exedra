@@ -27,11 +27,7 @@ class BuilderViewTest extends PHPUnit_Framework_TestCase
 
 	public function testRender()
 	{
-		ob_start();
-		$this->viewCreate()->render();
-		$content = ob_get_clean();
-
-		$this->assertEquals($content, 'Test View Content');
+		$this->assertEquals($this->viewCreate()->render(), 'Test View Content');
 	}
 
 	public function testRenderWithData()
@@ -40,11 +36,7 @@ class BuilderViewTest extends PHPUnit_Framework_TestCase
 
 		$view->set('testData', 'testDataValue');
 
-		ob_start();
-		$view->render();
-		$content = ob_get_clean();
-
-		$this->assertEquals($content, 'Test View Content'.'testDataValue');
+		$this->assertEquals($view->render(), 'Test View Content'.'testDataValue');
 	}
 
 	public function testRenderWithDefaultData()
@@ -53,11 +45,7 @@ class BuilderViewTest extends PHPUnit_Framework_TestCase
 
 		$view = $this->viewCreate();
 
-		ob_start();
-		$view->render();
-		$content = ob_get_clean();
-
-		$this->assertEquals($content, 'Test View Content'.'testDefaultDataValue');
+		$this->assertEquals($view->render(), 'Test View Content'.'testDefaultDataValue');
 	}
 
 	public function testRenderWithRequiredData()
@@ -70,9 +58,7 @@ class BuilderViewTest extends PHPUnit_Framework_TestCase
 
 		try
 		{
-			ob_start();
 			$view->render();
-			$content = ob_get_clean();
 		}
 		catch(\Exedra\Application\Exception\Exception $e)
 		{
@@ -83,10 +69,6 @@ class BuilderViewTest extends PHPUnit_Framework_TestCase
 
 		$view->set('title', 'hello');
 
-		ob_start();
-		$view->render();
-		$content = ob_get_clean();
-
-		$this->assertEquals($content, 'Test View Content');
+		$this->assertEquals($view->render(), 'Test View Content');
 	}
 }

@@ -239,9 +239,10 @@ class View
 	 */
 	public function prepare()
 	{
-		$this->prepared = true;
-
+		// buffer this content for the next render
 		$this->contents = $this->getContents();
+
+		$this->prepared = true;
 
 		return $this;
 	}
@@ -272,6 +273,8 @@ class View
 	{
 		if($this->prepared === false)
 			$this->prepare();
+
+		$this->prepared = false;
 
 		return $this->contents;
 	}
