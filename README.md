@@ -74,6 +74,11 @@ $app->map->any('/books')->group(function($group)
 {
     $group->get('/')->execute('controller=Book@index');
     
+    $group->get('tags', function($exe))
+    {
+        return 'list of tags';
+    };
+    
     $group->any('[:id]')->group(function($group)
     {
         $group->get('/')->execute('controller=Book@view');
