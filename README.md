@@ -95,6 +95,7 @@ Roadmap to 0.3.0
 - rename number of wrong terms used
   - 'uri' to 'path'
 - Internal Routing Improvements
+- More type of Exceptions
 - More clarity on application structure
 - Container based \Exedra\Application\Application and \Exedra\Application\Execution\Exec ?
 - Move \Exedra\Application\Execution\ and all the related namespaces outsides ?
