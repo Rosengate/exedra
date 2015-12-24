@@ -294,6 +294,11 @@ class Loader
 			case "Linux":
 			return str_replace("\\", DIRECTORY_SEPARATOR, $path);
 			break;
+			case "Darwin":
+			return str_replace("\\", DIRECTORY_SEPARATOR, $path);
+			break;
+			default:
+			return str_replace("\\", DIRECTORY_SEPARATOR, $path);
 		}
 	}
 
