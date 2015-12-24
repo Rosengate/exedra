@@ -92,6 +92,8 @@ Roadmap to 0.3.0
   - PSR-7 Message Interfaces
   - PSR-2 4 spaces indent ?
 - More clarity on HTTP Response
+- rename number of wrong terms used
+  - 'uri' to 'path'
 - Internal Routing Improvements
 - More clarity on application structure
 - Container based \Exedra\Application\Application and \Exedra\Application\Execution\Exec ?
