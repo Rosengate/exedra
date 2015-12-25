@@ -68,8 +68,8 @@ class Request
 	{
 		// initiate basic request data into properties.
 		$this->parameters	= isset($param['parameters']) ? $param['parameters'] : array("get"=>$_GET,"post"=>$_POST);
-		$this->headers		= isset($param['header']) ? $param['header'] : (function_exists("getallheaders")?getallheaders():null);
 		$this->server		= isset($param['server']) ? $param['server'] : $_SERVER;
+		$this->headers		= isset($param['header']) ? $param['header'] : (function_exists("getallheaders")? getallheaders() : $this->buildHeadersFromServer());
 		$this->method		= isset($param['method']) ? $param['method'] : (isset($this->server['REQUEST_METHOD'])?$this->server['REQUEST_METHOD'] : null);
 
 		if(isset($param['uri']))
@@ -118,6 +118,25 @@ class Request
 		$request_uri = trim(substr($request_uri,strlen(trim($base_path,"/"))),"/");
 
 		$this->setUri($request_uri);
+	}
+
+	/**
+	 * Build header from $_SERVER variable
+	 * http://stackoverflow.com/questions/13224615/get-the-http-headers-from-current-request-in-php
+	 * @return array
+	 */
+	protected function buildHeadersFromServer()
+	{
+		if (!is_array($this->server))
+            return array();
+
+        $headers = array();
+
+        foreach ($this->server as $name => $value)
+            if (substr($name, 0, 5) == 'HTTP_')
+                $headers[str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', substr($name, 5)))))] = $value;
+
+        return $headers;
 	}
 
 	/**
