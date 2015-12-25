@@ -68,7 +68,7 @@ class Request
 	{
 		// initiate basic request data into properties.
 		$this->parameters	= isset($param['parameters']) ? $param['parameters'] : array("get"=>$_GET,"post"=>$_POST);
-		$this->header		= isset($param['header']) ? $param['header'] : (function_exists("getallheaders")?getallheaders():null);
+		$this->headers		= isset($param['header']) ? $param['header'] : (function_exists("getallheaders")?getallheaders():null);
 		$this->server		= isset($param['server']) ? $param['server'] : $_SERVER;
 		$this->method		= isset($param['method']) ? $param['method'] : (isset($this->server['REQUEST_METHOD'])?$this->server['REQUEST_METHOD'] : null);
 
@@ -277,9 +277,15 @@ class Request
 	 * Return request _header
 	 * @return array
 	 */
-	public function getHeader()
+	public function getHeader($key = null)
 	{
-		return $this->header;
+		if(!$key)
+			return $this->headers;
+
+		if(!isset($this->headers[$key]))
+			return;
+
+		return $this->headers[$key];
 	}
 
 	/**
