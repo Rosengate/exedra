@@ -98,7 +98,7 @@ Roadmap to 0.3.0
   - PSR-2 4 spaces indent ?
 - More clarity on HTTP Response
 - rename number of wrong terms used
-  - 'uri' to 'path'
+  - 'uri' to 'path' [DONE]
 - Internal Routing Improvements
 - More type of Exceptions
 - More clarity on application structure

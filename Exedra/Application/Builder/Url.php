@@ -43,17 +43,17 @@ class Url
 
 	/**
 	 * Get url prefixed with $baseUrl
-	 * @param string uri (optional)
+	 * @param string path (optional)
 	 * @return string
 	 */
-	public function base($uri = null)
+	public function base($path = null)
 	{
-		return ($this->baseUrl ? rtrim($this->baseUrl, '/' ).'/' : '/').($uri ? trim($uri, '/') : '');
+		return ($this->baseUrl ? rtrim($this->baseUrl, '/' ).'/' : '/').($path ? trim($path, '/') : '');
 	}
 
 	/**
 	 * Get asset url prefixed with $assetUrl
-	 * @param string asset uri (optonal)
+	 * @param string asset path (optonal)
 	 * @return string
 	 */
 	public function asset($asset = null)
@@ -92,7 +92,7 @@ class Url
 	 * Create url by route name.
 	 * @param string routeName
 	 * @param array data
-	 * @param mixed query (uri query)
+	 * @param mixed query (uri query string)
 	 */
 	public function create($routeName, array $data = array(), array $query = array())
 	{
@@ -105,10 +105,10 @@ class Url
 		if(!$route)
 			return $this->getExceptionBuilder()->create('Unable to find route '.$routeName.' while creating a url');
 
-		$uri = $route->getAbsoluteUri($data);
+		$path = $route->getAbsolutePath($data);
 
 		// return ($this->baseUrl ? trim($this->baseUrl, '/') .'/'. $uri : $uri) . ($query ? '?'. $query : null);
-		return $this->base($uri).($query ? '?'.$query : null);
+		return $this->base($path).($query ? '?'.$query : null);
 		// return ($this->baseUrl ? trim($this->baseUrl, '/') .'/'. $uri : '/'.$uri) . ($query ? '?'. $query : null);
 	}
 }

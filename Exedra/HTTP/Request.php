@@ -67,26 +67,36 @@ class Request
 	protected function buildRequest(array $param = array())
 	{
 		// initiate basic request data into properties.
-		$this->parameters	= isset($param['parameters']) ? $param['parameters'] : array("get"=>$_GET,"post"=>$_POST);
+		$this->parameters	= isset($param['parameters']) ? $param['parameters'] : array("get" => $_GET, "post" => $_POST);
 		$this->server		= isset($param['server']) ? $param['server'] : $_SERVER;
 		$this->headers		= isset($param['header']) ? $param['header'] : (function_exists("getallheaders")? getallheaders() : $this->buildHeadersFromServer());
 		$this->method		= isset($param['method']) ? $param['method'] : (isset($this->server['REQUEST_METHOD'])?$this->server['REQUEST_METHOD'] : null);
 
-		if(isset($param['uri']))
+		if(isset($param['path']))
 		{
 			// check if in uri there're still a query string. pass as method's parameter.
-			$uris = explode('?', $param['uri']);
-			$this->uri = $uris[0];
+			$paths = explode('?', $param['path']);
+			$this->uriPath = $paths[0];
 			
 			// if has some query string passed on uri, treat it as get parameter.
-			if(isset($uris[1]))
-				parse_str($uris[1], $this->parameters['get']);
+			if(isset($paths[1]))
+				parse_str($paths[1], $this->parameters['get']);
 		}
 		else
 		{
 			if(isset($this->server['REQUEST_URI']))
-				$this->buildUri();
+				$this->buildUriPath();
 		}
+	}
+
+	/**
+	 * Alias to resolveUriPath
+	 * To be removed in 0.3.0 once adapted PSR-7
+	 * @return void
+	 */
+	public function resolveUri()
+	{
+		return $this->resolveUriPath();
 	}
 
 	/**
@@ -96,7 +106,7 @@ class Request
 	 * Actually i wrote this for XAMPP-like build.
 	 * @return void
 	 */
-	public function resolveUri()
+	public function resolveUriPath()
 	{
 		list($request_uri) = explode("?",$this->server['REQUEST_URI']);
 
@@ -117,7 +127,7 @@ class Request
 		// remove base_path
 		$request_uri = trim(substr($request_uri,strlen(trim($base_path,"/"))),"/");
 
-		$this->setUri($request_uri);
+		$this->setUriPath($request_uri);
 	}
 
 	/**
@@ -140,14 +150,13 @@ class Request
 	}
 
 	/**
-	 * Build URI.
-	 * @param string request_uri
+	 * Build URI path.
 	 */
-	protected function buildURI()
+	protected function buildUriPath()
 	{
 		list($request_uri) = explode('?', $this->server['REQUEST_URI']);
 
-		$this->setUri(trim($request_uri, '/'));
+		$this->setUriPath(trim($request_uri, '/'));
 	}
 
 	/**
@@ -266,21 +275,21 @@ class Request
 	}
 
 	/**
-	 * Set uri of the request
+	 * Set uri path of the request
 	 * @return void
 	 */
-	public function setUri($uri)
+	public function setUriPath($uriPath)
 	{
-		$this->uri = $uri;
+		$this->uriPath = $uriPath;
 	}
 
 	/**
 	 * Return uri of the request
 	 * @return string
 	 */
-	public function getUri()
+	public function getUriPath()
 	{
-		return $this->uri;
+		return $this->uriPath;
 	}
 
 	/**

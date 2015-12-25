@@ -20,7 +20,7 @@ class Route
 	/**
 	 * @var array properties
 	 * - method
-	 * - uri
+	 * - path
 	 * - ajax
 	 * - execute
 	 * - middleware
@@ -49,7 +49,9 @@ class Route
 	 */
 	protected static $aliases = array(
 								'bind:middleware' => 'middleware',
-								'path' => 'uri');
+								'uri' => 'path',
+								'handler' => 'execute',
+								'verb' => 'method');
 
 	public function __construct(Level $level, $name, array $properties = array())
 	{
@@ -59,8 +61,8 @@ class Route
 		$this->absoluteName = $level->getUpperRoute() ? $level->getUpperRoute()->getAbsoluteName().$notation.$name : $name;
 		$this->level = $level;
 
-		// default uri.
-		$this->setUri('');
+		// default path.
+		$this->setPath('');
 
 		if(count($properties) > 0)
 			$this->setProperties($properties);
@@ -123,41 +125,40 @@ class Route
 	}
 
 	/**
-	 * Get an absolutely resolved uri
+	 * Get an absolutely resolved uri path
 	 * @param params param for named parameter.
-	 * @return uri of all of the related routes to this, with replaced named parameter.
+	 * @return uri path of all of the related routes to this, with replaced named parameter.
 	 */
-	public function getAbsoluteUri($params = array())
+	public function getAbsolutePath($params = array())
 	{
 		$routes = $this->getFullRoutes();
 
-		$uris = array();
-		foreach($routes as $route)
-		{
-			$uris[] = $route->uriParameterReplace($params);
-		}
+		$paths = array();
 
-		return trim(implode('/', $uris), '/');
+		foreach($routes as $route)
+			$paths[] = $route->pathParameterReplace($params);
+
+		return trim(implode('/', $paths), '/');
 	}
 
 	/**
-	 * Get uri property for this route.
+	 * Get uri path property for this route.
 	 * @param boolean absolute
 	 * @return string
 	 */
-	public function getUri($absolute = false)
+	public function getPath($absolute = false)
 	{
 		if(!$absolute)
-			return $this->getProperty('uri');
+			return $this->getProperty('path');
 
 		$routes = $this->getFullRoutes();
 
-		$uris = array();
+		$paths = array();
 
 		foreach($routes as $route)
-			$uris[] = $route->getProperty('uri');
+			$paths[] = $route->getProperty('path');
 
-		return trim(implode('/', $uris), '/');
+		return trim(implode('/', $paths), '/');
 	}
 
 	/**
@@ -208,30 +209,30 @@ class Route
 	}
 
 	/**
-	 * Get a replaced uri parameter.
+	 * Get a replaced uri path parameter.
 	 * @param array data;
-	 * @return string of a replaced uri
+	 * @return string of a replaced path
 	 */
-	public function uriParameterReplace(array $data)
+	public function pathParameterReplace(array $data)
 	{
-		$uri = $this->getProperty('uri');
+		$path = $this->getProperty('path');
 
-		$segments	= explode("/",$uri);
+		$segments	= explode('/', $path);
 
 		$newSegments	= Array();
 		foreach($segments as $segment)
 		{
-			if(strpos($segment,"[") === false && strpos($segment, "]") === false)
+			if(strpos($segment, '[') === false && strpos($segment, ']') === false)
 			{
 				$newSegments[]	= $segment;
 				continue;
 			}
 
 			## strip.
-			$segment	= trim($segment,"[]");
-			list($key,$segment)	= explode(":",$segment);
+			$segment	= trim($segment, '[]');
+			list($key,$segment)	= explode(':', $segment);
 
-			$isOptional	= $segment[strlen($segment)-1] == "?"?true:false;
+			$isOptional	= $segment[strlen($segment)-1] == '?'? true : false;
 			$segment	= $isOptional?substr($segment, 0,strlen($segment)-1):$segment;
 
 			## is mandatory, but no parameter passed.
@@ -240,15 +241,15 @@ class Route
 				if(isset($this->exe))
 					$this->exe->exception->create("Url.Create : Required parameter not passed ($segment).");
 				else
-					throw new \Exedra\Application\Exception\Exception("Url.Create : Required parameter not passed ($segment).",null,null);
+					throw new \Exedra\Application\Exception\Exception("Url.Create : Required parameter not passed ($segment).", null, null);
 			}
 
 			## trailing capture.
-			if($key == "**")
+			if($key == '**')
 			{
 				if(is_array($data[$segment]))
 				{
-					$data[$segment] = implode("/",$data[$segment]);
+					$data[$segment] = implode('/', $data[$segment]);
 				}
 			}
 				
@@ -258,22 +259,22 @@ class Route
 				if(isset($data[$segment]))
 					$newSegments[]	= $data[$segment];
 				else
-					$newSegments[]	= "";
+					$newSegments[]	= '';
 		}
 
-		return implode("/",$newSegments);
+		return implode('/', $newSegments);
 	}
 
 	/**
-	 * Validate uri against the request
+	 * Validate uri path against the request
 	 * @param \Exedra\HTTP\Request request
-	 * @param string uri
+	 * @param string path
 	 * @return array struct of {route, parameter, continue}
 	 */
-	public function validate(\Exedra\HTTP\Request $request, $uri)
+	public function validate(\Exedra\HTTP\Request $request, $path)
 	{
 		// print_r($query);die;
-		foreach(array('method', 'uri', 'ajax') as $key)
+		foreach(array('method', 'path', 'ajax') as $key)
 		{
 			// by default, if parameter was set, but query not provided anything.
 			// if($this->hasProperty($key) && !isset($query[$key]))
@@ -287,23 +288,22 @@ class Route
 
 			switch($key)
 			{
-				case "method":
+				case 'method':
 				$value = $request->getMethod();
 				// return false because method doesn't exist.
 				if(!in_array(strtolower($value), $this->getProperty('method')))
 					return array('route'=> false, 'parameter'=> false, 'continue'=> false);
 
 				break;
-				case "uri":
-				$value = $uri;
-				$result = $this->validateURI($value);
+				case 'path':
+				$result = $this->validatePath($path);
 
 				if(!$result['matched'])
 					return array('route'=>false, 'parameter'=> $result['parameter'], 'continue'=> $result['continue']);
 
 				return array('route'=> $this, 'parameter'=> $result['parameter'], 'continue'=> $result['continue']);
 				break;
-				case "ajax":
+				case 'ajax':
 				if($request->isAjax() != $this->getProperty('ajax'))
 					return array('route' => false, 'parameter' => false, 'continue' => false);
 				
@@ -315,56 +315,55 @@ class Route
 	}
 
 	/**
-	 * Validate given uri
-	 * @param string uri
+	 * Validate given uri path
+	 * @param string path
 	 * @return array of matched flag, and parameter.
 	 */
-	protected function validateURI($uri)
+	protected function validatePath($path)
 	{
 		$continue = true;
 
-		$routeURI = $this->getProperty('uri');
+		$routePath = $this->getProperty('path');
 
-		if($routeURI === false)
+		if($routePath === false)
 			return false;
 
-		if($routeURI === "")
+		if($routePath === '')
 		{
 			return array(
-				'matched'=> ($uri === "" ? true : false),
+				'matched'=> ($path === '' ? true : false),
 				'parameter'=> array(),
 				'continue' => $continue
 				);
 		}
 
-
 		## 2. route check.
-		$segments	= explode("/",$routeURI);
-		$uris		= explode("/",$uri);
+		$segments	= explode('/',  $routePath);
+		$paths		= explode('/',  $path);
 
 		## initialize
 		$matched	= true;
 		$isTrailing = false;
-		$uriParams	= Array();
+		$pathParams	= Array();
 
 		## route segment loop.
 		$equal	= null;
 
-		$equalUriLength = count($segments) == count($uris);
+		$equalSegmentLength = count($segments) == count($paths);
 
 		foreach($segments as $no=>$segment)
 		{
 			## 2.1 non-pattern comparation.
 			// if($segment[0] != "[" || $segment[strlen($segment) - 1] != "]") gives notice due to uninitialized segment.
-			if($segment == "" || ($segment[0] != "[" || $segment[strlen($segment) - 1] != "]"))
+			if($segment == '' || ($segment[0] != '[' || $segment[strlen($segment) - 1] != ']'))
 			{
 				$equal	= false;
 
 				## need to move this logic outside perhaps.
-				if(!$equalUriLength)
+				if(!$equalSegmentLength)
 					$matched = false;
 
-				if(isset($uris[$no]) && $uris[$no] != $segment)
+				if(isset($paths[$no]) && $paths[$no] != $segment)
 				{
 					$matched	= false;
 					break;
@@ -378,8 +377,8 @@ class Route
 			}
 
 			## 2.2 pattern comparation
-			$pattern	= trim($segment,"[]");
-			@list($type, $segmentParamName) = explode(":",$pattern); # split by colon.
+			$pattern	= trim($segment, '[]');
+			@list($type, $segmentParamName) = explode(':', $pattern); # split by colon.
 
 			## no color was passed. thus, could't retrieve second value.
 			if(!$segmentParamName)
@@ -389,11 +388,11 @@ class Route
 			}
 
 			## 2.2.3 optional flag.
-			$isOptional			= $segmentParamName[strlen($segmentParamName)-1] == "?";
-			$segmentParamName	= trim($segmentParamName,"?");
+			$isOptional			= $segmentParamName[strlen($segmentParamName)-1] == '?';
+			$segmentParamName	= trim($segmentParamName, '?');
 
-			## 2.2.4 no data at current uri segment.
-			if(!isset($uris[$no]))
+			## 2.2.4 no data at current uri path segment.
+			if(!isset($paths[$no]))
 			{
 				## 2.2.4.1 but if optional, continue searching without breaking.
 				if($isOptional)
@@ -406,7 +405,7 @@ class Route
 				break;
 			}
 
-			if($uris[$no] === '' && !$isOptional)
+			if($paths[$no] === '' && !$isOptional)
 			{
 				$matched = false;
 				break;
@@ -416,17 +415,17 @@ class Route
 			switch($type)
 			{
 				// match all, so do nothing.
-				case "":
-					if($uris[$no] == "" && !$isOptional)
+				case '':
+					if($paths[$no] == '' && !$isOptional)
 					{
 						$matched = false;
 						break 2;
 					}
 				break;
 				// integer
-				case "i":
+				case 'i':
 					// segment value isn't numeric. OR is cumpulsory.
-					if(!is_numeric($uris[$no]) && !$isOptional)
+					if(!is_numeric($paths[$no]) && !$isOptional)
 					{
 						$continue = false;
 						$matched = false;
@@ -435,21 +434,21 @@ class Route
 				break;
 				// segments remainder
 				case '*':
-					$uriParams[$segmentParamName] = $uri;
+					$pathParams[$segmentParamName] = $path;
 					$matched = true;
 					$isTrailing = true;
 					break 2;
 				break;
 				// remainder segments into array
-				case "**":
+				case '**':
 					/*if(!$isOptional && $no === 0 && $uri === '')
 					{
 						$matched = false;
 						break 2;
 					}*/
-					## get all the rest of uri for param, and explode it so it return as list of segment.
-					$explodes = explode("/",$uri,$no+1);
-					$uriParams[$segmentParamName]	= explode("/",array_pop($explodes));
+					## get all the rest of path for param, and explode it so it return as list of segment.
+					$explodes = explode('/', $path, $no+1);
+					$pathParams[$segmentParamName]	= explode('/', array_pop($explodes));
 					$matched		= true;
 					$isTrailing		= true;
 					break 2; ## break the param loop, and set matched directly to true.
@@ -461,11 +460,11 @@ class Route
 			}
 
 			## need to move this logic outside perhaps.
-			if(count($segments) != count($uris))
+			if(count($segments) != count($paths))
 				$matched = false;
 
 			## set parameter.
-			$uriParams[$segmentParamName]	= $uris[$no];
+			$pathParams[$segmentParamName]	= $paths[$no];
 		}
 
 		## build result.
@@ -477,27 +476,27 @@ class Route
 		$result['matched']	= $matched;
 
 		## pass parameter.
-		$result['parameter'] = $uriParams;
+		$result['parameter'] = $pathParams;
 
 		## return matched, parameter founds, and remaining_uri (if deeproute)
 		return $result;
 	}
 
 	/**
-	 * Get remaining uri extracted from the passed uri.
-	 * @param string uri
-	 * @return string uri
+	 * Get remaining uri path extracted from the passed one.
+	 * @param string path
+	 * @return string path
 	 */
-	public function getRemainingUri($uri)
+	public function getRemainingPath($path)
 	{
-		$uris = explode("/", $uri);
-		$new_uriR	= Array();
-		for($i=count(explode("/", $this->properties['uri']));$i<count($uris);$i++)
-		{
-			$new_uriR[]	= $uris[$i];
-		}
+		$paths = explode('/', $path);
+		
+		$newPaths	= array();
 
-		return $this->properties['uri'] != '' ? implode("/", $new_uriR) : $uri;
+		for($i = count(explode('/', $this->properties['path'])); $i < count($paths); $i++)
+			$newPaths[]	= $paths[$i];
+
+		return $this->properties['path'] != '' ? implode('/', $newPaths) : $path;
 	}
 
 	/**
@@ -591,16 +590,17 @@ class Route
 	}
 
 	/**
-	 * Set uri pattern for this route.
-	 * @param string uri
+	 * Set uri path pattern for this route.
+	 * @param string path
 	 * @return this
 	 */
-	public function setUri($uri)
+	public function setPath($path)
 	{
-		if($uri !== false)
-			$uri = trim($uri, '/');
+		if($path !== false)
+			$path = trim($path, '/');
 
-		$this->setProperty('uri', $uri);
+		$this->setProperty('path', $path);
+
 		return $this;
 	}
 

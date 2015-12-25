@@ -13,7 +13,7 @@ class Group extends \Exedra\Application\Map\Level
 	{
 		$parameters = array();
 
-		$parameters['uri'] = $path === null ? '' : $path;
+		$parameters['path'] = $path === null ? '' : $path;
 
 		if($method)
 			$parameters['method'] = $method;

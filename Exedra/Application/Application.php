@@ -261,7 +261,7 @@ class Application
 		{
 			$msg = 'Querying Request :'."\n";
 			$msg .= 'Method : '.strtoupper($HTTPrequest->getMethod())."\n";
-			$msg .= 'Request URI : '.$HTTPrequest->getUri()."\n";
+			$msg .= 'Request Path : '.$HTTPrequest->getUriPath()."\n";
 			$msg .= 'Ajax : '.($HTTPrequest->isAjax() ? 'ya' : 'no');
 		}
 		else

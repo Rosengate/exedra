@@ -95,7 +95,7 @@ class Level extends \ArrayIterator
 			else
 				return $this->factory->throwException('Argument for map::find() must be either array or \Exedra\HTTP\Request');
 
-		$result = $this->findRouteByRequest($request, $request->getUri());
+		$result = $this->findRouteByRequest($request, $request->getUriPath());
 
 		return $this->factory->createFinding($result['route'] ? : null, $result['parameter'], $request);
 	}
@@ -230,7 +230,7 @@ class Level extends \ArrayIterator
 	 * @param array passedParameters - highly otional.
 	 * @return array {route: \Exedra\Application\Map\Route|false, parameter: array}
 	 */
-	public function findRouteByRequest(\Exedra\HTTP\Request $request, $levelUri, array $passedParameters = array())
+	public function findRouteByRequest(\Exedra\HTTP\Request $request, $levelUriPath, array $passedParameters = array())
 	{
 		$this->rewind();
 
@@ -239,16 +239,16 @@ class Level extends \ArrayIterator
 		{
 			$route = $this->current();
 
-			$result = $route->validate($request, $levelUri);
+			$result = $route->validate($request, $levelUriPath);
 
-			$remainingUri = $route->getRemainingUri($levelUri);
+			$remainingPath = $route->getRemainingPath($levelUriPath);
 
 			$hasSubroutes = $route->hasSubroutes();
 
 			// if have found, or to do a deeper search
-			if(($result['route'] != false) || ($result['continue'] === true && ($remainingUri != '' && $hasSubroutes)))
+			if(($result['route'] != false) || ($result['continue'] === true && ($remainingPath != '' && $hasSubroutes)))
 			{
-				$executionPriority = $route->hasSubroutes() && $route->hasExecution() && $remainingUri == '';
+				$executionPriority = $route->hasSubroutes() && $route->hasExecution() && $remainingPath == '';
 
 				// 1. if found. and no more subroute. OR
 				// 2. has subroutes but, has execution, 
@@ -268,7 +268,7 @@ class Level extends \ArrayIterator
 					$passedParameters = count($result['parameter']) > 0 ? $result['parameter'] : array();
 
 					// $subrouteResult = $route->getSubroutes()->query($queryUpdated, $passedParameters);
-					$subrouteResult = $route->getSubroutes()->findRouteByRequest($request, $remainingUri, $passedParameters);
+					$subrouteResult = $route->getSubroutes()->findRouteByRequest($request, $remainingPath, $passedParameters);
 
 					// if found. else. continue on this level.
 					if($subrouteResult['route'] != false)
