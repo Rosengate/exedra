@@ -29,13 +29,13 @@ class Structure
 	{
 		// Initiate default
 		$this->add(array(
-			"controller"	=>"controller",
+			"controller"	=>"Controller",
 			"model"			=>"model",
 			"config"		=>"config",
 			"view"			=>"view",
 			"routes"		=>"routes",
 			"documents"		=>"documents",
-			"middleware"	=>"middleware",
+			"middleware"	=>"Middleware",
 			"storage"		=>"storage"));
 
 		//  Absolute character

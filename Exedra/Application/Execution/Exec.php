@@ -109,7 +109,8 @@ class Exec
 			"form"=> array("\Exedra\Application\Execution\Builder\Form", array($this)),
 			"session"=> function() use($app) {return $app->session;},
 			// "file"=> function() use($exe) {return new \Exedra\Application\Builder\File($exe->loader);},
-			'middlewares'=> array('\Exedra\Application\Execution\Middlewares'),
+			// 'middlewares'=> function() use($app) {return new \Exedra\Application\Middleware\Middlewares($app->middleware);},
+			'middlewares' => function() use($app) {return $app->middleware->getMiddlewares();},
 			'asset' => array('\Exedra\Application\Builder\Asset', array($this)),
 			'path' => array('\Exedra\Application\Builder\Path', array($this->loader))
 			));
@@ -120,10 +121,6 @@ class Exec
 	 */
 	protected function initiateMiddlewares()
 	{
-		// if there's middlewares in registry.
-		if($this->registry->hasMiddlewares())
-			$this->middlewares->addByArray($this->registry->getMiddlewares());
-
 		// finding' middleware
 		if($this->finding->hasMiddlewares())
 			$this->middlewares->addByArray($this->finding->getMiddlewares());

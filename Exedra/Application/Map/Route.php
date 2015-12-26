@@ -29,7 +29,10 @@ class Route
 	 * - config
 	 * - base
 	 */
-	protected $properties = array();
+	protected $properties = array(
+		'path' => '',
+		'middleware' => array()
+		);
 
 	/**
 	 * Level this route is bound to
@@ -60,9 +63,6 @@ class Route
 		$this->name = $name;
 		$this->absoluteName = $level->getUpperRoute() ? $level->getUpperRoute()->getAbsoluteName().$notation.$name : $name;
 		$this->level = $level;
-
-		// default path.
-		$this->setPath('');
 
 		if(count($properties) > 0)
 			$this->setProperties($properties);
@@ -651,12 +651,37 @@ class Route
 	}
 
 	/**
-	 * Set middleware on this route.
+	 * Set middleware(s) on this route.
+	 * Will reset any
 	 * @param mixed middleware
 	 */
 	public function setMiddleware($middleware)
 	{
-		return $this->setProperty('middleware', $middleware);
+		if(!is_array($middleware))
+		{
+			$this->addMiddleware($middleware);
+		}
+		else
+		{
+			// reset if array was passed.
+			$this->properties['middleware'] = array();
+
+			foreach($middleware as $m)
+				$this->addMiddleware($m);
+		}
+
+		return $this;
+	}
+
+	/**
+	 * Add middleware to existing
+	 */
+	public function addMiddleware($middleware)
+	{
+		if($middleware === true && $this->level->factory->isExplicit())
+			$middleware = 'route='.$this->getAbsoluteName();
+		
+		$this->properties['middleware'][] = $middleware;
 	}
 
 	/**

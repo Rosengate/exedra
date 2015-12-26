@@ -109,7 +109,12 @@ class Finding
 
 			// has middleware.
 			if($route->hasProperty('middleware'))
-				$this->middlewares[$route->getName()] = $route->getProperty('middleware');
+			{
+				foreach($route->getProperty('middleware') as $middleware)
+					$this->middlewares[] = $middleware;
+
+				// $this->middlewares[$route->getName()] = $route->getProperty('middleware');
+			}
 
 			// pass conig.
 			if($route->hasProperty('config'))

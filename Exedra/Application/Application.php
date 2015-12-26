@@ -89,7 +89,8 @@ class Application
 			"config"=> array("\Exedra\Application\Config"),
 			"session"=> array("\Exedra\Application\Session\Session"),
 			"exception"=> array("\Exedra\Application\Builder\Exception", array($this)),
-			'path' => array('\Exedra\Application\Builder\Path', array($this->loader))
+			'path' => array('\Exedra\Application\Builder\Path', array($this->loader)),
+			'middleware' => array('\Exedra\Application\Middleware\Registry', array($this))
 			));
 	}
 

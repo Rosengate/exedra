@@ -26,7 +26,10 @@ class Registry
 
 	public function __construct(\Exedra\Application\Application $app)
 	{
+		$this->app = $app;
+
 		$this->handlers = new \Exedra\Application\Execution\Handlers($app);
+		
 		$this->registerDefaultHandlers();
 	}
 
@@ -64,7 +67,10 @@ class Registry
 	 */
 	public function addMiddleware($closure)
 	{
-		$this->middlewares[] = $closure;
+		// wire back to middleware registry for backward fix
+		$this->app->middleware->add($closure);
+
+		// $this->middlewares[] = $closure;
 	}
 
 	/**

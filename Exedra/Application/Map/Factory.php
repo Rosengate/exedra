@@ -23,6 +23,12 @@ class Factory
 
 	protected $reflections = array();
 
+	/**
+	 * Define explicitness of the routing.
+	 * @var bool
+	 */
+	protected $isExplicit = false;
+
 	public function __construct(\Exedra\Application\Application $app)
 	{
 		$this->app = $app;
@@ -39,12 +45,19 @@ class Factory
 		return $this->app->loader;
 	}
 
+	public function isExplicit()
+	{
+		return $this->isExplicit;
+	}
+
 	/**
 	 * Register default routing components
 	 * @return self
 	 */
 	public function useDefaultRouting()
 	{
+		$this->isExplicit = true;
+
 		return $this->register(array(
 			'route' => '\Exedra\Application\Map\Route',
 			'level' => '\Exedra\Application\Map\Level',
@@ -59,6 +72,8 @@ class Factory
 	 */
 	public function useConvenientRouting()
 	{
+		$this->isExplicit = false;
+
 		return $this->register(array(
 			'route' => '\Exedra\Application\Map\Convenient\Route',
 			'level' => '\Exedra\Application\Map\Convenient\Group'
