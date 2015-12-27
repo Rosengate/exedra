@@ -3,6 +3,7 @@ namespace Exedra\HTTP;
 
 /**
  * Simple HTTP Request class
+ * To be overhauled and follow PSR-7 
  */
 
 class Request

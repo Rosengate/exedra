@@ -3,6 +3,7 @@ namespace Exedra\HTTP;
 
 /**
  * Simple service class to help dealing with http response 
+ * To be overhauled and follow PSR-7
  */
 
 class Response
