@@ -43,7 +43,72 @@ Documentation
 ===
 Documentation and the homebase for exedra is currently hosted here : http://exedra.rosengate.com.
 
-Examples
+Basic Usage
+======
+Let's try below out! Just some nested routing, and stacked middleware going on!
+~~~
+require_once 'vendor/autoload.php'; // or just require exedra wherever u can find it
+$exedra = new \Exedra\Exedra(__DIR__);
+$app = $exedra->build('App');
+$app->mapFactory->useConvenientRouting();
+
+// global middleware
+$app->middleware->add(function($exe)
+{
+    $exe->texts = array('You');
+
+    return $exe->next($exe);
+});
+
+$app->map->any('/')->middleware(function($exe) // route based middleware
+{
+    $exe->texts[] = 'are';
+
+    return $exe->next($exe);
+    
+})->group(function($group)
+{
+    $group->any('/members')->group(function($group)
+    {
+        $group->get('/')->execute('controller=Member@index');
+        
+        $group->get('/[:id]')->execute('controller=Member@view');
+    });
+    
+    $group->get('/')->middleware(function($exe)
+    {
+        $exe->texts[] = 'definitely';
+
+        return $exe->next($exe);
+
+    })->group(function($group)
+    {
+        $group->get('/')->middleware(function($exe)
+        {
+            $exe->texts[] = 'here!';
+
+            return $exe->next($exe);
+
+        })->group(function($group)
+        {
+            $group->get('/')->execute(function($exe)
+            {
+                return implode(' ', $exe->texts);
+            });
+        });
+    });
+});
+
+$exedra->httpRequest->resolveUriPath(); // resolve uri path when you're under some deep subfolder.
+$exedra->dispatch();
+~~~
+
+#### Start Basic PHP Server
+~~~
+php -S localhost:9000
+~~~
+
+Another Examples
 ======
 ##### Default routing
 ~~~
