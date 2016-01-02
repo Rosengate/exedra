@@ -116,6 +116,11 @@ class Exec
 			));
 	}
 
+	public function getApp()
+	{
+		return $this->app;
+	}
+
 	/**
 	 * Initiate execution middlewares.
 	 */

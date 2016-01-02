@@ -9,11 +9,28 @@ class Arcanist extends Wizardry
 
 	protected $exedra;
 
-	public function __construct(\Exedra\Exedra $exedra, \Exedra\Application\Application $app)
+	public function __construct(\Exedra\Application\Application $app)
 	{
-		parent::__construct($exedra);
 		$this->app = $app;
-		$this->reference = new Reference\Arcanist;
+		parent::__construct($app->getExedra());
+	}
+
+	protected function setUp()
+	{
+		$this->register('routes', array(
+			'description' => 'List routes',
+			'options' => array('name', 'params', 'scan')
+			));
+
+		$this->register('serve', array(
+			'description' => 'Start server',
+			'options' => array()
+			));
+
+		$this->register('config', array(
+			'description' => 'List all configuration',
+			'options' => array('scan')
+			));
 	}
 
 	protected function executeScan()

@@ -273,9 +273,9 @@ class Application
 		return $this->exception->create('Route not found. '.$msg);
 	}
 
-	public function wizard($argv)
+	public function wizard($argv, $class = '\Exedra\Console\Wizard\Arcanist')
 	{
-		$wizard = new \Exedra\Console\Wizard\Arcanist($this->getExedra(), $this);
+		$wizard = new $class($this);
 
 		array_shift($argv);
 

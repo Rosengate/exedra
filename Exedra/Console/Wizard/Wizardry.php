@@ -12,14 +12,28 @@ abstract class Wizardry
 
 	protected $memory = array();
 
+	protected $commands = array();
+
 	public function __construct(\Exedra\Exedra $exedra)
 	{
 		$this->exedra = $exedra;
+		$this->setUp();
+	}
+
+	/**
+	 * Register command
+	 * @param string name
+	 * @param array definition
+	 */
+	protected function register($name, array $definition)
+	{
+		$this->commands[$name] = $definition;
 	}
 
 	public function run(array $argv)
 	{
-		$this->introduce();
+		if(!isset($argv[0]) || (isset($argv[0]) && !isset($this->commands[$argv[0]])))
+			$this->introduce();
 
 		if(!isset($argv[0]))
 			return $this->executeIndex();
@@ -61,7 +75,7 @@ abstract class Wizardry
 		if($pendingOption !== null)
 			$options[$pendingOption] = $pendingValue;
 
-		if(!$this->reference->hasCommand($command))
+		if(!isset($this->commands[$command]))
 		{
 			$this->say('Unable to find the command you are looking for.');
 			if($this->ask('Do you still want to continue?', array('yes', 'no')) == 'no')
@@ -71,6 +85,12 @@ abstract class Wizardry
 			return $this->executeIndex();
 		}
 
+		// return $this->$command($options);
+		return $this->runCommand($command, $options);
+	}
+
+	protected function runCommand($command, array $options = array())
+	{
 		$command = 'execute'.ucwords($command);
 
 		return $this->$command($options);
@@ -92,20 +112,31 @@ abstract class Wizardry
 
 		$no = 0;
 		$choiceNo = array();
-		foreach($this->reference->getRegistry() as $command => $struct)
+		$commands = array();
+
+		foreach($this->commands as $command => $struct)
+		{
+			$no++;
+			$choiceNo[] = $no;
+			$choices[] = $no.'. '.$struct['description']. ' ('.$command.')';
+
+			$commands[$no] = $command;
+		}
+		
+		/*foreach($this->reference->getRegistry() as $command => $struct)
 		{
 			$no++;
 			$choiceNo[] = $no;
 			$choices[] = $no.'. '.$struct['description']. ' ('.$command.')';
 
 			$commands[$no] = 'execute'.ucwords($command);
-		}
+		}*/
 
 		$choices = array_merge($choices, array('', 'Option : '));
 
 		$answer = $this->ask($choices, $choiceNo);
 
-		return $this->$commands[$answer]();
+		return $this->runCommand($commands[$answer]);
 	}
 
 	/**
@@ -177,6 +208,8 @@ abstract class Wizardry
 
 		$answer = $this->inputRead();
 
+		$this->say();
+
 		// if validation failed, recursive.
 		if($validation)
 		{
@@ -191,6 +224,47 @@ abstract class Wizardry
 		}
 
 		return $answer;
+	}
+
+	public function sayNice($text, $wall = '|')
+	{
+		$width = strlen($dashes = '-------------------------------------------------------');
+		$wallLength = (strlen($wall) + 1) * 2;
+		$text = wordwrap($text, $width - $wallLength);
+
+		$texts = array();
+
+		foreach(explode("\n", $text) as $line)
+			$texts[] = $wall.' '.$line.str_repeat(' ', $width-strlen($line) - $wallLength).' '.$wall;
+
+		$this->say($dashes);
+		$this->say($texts);
+		$this->say($dashes);
+	}
+
+	/**
+	 * With a given number
+	 */
+	public function askChoices($question, array $choices)
+	{
+		$choiceNumbers = array();
+
+		$this->sayNice($question);
+
+
+		$num = 1;
+		$answers = array();
+
+		foreach($choices as $no => $choice)
+		{
+			$answers[$num] = $no;
+			$choiceNumbers[] = $num;
+			$choices[$no] = $num++.'. '.$choice;
+		}
+
+		$this->say();
+
+		return $answers[$this->ask(array_merge($choices, array('', 'Option : ')), $choiceNumbers)];
 	}
 
 	public function abort()

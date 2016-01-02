@@ -8,7 +8,14 @@ class Archmage extends Wizardry
 	public function __construct($exedra)
 	{
 		parent::__construct($exedra);
-		$this->reference = new Reference\Archmage;
+	}
+
+	protected function setUp()
+	{
+		$this->register('start', array(
+			'description' => 'Create application',
+			'options' => array()
+			));
 	}
 
 	public function executeIndex()
