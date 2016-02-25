@@ -39,6 +39,10 @@ class Controller extends HandlerAbstract
 					$method = array_shift($args);
 					$action = str_replace($match[0], $method, $action);
 				}
+				else
+				{
+					$action = $method;
+				}
 			}
 
 			$cname = implode('/', array_map(function($value)
