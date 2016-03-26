@@ -82,8 +82,8 @@ class Application
 
 		$this->container = new \Exedra\Application\Container(array(
 			'registry'=> array('\Exedra\Application\Registry', array($this)),
-			"request"=>$this->exedra->httpRequest,
-			"response"=>$this->exedra->httpResponse,
+			'request' => function(){return \Exedra\HTTP\ServerRequest::createFromGlobals();},
+			// 'response' => function(){return \Exedra\Application\Execution\Response::createEmptyResponse();},
 			"map"=> function() use($app) { return $app->mapFactory->createLevel();},
 			"url" => array("\Exedra\Application\Builder\Url", array($this)),
 			"config"=> array("\Exedra\Application\Config"),
@@ -144,9 +144,9 @@ class Application
 
 	/**
 	 * Execute application
-	 * @param mixed query
+	 * @param string|array|\Exedra\HTTP\ServerRequest query
 	 * @param array parameter
-	 * @return mixed
+	 * @return \Exedra\Application\Execution\Exec
 	 */
 	public function execute($query, array $parameter = array())
 	{
@@ -157,10 +157,10 @@ class Application
 			{
 				$finding = $this->map->findByName($query, $parameter);
 			}
-			// expect it either \Exedra\HTTP\Request or array
+			// expect it either \Exedra\HTTP\ServerRequest or array
 			else
 			{
-				if($query instanceof \Exedra\HTTP\Request)
+				if($query instanceof \Exedra\HTTP\ServerRequest)
 				{
 					$request = $query;
 				}
@@ -170,7 +170,8 @@ class Application
 					$query = array();
 					\Exedra\Functions\Arrays::initiateByNotation($query, $data);
 					
-					$request = new \Exedra\HTTP\Request($query);
+					$request = \Exedra\HTTP\ServerRequest::createFromArray($query);
+					// $request = new \Exedra\HTTP\ServerRequest($query);
 				}
 
 				// \Exedra\Application\Map\Finding
@@ -208,13 +209,14 @@ class Application
 				$execution = $exe->middlewares->current();
 			}
 
-			$response = Execution\Resolver::resolve($execution($exe));
+			// $response = Execution\Resolver::resolve($execution($exe));
+			$exe->response->setBody($execution($exe));
 
 			// clear flash on every application execution (only if it has started).
 			if(\Exedra\Application\Session\Session::hasStarted())
 				$exe->flash->clear();
 			
-			return $response;
+			return $exe;
 		}
 		catch(\Exedra\Application\Execution\Exception\Exception $exception)
 		{
@@ -241,6 +243,21 @@ class Application
 	}
 
 	/**
+	 * Individually dispatch this application with the given HTTP request
+	 * @return \Exedra\HTTP\Response ?
+	 */
+	public function dispatch(\Exedra\HTTP\ServerRequest $request = null)
+	{
+		$request = $request ? : $this->request;
+
+		$exe = $this->execute($request);
+
+		$exe->response->sendHeader();
+
+		echo $exe->response->getBody();
+	}
+
+	/**
 	 * Exit script with given message and title
 	 * @param string message
 	 * @param string title
@@ -262,7 +279,7 @@ class Application
 		{
 			$msg = 'Querying Request :'."\n";
 			$msg .= 'Method : '.strtoupper($HTTPrequest->getMethod())."\n";
-			$msg .= 'Request Path : '.$HTTPrequest->getUriPath()."\n";
+			$msg .= 'Request Path : '.$HTTPrequest->getUri()->getPath()."\n";
 			$msg .= 'Ajax : '.($HTTPrequest->isAjax() ? 'ya' : 'no');
 		}
 		else

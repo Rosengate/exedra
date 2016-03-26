@@ -94,14 +94,19 @@ class Exec
 		$app = $this->app;
 		$exe = $this;
 
+		// $httpRequest = $this->finding->request ? : $this->app->request;
+		$httpRequest = $this->finding->getRequest();
+		$httpResponse = \Exedra\Application\Execution\Response::createEmptyResponse();
+
 		$this->container = new \Exedra\Application\Container(array(
 			"controller"=> array("\Exedra\Application\Builder\Controller", array($this)),
 			// "view"=> array("\Exedra\Application\Builder\View", array($this->exception, $this->loader)),
 			"view" => function() use($exe) {return new \Exedra\Application\Builder\View($exe->exception, $exe->loader);},
 			"middleware"=> array("\Exedra\Application\Builder\Middleware", array($this)),
 			"url"=> array("\Exedra\Application\Execution\Builder\Url", array($this)),
-			"request"=>$this->finding->request ? : $this->app->request, // use finding based request if found, else, use the original http request one.
-			"response"=>$this->app->exedra->httpResponse,
+			// "request" => $this->finding->request ? : $this->app->request, // use finding based request if found, else, use the original http request one.
+			'request' => $httpRequest,
+			'response' => $httpResponse,
 			"validator"=> array("\Exedra\Application\Utilities\Validator"),
 			"flash"=> function() use($app) {return new \Exedra\Application\Session\Flash($app->session);},
 			"redirect"=> array("\Exedra\Application\Response\Redirect", array($this)),

@@ -1,40 +1,60 @@
 <?php
 namespace Exedra\HTTP;
 
-/**
- * Simple service class to help dealing with http response 
- * To be overhauled and follow PSR-7
- */
-
-class Response
+class Response extends Message
 {
-	/**
-	 * HTTP Protocol
-	 * @var string
-	 */
-	protected $protocol = "HTTP/1.1";
+	protected $status;
 
-	/**
-	 * HTTP Response status message
-	 * @var int
-	 */
-	protected $status = 200;
-
-	/**
-	 * HTTP Response message
-	 * @var string
-	 */
-	protected $message;
-
-	/**
-	 * Get status message
-	 * @param int status
-	 * @return string
-	 */
-	protected function statusMessages($status)
+	public function __construct($status = 200, array $headers = array(), Stream $body, $protocol = '1.1', $reason = null)
 	{
-		$statusMessages = array(
-			100 => "continue",
+		parent::__construct($headers, $body, $protocol);
+
+		$this->setStatus($status, $reason);
+	}
+
+	public function __clone()
+	{
+		$this->body = clone $this->body;
+	}
+
+	public static function createEmptyResponse()
+	{
+		return new static(200, array(), new Stream(fopen('php://temp', 'r+')));
+	}
+
+	public function getStatusCode()
+	{
+		return $this->status;
+	}
+
+	public function setStatus($status, $reason = '')
+	{
+		$this->status = $status;
+
+		$this->reasonPhrase = $reason;
+
+		return $this;
+	}
+
+	public function withStatus()
+	{
+		$response = clone $this;
+
+		return $response->setStatus($status, $reason);
+	}
+
+	public function getReasonPhrase()
+	{
+		if($this->reasonPhrase)
+			return $this->reasonPhrase;
+
+		return $this->getDefaultReasonPhrase($this->status);
+	}
+
+	public function getDefaultReasonPhrase($status)
+	{
+		$defaultReasons = array(
+			100 => "Continue",
 			101 => "Switching Protocols",
 			102 => "Processing",
 			200 => "OK",
@@ -81,105 +101,37 @@ class Response
 			504 => "Gateway Timeout"
 			);
 
-		return $statusMessages[$status];
+		return $defaultReasons[$status];
 	}
 
 	/**
-	 * Set status and message.
-	 * @return this
+	 * Old method
+	 * @param string name
+	 * @param string value
+	 */
+	public function header($name, $value)
+	{
+		return $this->setHeader($name, $value);
+	}
+
+	public function sendHeader()
+	{
+		header('HTTP '.$this->getProtocolVersion().' '.$this->getStatusCode().' '.$this->getReasonPhrase());
+
+		foreach($this->headers as $key => $values)
+			header($key.': '.implode(', ', $values));
+	}
+
+	/**
+	 * Send header and print response
+	 * @return
 	 */
 	public function send()
 	{
-		// has custom status message, use it.
-		$message = $this->message ? $this->message : $this->statusMessages($this->status);
-		$status = $this->status;
-		$protocol = $this->protocol;
+		$this->sendHeader();
 
-		header($protocol.' '.$status.' '.$message);
-
-		return $this;
-	}
-
-	/**
-	 * Set custom status message
-	 * @param string message
-	 * @return this
-	 */
-	public function setMessage($message)
-	{
-		$this->message = $message;
-		return $this;
-	}
-
-	/**
-	 * Set status code
-	 * @param int code
-	 * @param string message (optional)
-	 * @return this
-	 */
-	public function setStatus($code, $message = null)
-	{
-		if($message)
-			$this->setMessage($message);
-
-		$this->status = $code;
-		return $this;
-	}
-
-	/**
-	 * @return status code
-	 */
-	public function getStatus()
-	{
-		return $this->status;
-	}
-
-	/**
-	 * Set header.
-	 * @param mixed key
-	 * @param string value
-	 */
-	public function header($key, $value = null)
-	{
-		if(is_array($key))
-		{
-			foreach($key as $k=>$v)
-			{
-				if(is_numeric($k))
-					$this->header($v);
-				else
-					$this->header($k, $v);
-			}
-		}
-		else if(is_string($key) && !$value)
-		{
-			header($key);
-		}
-		else
-		{
-			header($key.': '.trim($value));
-		}
-
-		return $this;
-	}
-
-	/**
-	 * redirect.
-	 */
-	public function redirect($url)
-	{
-		$this->setStatus(302);
-		$this->header('location', $url);die;
-	}
-
-	/**
-	 * create a header for download.
-	 * @param string filename
-	 * @return this
-	 */
-	public function download($filename)
-	{
-		$this->header('Content-Disposition', 'attachment; filename="'.$filename.'"');
-		return $this;
+		echo $this->getBody()->rewind()->getContents();
 	}
 }
+
+?>

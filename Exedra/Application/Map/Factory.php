@@ -62,7 +62,7 @@ class Factory
 			'route' => '\Exedra\Application\Map\Route',
 			'level' => '\Exedra\Application\Map\Level',
 			'finding' => '\Exedra\Application\Map\Finding',
-			'request' => '\Exedra\HTTP\Request',
+			'request' => '\Exedra\HTTP\ServerRequest',
 			'exception' => '\Exception'));
 	}
 
@@ -169,7 +169,7 @@ class Factory
 	 * @param \Exedra\HTTP\Request
 	 * @return \Exedra\Application\Map\Finding
 	 */
-	public function createFinding(Route $route = null, array $parameters = null, \Exedra\HTTP\Request $request = null)
+	public function createFinding(Route $route = null, array $parameters = null, \Exedra\HTTP\ServerRequest $request = null)
 	{
 		return $this->create('finding', array($route, $parameters, $request, $this->app->config));
 		return new Finding($route, $parameters, $request);
@@ -181,8 +181,9 @@ class Factory
 	 */
 	public function createRequest(array $query = array())
 	{
+		return \Exedra\HTTP\ServerRequest::createFromArray($query);
 		return $this->create('request', array($query));
-		return new \Exedra\HTTP\Request($query);
+		return new \Exedra\HTTP\ServerRequest($query);
 	}
 
 	public function throwException($message)

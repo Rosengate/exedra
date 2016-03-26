@@ -37,14 +37,14 @@ class RoutingTest extends PHPUnit_Framework_TestCase
 
 	public function testEmptyPath()
 	{
-		$finding = $this->map->find(['path' => '']);
+		$finding = $this->map->find(['uri' => ['path' => '']]);
 
 		$this->assertEquals('empty', $finding->route->getAbsoluteName());
 	}
 
 	public function testRouteOneLevel()
 	{
-		$finding = $this->map->find(['path' => 'path-one']);
+		$finding = $this->map->find(['uri' => ['path' => 'path-one']]);
 
 		// confirm by route name.
 		$this->assertEquals('one', $finding->route->getAbsoluteName());
@@ -57,7 +57,7 @@ class RoutingTest extends PHPUnit_Framework_TestCase
 			'three'=>['path' =>'something', 'execute'=> 'controller=hello@world']
 			));
 
-		$finding = $this->map->find(['path' => 'path-two/something']);
+		$finding = $this->map->find(['uri' => ['path' => 'path-two/something']]);
 
 		$this->assertEquals('two.three', $finding->route->getAbsoluteName());
 
@@ -66,7 +66,7 @@ class RoutingTest extends PHPUnit_Framework_TestCase
 			'two'=>['path' =>'another-thing', 'execute'=> 'controller=hello@world']
 			));
 
-		$finding = $this->map->find(['path' => 'path-two/sub-two/deep-one/another-thing']);
+		$finding = $this->map->find(['uri' => ['path' => 'path-two/sub-two/deep-one/another-thing']]);
 
 		$this->assertEquals('two.two.one.two', $finding->route->getAbsoluteName());
 	}
@@ -74,11 +74,11 @@ class RoutingTest extends PHPUnit_Framework_TestCase
 	public function testNestedRoute()
 	{
 		// 2 level
-		$finding = $this->map->find(['path' => 'path-two/sub-one']);
+		$finding = $this->map->find(['uri' => ['path' => 'path-two/sub-one']]);
 		$this->assertEquals('two.one', $finding->route->getAbsoluteName());
 
 		// 3 level
-		$finding = $this->map->find(['path' => 'path-two/sub-two/deep-one']);
+		$finding = $this->map->find(['uri' => ['path' => 'path-two/sub-two/deep-one']]);
 		$this->assertEquals('two.two.one', $finding->route->getAbsoluteName());
 	}
 
@@ -86,7 +86,7 @@ class RoutingTest extends PHPUnit_Framework_TestCase
 	{
 		$this->map->addRoutes(array('paramtest'=>['path' =>'[:param1]/[:param2]', 'execute'=> 'controller=hello@world']));
 
-		$finding = $this->map->find(['path' => 'ahmad/rahimie']);
+		$finding = $this->map->find(['uri' => ['path' => 'ahmad/rahimie']]);
 		$param = $finding->parameters;
 
 		$this->assertEquals(array('ahmad', 'rahimie'), array($param['param1'], $param['param2']));
@@ -103,7 +103,7 @@ class RoutingTest extends PHPUnit_Framework_TestCase
 			)]));
 
 		// test route r1.sr2
-		$finding = $this->map->find(['path' => 'ahmad/rahimie/eimihar']);
+		$finding = $this->map->find(['uri' => ['path' => 'ahmad/rahimie/eimihar']]);
 		$param = $finding->parameters;
 
 		// test route r1.sr3.ssr4
@@ -111,7 +111,7 @@ class RoutingTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals('ahmad', $param['param1']);
 		$this->assertEquals('eimihar', $param['param3']);
 
-		$finding = $this->map->find(['path' => 'ahmad/rahimie/eimihar/rosengate/path-ssr4/exedra']);
+		$finding = $this->map->find(['uri' => ['path' => 'ahmad/rahimie/eimihar/rosengate/path-ssr4/exedra']]);
 		$param = $finding->parameters;
 
 		$this->assertEquals('r1.sr3.ssr4', $finding->route->getAbsoluteName());
@@ -157,18 +157,17 @@ class RoutingTest extends PHPUnit_Framework_TestCase
 					}]
 				)]
 			));
-
 		// route r1 (name based route)
 		$response = $this->app->execute('r1', array('param1'=> 'something'));
-		$this->assertEquals('something', $response);
+		$this->assertEquals('something', $response->response->getBody());
 
-		// route r2.sr3 (query based route)
-		$response2 = $this->app->execute(['path' => 'hello/world']);
-		$this->assertEquals('world', $response2);
+		// route r2.sr3 (request based route)
+		$response2 = $this->app->execute(['uri' => ['path' => 'hello/world']]);
+		$this->assertEquals('world', $response2->response->getBody());
 
 		// middleware on r3.sr4
-		$response3 = $this->app->execute(['path' => 'hello/rita/world']);
-		$this->assertEquals('something', $response3);
+		$response3 = $this->app->execute(['uri' => ['path' => 'hello/rita/world']]);
+		$this->assertEquals('something', $response3->response->getBody());
 	}
 
 	public function testPrioritizeExecution()
@@ -181,7 +180,7 @@ class RoutingTest extends PHPUnit_Framework_TestCase
 				)]
 			));
 
-		$finding = $this->map->find(['path' => 'path1/path2']);
+		$finding = $this->map->find(['uri' => ['path' => 'path1/path2']]);
 		
 		$this->assertEquals('r1.sr2', $finding->route->getAbsoluteName());
 	}

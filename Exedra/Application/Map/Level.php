@@ -89,13 +89,13 @@ class Level extends \ArrayIterator
 	 */
 	public function find($request)
 	{
-		if(!($request instanceof \Exedra\HTTP\Request))
+		if(!($request instanceof \Exedra\HTTP\ServerRequest))
 			if(is_array($request))
 				$request = $this->factory->createRequest($request);
 			else
 				return $this->factory->throwException('Argument for map::find() must be either array or \Exedra\HTTP\Request');
 
-		$result = $this->findRouteByRequest($request, $request->getUriPath());
+		$result = $this->findRouteByRequest($request, trim($request->getUri()->getPath(), '/'));
 
 		return $this->factory->createFinding($result['route'] ? : null, $result['parameter'], $request);
 	}
@@ -230,7 +230,7 @@ class Level extends \ArrayIterator
 	 * @param array passedParameters - highly otional.
 	 * @return array {route: \Exedra\Application\Map\Route|false, parameter: array}
 	 */
-	public function findRouteByRequest(\Exedra\HTTP\Request $request, $levelUriPath, array $passedParameters = array())
+	public function findRouteByRequest(\Exedra\HTTP\ServerRequest $request, $levelUriPath, array $passedParameters = array())
 	{
 		$this->rewind();
 

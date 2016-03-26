@@ -48,8 +48,8 @@ class Exedra
 		$this->loader->registerAutoload($this->sourceDir, 'Exedra', false);
 
 		// create http request and response.
-		$this->httpRequest	= $request ? : new \Exedra\HTTP\Request;
-		$this->httpResponse = new \Exedra\HTTP\Response;
+		$this->httpRequest	= $request ? : (isset($_SERVER['REQUEST_URI']) ? \Exedra\HTTP\ServerRequest::createFromGlobals() : null);
+		$this->httpResponse = \Exedra\HTTP\Response::createEmptyResponse();
 
 		// baseDir
 		$this->baseDir = $baseDir;
@@ -151,7 +151,8 @@ class Exedra
 	{
 		foreach($this->apps as $app_name => $app)
 		{
-			echo $app->execute($this->httpRequest);
+			$app->dispatch($this->httpRequest);
+			// echo $app->execute($this->httpRequest);
 		}
 	}
 

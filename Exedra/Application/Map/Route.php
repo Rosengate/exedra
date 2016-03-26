@@ -271,7 +271,7 @@ class Route
 	 * @param string path
 	 * @return array struct of {route, parameter, continue}
 	 */
-	public function validate(\Exedra\HTTP\Request $request, $path)
+	public function validate(\Exedra\HTTP\ServerRequest $request, $path)
 	{
 		// print_r($query);die;
 		foreach(array('method', 'path', 'ajax') as $key)
