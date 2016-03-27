@@ -434,7 +434,8 @@ class Route
 				break;
 				// segments remainder
 				case '*':
-					$pathParams[$segmentParamName] = $path;
+					$path = explode('/', $path, $no+1);
+					$pathParams[$segmentParamName] = array_pop($path);
 					$matched = true;
 					$isTrailing = true;
 					break 2;

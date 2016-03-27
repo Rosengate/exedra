@@ -103,13 +103,15 @@ class Level extends \ArrayIterator
 	/**
 	 * Make a finding by given absolute name
 	 * @param string name.
+	 * @param array parameters
+	 * @param \Exedra\HTTP\ServerRequest request forwarded request, for this Finding
 	 * @return \Exedra\Application\Map\Finding
 	 */
-	public function findByName($name, $parameters = array())
+	public function findByName($name, array $parameters = array(), \Exedra\HTTP\ServerRequest $request = null)
 	{
 		$route = $this->findRoute($name);
 
-		return $this->factory->createFinding($route ? : null, $parameters);
+		return $this->factory->createFinding($route ? : null, $parameters, $request);
 	}
 
 	/**

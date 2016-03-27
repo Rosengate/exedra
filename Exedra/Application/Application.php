@@ -148,14 +148,14 @@ class Application
 	 * @param array parameter
 	 * @return \Exedra\Application\Execution\Exec
 	 */
-	public function execute($query, array $parameter = array())
+	public function execute($query, array $parameter = array(), \Exedra\HTTP\ServerRequest $request = null)
 	{
 		try
 		{
 			// expect it as route name
 			if(is_string($query))
 			{
-				$finding = $this->map->findByName($query, $parameter);
+				$finding = $this->map->findByName($query, $parameter, $request);
 			}
 			// expect it either \Exedra\HTTP\ServerRequest or array
 			else

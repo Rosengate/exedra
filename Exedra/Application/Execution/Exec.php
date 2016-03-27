@@ -430,9 +430,12 @@ class Exec
 	 * @param string route
 	 * @param array parameter.
 	 */
-	public function execute($route, array $parameter = array())
+	public function execute($route, array $parameters = array(), \Exedra\HTTP\ServerRequest $request = null)
 	{
 		$route = $this->baseRoute($route);
-		return $this->app->execute($route, $parameter);
+
+		$request = $request ? : $this->request;
+
+		return $this->app->execute($route, $parameters, $request);
 	}
 }
