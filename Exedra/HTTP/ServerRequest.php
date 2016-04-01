@@ -80,7 +80,7 @@ class ServerRequest extends Message
 
 		$uriParts['host'] = $server['SERVER_NAME'];
 		$uriParts['port'] = $server['SERVER_PORT'];
-		$uriParts['scheme'] = $server['REQUEST_SCHEME'];
+		$uriParts['scheme'] = isset($server['REQUEST_SCHEME']) ? $server['REQUEST_SCHEME'] : ( isset($server['HTTPS']) && $server['HTTPS'] == 'on' ? 'https' : 'http' );
 
 		if(function_exists('getallheaders'))
 		{
