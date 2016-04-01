@@ -157,9 +157,17 @@ class Factory
 			$loadParameter = $pattern;
 		}
 
-		$subroutes = $this->getLoader()->load($loadParameter);
+		$closure = $this->getLoader()->load($loadParameter);
 
-		return $this->createLevel($route, $subroutes);
+		// expecting a Map\Level from this loaded file.
+		if(!($closure instanceof \Closure))
+			return $this->throwException('Expecting closure for the subroutes');
+
+		$level = $this->createLevel($route);
+
+		$closure($level);
+
+		return $level;
 	}
 
 	/**
