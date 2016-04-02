@@ -267,7 +267,7 @@ class Level extends \ArrayIterator
 				else
 				{
 					// if has passed parameter.
-					$passedParameters = count($result['parameter']) > 0 ? $result['parameter'] : array();
+					$passedParameters = array_merge(count($result['parameter']) > 0 ? $result['parameter'] : array(), $passedParameters);
 
 					// $subrouteResult = $route->getSubroutes()->query($queryUpdated, $passedParameters);
 					$subrouteResult = $route->getSubroutes()->findRouteByRequest($request, $remainingPath, $passedParameters);

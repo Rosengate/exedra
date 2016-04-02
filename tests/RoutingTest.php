@@ -119,6 +119,25 @@ class RoutingTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals('exedra', $param['param6']);
 	}
 
+	public function testFarNestedParam()
+	{
+		$this->map->addRoutes(array(
+			'r1' => ['path' => '[:param1]', 'subroutes' => array(
+				'sr2' => ['subroutes' => array(
+					'sr3' => ['subroutes' => array(
+						'sr4' => ['subroutes' => array(
+							'sr5' => ['path' => 'segment']
+							)]
+						)]
+					)]
+				)]
+			));
+
+		$finding = $this->map->find(['uri' => ['path' => 'exedra/segment']]);
+
+		$this->assertEquals('exedra', $finding->parameters['param1']);
+	}
+
 	public function testFindByName()
 	{
 		$this->map->addRoutes(array(
