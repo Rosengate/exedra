@@ -70,7 +70,7 @@ class Container
 	{
 		if(isset($this->registry[$dependency]))
 		{
-			return $this->get($dependency, $args);
+			return $this->resolve($dependency, $args);
 		}
 	}
 
