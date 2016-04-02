@@ -94,6 +94,10 @@ class Application
 			));
 	}
 
+	/**
+	 * Resolve dependency from dependency injection container, off property $di.
+	 * @return mixed.
+	 */
 	public function __get($property)
 	{
 		if($this->container->has($property))
@@ -101,6 +105,16 @@ class Application
 			$this->$property = $this->container->get($property);
 			return $this->$property;
 		}
+	}
+
+	/**
+	 * A magic call to container based method
+	 * @param string name
+	 * @param array args
+	 */
+	public function __call($name, $args)
+	{
+		return call_user_func_array(array($this->container, $name), $args);
 	}
 
 	/**

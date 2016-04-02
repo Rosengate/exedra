@@ -177,6 +177,16 @@ class Exec
 	}
 
 	/**
+	 * A magic call to container based method
+	 * @param string name
+	 * @param array args
+	 */
+	public function __call($name, $args)
+	{
+		return call_user_func_array(array($this->container, $name), $args);
+	}
+
+	/**
 	 * Point to the next handler, and execute that handler.
 	 */
 	public function next()
