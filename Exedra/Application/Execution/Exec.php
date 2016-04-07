@@ -1,7 +1,7 @@
 <?php
 namespace Exedra\Application\Execution;
 
-class Exec
+class Exec extends \Exedra\Application\Container
 {
 	/**
 	 * Application instance
@@ -98,7 +98,7 @@ class Exec
 		$httpRequest = $this->finding->getRequest();
 		$httpResponse = \Exedra\Application\Execution\Response::createEmptyResponse();
 
-		$this->container = new \Exedra\Application\Container(array(
+		$this->dependencies['services'] = array(
 			"controller"=> array("\Exedra\Application\Builder\Controller", array($this)),
 			// "view"=> array("\Exedra\Application\Builder\View", array($this->exception, $this->loader)),
 			"view" => function() use($exe) {return new \Exedra\Application\Builder\View($exe->exception, $exe->loader);},
@@ -118,7 +118,7 @@ class Exec
 			'middlewares' => function() use($app) {return $app->middleware->getMiddlewares();},
 			'asset' => array('\Exedra\Application\Builder\Asset', array($this)),
 			'path' => array('\Exedra\Application\Builder\Path', array($this->loader))
-			));
+			);
 	}
 
 	public function getApp()
@@ -167,24 +167,24 @@ class Exec
 	 * Resolve dependency from dependency injection container, off property $di.
 	 * @return mixed.
 	 */
-	public function __get($property)
+	/*public function __get($property)
 	{
 		if($this->container->has($property))
 		{
 			$this->$property = $this->container->get($property);
 			return $this->$property;
 		}
-	}
+	}*/
 
 	/**
 	 * A magic call to container based method
 	 * @param string name
 	 * @param array args
 	 */
-	public function __call($name, $args)
+	/*public function __call($name, $args)
 	{
 		return call_user_func_array(array($this->container, $name), $args);
-	}
+	}*/
 
 	/**
 	 * Point to the next handler, and execute that handler.

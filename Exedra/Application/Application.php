@@ -1,6 +1,6 @@
 <?php namespace Exedra\Application;
 
-class Application
+class Application extends Container
 {
 	/**
 	 * Application name. Reflected as your application directory name.
@@ -53,7 +53,7 @@ class Application
 		$this->initiateProperties();
 
 		// register dependencies.
-		$this->initiateContainer();
+		$this->serviceRegistry();
 	}
 
 	/**
@@ -76,11 +76,11 @@ class Application
 	/**
 	 * Register dependencies.
 	 */
-	protected function initiateContainer()
+	protected function serviceRegistry()
 	{
 		$app = $this;
 
-		$this->container = new \Exedra\Application\Container(array(
+		$this->dependencies['services'] = array(
 			'registry'=> array('\Exedra\Application\Registry', array($this)),
 			'request' => function(){return \Exedra\HTTP\ServerRequest::createFromGlobals();},
 			// 'response' => function(){return \Exedra\Application\Execution\Response::createEmptyResponse();},
@@ -91,31 +91,33 @@ class Application
 			"exception"=> array("\Exedra\Application\Builder\Exception", array($this)),
 			'path' => array('\Exedra\Application\Builder\Path', array($this->loader)),
 			'middleware' => array('\Exedra\Application\Middleware\Registry', array($this))
-			));
+			);
+
+		// $this->container = new \Exedra\Application\Container();
 	}
 
 	/**
 	 * Resolve dependency from dependency injection container, off property $di.
 	 * @return mixed.
 	 */
-	public function __get($property)
+	/*public function __get($property)
 	{
 		if($this->container->has($property))
 		{
 			$this->$property = $this->container->get($property);
 			return $this->$property;
 		}
-	}
+	}*/
 
 	/**
 	 * A magic call to container based method
 	 * @param string name
 	 * @param array args
 	 */
-	public function __call($name, $args)
+	/*public function __call($name, $args)
 	{
 		return call_user_func_array(array($this->container, $name), $args);
-	}
+	}*/
 
 	/**
 	 * Get application name
