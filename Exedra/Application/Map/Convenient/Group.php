@@ -33,6 +33,11 @@ class Group extends \Exedra\Application\Map\Level
 		return $route;
 	}
 
+	public function middleware($middleware)
+	{
+		return $this->setMiddleware($middleware);
+	}
+
 	public function get($path = null, $params = null)
 	{
 		return $this->add('get', $path, $params);
