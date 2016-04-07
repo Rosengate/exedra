@@ -37,6 +37,15 @@ class Factory
 	}
 
 	/**
+	 * Get middleware registry from \Exedra\Application\Application
+	 * @return \Exedra\Application\Middleware\Registry
+	 */
+	public function getMiddlewareRegistry()
+	{
+		return $this->app->middleware;
+	}
+
+	/**
 	 * Get application loader
 	 * @return \Exedra\Loader
 	 */

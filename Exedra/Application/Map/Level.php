@@ -31,6 +31,38 @@ class Level extends \ArrayIterator
 	}
 
 	/**
+	 * Inversely set middleware on upper route
+	 * If there's this level is on the top (not route dependant), register middleware on app
+	 * @param mixed middleware
+	 * @return this
+	 */
+	public function setMiddleware($middleware)
+	{
+		if($this->route)
+			$this->route->setMiddleware($middleware);
+		else
+			$this->factory->getMiddlewareRegistry()->add($middleware);
+
+		return $this;
+	}
+
+	/**
+	 * Inversely add middleware on upper route
+	 * If there's this level is on the top (not route dependant), register middleware on app
+	 * @param mixed middleware
+	 * @return this
+	 */
+	public function addMiddleware($middleware)
+	{
+		if($this->route)
+			$this->route->addMiddleware($middleware);
+		else
+			$this->factory->getMiddlewareRegistry()->add($middleware);
+
+		return $this;
+	}
+
+	/**
 	 * Add routes by the given array.
 	 * @param array routes
 	 */
