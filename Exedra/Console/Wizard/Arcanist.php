@@ -38,9 +38,9 @@ class Arcanist extends Wizardry
 		
 	}
 
-	public function executeServe()
+	public function executeServe(array $options = array())
 	{
-		$port = $this->ask('Run server at port 9000 ? [Or please specify] : ', function($answer, $wizard)
+		$port = isset($options['p']) ? $options['p'] : $this->ask('Run server at port 9000 ? [Or please specify] : ', function($answer, $wizard)
 		{
 			if($answer == '')
 				return true;
