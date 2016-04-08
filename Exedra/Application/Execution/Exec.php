@@ -327,7 +327,7 @@ class Exec extends \Exedra\Application\Container
 		$params = array();
 
 		foreach($keys as $key)
-			$params[] = $this->params[trim($key)];
+			$params[trim($key)] = $this->params[trim($key)];
 
 		return $params;
 	}
