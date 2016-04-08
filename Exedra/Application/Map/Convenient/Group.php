@@ -55,7 +55,7 @@ class Group extends \Exedra\Application\Map\Level
 
 	public function delete($path = null, $params = null)
 	{
-		return $this->add('put', $path, $params);
+		return $this->add('delete', $path, $params);
 	}
 
 	public function any($path = null, $params = null)
