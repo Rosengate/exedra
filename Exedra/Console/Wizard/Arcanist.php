@@ -64,7 +64,7 @@ class Arcanist extends Wizardry
 
 		$port = $port == '' ? 9000 : $port;
 
-		$public = $this->app->config->get('wizard.public_folder');
+		$public = $this->app->config->get('wizard.public_folder', 'public');
 
 		$dir = $this->exedra->getBaseDir().'/'.$public;
 		chdir($dir);
