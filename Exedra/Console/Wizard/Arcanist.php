@@ -134,6 +134,10 @@ class Arcanist extends Wizardry
 					return;
 			}
 
+			// list only routes that is executable
+			if(!$route->hasExecution())
+				return;
+
 			$row = array();
 
 			$data = array(
