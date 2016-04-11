@@ -22,10 +22,10 @@ class Route extends \Exedra\Application\Map\Route
 	}
 
 	/**
-	 * Alias to setSubroutes except that now it require \Closure
+	 * Alias to setSubroutes
 	 * @param \Closure callback
 	 */
-	public function group(\Closure $callback)
+	public function group($callback)
 	{
 		return $this->setSubroutes($callback);
 	}
