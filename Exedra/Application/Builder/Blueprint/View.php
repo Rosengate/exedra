@@ -5,7 +5,7 @@ namespace Exedra\Application\Builder\Blueprint;
  * Blueprint for View
  */
 
-class View
+class View implements \ArrayAccess
 {
 	/**
 	 * An Exception manager.
@@ -54,6 +54,45 @@ class View
 		if($path) $this->setPath($path);
 		if($data) $this->set($data);
 		$this->loader = $loader;
+	}
+
+	/**
+	 * Set data through array offset
+	 * @param string key
+	 * @param mixed value
+	 */
+	public function offsetSet($key, $value)
+	{
+		$this->data[$key] = $value;
+	}
+
+	/**
+	 * Get data through array offset
+	 * @param string key
+	 * @return mixed
+	 */
+	public function offsetGet($key)
+	{
+		return $this->data[$key];
+	}
+
+	/**
+	 * Check data existence through array offset
+	 * @param string key
+	 * @return bool
+	 */
+	public function offsetExists($key)
+	{
+		return isset($this->data[$key]);
+	}
+
+	/**
+	 * Unset data through array offset
+	 * @param string key
+	 */
+	public function offsetUnset($key)
+	{
+		unset($this->data[$key]);
 	}
 
 	/**
