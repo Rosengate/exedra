@@ -51,7 +51,7 @@ Abstract Class InstanceBuilder
 		if(!$this->loader->has(array('structure'=> $builderName, 'path'=> $path)))
 		{
 			$structure = $this->structure->get($builderName);
-			$path = $this->exe->app->getAppName().'/'.($this->exe->getModule()?$this->exe->getModule().'/':'').$structure.'/'.$path;
+			$path = $this->exe->app->getBaseDir().'/'.($this->exe->getModule()?$this->exe->getModule().'/':'').$structure.'/'.$path;
 			$this->exe->exception->create("Unable to find file '".$path."' for ".$builderName." : ".$className.($this->module?" (module : ".$this->module.")":"").".");
 		}
 
@@ -59,7 +59,7 @@ Abstract Class InstanceBuilder
 
 		// namespace based builder.
 		if($this->isNamespaced)
-			$className = $this->exe->app->getAppname().'\\'.($this->exe->getModule() ? $this->exe->getModule().'\\' : '' ).$builderName.'\\'.$className;
+			$className = $this->exe->app->getNamespace().'\\'.($this->exe->getModule() ? $this->exe->getModule().'\\' : '' ).$builderName.'\\'.$className;
 		else
 			$className		= $this->structure->getPattern($this->patternName,$className);
 

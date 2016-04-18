@@ -58,7 +58,8 @@ class Asset
 	 */
 	public function getBaseDir()
 	{
-		return $this->exe->app->exedra->getBaseDir();
+		return $this->exe->getApp()->getRootDir();
+		// return $this->exe->app->exedra->getBaseDir();
 	}
 
 	/**
@@ -71,7 +72,8 @@ class Asset
 	{
 		if(!$absolute)
 		{
-			$root = $this->exe->app->exedra->getBaseDir();
+			// $root = $this->exe->app->exedra->getBaseDir();
+			$root = $this->exe->getApp()->getRootDir();
 
 			$this->basePath = $root.DIRECTORY_SEPARATOR.$path;
 		}

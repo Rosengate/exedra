@@ -2,6 +2,7 @@
 namespace Exedra\Console\Wizard;
 /**
  * \Exedra\Exedra based wizard
+ * Probably not going to need this class anymore :(
  */
 class Archmage extends Wizardry
 {

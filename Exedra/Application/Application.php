@@ -40,20 +40,48 @@ class Application extends Container
 
 	/**
 	 * Create a new application
-	 * @param string name (application name)
+	 * @param string|array params [if string, expect app directory, else array of directories, and configuration]
 	 * @param \Exedra\Exedra exedra instance
 	 */
-	public function __construct($name, \Exedra\Exedra $exedra)
+	public function __construct($params, \Exedra\Exedra $exedra = null)
 	{
-		// initiate application name and save \Exedra\Exedra reference.
-		$this->name = $name;
-		$this->exedra = $exedra;
+		$this->configure(is_array($params) ? $params : array('dir.app' => $params));
 
 		// initialize properties
 		$this->initiateProperties();
 
+		// autoload the current folder
+		$this->loader->autoload('', $this->config->get('namespace'));
+
 		// register dependencies.
 		$this->serviceRegistry();
+	}
+
+	/**
+	 * Configure default variables
+	 * @param array params
+	 */
+	protected function configure(array $params)
+	{
+		$this->config = new \Exedra\Application\Config;
+
+		if(!isset($params['dir.app']))
+			throw new \Exception('dir.app parameter is required, at least.');
+
+		foreach($params as $key => $value)
+			$this->config->set($key, $value);
+
+		if(!isset($params['dir.root']))
+			$this->config->set('dir.root', $params['dir.app'].'/..');
+
+		if(!isset($params['dir.public']))
+			$this->config->set('dir.public', $params['dir.app'].'/../public');
+
+		if(!isset($params['namespace']))
+		{
+			$paths = explode('/', $params['dir.app']);
+			$this->config->set('namespace', end($paths));
+		}
 	}
 
 	/**
@@ -69,7 +97,9 @@ class Application extends Container
 	{
 		// create application structure and loader
 		$this->structure = new \Exedra\Application\Structure\Structure();
-		$this->loader = new \Exedra\Loader($this->getBaseDir(), $this->structure);
+
+		$this->loader = new \Exedra\Loader($this->getDir(), $this->structure);
+		
 		$this->mapFactory = new \Exedra\Application\Map\Factory($this);
 	}
 
@@ -92,49 +122,41 @@ class Application extends Container
 			'path' => array('\Exedra\Application\Builder\Path', array($this->loader)),
 			'middleware' => array('\Exedra\Application\Middleware\Registry', array($this))
 			);
-
-		// $this->container = new \Exedra\Application\Container();
 	}
 
 	/**
-	 * Resolve dependency from dependency injection container, off property $di.
-	 * @return mixed.
+	 * Get directory for app folder
+	 * @param string|null path
+	 * @return string
 	 */
-	/*public function __get($property)
+	public function getDir($path = null)
 	{
-		if($this->container->has($property))
-		{
-			$this->$property = $this->container->get($property);
-			return $this->$property;
-		}
-	}*/
-
-	/**
-	 * A magic call to container based method
-	 * @param string name
-	 * @param array args
-	 */
-	/*public function __call($name, $args)
-	{
-		return call_user_func_array(array($this->container, $name), $args);
-	}*/
-
-	/**
-	 * Get application name
-	 * @return string application name
-	 */
-	public function getAppName()
-	{
-		return $this->name;
+		return $this->config->get('dir.app') . ($path ? '/' . $path : '');
 	}
 
 	/**
-	 * Return base directory for this app
-	 * @return string.
+	 * Alias for getDir
+	 * @param string|null path
+	 * @return string
 	 */
-	public function getBaseDir()
+	public function getBaseDir($path = null)
 	{
-		return $this->exedra->getBaseDir().'/'.$this->getAppName();
+		return $this->getDir($path);
+	}
+
+	/**
+	 * Get root directory
+	 * @param string|null path
+	 * @return string
+	 */
+	public function getRootDir($path = null)
+	{
+		return $this->config->get('dir.root') . ($path ? '/' . $path : '');
+	}
+
+	public function getNamespace()
+	{
+		return $this->config->get('namespace');
 	}
 
 	/**

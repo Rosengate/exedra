@@ -4,6 +4,7 @@ namespace Exedra\Console\Wizard\Spells;
  * With the power granted by Exedra, this spell class may a little bit dangerous to a new user
  * Because it hides the mechanism of how things created.
  * Use with your own consent!
+ * Probably, not going to need this console anymore
  */
 class Necromancy
 {

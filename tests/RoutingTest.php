@@ -5,33 +5,28 @@ class RoutingTest extends PHPUnit_Framework_TestCase
 {
 	public function setUp()
 	{
-		$this->exedra = new \Exedra\Exedra(__DIR__);
-
 		// build a basic case
-		$this->app = $this->exedra->build('app', function($app)
-		{
-			$app->map->addRoutes(array(
-				'one'=>['path' =>'path-one', 'execute'=> 'controller=hello@world'],
-				'two'=>['path' =>'path-two', 'subroutes'=> array(
-					'one'=> ['path' =>'sub-one', 'execute'=> 'controller=hello@world'],
-					'two'=> ['path' =>'sub-two', 'subroutes'=> array(
-						'one'=> ['path' =>'deep-one', 'execute'=> 'controller=hello@world'],
-						)]
-					)]
-				));
+		$app = $this->app = new \Exedra\Application\Application(__DIR__);
 
-			$app->map->addRoutes(array(
-				'empty'=>['path' =>'', 'execute'=> 'controller=hello@world']
-				));
-		});
+		$app->map->addRoutes(array(
+			'one'=>['path' =>'path-one', 'execute'=> 'controller=hello@world'],
+			'two'=>['path' =>'path-two', 'subroutes'=> array(
+				'one'=> ['path' =>'sub-one', 'execute'=> 'controller=hello@world'],
+				'two'=> ['path' =>'sub-two', 'subroutes'=> array(
+					'one'=> ['path' =>'deep-one', 'execute'=> 'controller=hello@world'],
+					)]
+				)]
+			));
+
+		$app->map->addRoutes(array(
+			'empty'=>['path' =>'', 'execute'=> 'controller=hello@world']
+			));
 
 		$this->map = $this->app->map;
 	}
 
 	public function testApp()
 	{
-		$this->assertEquals('Exedra\Exedra', get_class($this->exedra));
-
 		$this->assertEquals('Exedra\Application\Application', get_class($this->app));
 	}
 

@@ -14,9 +14,9 @@ abstract class Wizardry
 
 	protected $commands = array();
 
-	public function __construct(\Exedra\Exedra $exedra)
+	public function __construct()
 	{
-		$this->exedra = $exedra;
+		// $this->exedra = $exedra;
 		$this->setUp();
 	}
 
@@ -168,11 +168,6 @@ abstract class Wizardry
 		echo $text;
 
 		return $this;
-	}
-
-	public function getExedra()
-	{
-		return $this->exedra;
 	}
 
 	public function inputRead()

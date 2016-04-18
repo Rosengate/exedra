@@ -79,7 +79,7 @@ class Exedra
 	 * @return \Exedra\Application\Application
 	 * @throws \Exception
 	 */
-	public function build($app_name = 'App',\Closure $execution = null)
+	public function build($app_name = 'App', \Closure $execution = null)
 	{
 		try
 		{
@@ -98,11 +98,12 @@ class Exedra
 				throw new \Exception("Application with name ".$app_name.' already exists.');
 
 			// create new application with an injected Map (with an injected map, request (an injected http request), and configuration handler.).
-			$this->apps[$app_name] = new \Exedra\Application\Application($app_name, $this);
+			$this->apps[$app_name] = new \Exedra\Application\Application(array(
+				'namespace' => $namespacePrefix,
+				'dir.app' => $this->baseDir.'/'.$app_name,
+				'dir.root' => $this->baseDir
+				));
 
-			// register autoload for this app_name.
-			$this->loader->registerAutoload($app_name, $namespacePrefix);
-				
 			// Execute in instant.
 			if(!is_null($execution))
 				$execution($this->apps[$app_name]);

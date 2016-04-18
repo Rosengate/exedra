@@ -12,7 +12,7 @@ class Arcanist extends Wizardry
 	public function __construct(\Exedra\Application\Application $app)
 	{
 		$this->app = $app;
-		parent::__construct($app->getExedra());
+		parent::__construct();
 	}
 
 	protected function setUp()
@@ -64,9 +64,14 @@ class Arcanist extends Wizardry
 
 		$port = $port == '' ? 9000 : $port;
 
-		$public = $this->app->config->get('wizard.public_folder', 'public');
+		$dir = $this->app->config->get('dir.public', 'public');
 
-		$dir = $this->exedra->getBaseDir().'/'.$public;
+		// $dir = $this->exedra->getBaseDir().'/'.$public;
+		// $dir = $this->app->getRootDir().'/'.$public;
+
+		if(!file_exists($dir))
+			return $this->say('Public folder doesn\'t exist. ('.$dir.')');
+
 		chdir($dir);
 		$this->say('php server started at localhost:'.$port);
 		exec('php -S localhost:'.$port);

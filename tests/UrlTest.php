@@ -7,10 +7,7 @@ class UrlTest extends PHPUnit_Framework_TestCase
 	{
 		$this->exedra = new \Exedra\Exedra(__DIR__);
 
-		$this->app = $this->exedra->build('app', function()
-		{
-
-		});
+		$this->app = new \Exedra\Application\Application(__DIR__);
 
 		$this->map = $this->app->map;
 	}
