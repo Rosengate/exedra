@@ -6,7 +6,7 @@ class RoutingTest extends PHPUnit_Framework_TestCase
 	public function setUp()
 	{
 		// build a basic case
-		$app = $this->app = new \Exedra\Application\Application(__DIR__);
+		$app = $this->app = new \Exedra\Application(__DIR__);
 
 		$app->map->addRoutes(array(
 			'one'=>['path' =>'path-one', 'execute'=> 'controller=hello@world'],
@@ -27,7 +27,7 @@ class RoutingTest extends PHPUnit_Framework_TestCase
 
 	public function testApp()
 	{
-		$this->assertEquals('Exedra\Application\Application', get_class($this->app));
+		$this->assertEquals('Exedra\Application', get_class($this->app));
 	}
 
 	public function testEmptyPath()

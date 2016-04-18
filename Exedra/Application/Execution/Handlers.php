@@ -8,7 +8,7 @@ class Handlers
 {
 	/**
 	 * Application instance
-	 * @var \Exedra\Application\Application
+	 * @var \Exedra\Application
 	 */
 	protected $app;
 
@@ -24,7 +24,7 @@ class Handlers
 	 */
 	protected $handlers = array();
 
-	public function __construct(\Exedra\Application\Application $app)
+	public function __construct(\Exedra\Application $app)
 	{
 		$this->app = $app;
 	}

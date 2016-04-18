@@ -1,7 +1,7 @@
 <?php
 namespace Exedra\Console\Wizard;
 /**
- * \Exedra\Application\Application based wizard
+ * \Exedra\Application based wizard
  */
 class Arcanist extends Wizardry
 {
@@ -9,7 +9,7 @@ class Arcanist extends Wizardry
 
 	protected $exedra;
 
-	public function __construct(\Exedra\Application\Application $app)
+	public function __construct(\Exedra\Application $app)
 	{
 		$this->app = $app;
 		parent::__construct();

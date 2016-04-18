@@ -5,7 +5,7 @@ require_once "Loader.php";
 class Exedra
 {
 	/**
-	 * An array of \Exedra\Application\Application
+	 * An array of \Exedra\Application
 	 * @var array
 	 */
 	var $apps = array();
@@ -76,7 +76,7 @@ class Exedra
 	 * Build application instance
 	 * @param string app_name
 	 * @param callback execution
-	 * @return \Exedra\Application\Application
+	 * @return \Exedra\Application
 	 * @throws \Exception
 	 */
 	public function build($app_name = 'App', \Closure $execution = null)
@@ -98,7 +98,7 @@ class Exedra
 				throw new \Exception("Application with name ".$app_name.' already exists.');
 
 			// create new application with an injected Map (with an injected map, request (an injected http request), and configuration handler.).
-			$this->apps[$app_name] = new \Exedra\Application\Application(array(
+			$this->apps[$app_name] = new \Exedra\Application(array(
 				'namespace' => $namespacePrefix,
 				'dir.app' => $this->baseDir.'/'.$app_name,
 				'dir.root' => $this->baseDir
@@ -120,7 +120,7 @@ class Exedra
 	/**
 	 * Get application instance
 	 * @param string name
-	 * @return \Exedra\Application\Application
+	 * @return \Exedra\Application
 	 */
 	public function get($name)
 	{

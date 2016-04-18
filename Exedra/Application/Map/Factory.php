@@ -15,7 +15,7 @@ class Factory
 
 	/**
 	 * Application instance
-	 * @var \Exedra\Application\Application app
+	 * @var \Exedra\Application app
 	 */
 	protected $app;
 
@@ -29,7 +29,7 @@ class Factory
 	 */
 	protected $isExplicit = false;
 
-	public function __construct(\Exedra\Application\Application $app)
+	public function __construct(\Exedra\Application $app)
 	{
 		$this->app = $app;
 
@@ -39,7 +39,7 @@ class Factory
 	}
 
 	/**
-	 * Get middleware registry from \Exedra\Application\Application
+	 * Get middleware registry from \Exedra\Application
 	 * @return \Exedra\Application\Middleware\Registry
 	 */
 	public function getMiddlewareRegistry()

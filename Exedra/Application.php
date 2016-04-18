@@ -1,11 +1,6 @@
-<?php namespace Exedra\Application;
+<?php namespace Exedra;
 
-/**
- * This class is no longer used.
- * moved to up
- * Kept for commit history reference
- */
-class Application extends Container
+class Application extends \Exedra\Application\Container
 {
 	/**
 	 * Application name. Reflected as your application directory name.
@@ -229,7 +224,7 @@ class Application extends Container
 			if(!$finding->success())
 				return $this->throwFailedExecution($finding, $query, $parameter);
 
-			$exe = new Execution\Exec($this, $finding);
+			$exe = new \Exedra\Application\Execution\Exec($this, $finding);
 
 			$this->exe = $exe;
 

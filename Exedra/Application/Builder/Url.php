@@ -19,7 +19,7 @@ class Url
 	 */
 	protected $assetUrl;
 
-	public function __construct(\Exedra\Application\Application $app)
+	public function __construct(\Exedra\Application $app)
 	{
 		$this->app	= $app;
 

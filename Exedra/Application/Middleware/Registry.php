@@ -21,7 +21,7 @@ class Registry
 	 */
 	protected $middlewares = array();
 
-	public function __construct(\Exedra\Application\Application $app)
+	public function __construct(\Exedra\Application $app)
 	{
 		$this->app = $app;
 

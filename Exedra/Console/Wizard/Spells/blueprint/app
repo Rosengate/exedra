@@ -2,7 +2,7 @@
 $exedra = require_once __DIR__.'/../exedra';
 
 /**
- * This exedra::build method basically returns application instance. (\Exedra\Application\Application)
+ * This exedra::build method basically returns application instance. (\Exedra\Application)
  * The same one passed into the \Closure. 
  * 1. You can code outside of the \Closure if you want. 
  * Just make sure this script returns the same application instance

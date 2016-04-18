@@ -7,11 +7,11 @@ namespace Exedra\Application\Builder;
 class Exception
 {
 	/**
-	 * @var \Exedra\Application\Application app
+	 * @var \Exedra\Application app
 	 */
 	protected $app;
 
-	public function __construct(\Exedra\Application\Application $app)
+	public function __construct(\Exedra\Application $app)
 	{
 		$this->app = $app;
 	}

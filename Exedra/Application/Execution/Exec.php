@@ -5,7 +5,7 @@ class Exec extends \Exedra\Application\Container
 {
 	/**
 	 * Application instance
-	 * @var \Exedra\Application\Application
+	 * @var \Exedra\Application
 	 */
 	public $app;
 
@@ -57,7 +57,7 @@ class Exec extends \Exedra\Application\Container
 	 */
 	public $config;
 
-	public function __construct(\Exedra\Application\Application $app, \Exedra\Application\Map\Finding $finding)
+	public function __construct(\Exedra\Application $app, \Exedra\Application\Map\Finding $finding)
 	{
 		$this->finding = $finding;
 		$this->app = $app;
