@@ -114,12 +114,24 @@ class Response extends Message
 		return $this->setHeader($name, $value);
 	}
 
+	/**
+	 * Send header
+	 */
 	public function sendHeader()
 	{
 		header('HTTP '.$this->getProtocolVersion().' '.$this->getStatusCode().' '.$this->getReasonPhrase());
 
 		foreach($this->headers as $key => $values)
 			header($key.': '.implode(', ', $values));
+	}
+
+	/**
+	 * Set location header (redirect)
+	 * @param string url
+	 */
+	public function redirect($url)
+	{
+		$this->setHeader('location', $url);
 	}
 
 	/**
