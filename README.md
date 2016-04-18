@@ -43,17 +43,46 @@ Documentation
 ===
 Documentation and the homebase for exedra is currently hosted here : http://exedra.rosengate.com.
 
-Basic Usage
+Booting up \Exedra\Application
 ======
-Let's try below out! Just some nested routing, and stacked middleware going on!
+At the end of this file, this is how your sample project directory may look like :
 ~~~
-require_once 'vendor/autoload.php'; // or just require exedra wherever u can find it
-$exedra = new \Exedra\Exedra(__DIR__);
-$app = $exedra->build('App');
-$app->mapFactory->useConvenientRouting();
+App
+  app.php
+public
+  index.php
+vendor
+wizard
+composer.json
+composer.lock
+~~~
+#### /App/app.php
+You can write up the boot file anywhere. But there're several directory config paths required to be configured.
+Create a simple boot file named **app.php** under App.
 
+And load the composer autoload accordingly. The **app.php** file should return the same \Exedra\Application instance, so it's usable for the front controller index.php, or wizard/console later.
+~~~
+require_once __DIR__.'/../vendor/autoload.php';
+
+$app = new \Exedra\Application(array(
+    'namespace' => 'App',
+    'dir.app' => __DIR__',
+    'dir.root' => __DIR__.'/../',
+    'dir.public' => __DIR__.'/../public/'
+    ));
+
+return $app;
+~~~
+Or you can code it this way :
+~~~
+$app = new \Exedra\Application(__DIR__);
+~~~
+By default it'll take the argument as the **dir.app** path, and configure the **namespace**, based on the folder name it's located in, the **dir.root** will be higher one level, and **dir.public** is configured under the **dir.root**.
+
+Now let's try some routing. In the same **app.php** file :
+~~~
 // global middleware
-$app->middleware->add(function($exe)
+$app->map->middleware(function($exe)
 {
     $exe->texts = array('You');
 
@@ -99,14 +128,33 @@ $app->map->any('/')->middleware(function($exe) // route based middleware
     });
 });
 
-$exedra->httpRequest->resolveUriPath(); // resolve uri path when you're under some deep subfolder.
-$exedra->dispatch();
+return $app;
+~~~
+
+#### /public/index.php
+Create your front controller file (**index.php**) under your public folder (**dir.public**). And require the app.php for the application instance.
+~~~
+require_once __DIR__.'/../App/app.php';
+
+$app->request->resolveUriPath();
+
+$app->dispatch();
+~~~
+
+#### /wizard
+Create a file named **wizard**, in your project root directory, or anywhere convenient to you. And require the **app.php** we created earlier.
+~~~
+$app = require_once 'App/app.php';
+
+$app->wizard($argv);
 ~~~
 
 #### Start Basic PHP Server
+execute the wizard with php :
 ~~~
-php -S localhost:9000
+php wizard
 ~~~
+and choose the serve option. it'll serve based on the **dir.public** path configured.
 
 Another Examples
 ======
@@ -129,28 +177,6 @@ $app->map->addRoutes(array(
         )
     )
 ));
-~~~
-##### Convenient routing
-~~~
-// specify the usage
-$app->mapFactory->useConvenientRouting();
-
-$app->map->any('/books')->group(function($group)
-{
-    $group->get('/')->execute('controller=Book@index');
-    
-    $group->get('tags', function($exe)
-    {
-        return 'list of tags';
-    });
-    
-    $group->any('[:id]')->group(function($group)
-    {
-        $group->get('/')->execute('controller=Book@view');
-        
-        $group->get('/authors', 'controller=Book/Author@index');
-    });
-});
 ~~~
 Some of the projects built on top of exedra :
 
