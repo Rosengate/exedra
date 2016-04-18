@@ -14,29 +14,11 @@ The first unreleased version of exedra has so much constraining ungroupable rout
 
 Installation
 ======
-### Clone
-~~~
-git clone https://github.com/rosengate/exedra project_name
-~~~
-
 ### Composer
 ===
 Install rosengate/exedra through your console, in your project folder.
 ~~~
 composer require rosengate/exedra dev-master
-~~~
-
-Or install/update manually
-~~~
-{
-    "require": {
-        "rosengate/exedra": "dev-master"
-    }
-}
-~~~
-and do 
-~~~
-composer update
 ~~~
 
 Documentation
