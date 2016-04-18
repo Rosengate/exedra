@@ -57,10 +57,11 @@ composer.json
 composer.lock
 ~~~
 #### /App/app.php
-You can write up the boot file anywhere. But there're several directory config paths required to be configured.
-Create a simple boot file named **app.php** under App.
+You can write up the boot file (**app.php**) anywhere. But there're several important directory config paths required to be configured.
 
-And load the composer autoload accordingly. The **app.php** file should return the same \Exedra\Application instance, so it's usable for the front controller index.php, or wizard/console later.
+First, create the boot file named **app.php** under App.
+
+And load the composer autoload accordingly. The **app.php** file should return the same \Exedra\Application instance, so it's usable for the front controller index.php, or wizard (console) later.
 ~~~
 require_once __DIR__.'/../vendor/autoload.php';
 
@@ -75,54 +76,73 @@ return $app;
 ~~~
 Or you can code it this way :
 ~~~
+require_once __DIR__.'/../vendor/autoload.php';
+
 $app = new \Exedra\Application(__DIR__);
+
+return $app;
 ~~~
 By default it'll take the argument as the **dir.app** path, and configure the **namespace**, based on the folder name it's located in, the **dir.root** will be higher one level, and **dir.public** is configured under the **dir.root**.
 
-Now let's try some routing. In the same **app.php** file :
+Now, in the same **app.php** let's write some nestful chatting api codes :
 ~~~
 // global middleware
 $app->map->middleware(function($exe)
 {
-    $exe->texts = array('You');
-
     return $exe->next($exe);
 });
 
-$app->map->any('/')->middleware(function($exe) // route based middleware
-{
-    $exe->texts[] = 'are';
+// or specify by class name
+$app->map->middleware(\App\Middleware\All::CLASS);
 
-    return $exe->next($exe);
-    
-})->group(function($group)
+$app->map->any('/api')->middleware(\App\Middleware\Api::CLASS)->group(function($api)
 {
-    $group->any('/members')->group(function($group)
+    // or inversely, you can register the middleware into the current route, through this level.
+    $api->middleware(\App\Middleware\ApiAuth::CLASS);
+    
+    $api->any('/users')->group(function(users)
     {
-        $group->get('/')->execute('controller=Member@index');
+        // create new user
+        // POST /api/users
+        $users->post('/')->execute(function($exe)
+        {
+            
+        });
         
-        $group->get('/[:id]')->execute('controller=Member@view');
+        // GET /api/users/[:id]
+        $users->get('/[:id]')->execute(function($exe)
+        {
+            return $exe->param('id');
+        });
     });
     
-    $group->get('/')->middleware(function($exe)
+    $api->any('/channels')->group(function($channels)
     {
-        $exe->texts[] = 'definitely';
-
-        return $exe->next($exe);
-
-    })->group(function($group)
-    {
-        $group->get('/')->middleware(function($exe)
+        // create new channel
+        // POST /api/channels
+        $channels->post('/')->execute(function($exe)
         {
-            $exe->texts[] = 'here!';
-
-            return $exe->next($exe);
-
-        })->group(function($group)
+            
+        });
+        
+        // GET /api/channels
+        $channels->get('/')->execute(function($exe)
         {
-            $group->get('/')->execute(function($exe)
+        
+        });
+        
+        $channels->get('/[:id]')->group(function($channel)
+        {
+            // GET /api/channels/:id
+            $channel->get('/')->execute(function()
             {
-                return implode(' ', $exe->texts);
+                
+            });
+            
+            // POST /api/channels/:id/join
+            $channel->post('/join')->execute(function()
+            {
+            
             });
         });
     });
@@ -132,9 +152,9 @@ return $app;
 ~~~
 
 #### /public/index.php
-Create your front controller file (**index.php**) under your public folder (**dir.public**). And require the app.php for the application instance.
+Create your front controller file (**index.php**) under your public folder (**dir.public**). And require the **app.php** file;
 ~~~
-require_once __DIR__.'/../App/app.php';
+$app = require_once __DIR__.'/../App/app.php';
 
 $app->request->resolveUriPath();
 
@@ -142,9 +162,9 @@ $app->dispatch();
 ~~~
 
 #### /wizard
-Create a file named **wizard**, in your project root directory, or anywhere convenient to you. And require the **app.php** we created earlier.
+Create a file named **wizard**, in your project root directory, or anywhere convenient to you. And require the **app.php** again.
 ~~~
-$app = require_once 'App/app.php';
+$app = require_once __DIR__.'/App/app.php';
 
 $app->wizard($argv);
 ~~~
@@ -170,7 +190,7 @@ $app->map->addRoutes(array(
                 'execute' => 'controller=Book@List',
             'view' => array(
                 'uri' => '[:id]',
-                'method' => 'get',
+                'method' => 'GET',
                 'execute' => ''controller=Book@View'
                 )
             )
