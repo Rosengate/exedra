@@ -71,16 +71,19 @@ class Application extends Container
 		foreach($params as $key => $value)
 			$this->config->set($key, $value);
 
+		// root will be one level higher
 		if(!isset($params['dir.root']))
 			$this->config->set('dir.root', $params['dir.app'].'/..');
 
+		// by default, set public dir on one level higher
 		if(!isset($params['dir.public']))
 			$this->config->set('dir.public', $params['dir.app'].'/../public');
 
+		// take namespace from folder name
 		if(!isset($params['namespace']))
 		{
-			$paths = explode('/', $params['dir.app']);
-			$this->config->set('namespace', end($paths));
+			$paths = explode('/', str_replace('\\', '/', $params['dir.app']));
+			$this->config->set('namespace', ucwords(end($paths)));
 		}
 	}
 
