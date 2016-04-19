@@ -291,9 +291,29 @@ class Application extends \Exedra\Application\Container
 
 		$exe = $this->execute($request);
 
-		$exe->response->sendHeader();
+		$body = $exe->response->getBody();
 
-		echo $exe->response->getBody();
+		$response = $exe->response;
+		
+		// recursively check if body is truly not another execution instance
+		// if it is, retrieve both true body and http response, until the final
+		while(true)
+		{
+			if($body instanceof \Exedra\Application\Execution\Exec)
+			{
+				$response = $body->response;
+
+				$body = $body->response->getBody();
+			}
+			else
+			{
+				break;
+			}
+		}
+
+		$response->sendHeader();
+
+		echo $body;
 	}
 
 	/**
