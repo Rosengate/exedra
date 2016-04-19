@@ -57,6 +57,10 @@ class Route
 								'handler' => 'execute',
 								'verb' => 'method');
 
+	/**
+	 * Route meta information
+	 * @var array meta
+	 */
 	protected $meta = array();
 
 	public function __construct(Level $level, $name, array $properties = array())
@@ -830,8 +834,11 @@ class Route
 	 * Get meta information
 	 * @param string key
 	 */
-	public function getMeta($key)
+	public function getMeta($key = null)
 	{
+		if(!$key)
+			return $this->meta;
+
 		return $this->meta[$key];
 	}
 

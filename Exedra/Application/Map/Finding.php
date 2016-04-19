@@ -117,13 +117,14 @@ class Finding
 			{
 				foreach($route->getProperty('middleware') as $middleware)
 					$this->middlewares[] = $middleware;
-
-				// $this->middlewares[$route->getName()] = $route->getProperty('middleware');
 			}
 
-			if($route->hasProperty('meta'))
+			$meta = $route->getMeta();
+
+			// if route has meta information
+			if(count($meta) > 0)
 			{
-				foreach($route->getProperty('meta') as $key => $value)
+				foreach($meta as $key => $value)
 					$this->meta[$key] = $value;
 			}
 
