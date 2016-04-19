@@ -1,7 +1,7 @@
 <?php
-namespace Exedra\Application\Map\Convenient;
+namespace Exedra\Application\Map;
 
-class Group extends \Exedra\Application\Map\Level
+class Convenient extends \Exedra\Application\Map\Level
 {
 	/**
 	 * Convenient route adding method
@@ -31,11 +31,6 @@ class Group extends \Exedra\Application\Map\Level
 		$this->addRoute($route);
 
 		return $route;
-	}
-
-	public function middleware($middleware)
-	{
-		return $this->setMiddleware($middleware);
 	}
 
 	public function get($path = null, $params = null)

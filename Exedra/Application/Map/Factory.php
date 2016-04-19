@@ -33,9 +33,7 @@ class Factory
 	{
 		$this->app = $app;
 
-		$this->registerBasicComponents();
-
-		$this->useConvenientRouting();
+		$this->registerRoutingComponents();
 	}
 
 	/**
@@ -64,43 +62,17 @@ class Factory
 	/**
 	 * Register basic components [Finding, ServerRequest, Exception]
 	 */
-	protected function registerBasicComponents()
+	protected function registerRoutingComponents()
 	{
 		$this->register(array(
 			'finding' => '\Exedra\Application\Map\Finding',
+			'route' => '\Exedra\Application\Map\Route',
+			'level' => '\Exedra\Application\Map\Convenient',
 			'request' => '\Exedra\HTTP\ServerRequest',
 			'exception' => '\Exception'
 			));
 
 		return $this;
-	}
-
-	/**
-	 * Register default routing components
-	 * @return self
-	 */
-	public function useDefaultRouting()
-	{
-		$this->isExplicit = true;
-
-		return $this->register(array(
-			'route' => '\Exedra\Application\Map\Route',
-			'level' => '\Exedra\Application\Map\Level'
-			));
-	}
-
-	/**
-	 * Register Convenient routing components
-	 * @return self
-	 */
-	public function useConvenientRouting()
-	{
-		$this->isExplicit = false;
-
-		return $this->register(array(
-			'route' => '\Exedra\Application\Map\Convenient\Route',
-			'level' => '\Exedra\Application\Map\Convenient\Group'
-			));
 	}
 
 	/**

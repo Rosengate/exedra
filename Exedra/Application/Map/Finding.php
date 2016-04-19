@@ -14,6 +14,11 @@ class Finding
 	public $middlewares = array();
 
 	/**
+	 * @var array meta
+	 */
+	protected $meta = array();
+
+	/**
 	 * @var array parameters
 	 */
 	public $parameters = array();
@@ -116,6 +121,12 @@ class Finding
 				// $this->middlewares[$route->getName()] = $route->getProperty('middleware');
 			}
 
+			if($route->hasProperty('meta'))
+			{
+				foreach($route->getProperty('meta') as $key => $value)
+					$this->meta[$key] = $value;
+			}
+
 			// pass conig.
 			if($route->hasProperty('config'))
 				$this->configs->set($route->getProperty('config'));
@@ -155,6 +166,24 @@ class Finding
 	public function getConfig()
 	{
 		return $this->configs;
+	}
+
+	/**
+	 * Get meta information
+	 * @param string key
+	 */
+	public function getMeta($key)
+	{
+		return $this->meta[$key];
+	}
+
+	/**
+	 * Check whether the meta information exists
+	 * @param string key
+	 */
+	public function hasMeta($key)
+	{
+		return isset($this->meta[$key]);
 	}
 
 	/**

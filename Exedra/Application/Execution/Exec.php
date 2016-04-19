@@ -264,9 +264,26 @@ class Exec extends \Exedra\Application\Container
 	 */
 	public function param($name, $default = null)
 	{
-		if(!$name) return $this->params;
-
 		return \Exedra\Functions\Arrays::hasByNotation($this->params, $name) ? \Exedra\Functions\Arrays::getByNotation($this->params, $name) : $default;
+	}
+
+	/**
+	 * Get route meta information
+	 * @param string key
+	 */
+	public function meta($key)
+	{
+		return $this->finding->getMeta($key);
+	}
+
+	/**
+	 * Check whether given meta key exists
+	 * @param string key
+	 * @return bool
+	 */
+	public function hasMeta($key)
+	{
+		return $this->finding->hasMeta($key);
 	}
 
 	/**

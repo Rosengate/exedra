@@ -47,6 +47,16 @@ class Level extends \ArrayIterator
 	}
 
 	/**
+	 * Alias to setMiddleware
+	 * @param mixed middleware
+	 * @return this
+	 */
+	public function middleware($middleware)
+	{
+		return $this->setMiddleware($middleware);
+	}
+
+	/**
 	 * Inversely add middleware on upper route
 	 * If there's this level is on the top (not route dependant), register middleware on app
 	 * @param mixed middleware

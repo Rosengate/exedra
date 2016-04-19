@@ -99,11 +99,9 @@ class Application extends \Exedra\Application\Container
 	protected function initiateProperties()
 	{
 		// create application structure and loader
-		$this->structure = new \Exedra\Application\Structure\Structure();
+		$this->structure = new \Exedra\Application\Structure\Structure;
 
 		$this->loader = new \Exedra\Loader($this->getDir(), $this->structure);
-		
-		$this->mapFactory = new \Exedra\Application\Map\Factory($this);
 	}
 
 	/**
@@ -114,10 +112,10 @@ class Application extends \Exedra\Application\Container
 		$app = $this;
 
 		$this->dependencies['services'] = array(
+			'mapFactory' => function(){ return new \Exedra\Application\Map\Factory($this);},
 			'registry'=> array('\Exedra\Application\Registry', array($this)),
-			'request' => function(){return \Exedra\HTTP\ServerRequest::createFromGlobals();},
-			// 'response' => function(){return \Exedra\Application\Execution\Response::createEmptyResponse();},
-			"map"=> function() use($app) { return $app->mapFactory->createLevel();},
+			'request' => function(){ return \Exedra\HTTP\ServerRequest::createFromGlobals();},
+			"map"=> function() { return $this->mapFactory->createLevel();},
 			"url" => array("\Exedra\Application\Builder\Url", array($this)),
 			"config"=> array("\Exedra\Application\Config"),
 			"session"=> array("\Exedra\Application\Session\Session"),

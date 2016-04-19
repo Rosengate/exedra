@@ -53,8 +53,11 @@ class Route
 	protected static $aliases = array(
 								'bind:middleware' => 'middleware',
 								'uri' => 'path',
+								'group' => 'subroutes',
 								'handler' => 'execute',
 								'verb' => 'method');
+
+	protected $meta = array();
 
 	public function __construct(Level $level, $name, array $properties = array())
 	{
@@ -577,6 +580,10 @@ class Route
 		return isset($this->properties['execute']);
 	}
 
+	/**
+	 * Set route name
+	 * @param string name
+	 */
 	public function setName($name)
 	{
 		$this->name = $name;
@@ -584,9 +591,35 @@ class Route
 		return $this;
 	}
 
+	/**
+	 * Alias to setName
+	 * @param string name
+	 */
+	public function name($name)
+	{
+		$this->name = $name;
+
+		return $this;
+	}
+
+	/**
+	 * Set base route
+	 */
 	public function setBase($baseRoute)
 	{
 		$this->setProperty('base', $baseRoute);
+		
+		return $this;
+	}
+
+	/**
+	 * Alias to setBase
+	 * @param string baseRoute
+	 */
+	public function base($baseRoute)
+	{
+		$this->setProperty('base', $baseRoute);
+
 		return $this;
 	}
 
@@ -603,6 +636,15 @@ class Route
 		$this->setProperty('path', $path);
 
 		return $this;
+	}
+
+	/**
+	 * Alias to setPath
+	 * @param string path
+	 */
+	public function path($path)
+	{
+		return $this->setPath($path);
 	}
 
 	/**
@@ -623,12 +665,30 @@ class Route
 	}
 
 	/**
-	 * Set config for this route.
-	 * @param array value
+	 * Alias to setMethod
+	 * @param string method
 	 */
-	public function setConfig(array $value)
+	public function method($method)
 	{
-		return $this->setProperty('config', $value);
+		return $this->setMethod($method);
+	}
+
+	/**
+	 * Set config for this route.
+	 * @param array config
+	 */
+	public function setConfig(array $config)
+	{
+		return $this->setProperty('config', $config);
+	}
+
+	/**
+	 * Alias to setConfig
+	 * @param array config
+	 */
+	public function config(array $config)
+	{
+		return $this->setProperty('config', $config);
 	}
 
 	/**
@@ -638,16 +698,37 @@ class Route
 	public function setExecute($execute)
 	{
 		$this->setProperty('execute', $execute);
+	
+		return $this;
+	}
+
+	/**
+	 * Alias to setExecute
+	 * @param mixed execute
+	 */
+	public function execute($execute)
+	{
+		$this->setProperty('execute', $execute);
+	
 		return $this;
 	}
 
 	/**
 	 * Add new level on for this route.
-	 * @param array or pattern subroutes
+	 * @param array|string|callback
 	 */
 	public function setSubroutes($subroutes)
 	{
 		// only create Level if the argument is array. else, just save the pattern.
+		return $this->setProperty('subroutes', $subroutes);
+	}
+
+	/**
+	 * Alias to setSubroutes
+	 * @param array|string|callback
+	 */
+	public function group($subroutes)
+	{
 		return $this->setProperty('subroutes', $subroutes);
 	}
 
@@ -686,6 +767,15 @@ class Route
 	}
 
 	/**
+	 * Alias to setMiddleware
+	 * @param mixed middleware handler
+	 */
+	public function middleware($middleware)
+	{
+		return $this->setMiddleware($middleware);
+	}
+
+	/**
 	 * Set module under this route.
 	 * @param string module
 	 */
@@ -701,6 +791,48 @@ class Route
 	public function setTag($tag)
 	{
 		return $this->setProperty('tag', $tag);
+	}
+
+	/**
+	 * Alias to setTag
+	 * @param string tag
+	 */
+	public function tag($tag)
+	{
+		return $this->setProperty('tag', $tag);
+	}
+
+	/**
+	 * Set meta information
+	 * @param string key
+	 * @param mixed value
+	 */
+	public function setMeta($key, $value)
+	{
+		$this->meta[$key] = $value;
+
+		return $this;
+	}
+
+	/**
+	 * Alias to meta information
+	 * @param string key
+	 * @param mixed value
+	 */
+	public function meta($key, $value)
+	{
+		$this->meta[$key] = $value;
+
+		return $this;
+	}
+
+	/**
+	 * Get meta information
+	 * @param string key
+	 */
+	public function getMeta($key)
+	{
+		return $this->meta[$key];
 	}
 
 	/**
