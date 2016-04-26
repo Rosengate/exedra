@@ -113,7 +113,7 @@ class ServerRequest extends Message
 			Stream::createFromContents(file_get_contents('php://input')),
 			$server,
 			$_COOKIE,
-			uploadedFile::createFromGlobals($_FILES),
+			UploadedFile::createFromGlobals($_FILES),
 			$_GET,
 			$_POST
 		);
