@@ -18,13 +18,13 @@ class Exedra
 
 	/**
 	 * The original HTTP Request object.
-	 * @var \Exedra\HTTP\Request
+	 * @var \Exedra\Http\Request
 	 */
 	public $httpRequest;
 
 	/**
 	 * The original HTTP Response object (more likely a service object)
-	 * @var \Exedra\HTTP\Response
+	 * @var \Exedra\Http\Response
 	 */
 	public $httpResponse;
 
@@ -38,7 +38,7 @@ class Exedra
 
 	protected $sourceDir;
 
-	public function __construct($baseDir, \Exedra\HTTP\Request $request = null)
+	public function __construct($baseDir, \Exedra\Http\Request $request = null)
 	{
 		$this->loader = new Loader($baseDir);
 		
@@ -48,8 +48,8 @@ class Exedra
 		$this->loader->registerAutoload($this->sourceDir, 'Exedra', false);
 
 		// create http request and response.
-		// $this->httpRequest	= $request ? : (isset($_SERVER['REQUEST_URI']) ? \Exedra\HTTP\ServerRequest::createFromGlobals() : null);
-		// $this->httpResponse = \Exedra\HTTP\Response::createEmptyResponse();
+		// $this->httpRequest	= $request ? : (isset($_SERVER['REQUEST_URI']) ? \Exedra\Http\ServerRequest::createFromGlobals() : null);
+		// $this->httpResponse = \Exedra\Http\Response::createEmptyResponse();
 
 		// baseDir
 		$this->baseDir = $baseDir;

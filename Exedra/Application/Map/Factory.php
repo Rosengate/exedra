@@ -2,7 +2,7 @@
 namespace Exedra\Application\Map;
 
 /**
- * A factory that handle the route/level/finding and http request creation
+ * A factory that handle the route/level/finding and HTTP request creation
  * This instance is injected into each level created
  */
 
@@ -68,7 +68,7 @@ class Factory
 			'finding' => '\Exedra\Application\Map\Finding',
 			'route' => '\Exedra\Application\Map\Route',
 			'level' => '\Exedra\Application\Map\Convenient',
-			'request' => '\Exedra\HTTP\ServerRequest',
+			'request' => '\Exedra\Http\ServerRequest',
 			'exception' => '\Exception'
 			));
 
@@ -169,10 +169,10 @@ class Factory
 	 * Create finding object
 	 * @param \Exedra\Application\Map\Route result's route.
 	 * @param array parameters
-	 * @param \Exedra\HTTP\Request
+	 * @param \Exedra\Http\Request
 	 * @return \Exedra\Application\Map\Finding
 	 */
-	public function createFinding(Route $route = null, array $parameters = null, \Exedra\HTTP\ServerRequest $request = null)
+	public function createFinding(Route $route = null, array $parameters = null, \Exedra\Http\ServerRequest $request = null)
 	{
 		return $this->create('finding', array($route, $parameters, $request, $this->app->config));
 		return new Finding($route, $parameters, $request);
@@ -180,13 +180,13 @@ class Factory
 
 	/**
 	 * Create request required by map-routing related matters.
-	 * @return \Exedra\HTTP\Request
+	 * @return \Exedra\Http\Request
 	 */
 	public function createRequest(array $query = array())
 	{
-		return \Exedra\HTTP\ServerRequest::createFromArray($query);
+		return \Exedra\Http\ServerRequest::createFromArray($query);
 		return $this->create('request', array($query));
-		return new \Exedra\HTTP\ServerRequest($query);
+		return new \Exedra\Http\ServerRequest($query);
 	}
 
 	public function throwException($message)

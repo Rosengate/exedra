@@ -274,11 +274,11 @@ class Route
 
 	/**
 	 * Validate uri path against the request
-	 * @param \Exedra\HTTP\Request request
+	 * @param \Exedra\Http\Request request
 	 * @param string path
 	 * @return array struct of {route, parameter, continue}
 	 */
-	public function validate(\Exedra\HTTP\ServerRequest $request, $path)
+	public function validate(\Exedra\Http\ServerRequest $request, $path)
 	{
 		// print_r($query);die;
 		foreach(array('method', 'path', 'ajax') as $key)

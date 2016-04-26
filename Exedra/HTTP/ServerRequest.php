@@ -1,5 +1,5 @@
 <?php
-namespace Exedra\HTTP;
+namespace Exedra\Http;
 
 /**
  * Implementation of both Psr\Http\Message\RequestInterface and Psr\Http\Message\ServerRequestInterface

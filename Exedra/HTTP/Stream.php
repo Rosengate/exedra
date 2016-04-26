@@ -1,5 +1,5 @@
 <?php
-namespace Exedra\HTTP;
+namespace Exedra\Http;
 
 /**
  * A placeholder for upcoming PSR-7 impementation

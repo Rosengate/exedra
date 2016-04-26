@@ -1,5 +1,5 @@
 <?php
-namespace Exedra\HTTP;
+namespace Exedra\Http;
 
 /**
  * HTTP Request interface
@@ -9,7 +9,7 @@ class Request extends Message
 {
 	/**
 	 * HTTP Request URI instance
-	 * @param \Exedra\HTTP|Uri
+	 * @param \Exedra\Http|Uri
 	 */
 	protected $uri;
 

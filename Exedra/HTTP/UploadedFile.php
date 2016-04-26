@@ -1,5 +1,5 @@
 <?php
-namespace Exedra\HTTP;
+namespace Exedra\Http;
 
 /**
  * A placeholder for upcoming PSR-7 impementation
@@ -33,7 +33,7 @@ class UploadedFile
 	}
 
 	/**
-	 * Create an array of \Exedra\HTTP\UploadedFile
+	 * Create an array of \Exedra\Http\UploadedFile
 	 * @param array files
 	 * @return array
 	 */

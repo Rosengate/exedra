@@ -1,5 +1,5 @@
 <?php
-namespace Exedra\HTTP;
+namespace Exedra\Http;
 
 class Response extends Message
 {

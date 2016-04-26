@@ -457,7 +457,7 @@ class Exec extends \Exedra\Application\Container
 	 * @param string route
 	 * @param array parameter.
 	 */
-	public function execute($route, array $parameters = array(), \Exedra\HTTP\ServerRequest $request = null)
+	public function execute($route, array $parameters = array(), \Exedra\Http\ServerRequest $request = null)
 	{
 		$route = $this->baseRoute($route);
 

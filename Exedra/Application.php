@@ -114,7 +114,7 @@ class Application extends \Exedra\Application\Container
 		$this->dependencies['services'] = array(
 			'mapFactory' => function(){ return new \Exedra\Application\Map\Factory($this);},
 			'registry'=> array('\Exedra\Application\Registry', array($this)),
-			'request' => function(){ return \Exedra\HTTP\ServerRequest::createFromGlobals();},
+			'request' => function(){ return \Exedra\Http\ServerRequest::createFromGlobals();},
 			"map"=> function() { return $this->mapFactory->createLevel();},
 			"url" => array("\Exedra\Application\Builder\Url", array($this)),
 			"config"=> array("\Exedra\Application\Config"),
@@ -183,11 +183,11 @@ class Application extends \Exedra\Application\Container
 
 	/**
 	 * Execute application
-	 * @param string|array|\Exedra\HTTP\ServerRequest query
+	 * @param string|array|\Exedra\Http\ServerRequest query
 	 * @param array parameter
 	 * @return \Exedra\Application\Execution\Exec
 	 */
-	public function execute($query, array $parameter = array(), \Exedra\HTTP\ServerRequest $request = null)
+	public function execute($query, array $parameter = array(), \Exedra\Http\ServerRequest $request = null)
 	{
 		try
 		{
@@ -196,10 +196,10 @@ class Application extends \Exedra\Application\Container
 			{
 				$finding = $this->map->findByName($query, $parameter, $request);
 			}
-			// expect it either \Exedra\HTTP\ServerRequest or array
+			// expect it either \Exedra\Http\ServerRequest or array
 			else
 			{
-				if($query instanceof \Exedra\HTTP\ServerRequest)
+				if($query instanceof \Exedra\Http\ServerRequest)
 				{
 					$request = $query;
 				}
@@ -209,8 +209,8 @@ class Application extends \Exedra\Application\Container
 					$query = array();
 					\Exedra\Functions\Arrays::initiateByNotation($query, $data);
 					
-					$request = \Exedra\HTTP\ServerRequest::createFromArray($query);
-					// $request = new \Exedra\HTTP\ServerRequest($query);
+					$request = \Exedra\Http\ServerRequest::createFromArray($query);
+					// $request = new \Exedra\Http\ServerRequest($query);
 				}
 
 				// \Exedra\Application\Map\Finding
@@ -282,10 +282,10 @@ class Application extends \Exedra\Application\Container
 	}
 
 	/**
-	 * Individually dispatch this application with the given HTTP request
-	 * @return \Exedra\HTTP\Response ?
+	 * Individually dispatch this application with the given Http request
+	 * @return \Exedra\Http\Response ?
 	 */
-	public function dispatch(\Exedra\HTTP\ServerRequest $request = null)
+	public function dispatch(\Exedra\Http\ServerRequest $request = null)
 	{
 		$request = $request ? : $this->request;
 
@@ -334,12 +334,12 @@ class Application extends \Exedra\Application\Container
 	 */
 	protected function throwFailedExecution(\Exedra\Application\Map\Finding $finding, $query, array $parameter = array())
 	{
-		if($HTTPrequest = $finding->request)
+		if($httpRequest = $finding->request)
 		{
 			$msg = 'Querying Request :'."\n";
-			$msg .= 'Method : '.strtoupper($HTTPrequest->getMethod())."\n";
-			$msg .= 'Request Path : '.$HTTPrequest->getUri()->getPath()."\n";
-			$msg .= 'Ajax : '.($HTTPrequest->isAjax() ? 'ya' : 'no');
+			$msg .= 'Method : '.strtoupper($httpRequest->getMethod())."\n";
+			$msg .= 'Request Path : '.$httpRequest->getUri()->getPath()."\n";
+			$msg .= 'Ajax : '.($httpRequest->isAjax() ? 'ya' : 'no');
 		}
 		else
 		{

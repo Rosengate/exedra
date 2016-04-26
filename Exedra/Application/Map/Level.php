@@ -125,17 +125,17 @@ class Level extends \ArrayIterator
 	}
 
 	/**
-	 * Make a finding by \Exedra\HTTP\Request or array
-	 * @param \Exedra\HTTP\Request
+	 * Make a finding by \Exedra\Http\Request or array
+	 * @param \Exedra\Http\Request
 	 * @return \Exedra\Application\Map\Finding
 	 */
 	public function find($request)
 	{
-		if(!($request instanceof \Exedra\HTTP\ServerRequest))
+		if(!($request instanceof \Exedra\Http\ServerRequest))
 			if(is_array($request))
 				$request = $this->factory->createRequest($request);
 			else
-				return $this->factory->throwException('Argument for map::find() must be either array or \Exedra\HTTP\Request');
+				return $this->factory->throwException('Argument for map::find() must be either array or \Exedra\Http\Request');
 
 		$result = $this->findRouteByRequest($request, trim($request->getUri()->getPath(), '/'));
 
@@ -146,10 +146,10 @@ class Level extends \ArrayIterator
 	 * Make a finding by given absolute name
 	 * @param string name.
 	 * @param array parameters
-	 * @param \Exedra\HTTP\ServerRequest request forwarded request, for this Finding
+	 * @param \Exedra\Http\ServerRequest request forwarded request, for this Finding
 	 * @return \Exedra\Application\Map\Finding
 	 */
-	public function findByName($name, array $parameters = array(), \Exedra\HTTP\ServerRequest $request = null)
+	public function findByName($name, array $parameters = array(), \Exedra\Http\ServerRequest $request = null)
 	{
 		$route = $this->findRoute($name);
 
@@ -274,7 +274,7 @@ class Level extends \ArrayIterator
 	 * @param array passedParameters - highly otional.
 	 * @return array {route: \Exedra\Application\Map\Route|false, parameter: array}
 	 */
-	public function findRouteByRequest(\Exedra\HTTP\ServerRequest $request, $levelUriPath, array $passedParameters = array())
+	public function findRouteByRequest(\Exedra\Http\ServerRequest $request, $levelUriPath, array $passedParameters = array())
 	{
 		$this->rewind();
 

@@ -37,7 +37,7 @@ class Finding
 
 	/**
 	 * Request instance
-	 * @var \Exedra\HTTP\Request|null
+	 * @var \Exedra\Http\Request|null
 	 */
 	public $request = null;
 
@@ -50,7 +50,7 @@ class Finding
 	 * @param \Exedra\Application\Map\Route or null
 	 * @param array parameters
 	 */
-	public function __construct(\Exedra\Application\Map\Route $route = null, array $parameters = array(), \Exedra\HTTP\ServerRequest $request = null, \Exedra\Application\Config $config)
+	public function __construct(\Exedra\Application\Map\Route $route = null, array $parameters = array(), \Exedra\Http\ServerRequest $request = null, \Exedra\Application\Config $config)
 	{
 		$this->route = $route;
 		$this->request = $request;
@@ -206,8 +206,8 @@ class Finding
 	}
 
 	/**
-	 * Get HTTP request found along with the finding
-	 * @return \Exedra\HTTP\ServerRequest
+	 * Get Http request found along with the finding
+	 * @return \Exedra\Http\ServerRequest
 	 */
 	public function getRequest()
 	{

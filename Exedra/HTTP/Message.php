@@ -1,5 +1,5 @@
 <?php
-namespace Exedra\HTTP;
+namespace Exedra\Http;
 
 /**
  * A placeholder for upcoming PSR-7 impementation
@@ -24,7 +24,7 @@ class Message
 
 	/**
 	 * Stream
-	 * @param \Exedra\HTTP\Stream
+	 * @param \Exedra\Http\Stream
 	 */
 	protected $body;
 
@@ -130,7 +130,7 @@ class Message
 	}
 
 	/**
-	 * @return \Exedra\HTTP\Stream
+	 * @return \Exedra\Http\Stream
 	 */
 	public function getBody()
 	{
