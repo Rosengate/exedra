@@ -2,9 +2,8 @@
 namespace Exedra\Application\Builder;
 
 /**
- * A Route Oriented Url builder.
+ * A route oriented url generator
  */
-
 class Url
 {
 	/**
@@ -42,6 +41,17 @@ class Url
 	}
 
 	/**
+	 * Get previous url (referer)
+	 * @return string
+	 */
+	public function previous()
+	{
+		$referer = $this->app->request->getHeaderLine('referer');
+
+		return $referer ? : false;
+	}
+
+	/**
 	 * Get url prefixed with $baseUrl
 	 * @param string path (optional)
 	 * @return string
@@ -49,6 +59,16 @@ class Url
 	public function base($path = null)
 	{
 		return ($this->baseUrl ? rtrim($this->baseUrl, '/' ).'/' : '/').($path ? trim($path, '/') : '');
+	}
+
+	/**
+	 * Alias to base()
+	 * @param string path
+	 * @return string
+	 */
+	public function to($path = null)
+	{
+		return $this->base($path);
 	}
 
 	/**
@@ -110,5 +130,16 @@ class Url
 		// return ($this->baseUrl ? trim($this->baseUrl, '/') .'/'. $uri : $uri) . ($query ? '?'. $query : null);
 		return $this->base($path).($query ? '?'.$query : null);
 		// return ($this->baseUrl ? trim($this->baseUrl, '/') .'/'. $uri : '/'.$uri) . ($query ? '?'. $query : null);
+	}
+
+	/**
+	 * Alias to create()
+	 * @param string routename
+	 * @param array data
+	 * @param array query
+	 */
+	public function route($routeName, array $data = array(), array $query = array())
+	{
+		return $this->create($routeName, $data, $query);
 	}
 }
