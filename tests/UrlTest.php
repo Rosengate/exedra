@@ -36,10 +36,13 @@ class UrlTest extends PHPUnit_Framework_TestCase
 
 	public function testCurrent()
 	{
-		$this->app->request = \Exedra\Http\ServerRequest::createFromArray(array(
+		$this->app['services']['request'] = function()
+		{
+			return \Exedra\Http\ServerRequest::createFromArray(array(
 			'method' => 'GET',
 			'uri' => 'http://example.com/hello/world'
 			));
+		};
 
 		$this->assertEquals('http://example.com/hello/world', $this->app->url->current());
 	}
@@ -63,6 +66,11 @@ class UrlTest extends PHPUnit_Framework_TestCase
 			'app.url' => 'http://example.com/foo',
 			'asset.url' => 'http://example.com/foo/assets'
 			));
+
+		$this->app['services']['request'] = function()
+		{
+			return null;
+		};
 
 		$this->assertEquals('http://example.com/foo/bar/baz', $this->app->url->base('bar/baz'));
 		
