@@ -103,7 +103,7 @@ class Exec extends \Exedra\Application\Container
 			"middleware"=> array("\Exedra\Application\Builder\Middleware", array($this)),
 			// "url"=> array("\Exedra\Application\Execution\Builder\Url", array($this)),
 			'url' => function(){ return new \Exedra\Application\Execution\Builder\Url($this->app->map, $this->request, $this->config, $this);},
-			"validator"=> array("\Exedra\Application\Utilities\Validator"),
+			// "validator"=> array("\Exedra\Application\Utilities\Validator"),
 			"flash"=> function() {return new \Exedra\Application\Session\Flash($this->app->session);},
 			"redirect"=> array("\Exedra\Application\Execution\Redirect", array($this)),
 			"exception"=> array("\Exedra\Application\Execution\Builder\Exception", array($this)),
