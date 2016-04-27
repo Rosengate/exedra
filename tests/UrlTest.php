@@ -18,7 +18,7 @@ class UrlTest extends PHPUnit_Framework_TestCase
 			'tester'=>['uri'=> 'tester/[:route]', 'execute'=>function($exe)
 				{
 					$params = $exe->param('params') ? : array();
-					return $exe->url->create($exe->param('route'), $params);
+					return $exe->url->route($exe->param('route'), $params);
 				}],
 			'r1'=>['uri'=> 'uri1/uri2', 'execute'=>function(){ }],
 			'r2'=>['uri'=> 'uri1/[:param]', 'execute'=>function(){ }]
@@ -32,6 +32,43 @@ class UrlTest extends PHPUnit_Framework_TestCase
 				'route'=> 'r2',
 				'params'=> array('param'=> 'simple-param'))
 				)->response->getBody());
+	}
+
+	public function testCurrent()
+	{
+		$this->app->request = \Exedra\Http\ServerRequest::createFromArray(array(
+			'method' => 'GET',
+			'uri' => 'http://example.com/hello/world'
+			));
+
+		$this->assertEquals('http://example.com/hello/world', $this->app->url->current());
+	}
+
+	/*public function testPrevious()
+	{
+		$this->app->request = \Exedra\Http\ServerRequest::createFromArray(array(
+			'method' => 'GET',
+			'uri' => 'http://example.com/hello/world',
+			'headers' => array(
+				'referer' => 'http://example.com/previous'
+				)
+			));
+
+		echo $this->app->request->getHeaderLine('referer');
+	}*/
+
+	public function testBaseAndAsset()
+	{
+		$this->app->config->set(array(
+			'app.url' => 'http://example.com/foo',
+			'asset.url' => 'http://example.com/foo/assets'
+			));
+
+		$this->assertEquals('http://example.com/foo/bar/baz', $this->app->url->base('bar/baz'));
+		
+		$this->assertEquals('http://example.com/foo/bar/baz', $this->app->url->to('bar/baz'));
+
+		$this->assertEquals('http://example.com/foo/assets/bazt', $this->app->url->asset('bazt'));
 	}
 }
 

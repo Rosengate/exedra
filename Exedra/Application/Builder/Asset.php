@@ -4,15 +4,10 @@ namespace Exedra\Application\Builder;
 class Asset
 {
 	/**
-	 * @var \Exedra\Application\Execution\Exec
-	 */
-	protected $exe;
-
-	/**
-	 * Whether the asset can create by the given \Closure or not.
+	 * Whether asset is persistable on creation or not
 	 * @var boolean
 	 */
-	protected $createEnabled;
+	protected $persistable = false;
 
 	/**
 	 * Base path for where exedra may look for it at.
@@ -20,25 +15,35 @@ class Asset
 	 */
 	protected $basePath;
 
+	/**
+	 * Asset configuration
+	 * @var array config
+	 */
+	protected $config;
+
 	protected $assetPaths = array();
 
-	public function __construct(\Exedra\Application\Execution\Exec $exe)
+	public function __construct(\Exedra\Application\Builder\Url $urlBuilder, $basePath, array $config = array())
 	{
-		$this->exe = $exe;
+		$this->urlBuilder = $urlBuilder;
+
+		$this->config = $config;
 
 		$this->initialize();
+
+		$this->setBasePath($basePath);
 	}
 
 	protected function initialize()
 	{
-		$configAsset = array_merge($this->exe->app->config->get('asset', array()), $this->exe->config->get('asset', array()));
+		$configAsset = $this->config->get('asset');
 
 		foreach($configAsset as $key => $value)
 		{
 			switch($key)
 			{
-				case 'enable_create':
-				$this->enableCreate($value);
+				case 'persistable':
+				$this->setPersistable($value);
 				break;
 				case 'base_path':
 				$this->setBasePath($value);
@@ -54,25 +59,24 @@ class Asset
 	}
 
 	/**
-	 * @return string of Exedra very base directory.
+	 * Get builder base path
+	 * @return string 
 	 */
-	public function getBaseDir()
+	public function getBasePath()
 	{
-		return $this->exe->getApp()->getRootDir();
-		// return $this->exe->app->exedra->getBaseDir();
+		return $this->basePath;
 	}
 
 	/**
 	 * Set base path for this builder. All assets built will be based on this path.
 	 * @param string path
-	 * @param boolean absoluteness of path given
+	 * @param bool absoluteness of path given
 	 * @return this
 	 */
 	public function setBasePath($path, $absolute = false)
 	{
 		if(!$absolute)
 		{
-			// $root = $this->exe->app->exedra->getBaseDir();
 			$root = $this->exe->getApp()->getRootDir();
 
 			$this->basePath = $root.DIRECTORY_SEPARATOR.$path;
@@ -89,9 +93,9 @@ class Asset
 	 * Enable file creation.
 	 * @param boolean
 	 */
-	public function enableCreate($bool)
+	public function setPersistable($bool)
 	{
-		$this->createEnabled = $bool;
+		$this->persistable = $bool;
 	}
 
 	/**
@@ -134,10 +138,12 @@ class Asset
 	public function js($filename)
 	{
 		$ds = DIRECTORY_SEPARATOR;
+
 		$filename = (isset($this->assetPaths['js']) ? $this->assetPaths['js'].'/' : '').$filename;
+		
 		$filepath = $this->refinePath($this->basePath.$ds.$filename);
 
-		return new Blueprint\Asset($this->exe, 'js', $filepath, $filename, $this->createEnabled);
+		return new Blueprint\Asset($this->urlBuilder, 'js', $filepath, $filename, $this->persistable);
 	}
 
 	/**
@@ -148,9 +154,11 @@ class Asset
 	public function css($filename)
 	{
 		$ds = DIRECTORY_SEPARATOR;
+		
 		$filename = (isset($this->assetPaths['css']) ? $this->assetPaths['css'].'/' : '').$filename;
+		
 		$filepath = $this->refinePath($this->basePath.$ds.$filename);
 
-		return new Blueprint\Asset($this->exe, 'css', $filepath, $filename, $this->createEnabled);
+		return new Blueprint\Asset($this->urlBuilder, 'css', $filepath, $filename, $this->persistable);
 	}
 }

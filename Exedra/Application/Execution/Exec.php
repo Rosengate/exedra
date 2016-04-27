@@ -84,6 +84,8 @@ class Exec extends \Exedra\Application\Container
 		$this->config = $this->finding->getConfig();
 		$this->setBaseRoute($this->finding->getBaseRoute());
 		\Exedra\Functions\Arrays::initiateByNotation($this->params, $this->finding->param());
+		$this->request = $this->finding->getRequest();
+		$this->response = \Exedra\Application\Execution\Response::createEmptyResponse();
 	}
 
 	/**
@@ -94,29 +96,24 @@ class Exec extends \Exedra\Application\Container
 		$app = $this->app;
 		$exe = $this;
 
-		// $httpRequest = $this->finding->request ? : $this->app->request;
-		$httpRequest = $this->finding->getRequest();
-		$httpResponse = \Exedra\Application\Execution\Response::createEmptyResponse();
-
 		$this->dependencies['services'] = array(
 			"controller"=> array("\Exedra\Application\Builder\Controller", array($this)),
 			// "view"=> array("\Exedra\Application\Builder\View", array($this->exception, $this->loader)),
-			"view" => function() use($exe) {return new \Exedra\Application\Builder\View($exe->exception, $exe->loader);},
+			"view" => function() {return new \Exedra\Application\Builder\View($this->exception, $this->loader);},
 			"middleware"=> array("\Exedra\Application\Builder\Middleware", array($this)),
-			"url"=> array("\Exedra\Application\Execution\Builder\Url", array($this)),
-			// "request" => $this->finding->request ? : $this->app->request, // use finding based request if found, else, use the original http request one.
-			'request' => $httpRequest,
-			'response' => $httpResponse,
+			// "url"=> array("\Exedra\Application\Execution\Builder\Url", array($this)),
+			'url' => function(){ return new \Exedra\Application\Execution\Builder\Url($this->app->map, $this->request, $this->config, $this);},
 			"validator"=> array("\Exedra\Application\Utilities\Validator"),
-			"flash"=> function() use($app) {return new \Exedra\Application\Session\Flash($app->session);},
+			"flash"=> function() {return new \Exedra\Application\Session\Flash($this->app->session);},
 			"redirect"=> array("\Exedra\Application\Response\Redirect", array($this)),
 			"exception"=> array("\Exedra\Application\Execution\Builder\Exception", array($this)),
 			"form"=> array("\Exedra\Application\Execution\Builder\Form", array($this)),
-			"session"=> function() use($app) {return $app->session;},
+			"session"=> function() {return $this->app->session;},
 			// "file"=> function() use($exe) {return new \Exedra\Application\Builder\File($exe->loader);},
 			// 'middlewares'=> function() use($app) {return new \Exedra\Application\Middleware\Middlewares($app->middleware);},
-			'middlewares' => function() use($app) {return $app->middleware->getMiddlewares();},
-			'asset' => array('\Exedra\Application\Builder\Asset', array($this)),
+			'middlewares' => function() {return $this->app->middleware->getMiddlewares();},
+			// 'asset' => array('\Exedra\Application\Builder\Asset', array($this)),
+			'asset' => function(){ return new \Exedra\Application\Builder\Asset($this->url, $this->app->getRootDir(), $this->config->get('asset', array()));},
 			'path' => array('\Exedra\Application\Builder\Path', array($this->loader))
 			);
 	}
@@ -323,7 +320,7 @@ class Exec extends \Exedra\Application\Container
 		else
 		{
 			if(isset($this->params[$key]))
-				$this->exception->create('The given key \''.$key.'\' has already exists.');
+				throw new \InvalidArgumentException('The given key ['.$key.'] has already exist');
 				
 			$this->params[$key] = $value;
 		}

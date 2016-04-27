@@ -7,15 +7,22 @@ class Asset
 
 	protected $type;
 
-	public function __construct(\Exedra\Application\Execution\Exec $exe, $type, $filepath, $filename)
+	protected $persistable = false;
+
+	public function __construct(\Exedra\Application\Builder\Url $urlBuilder, $type, $filepath, $filename, $persistable = false)
 	{
 		if(!in_array($type, array('js', 'css')))
-			$exe->exception->create('Only js and css be used.');
+			throw new \InvalidArgumentException('Accept only js and css');
 
-		$this->exe = $exe;
+		$this->urlBuilder = $urlBuilder;
+	
 		$this->type = $type;
+	
 		$this->filepath = $filepath;
+		
 		$this->filename = $filename;
+
+		$this->persistable = $persistable;
 	}
 
 	/**
@@ -23,7 +30,10 @@ class Asset
 	 */
 	protected function getTypeTag()
 	{
-		$typeTags = array('css' => 'style', 'js' => 'script');
+		$typeTags = array(
+			'css' => 'style',
+			'js' => 'script'
+		);
 
 		return $typeTags[$this->type];
 	}
@@ -39,23 +49,31 @@ class Asset
 		$closure();
 		$content = ob_get_clean();
 
-		// trim empty spaces and strip only <script> tags.
+		// trim empty spaces and strip only script/style tags.
 		$content = trim(preg_replace('/<\/?' . $this->getTypeTag() . '(.|\s)*?>/', '', $content));
 
 		$dirs = explode(DIRECTORY_SEPARATOR, $this->filepath);
+
 		array_pop($dirs);
+
 		$dirs = implode(DIRECTORY_SEPARATOR, $dirs);
 
 		if(!is_dir($dirs))
-		{
 			mkdir($dirs, '755', true);
-		}
 
 		// keep replacing those content
-		file_put_contents($this->filepath, $content);
-
+		$this->persist($content);
 
 		return $this;
+	}
+
+	/**
+	 * Persist something to the path
+	 * @param string content
+	 */
+	public function persist($content)
+	{
+		file_put_contents($this->filepath, $content);
 	}
 
 	/**
@@ -64,7 +82,7 @@ class Asset
 	 */
 	public function url()
 	{
-		return $this->exe->url->asset($this->filename);
+		return $this->urlBuilder->asset($this->filename);
 	}
 
 	/**
