@@ -23,7 +23,7 @@ composer require rosengate/exedra dev-master
 
 Documentation
 ===
-Documentation and the homebase for exedra is currently hosted here : http://exedra.rosengate.com.
+Documentation and the homebase for exedra is currently hosted here : http://exedra.rosengate.com (not updated)
 
 Booting up \Exedra\Application
 ======
