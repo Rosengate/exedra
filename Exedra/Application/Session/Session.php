@@ -2,7 +2,7 @@
 namespace Exedra\Application\Session;
 
 /**
- * A simple session manager based on php _SESSION (default)
+ * A simple session manager based on php native session
  */
 class Session
 {

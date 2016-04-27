@@ -1,5 +1,5 @@
 <?php
-namespace Exedra\Application\Response;
+namespace Exedra\Application\Execution;
 
 class Redirect
 {
@@ -10,12 +10,22 @@ class Redirect
 
 	/**
 	 * Redirect to url
+	 * Set header redirect to the url
 	 * @param string url
 	 * @return redirection
 	 */
-	final public function toUrl($url)
+	public function toUrl($url)
 	{
 		return $this->exe->response->redirect($url);
+	}
+
+	/**
+	 * Alias to toUrl(url)
+	 * @param string url
+	 */
+	public function url($url)
+	{
+		return $this->toUrl($url);
 	}
 
 	/**
@@ -27,16 +37,18 @@ class Redirect
 	public function flash($key, $val = null)
 	{
 		$this->exe->flash->set($key, $val);
+		
 		return $this;
 	}
 
 	/**
 	 * Refresh the page.
-	 * @return redirection
+	 * alias to \Exedra\Http\Response::refresh()
+	 * @return refresh
 	 */
-	public function refresh()
+	public function refresh($time = 0)
 	{
-		return $this->to($this->exe->getRoute(), $this->exe->params());
+		return $this->exe->response->refresh($time);
 	}
 
 	/**
@@ -45,7 +57,18 @@ class Redirect
 	 * @param array route named params
 	 * @param mixed query string
 	 */
-	public function to($route = null, $params = array(), $query = array())
+	public function to($route = null, array $params = array(), array $query = array())
+	{
+		return $this->toRoute($route, $params, $query);
+	}
+
+	/**
+	 * Alias to toRoute
+	 * @param string route
+	 * @param array route named params
+	 * @param mixed query string
+	 */
+	public function route($route = null, array $params = array(), array $query = array())
 	{
 		return $this->toRoute($route, $params, $query);
 	}

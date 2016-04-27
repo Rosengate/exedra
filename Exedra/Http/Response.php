@@ -131,7 +131,16 @@ class Response extends Message
 	 */
 	public function redirect($url)
 	{
-		$this->setHeader('location', $url);
+		$this->setHeader('Location', $url);
+	}
+
+	/**
+	 * Set Refresh header
+	 * @param int time
+	 */
+	public function refresh($time = 0)
+	{
+		$this->setHeader('Refresh', $time);
 	}
 
 	/**

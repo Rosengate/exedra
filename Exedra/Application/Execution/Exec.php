@@ -105,7 +105,7 @@ class Exec extends \Exedra\Application\Container
 			'url' => function(){ return new \Exedra\Application\Execution\Builder\Url($this->app->map, $this->request, $this->config, $this);},
 			"validator"=> array("\Exedra\Application\Utilities\Validator"),
 			"flash"=> function() {return new \Exedra\Application\Session\Flash($this->app->session);},
-			"redirect"=> array("\Exedra\Application\Response\Redirect", array($this)),
+			"redirect"=> array("\Exedra\Application\Execution\Redirect", array($this)),
 			"exception"=> array("\Exedra\Application\Execution\Builder\Exception", array($this)),
 			"form"=> array("\Exedra\Application\Execution\Builder\Form", array($this)),
 			"session"=> function() {return $this->app->session;},
