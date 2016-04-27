@@ -8,7 +8,8 @@ class Container implements \ArrayAccess
 	 */
 	protected $dependencies = array(
 		'services' => array(),
-		'callable' => array()
+		'callables' => array(),
+		'factories' => array()
 		);
 
 	/**
@@ -60,7 +61,7 @@ class Container implements \ArrayAccess
 	}
 
 	/**
-	 * Getter for services
+	 * Invoke the service and save
 	 * @param string dependency
 	 * @return this->get(dependency)
 	 */
@@ -70,14 +71,19 @@ class Container implements \ArrayAccess
 	}
 
 	/**
-	 * Invoke the registried callable
+	 * Invoke the registered callable
+	 * @param string name
+	 * @param array args
+	 * @return mixed
+	 *
+	 * @throws \InvalidArgumentException
 	 */
-	public function __call($name, $args = array())
+	public function __call($name, array $args = array())
 	{
-		if(!isset($this->dependencies['callable'][$name]))
-			throw new \Exception('Unable to find the callable registry for \''.$name.'\'');
+		if(!isset($this->dependencies['callables'][$name]))
+			throw new \InvalidArgumentException('Unable to find the callable registry for \''.$name.'\'');
 
-		$registry = $this->dependencies['callable'][$name];
+		$registry = $this->dependencies['callables'][$name];
 
 		if($registry instanceof \Closure)
 			return call_user_func_array($registry->bindTo($this), $args);
@@ -85,7 +91,44 @@ class Container implements \ArrayAccess
 		if(is_callable($registry))
 			return call_user_func_array($registry, $args);
 
-		throw new \Exception('Registry '.$name.' must be an instance of \Closure');
+		return $registry;
+	}
+
+	/**
+	 * Invoke the registered factory
+	 * @param string name
+	 * @param array args
+	 * @return mixed
+	 * 
+	 * @throws \InvalidArgumentException
+	 */
+	public function create($name, array $args = array())
+	{
+		if(!isset($this->dependencies['factories'][$name]))
+			throw new \InvalidArgumentException('Unable to find the registered factory for ['.$name.']');
+
+		$factory = $this->dependencies['factories'][$name];
+
+		if($factory instanceof \Closure)
+			return call_user_func_array($factory->bindTo($this), $args);
+
+		if(is_callable($factory))
+			return call_user_func_array($factory, $args);
+
+		throw new \InvalidArgumentException('Registered factory ['.$name.'] must be an instance of \Closure');
+	}
+
+	/**
+	 * Alias to create()
+	 * @param string name
+	 * @param array args
+	 * @return mixed
+	 *
+	 * @throws \InvalidArgumentException
+	 */
+	public function make($name, array $args = array())
+	{
+		return $this->create($name, $args);
 	}
 
 	/**
