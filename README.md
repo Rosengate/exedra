@@ -138,8 +138,6 @@ Create your front controller file (**index.php**) under your public folder (**di
 ~~~
 $app = require_once __DIR__.'/../App/app.php';
 
-$app->request->resolveUriPath();
-
 $app->dispatch();
 ~~~
 
