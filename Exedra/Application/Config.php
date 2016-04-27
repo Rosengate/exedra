@@ -1,6 +1,6 @@
 <?php namespace Exedra\Application;
 
-class Config
+class Config implements \ArrayAccess
 {
 	/**
 	 * Config storage
@@ -57,5 +57,47 @@ class Config
 	public function has($key)
 	{
 		return \Exedra\Functions\Arrays::hasByNotation($this->storage, $key);
+	}
+
+	/**
+	 * Set config through array offset
+	 * @param string key
+	 * @param mixed value
+	 */
+	public function offsetSet($key, $value)
+	{
+		$this->set($key, $value);
+	}
+
+	/**
+	 * Get config through array offset
+	 * @param string key
+	 * @return mixed
+	 */
+	public function &offsetGet($key)
+	{
+		if(!$this->has($key))
+			return null;
+
+		return \Exedra\Functions\Arrays::getReferenceByNotation($this->storage, $key);
+	}
+
+	/**
+	 * Check config existence through array offset
+	 * @param string key
+	 * @return bool
+	 */
+	public function offsetExists($key)
+	{
+		return $this->has($key);
+	}
+
+	/**
+	 * Unset config through array offset
+	 * @param string key
+	 */
+	public function offsetUnset($key)
+	{
+		\Exedra\Functions\Arrays::deleteByNotation($this->storage, $key);
 	}
 }
