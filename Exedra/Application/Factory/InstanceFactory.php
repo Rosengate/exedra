@@ -21,11 +21,14 @@ Abstract Class InstanceFactory
 	 */
 	protected $isNamespaced = true;
 
-	public function __construct(\Exedra\Application\Execution\Exec $exe, $module = null)
+	public function __construct(\Exedra\Application\Execution\Exec $exe)
 	{
 		$this->exe = $exe;
+
 		$this->loader = $exe->loader;
+		
 		$this->structure = $exe->app->structure;
+		
 		$this->module = $exe->getModule();
 
 		// if the execution instance has this config.
@@ -34,52 +37,73 @@ Abstract Class InstanceFactory
 	}
 
 	/**
+	 * Build class path
+	 * @param string class
+	 * @return string
+	 */
+	protected function buildClassPath($class)
+	{
+		$path = $this->exe->app->getBaseDir();
+
+		if($module = $this->exe->getModule())
+			$path .= '/'.$module;
+
+		$path .= '/'.$this->factoryName;
+
+		return $path . '/' .$class.'.php';
+	}
+
+	/**
+	 * Build class name
+	 * @param string class
+	 * @return string
+	 */
+	protected function buildClassName($class)
+	{
+		$className .= $this->exe->app->getNamespace();
+
+		if($module = $this->exe->getModule())
+			$className .= '\\'.$module;
+
+		$className .= '\\'.ucwords($this->factoryName);
+
+		$className .= '\\'.$class;
+
+		return $className;
+	}
+
+	/**
 	 * Create the factory
 	 * @param string className
 	 * @param array constructorParam
 	 * @return Object
 	 */
-	public function create($className, array $constructorParam = array())
+	public function create($className, array $args = array())
 	{
 		$factoryName = $this->factoryName;
 
-		## loader.
-		// $path	= $this->structure->get($factoryName,$className.".php",$this->module);
-		$path = $className.'.php';
+		// loader.
+		$path = $this->buildClassPath($className);
 
-		## Exception : file not found.
-		if(!$this->loader->has(array('structure'=> $factoryName, 'path'=> $path)))
-		{
-			$structure = $this->structure->get($factoryName);
-			$path = $this->exe->app->getBaseDir().'/'.($this->exe->getModule()?$this->exe->getModule().'/':'').$structure.'/'.$path;
-			$this->exe->exception->create("Unable to find file '".$path."' for ".$factoryName." : ".$className.($this->module?" (module : ".$this->module.")":"").".");
-		}
+		// file not found
+		if(!file_exists($path))
+			throw new \Exception($factoryName.' ['.$path.'] does not exists');
 
-		$this->loader->loadOnce(array('structure'=> $factoryName, 'path'=> $path));
+		$className = $this->buildClassName($className);
 
-		// namespace based factory.
-		if($this->isNamespaced)
-			$className = $this->exe->app->getNamespace().'\\'.($this->exe->getModule() ? $this->exe->getModule().'\\' : '' ).ucwords($factoryName).'\\'.$className;
-		else
-			$className		= $this->structure->getPattern($this->patternName,$className);
-
-		## Exception : class name not found.
+		// class name does not exists in the given path.
 		if(!class_exists($className))
-			$this->exe->exception->create("Class named '$className' does not exists in file ".$path);
+			throw new \Exception('Class named ['.$className.'] does not exists in file '.$path);
 
-		if(!is_object($className))
+		if(count($args))
 		{
-			if($constructorParam)
-			{
-				$reflection	= new \ReflectionClass($className);
-				$controller	= $reflection->newInstanceArgs($constructorParam);
-			}
-			else
-			{
-				$controller	= new $className;
-			}
+			$reflection	= new \ReflectionClass($className);
 
-			$reflection	= new \ReflectionClass($controller);
+			$controller	= $reflection->newInstanceArgs($args);
+		}
+		else
+		{
+			$controller	= new $className;
 		}
 
 		return $controller;

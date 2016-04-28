@@ -217,7 +217,7 @@ class Exec extends \Exedra\Application\Container
 	 */
 	public function hasRoute($route, array $params = array())
 	{
-		if(strpos($route, $this->app->structure->getCharacter('absolute')) === 0)
+		if(strpos($route, '@') === 0)
 			$isRoute = strpos($this->getAbsoluteRoute(), substr($route, 1)) === 0;
 		else
 			$isRoute = strpos($this->getRoute(), $route) === 0;
@@ -239,7 +239,7 @@ class Exec extends \Exedra\Application\Container
 	 */
 	public function isRoute($route, array $params = array())
 	{
-		if(strpos($route, $this->app->structure->getCharacter('absolute')) === 0)
+		if(strpos($route, '@') === 0)
 			$isRoute = $this->getAbsoluteRoute() == substr($route, 1);
 		else
 			$isRoute = $this->getRoute() == $route;
@@ -418,7 +418,7 @@ class Exec extends \Exedra\Application\Container
 	 */
 	public function baseRoute($route)
 	{
-		if(strpos($route, $this->app->structure->getCharacter('absolute')) === 0)
+		if(strpos($route, '@') === 0)
 		{
 			$route = substr($route, 1, strlen($route)-1);
 		}

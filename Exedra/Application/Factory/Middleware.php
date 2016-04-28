@@ -7,7 +7,7 @@ namespace Exedra\Application\Factory;
 
 class Middleware extends \Exedra\Application\Factory\InstanceFactory
 {
-	protected $factoryName = "middleware";
+	protected $factoryName = "Middleware";
 	
 	protected $patternName	= "middleware_name";
 
