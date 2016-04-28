@@ -1,5 +1,5 @@
 <?php
-class UrlTest extends PHPUnit_Framework_TestCase
+class FactoryUrlTest extends PHPUnit_Framework_TestCase
 {
 	public function setUp()
 	{
@@ -43,18 +43,18 @@ class UrlTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals('http://example.com/hello/world', $this->app->url->current());
 	}
 
-	/*public function testPrevious()
+	public function testPrevious()
 	{
 		$this->app->request = \Exedra\Http\ServerRequest::createFromArray(array(
 			'method' => 'GET',
 			'uri' => 'http://example.com/hello/world',
 			'headers' => array(
-				'referer' => 'http://example.com/previous'
+				'Referer' => array('http://example.com/previous')
 				)
 			));
 
-		echo $this->app->request->getHeaderLine('referer');
-	}*/
+		$this->assertEquals('http://example.com/previous', $this->app->url->previous());
+	}
 
 	public function testBaseAndAsset()
 	{
