@@ -59,7 +59,7 @@ Abstract Class InstanceBuilder
 
 		// namespace based builder.
 		if($this->isNamespaced)
-			$className = $this->exe->app->getNamespace().'\\'.($this->exe->getModule() ? $this->exe->getModule().'\\' : '' ).$builderName.'\\'.$className;
+			$className = $this->exe->app->getNamespace().'\\'.($this->exe->getModule() ? $this->exe->getModule().'\\' : '' ).ucwords($builderName).'\\'.$className;
 		else
 			$className		= $this->structure->getPattern($this->patternName,$className);
 
