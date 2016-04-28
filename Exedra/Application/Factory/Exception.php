@@ -1,8 +1,8 @@
 <?php
-namespace Exedra\Application\Builder;
+namespace Exedra\Application\Factory;
 
 /**
- * Simple application exception builder.
+ * Simple application exception factory.
  */
 class Exception
 {

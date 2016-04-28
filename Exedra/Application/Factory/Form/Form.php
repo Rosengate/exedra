@@ -1,5 +1,5 @@
 <?php
-namespace Exedra\Application\Builder\Form;
+namespace Exedra\Application\Factory\Form;
 
 class Form
 {
@@ -138,7 +138,7 @@ class Form
 	 * @param string name
 	 * @param mixed attr
 	 * @param string value
-	 * @return \Exedra\Application\Builder\Form\Input\Input
+	 * @return \Exedra\Application\Factory\Form\Input\Input
 	 */
 	protected function createInput($type, $name, $value = null, $attr = null)
 	{
@@ -168,7 +168,7 @@ class Form
 	 * @param mixed attr (optional)
 	 * @param string value (optional)
 	 * @param string first (optional)
-	 * @return \Exedra\Application\Builder\Form\Input\Select
+	 * @return \Exedra\Application\Factory\Form\Input\Select
 	 */
 	public function select($name, array $options = array(), $value = null, $attr = null, $first = null)
 	{

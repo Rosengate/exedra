@@ -2,19 +2,19 @@
 
 require_once "Exedra/Exedra.php";
 
-class BuilderPathTest extends PHPUnit_Framework_TestCase
+class FactoryPathTest extends PHPUnit_Framework_TestCase
 {
 	public function setUp()
 	{
 		$exedra = new \Exedra\Exedra(__DIR__);
 
-		$this->builderPath = new \Exedra\Application\Builder\Path($exedra->loader);
+		$this->factoryPath = new \Exedra\Application\Factory\Path($exedra->loader);
 
 	}
 
 	public function testCreate()
 	{
-		$this->testPath = $this->builderPath->create('PathTest.php');
+		$this->testPath = $this->factoryPath->create('PathTest.php');
 
 		$this->assertEquals($this->testPath, __DIR__.DIRECTORY_SEPARATOR.'PathTest.php');
 	}
@@ -23,7 +23,7 @@ class BuilderPathTest extends PHPUnit_Framework_TestCase
 	{
 		$this->testCreate();
 
-		$this->assertEquals($this->testPath instanceof \Exedra\Application\Builder\Blueprint\Path, true);
+		$this->assertEquals($this->testPath instanceof \Exedra\Application\Factory\Blueprint\Path, true);
 	}
 
 	public function testCheckExists()

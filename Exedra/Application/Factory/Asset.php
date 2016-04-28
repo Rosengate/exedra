@@ -1,5 +1,5 @@
 <?php
-namespace Exedra\Application\Builder;
+namespace Exedra\Application\Factory;
 
 class Asset
 {
@@ -23,9 +23,9 @@ class Asset
 
 	protected $assetPaths = array();
 
-	public function __construct(\Exedra\Application\Builder\Url $urlBuilder, $basePath, array $config = array())
+	public function __construct(\Exedra\Application\Factory\Url $urlFactory, $basePath, array $config = array())
 	{
-		$this->urlBuilder = $urlBuilder;
+		$this->urlFactory = $urlFactory;
 
 		$this->config = $config;
 
@@ -59,7 +59,7 @@ class Asset
 	}
 
 	/**
-	 * Get builder base path
+	 * Get factory base path
 	 * @return string 
 	 */
 	public function getBasePath()
@@ -68,7 +68,7 @@ class Asset
 	}
 
 	/**
-	 * Set base path for this builder. All assets built will be based on this path.
+	 * Set base path for this factory. All assets built will be based on this path.
 	 * @param string path
 	 * @param bool absoluteness of path given
 	 * @return this
@@ -133,7 +133,7 @@ class Asset
 	/**
 	 * Instantiate a javascript Asset 
 	 * @param string
-	 * @return \Exedra\Application\Builder\Blueprint\Asset
+	 * @return \Exedra\Application\Factory\Blueprint\Asset
 	 */
 	public function js($filename)
 	{
@@ -143,13 +143,13 @@ class Asset
 		
 		$filepath = $this->refinePath($this->basePath.$ds.$filename);
 
-		return new Blueprint\Asset($this->urlBuilder, 'js', $filepath, $filename, $this->persistable);
+		return new Blueprint\Asset($this->urlFactory, 'js', $filepath, $filename, $this->persistable);
 	}
 
 	/**
 	 * Instantiate a css asset
 	 * @param string
-	 * @return \Exedra\Application\Builder\Blueprint\Asset
+	 * @return \Exedra\Application\Factory\Blueprint\Asset
 	 */
 	public function css($filename)
 	{
@@ -159,6 +159,6 @@ class Asset
 		
 		$filepath = $this->refinePath($this->basePath.$ds.$filename);
 
-		return new Blueprint\Asset($this->urlBuilder, 'css', $filepath, $filename, $this->persistable);
+		return new Blueprint\Asset($this->urlFactory, 'css', $filepath, $filename, $this->persistable);
 	}
 }

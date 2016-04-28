@@ -1,5 +1,5 @@
 <?php
-namespace Exedra\Application\Builder\Blueprint;
+namespace Exedra\Application\Factory\Blueprint;
 
 /**
  * Simple class for object oriented based path.

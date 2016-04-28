@@ -1,17 +1,17 @@
 <?php
-namespace Exedra\Application\Builder;
+namespace Exedra\Application\Factory;
 
 /**
- * Exedra View Builder
+ * Exedra View Factory
  */
 
 class View
 {
 	/**
 	 * An Exception manager.
-	 * @var \Exedra\Application\Builder\Exception
+	 * @var \Exedra\Application\Factory\Exception
 	 */
-	protected $exceptionBuilder;
+	protected $exceptionFactory;
 	
 	/**
 	 * Intance of execution based loader.
@@ -37,10 +37,10 @@ class View
 	 */
 	protected $ext = 'php';
 
-	public function __construct(\Exedra\Application\Builder\Exception $exceptionBuilder, \Exedra\Loader $loader)
+	public function __construct(\Exedra\Application\Factory\Exception $exceptionFactory, \Exedra\Loader $loader)
 	{
 		$this->loader = $loader;
-		$this->exceptionBuilder = $exceptionBuilder;
+		$this->exceptionFactory = $exceptionFactory;
 	}
 
 	/**
@@ -55,7 +55,7 @@ class View
 
 		// $path = $this->buildPath($path);
 		if(!$this->has($path))
-			$this->exceptionBuilder->create("Unable to find view '$path'");
+			$this->exceptionFactory->create("Unable to find view '$path'");
 		
 		// append .php extension.
 		$path = $this->buildPath($path);
@@ -64,7 +64,7 @@ class View
 		if(count($this->defaultData) > 0)
 			$data = array_merge($data, $this->defaultData);
 
-		$view	= new Blueprint\View($this->exceptionBuilder, $path, $data, $this->loader);
+		$view	= new Blueprint\View($this->exceptionFactory, $path, $data, $this->loader);
 		
 		return $view;
 	}
@@ -106,7 +106,7 @@ class View
 	}
 
 	/**
-	 * Set default data for every view created through this builder.
+	 * Set default data for every view created through this factory.
 	 * @param mixed name
 	 * @param data string
 	 * @return this

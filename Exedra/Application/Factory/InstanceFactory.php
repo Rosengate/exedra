@@ -1,13 +1,13 @@
 <?php
-namespace Exedra\Application\Builder;
+namespace Exedra\Application\Factory;
 
-Abstract Class InstanceBuilder
+Abstract Class InstanceFactory
 {
 	/**
-	 * Builder name.
+	 * Factory name.
 	 * @var string
 	 */
-	protected $builderName;
+	protected $factoryName;
 
 	/**
 	 * Structure pattern to be used by \Exedra\Application\Structure\Structure
@@ -29,37 +29,37 @@ Abstract Class InstanceBuilder
 		$this->module = $exe->getModule();
 
 		// if the execution instance has this config.
-		if($exe->config->has('namespaced_builder'))
-			$this->isNamespaced = $exe->config->get('namespaced_builder');
+		if($exe->config->has('namespaced_factory'))
+			$this->isNamespaced = $exe->config->get('namespaced_factory');
 	}
 
 	/**
-	 * Create the builder
+	 * Create the factory
 	 * @param string className
 	 * @param array constructorParam
 	 * @return Object
 	 */
 	public function create($className, array $constructorParam = array())
 	{
-		$builderName = $this->builderName;
+		$factoryName = $this->factoryName;
 
 		## loader.
-		// $path	= $this->structure->get($builderName,$className.".php",$this->module);
+		// $path	= $this->structure->get($factoryName,$className.".php",$this->module);
 		$path = $className.'.php';
 
 		## Exception : file not found.
-		if(!$this->loader->has(array('structure'=> $builderName, 'path'=> $path)))
+		if(!$this->loader->has(array('structure'=> $factoryName, 'path'=> $path)))
 		{
-			$structure = $this->structure->get($builderName);
+			$structure = $this->structure->get($factoryName);
 			$path = $this->exe->app->getBaseDir().'/'.($this->exe->getModule()?$this->exe->getModule().'/':'').$structure.'/'.$path;
-			$this->exe->exception->create("Unable to find file '".$path."' for ".$builderName." : ".$className.($this->module?" (module : ".$this->module.")":"").".");
+			$this->exe->exception->create("Unable to find file '".$path."' for ".$factoryName." : ".$className.($this->module?" (module : ".$this->module.")":"").".");
 		}
 
-		$this->loader->loadOnce(array('structure'=> $builderName, 'path'=> $path));
+		$this->loader->loadOnce(array('structure'=> $factoryName, 'path'=> $path));
 
-		// namespace based builder.
+		// namespace based factory.
 		if($this->isNamespaced)
-			$className = $this->exe->app->getNamespace().'\\'.($this->exe->getModule() ? $this->exe->getModule().'\\' : '' ).ucwords($builderName).'\\'.$className;
+			$className = $this->exe->app->getNamespace().'\\'.($this->exe->getModule() ? $this->exe->getModule().'\\' : '' ).ucwords($factoryName).'\\'.$className;
 		else
 			$className		= $this->structure->getPattern($this->patternName,$className);
 

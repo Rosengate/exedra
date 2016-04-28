@@ -116,12 +116,12 @@ class Application extends \Exedra\Application\Container
 			'registry'=> array('\Exedra\Application\Registry', array($this)),
 			'request' => function(){ return \Exedra\Http\ServerRequest::createFromGlobals();},
 			"map"=> function() { return $this->mapFactory->createLevel();},
-			// "url" => array("\Exedra\Application\Builder\Url", array($this)),
-			'url' => function() { return new \Exedra\Application\Builder\Url($this->map, $this->request, $this->config);},
+			// "url" => array("\Exedra\Application\Factory\Url", array($this)),
+			'url' => function() { return new \Exedra\Application\Factory\Url($this->map, $this->request, $this->config);},
 			"config"=> array("\Exedra\Application\Config"),
 			"session"=> array("\Exedra\Application\Session\Session"),
-			"exception"=> array("\Exedra\Application\Builder\Exception", array($this)),
-			'path' => array('\Exedra\Application\Builder\Path', array($this->loader)),
+			"exception"=> array("\Exedra\Application\Factory\Exception", array($this)),
+			'path' => array('\Exedra\Application\Factory\Path', array($this->loader)),
 			'middleware' => array('\Exedra\Application\Middleware\Registry', array($this))
 			);
 	}

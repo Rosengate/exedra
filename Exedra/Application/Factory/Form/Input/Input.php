@@ -1,5 +1,5 @@
 <?php
-namespace Exedra\Application\Builder\Form\Input;
+namespace Exedra\Application\Factory\Form\Input;
 
 class Input extends Base
 {

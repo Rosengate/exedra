@@ -2,7 +2,7 @@
 
 require_once "Exedra/Exedra.php";
 
-class BuilderViewTest extends PHPUnit_Framework_TestCase
+class FactoryViewTest extends PHPUnit_Framework_TestCase
 {
 	public function setUp()
 	{
@@ -10,19 +10,19 @@ class BuilderViewTest extends PHPUnit_Framework_TestCase
 
 		$app = $exedra->build('TestApp');
 
-		$this->builderView = new \Exedra\Application\Builder\View(new \Exedra\Application\Builder\Exception($app), $app->loader);
+		$this->factoryView = new \Exedra\Application\Factory\View(new \Exedra\Application\Factory\Exception($app), $app->loader);
 	}
 
 	public function viewCreate()
 	{
-		return $this->builderView->create('TestView');
+		return $this->factoryView->create('TestView');
 	}
 
 	public function testCreate()
 	{
 		$view = $this->viewCreate();
 
-		$this->assertEquals($view instanceof \Exedra\Application\Builder\Blueprint\View, true);
+		$this->assertEquals($view instanceof \Exedra\Application\Factory\Blueprint\View, true);
 	}
 
 	public function testRender()
@@ -41,7 +41,7 @@ class BuilderViewTest extends PHPUnit_Framework_TestCase
 
 	public function testRenderWithDefaultData()
 	{
-		$this->builderView->setDefaultData('testDefaultData', 'testDefaultDataValue');
+		$this->factoryView->setDefaultData('testDefaultData', 'testDefaultDataValue');
 
 		$view = $this->viewCreate();
 

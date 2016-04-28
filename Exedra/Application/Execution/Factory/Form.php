@@ -1,7 +1,7 @@
 <?php
-namespace Exedra\Application\Execution\Builder;
+namespace Exedra\Application\Execution\Factory;
 
-class Form extends \Exedra\Application\Builder\Form\Form
+class Form extends \Exedra\Application\Factory\Form\Form
 {
 	public function __construct(\Exedra\Application\Execution\Exec $exe)
 	{

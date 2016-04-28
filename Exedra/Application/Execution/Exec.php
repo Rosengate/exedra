@@ -97,24 +97,24 @@ class Exec extends \Exedra\Application\Container
 		$exe = $this;
 
 		$this->dependencies['services'] = array(
-			"controller"=> array("\Exedra\Application\Builder\Controller", array($this)),
-			// "view"=> array("\Exedra\Application\Builder\View", array($this->exception, $this->loader)),
-			"view" => function() {return new \Exedra\Application\Builder\View($this->exception, $this->loader);},
-			"middleware"=> array("\Exedra\Application\Builder\Middleware", array($this)),
-			// "url"=> array("\Exedra\Application\Execution\Builder\Url", array($this)),
-			'url' => function(){ return new \Exedra\Application\Execution\Builder\Url($this->app->map, $this->request, $this->config, $this);},
+			"controller"=> array("\Exedra\Application\Factory\Controller", array($this)),
+			// "view"=> array("\Exedra\Application\Factory\View", array($this->exception, $this->loader)),
+			"view" => function() {return new \Exedra\Application\Factory\View($this->exception, $this->loader);},
+			"middleware"=> array("\Exedra\Application\Factory\Middleware", array($this)),
+			// "url"=> array("\Exedra\Application\Execution\Factory\Url", array($this)),
+			'url' => function(){ return new \Exedra\Application\Execution\Factory\Url($this->app->map, $this->request, $this->config, $this);},
 			// "validator"=> array("\Exedra\Application\Utilities\Validator"),
 			"flash"=> function() {return new \Exedra\Application\Session\Flash($this->app->session);},
 			"redirect"=> array("\Exedra\Application\Execution\Redirect", array($this)),
-			"exception"=> array("\Exedra\Application\Execution\Builder\Exception", array($this)),
-			"form"=> array("\Exedra\Application\Execution\Builder\Form", array($this)),
+			"exception"=> array("\Exedra\Application\Execution\Factory\Exception", array($this)),
+			"form"=> array("\Exedra\Application\Execution\Factory\Form", array($this)),
 			"session"=> function() {return $this->app->session;},
-			// "file"=> function() use($exe) {return new \Exedra\Application\Builder\File($exe->loader);},
+			// "file"=> function() use($exe) {return new \Exedra\Application\Factory\File($exe->loader);},
 			// 'middlewares'=> function() use($app) {return new \Exedra\Application\Middleware\Middlewares($app->middleware);},
 			'middlewares' => function() {return $this->app->middleware->getMiddlewares();},
-			// 'asset' => array('\Exedra\Application\Builder\Asset', array($this)),
-			'asset' => function(){ return new \Exedra\Application\Builder\Asset($this->url, $this->app->getRootDir(), $this->config->get('asset', array()));},
-			'path' => array('\Exedra\Application\Builder\Path', array($this->loader))
+			// 'asset' => array('\Exedra\Application\Factory\Asset', array($this)),
+			'asset' => function(){ return new \Exedra\Application\Factory\Asset($this->url, $this->app->getRootDir(), $this->config->get('asset', array()));},
+			'path' => array('\Exedra\Application\Factory\Path', array($this->loader))
 			);
 	}
 

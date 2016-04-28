@@ -1,5 +1,5 @@
 <?php
-namespace Exedra\Application\Builder\Blueprint;
+namespace Exedra\Application\Factory\Blueprint;
 
 class Asset
 {
@@ -9,12 +9,12 @@ class Asset
 
 	protected $persistable = false;
 
-	public function __construct(\Exedra\Application\Builder\Url $urlBuilder, $type, $filepath, $filename, $persistable = false)
+	public function __construct(\Exedra\Application\Factory\Url $urlFactory, $type, $filepath, $filename, $persistable = false)
 	{
 		if(!in_array($type, array('js', 'css')))
 			throw new \InvalidArgumentException('Accept only js and css');
 
-		$this->urlBuilder = $urlBuilder;
+		$this->urlFactory = $urlFactory;
 	
 		$this->type = $type;
 	
@@ -82,7 +82,7 @@ class Asset
 	 */
 	public function url()
 	{
-		return $this->urlBuilder->asset($this->filename);
+		return $this->urlFactory->asset($this->filename);
 	}
 
 	/**

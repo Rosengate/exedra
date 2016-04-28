@@ -1,5 +1,5 @@
 <?php
-namespace Exedra\Application\Builder\Blueprint;
+namespace Exedra\Application\Factory\Blueprint;
 
 /**
  * Blueprint for View
@@ -9,9 +9,9 @@ class View implements \ArrayAccess
 {
 	/**
 	 * An Exception manager.
-	 * @var \Exedra\Application\Builder\Exception
+	 * @var \Exedra\Application\Factory\Exception
 	 */
-	protected $exceptionBuilder;
+	protected $exceptionFactory;
 
 	/**
 	 * Path for this view.
@@ -48,9 +48,9 @@ class View implements \ArrayAccess
 	 */
 	protected $callbacks	= array();
 
-	public function __construct(\Exedra\Application\Builder\Exception $exceptionBuilder, $path = null, $data = null, \Exedra\Loader $loader)
+	public function __construct(\Exedra\Application\Factory\Exception $exceptionFactory, $path = null, $data = null, \Exedra\Loader $loader)
 	{
-		$this->exceptionBuilder = $exceptionBuilder;
+		$this->exceptionFactory = $exceptionFactory;
 		if($path) $this->setPath($path);
 		if($data) $this->set($data);
 		$this->loader = $loader;
@@ -294,10 +294,10 @@ class View implements \ArrayAccess
 	protected function isReady()
 	{
 		if($requiredArgs = $this->requirementCheck())
-			return $this->exceptionBuilder->create('View.render : Missing required argument(s) for view ("'. $this->path .'") : '. $requiredArgs .'</b>');
+			return $this->exceptionFactory->create('View.render : Missing required argument(s) for view ("'. $this->path .'") : '. $requiredArgs .'</b>');
 
 		if($this->path == null)
-			return $this->exceptionBuilder->create('View.render : path was not set (null)');
+			return $this->exceptionFactory->create('View.render : path was not set (null)');
 
 		return true;
 	}

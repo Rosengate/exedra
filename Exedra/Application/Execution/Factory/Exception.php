@@ -1,7 +1,7 @@
 <?php
-namespace Exedra\Application\Execution\Builder;
+namespace Exedra\Application\Execution\Factory;
 
-class Exception extends \Exedra\Application\Builder\Exception
+class Exception extends \Exedra\Application\Factory\Exception
 {
 	/**
 	 * @var \Exedra\Application\Execution\Exec

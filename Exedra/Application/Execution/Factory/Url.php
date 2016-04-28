@@ -1,7 +1,7 @@
 <?php
-namespace Exedra\Application\Execution\Builder;
+namespace Exedra\Application\Execution\Factory;
 
-class Url extends \Exedra\Application\Builder\Url
+class Url extends \Exedra\Application\Factory\Url
 {
 	/**
 	 * Exec instance
