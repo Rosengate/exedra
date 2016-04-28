@@ -2,11 +2,13 @@ Exédra
 ======
 A multi-tier nestful routing oriented PHP Framework.
 
-p/s : Development is still on-going. Expect some b.c. breaks.
+p/s : Development is still on-going. It's expected to reach matured state by version 0.2.5
 
 Introduction
 ======
-This PHP framework focuses mainly on nestable route mapping, route oriented based execution and which hopefully will provide much modular application execution. Route is unique, and identified by name. Imagine developing an application hierarchically down the depth without losing the identity of the executions you planned, while stacking middlewares down the path on every possible node of route.
+This PHP framework focuses mainly on nestable/groupable route mapping, route oriented based middleware/execution and which hopefully will provide much modular application execution. Route is unique, and identifiable by name, tag, queryable by Http Request. Imagine developing an application hierarchically down the depth without losing the identity of the executions you planned, while stacking middlewares down the path on every possible node of route.
+
+Imagine building a plane while flying it!
 
 History
 ======
@@ -185,15 +187,16 @@ http://github.com/rosengate/exedra-web (hosted at exedra.rosengate.com)
 Roadmap to 0.3.0
 ======
 - Adapt several PSR's styles and standards
-  - PSR-7 Message Interfaces
+  - PSR-7 Message Interfaces [DONE]
   - PSR-2 4 spaces indent ?
-- More clarity on HTTP Response
-- rename number of wrong terms used
+- More clarity on HTTP Response [DONE]
+- proper jargon renames
   - 'uri' to 'path' [DONE]
+  - builder to factory [DONE]
 - Internal Routing Improvements
 - More type of Exceptions
 - More clarity on application structure
-- Container based \Exedra\Application\Application and \Exedra\Application\Execution\Exec ?
+- Container based \Exedra\Application\Application and \Exedra\Application\Execution\Exec ? [DONE]
 - Move \Exedra\Application\Execution\ and all the related namespaces outsides ?
 - Do more tests
 
