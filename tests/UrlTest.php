@@ -1,12 +1,8 @@
 <?php
-require_once "Exedra/Exedra.php";
-
 class UrlTest extends PHPUnit_Framework_TestCase
 {
 	public function setUp()
 	{
-		$this->exedra = new \Exedra\Exedra(__DIR__);
-
 		$this->app = new \Exedra\Application(__DIR__);
 
 		$this->map = $this->app->map;

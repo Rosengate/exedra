@@ -1,12 +1,8 @@
 <?php
-require_once "Exedra/Exedra.php";
-
 class ConfigTest extends PHPUnit_Framework_TestCase
 {
 	public function setUp()
 	{
-		$exedra = new \Exedra\Exedra(__DIR__);
-		
 		$this->config = new \Exedra\Application\Config;
 	}
 

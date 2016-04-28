@@ -1,14 +1,9 @@
 <?php
-
-require_once "Exedra/Exedra.php";
-
 class FactoryViewTest extends PHPUnit_Framework_TestCase
 {
 	public function setUp()
 	{
-		$exedra = new \Exedra\Exedra(__DIR__);
-
-		$app = $exedra->build('TestApp');
+		$app = new \Exedra\Application(__DIR__.'/TestApp');
 
 		$this->factoryView = new \Exedra\Application\Factory\View(new \Exedra\Application\Factory\Exception($app), $app->loader);
 	}

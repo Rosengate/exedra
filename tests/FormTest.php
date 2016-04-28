@@ -1,6 +1,4 @@
 <?php
-require_once "Exedra/Exedra.php";
-
 class FormTest extends PHPUnit_Framework_TestCase
 {
 	public function setUp()

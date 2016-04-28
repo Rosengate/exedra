@@ -1,15 +1,11 @@
 <?php
-
-require_once "Exedra/Exedra.php";
-
 class FactoryPathTest extends PHPUnit_Framework_TestCase
 {
 	public function setUp()
 	{
-		$exedra = new \Exedra\Exedra(__DIR__);
+		$app = new \Exedra\Application(__DIR__);
 
-		$this->factoryPath = new \Exedra\Application\Factory\Path($exedra->loader);
-
+		$this->factoryPath = new \Exedra\Application\Factory\Path($app->loader);
 	}
 
 	public function testCreate()
