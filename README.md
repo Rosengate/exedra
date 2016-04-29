@@ -6,9 +6,13 @@ p/s : Development is still on-going. It's expected to reach matured state by ver
 
 Introduction
 ======
-This PHP framework focuses mainly on nestable/groupable route mapping, route oriented based middleware/execution and which hopefully will provide much modular application execution. Route is unique, and identifiable by name, tag, queryable by Http Request. Imagine developing an application hierarchically down the depth without losing the identity of the executions you planned, while stacking middlewares down the path on every possible node of route.
+This PHP framework focuses mainly on nestable/groupable route mapping, route oriented based middleware/execution and which hopefully will provide much modular application execution. Route is unique, and identifiable by name, tag, queriable by Http Request. Imagine developing an application hierarchically down the depth without losing the identity of the executions you planned, while stacking middlewares down the path on every possible node of route.
 
 Imagine building a plane while flying it!
+
+Goal
+======
+Exedra focuses on being contextual, and explicitful while being simple and minimal at the same time. Hence the goal of being microframework would do just enough. It's not meant to contend with the other great contenders like laravel, symfony, codeignitor. It will not surprise you with unintended heart attacks, but of course, number of what it intently can do would definitely surprise you.
 
 History
 ======
