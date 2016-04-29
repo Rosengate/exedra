@@ -14,6 +14,7 @@ abstract class HandlerAbstract implements HandlerInterface
 	/**
 	 * Replace everything in a pattern with this execution parameters.
 	 * @param mixed pattern
+	 * @throws \Exedra\Exception\InvalidArgumentException
 	 */
 	protected function parameterize($pattern)
 	{
@@ -42,7 +43,7 @@ abstract class HandlerAbstract implements HandlerInterface
 			}, $pattern);
 
 			if(count($unmatched) > 0)
-				return $this->exe->exception->create('Missing parameter(s) for execution handler '.$this->name.' : '.implode(', ', $unmatched).'');
+				throw new \Exedra\Exception\InvalidArgumentException('Missing parameter(s) for execution handler '.$this->name.' : '.implode(', ', $unmatched).'');
 		}
 
 		return $pattern;

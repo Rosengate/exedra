@@ -20,7 +20,7 @@ class Table
 			return $this->addOneColumnRow($records);
 		
 		if(count($this->header) !== 0 && count($records) != count($this->header))
-			throw new \Exception("\Exedra\Console\Table : Row records must be same with headers (".count($this->header).")");
+			throw new \Exedra\Exception\InvalidArgumentException("\Exedra\Console\Table : Row records must be same with headers (".count($this->header).")");
 
 		$this->rows[] = $records;
 	}

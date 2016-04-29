@@ -87,13 +87,13 @@ Abstract Class InstanceFactory
 
 		// file not found
 		if(!file_exists($path))
-			throw new \Exception($factoryName.' ['.$path.'] does not exists');
+			throw new \Exedra\Exception\NotFoundException($factoryName.' ['.$path.'] does not exists');
 
 		$className = $this->buildClassName($className);
 
 		// class name does not exists in the given path.
 		if(!class_exists($className))
-			throw new \Exception('Class named ['.$className.'] does not exists in file '.$path);
+			throw new \Exedra\Exception\NotFoundException('Class named ['.$className.'] does not exists in file '.$path);
 
 		if(count($args))
 		{
@@ -131,7 +131,8 @@ Abstract Class InstanceFactory
 		if(!method_exists($controller, $method))
 		{
 			$reflection	= new \ReflectionClass($controller);
-			$this->exe->exception->create($reflection->getName()." : Method '$method' does not exists.");
+
+			throw new \Exedra\Exception\NotFoundException($reflection->getName()." : Method [$method] does not exists.");
 		}
 
 		return call_user_func_array(Array($controller,$method), $parameter);

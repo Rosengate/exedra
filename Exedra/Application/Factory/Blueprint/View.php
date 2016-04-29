@@ -8,12 +8,6 @@ namespace Exedra\Application\Factory\Blueprint;
 class View implements \ArrayAccess
 {
 	/**
-	 * An Exception manager.
-	 * @var \Exedra\Application\Factory\Exception
-	 */
-	protected $exceptionFactory;
-
-	/**
 	 * Path for this view.
 	 * @var string
 	 */
@@ -48,11 +42,12 @@ class View implements \ArrayAccess
 	 */
 	protected $callbacks	= array();
 
-	public function __construct(\Exedra\Application\Factory\Exception $exceptionFactory, $path = null, $data = null, \Exedra\Loader $loader)
+	public function __construct($path = null, $data = null, \Exedra\Loader $loader)
 	{
-		$this->exceptionFactory = $exceptionFactory;
 		if($path) $this->setPath($path);
+	
 		if($data) $this->set($data);
+	
 		$this->loader = $loader;
 	}
 
@@ -248,7 +243,7 @@ class View implements \ArrayAccess
 
 	/**
 	 * Check required data for rendering use.
-	 * @return mixed
+	 * @return array
 	 */
 	protected function requirementCheck()
 	{
@@ -265,7 +260,7 @@ class View implements \ArrayAccess
 			}
 
 			if(count($nonExist) > 0)
-				return implode(", ",$nonExist);
+				return $nonExist;
 		}
 
 		return false;
@@ -289,15 +284,16 @@ class View implements \ArrayAccess
 	/**
 	 * Check if view is ready
 	 * @return boolean
-	 * @throws \Exedra\Application\Exception\Exception
+	 * 
+	 * @throws \Exedra\Exception\InvalidArgumentException
 	 */
 	protected function isReady()
 	{
 		if($requiredArgs = $this->requirementCheck())
-			return $this->exceptionFactory->create('View.render : Missing required argument(s) for view ("'. $this->path .'") : '. $requiredArgs .'</b>');
+			throw new \Exedra\Exception\InvalidArgumentException('View.render : Missing required argument(s) for view ['. $this->path .'] : '. implode(', ', $requiredArgs) .'');
 
 		if($this->path == null)
-			return $this->exceptionFactory->create('View.render : path was not set (null)');
+			throw new \Exedra\Exception\InvalidArgumentException('Path was not set');
 
 		return true;
 	}

@@ -8,12 +8,6 @@ namespace Exedra\Application\Factory;
 class View
 {
 	/**
-	 * An Exception manager.
-	 * @var \Exedra\Application\Factory\Exception
-	 */
-	protected $exceptionFactory;
-	
-	/**
 	 * Intance of execution based loader.
 	 * @var \Exedra\Loader
 	 */
@@ -37,10 +31,9 @@ class View
 	 */
 	protected $ext = 'php';
 
-	public function __construct(\Exedra\Application\Factory\Exception $exceptionFactory, \Exedra\Loader $loader)
+	public function __construct(\Exedra\Loader $loader)
 	{
 		$this->loader = $loader;
-		$this->exceptionFactory = $exceptionFactory;
 	}
 
 	/**
@@ -55,7 +48,7 @@ class View
 
 		// $path = $this->buildPath($path);
 		if(!$this->has($path))
-			$this->exceptionFactory->create("Unable to find view '$path'");
+			throw new \Exedra\Exception\NotFoundException('Unable to find view ['.$path.']');
 		
 		// append .php extension.
 		$path = $this->buildPath($path);
@@ -64,7 +57,7 @@ class View
 		if(count($this->defaultData) > 0)
 			$data = array_merge($data, $this->defaultData);
 
-		$view	= new Blueprint\View($this->exceptionFactory, $path, $data, $this->loader);
+		$view	= new Blueprint\View($path, $data, $this->loader);
 		
 		return $view;
 	}

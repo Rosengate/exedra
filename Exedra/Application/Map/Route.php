@@ -219,6 +219,8 @@ class Route
 	 * Get a replaced uri path parameter.
 	 * @param array data;
 	 * @return string of a replaced path
+	 *
+	 * @throws \Exedra\Exception\InvalidArgumentException
 	 */
 	public function pathParameterReplace(array $data)
 	{
@@ -245,10 +247,7 @@ class Route
 			## is mandatory, but no parameter passed.
 			if(!$isOptional && !isset($data[$segment]))
 			{
-				if(isset($this->exe))
-					$this->exe->exception->create("Url.Create : Required parameter not passed ($segment).");
-				else
-					throw new \Exedra\Application\Exception\Exception("Url.Create : Required parameter not passed ($segment).", null, null);
+				throw new \Exedra\Exception\InvalidArgumentException("Url.Create : Required parameter not passed [$segment].");
 			}
 
 			## trailing capture.
@@ -534,7 +533,8 @@ class Route
 	/**
 	 * Resolve level in case of Closure, string and array
 	 * @return \Exedra\Application\Map\Level
-	 * @throws \Exception
+	 *
+	 * @throws \Exedra\Exception\InvalidArgumentException
 	 */
 	public function resolveLevel($level)
 	{
@@ -558,7 +558,7 @@ class Route
 				return $level;
 			break;
 			default:
-				return $this->level->factory->throwException('Unable to resolve route level. It must be type of Closure, string, or array');
+				throw new \Exedra\Exception\InvalidArgumentException('Unable to resolve route level. It must be type of Closure, string, or array');
 			break;
 		}
 	}

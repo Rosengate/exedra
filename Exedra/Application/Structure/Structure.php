@@ -62,7 +62,7 @@ class Structure
 	public function get($name)
 	{
 		if(!isset($this->paths[$name]))
-			throw new \Exception("Structure '$name' does not exist");
+			throw new \Exedra\Exception\NotFoundException('Structure ['.$name.'] does not exist');
 
 		return $this->paths[$name];
 	}
@@ -93,7 +93,7 @@ class Structure
 		}
 
 		if(!isset($this->paths[$name]))
-			throw new \Exception("Structure '$name' does not exist");
+			throw new \Exedra\Exception\NotFoundException('Structure ['.$name.'] does not exist');
 
 		$paths[]	= $this->paths[$name];
 
@@ -108,7 +108,7 @@ class Structure
 				$paths[]	= $p;
 
 				if(!is_dir($temp = $this->refinePath($paths)) && count($additionals) < $no)
-					throw new \Exception("Structure : Directory for path ($temp) does not exist");
+					throw new \Exedra\Exception\NotFoundException('Structure : Directory for path ['.$temp.'] does not exist');
 			}
 		}
 
@@ -178,7 +178,7 @@ class Structure
 	public function getPattern($pattern,$val)
 	{
 		if(!isset($this->patterns[$pattern]))
-			throw new \Exception("Structure : pattern called $pattern does not exists.");
+			throw new \Exedra\Exception\NotFoundException("Structure : pattern called [$pattern] does not exists.");
 
 		return $this->patterns[$pattern]($val);
 	}

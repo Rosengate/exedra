@@ -88,7 +88,7 @@ class Loader
 		$file = $this->refinePath($this->prefixPath($file));
 
 		if(!file_exists($file))
-			throw new \Exception("File not found : $file");
+			throw new \Exedra\Exception\NotFoundException("File not found : $file");
 
 		extract($data);
 
@@ -116,7 +116,7 @@ class Loader
 	protected function configure(array $options)
 	{
 		if(!isset($options['path']))
-			throw new \Exception('Path parameter missing.');
+			throw new \Exedra\Exception\InvalidArgumentException('Path parameter missing.');
 
 		$path = $options['path'];
 
@@ -238,7 +238,7 @@ class Loader
 		$file = $this->refinePath($this->prefixPath($file));
 
 		if(!file_exists($file))
-			throw new \Exception("File not found : $file");
+			throw new \Exedra\Exception\NotFoundException("File not found : $file");
 
 		return file_get_contents($file);
 	}

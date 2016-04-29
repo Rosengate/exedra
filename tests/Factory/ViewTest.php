@@ -5,7 +5,7 @@ class FactoryViewTest extends PHPUnit_Framework_TestCase
 	{
 		$app = new \Exedra\Application(__DIR__.'/TestApp');
 
-		$this->factoryView = new \Exedra\Application\Factory\View(new \Exedra\Application\Factory\Exception($app), $app->loader);
+		$this->factoryView = new \Exedra\Application\Factory\View($app->loader);
 	}
 
 	public function viewCreate()
@@ -55,7 +55,7 @@ class FactoryViewTest extends PHPUnit_Framework_TestCase
 		{
 			$view->render();
 		}
-		catch(\Exedra\Application\Exception\Exception $e)
+		catch(\Exedra\Exception\InvalidArgumentException $e)
 		{
 			$exceptionThrown = true;
 		}

@@ -66,6 +66,8 @@ class Handlers
 	/**
 	 * Resolve the given middleware pattern
 	 * @return \Closure
+	 *
+	 * @throws \Exedra\Exception\NotFoundException
 	 */
 	public function resolve($exe, $pattern)
 	{
@@ -93,6 +95,6 @@ class Handlers
 			}
 		}
 
-		return $exe->exception->create('Unable to find handler for the given middleware pattern');
+		throw new \Exedra\Exception\NotFoundException('Unable to find handler for the given middleware pattern');
 	}
 }

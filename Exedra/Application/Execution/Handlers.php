@@ -55,6 +55,9 @@ class Handlers
 	 * @param \Exedra\Application\Execution\Exec exe
 	 * @param mixed pattern
 	 * @return \Closure
+	 *
+	 * @throws \Exedra\Exception\InvalidArgumentException
+	 * @throws \Exedra\Exception\NotFoundException
 	 */
 	public function resolve(\Exedra\Application\Execution\Exec $exe, $pattern)
 	{
@@ -67,13 +70,13 @@ class Handlers
 				$resolve = $handler->prepare($pattern);
 
 				if(!(is_callable($resolve)))
-					return $exe->exception->create('The resolve() method for handler \''.$name.'\' must return \Closure or callable');
+					throw new \Exedra\Exception\InvalidArgumentException('The resolve() method for handler ['.$name.'] must return \Closure or callable');
 
 				return $resolve;
 			}
 		}
 
-		return $exe->exception->create('No executional pattern handler matched.'.(is_string($pattern) ? ' Pattern : '.$pattern : ''));
+		throw new \Exedra\Exception\NotFoundException('No executional pattern handler matched. '.(is_string($pattern) ? ' ['.$pattern.']' : ''));
 	}
 }
 

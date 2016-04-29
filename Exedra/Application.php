@@ -66,7 +66,7 @@ class Application extends \Exedra\Application\Container
 		$this->config = new \Exedra\Application\Config;
 
 		if(!isset($params['dir.app']))
-			throw new \Exception('dir.app parameter is required, at least.');
+			throw new \Exedra\Exception\InvalidArgumentException('dir.app parameter is required, at least.');
 
 		foreach($params as $key => $value)
 			$this->config->set($key, $value);
@@ -120,7 +120,7 @@ class Application extends \Exedra\Application\Container
 			'url' => function() { return new \Exedra\Application\Factory\Url($this->map, $this->request, $this->config);},
 			"config"=> array("\Exedra\Application\Config"),
 			"session"=> array("\Exedra\Application\Session\Session"),
-			"exception"=> array("\Exedra\Application\Factory\Exception", array($this)),
+			// "exception"=> array("\Exedra\Application\Factory\Exception", array($this)),
 			'path' => array('\Exedra\Application\Factory\Path', array($this->loader)),
 			'middleware' => array('\Exedra\Application\Middleware\Registry', array($this))
 			);
@@ -357,7 +357,7 @@ class Application extends \Exedra\Application\Container
 			$msg = 'Querying Route : '.$query;
 		}
 
-		return $this->exception->create('Route not found. '.$msg);
+		throw new \Exedra\Exception\NotFoundException('Route is not found');
 	}
 
 	public function wizard($argv, $class = '\Exedra\Console\Wizard\Arcanist')
