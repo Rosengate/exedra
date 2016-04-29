@@ -60,7 +60,7 @@ Abstract Class InstanceFactory
 	 */
 	protected function buildClassName($class)
 	{
-		$className .= $this->exe->app->getNamespace();
+		$className = $this->exe->app->getNamespace();
 
 		if($module = $this->exe->getModule())
 			$className .= '\\'.$module;
