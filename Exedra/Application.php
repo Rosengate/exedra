@@ -162,6 +162,16 @@ class Application extends \Exedra\Application\Container
 	}
 
 	/**
+	 * Get public directory
+	 * @param string|null
+	 * @return string
+	 */
+	public function getPublicDir($path = null)
+	{
+		return $this->config->get('dir.public') . ($path ? '/' . $path : '');
+	}
+
+	/**
 	 * Get exedra instance
 	 * @return \Exedra\Exedra
 	 */

@@ -153,6 +153,11 @@ class Response extends Message
 
 		echo $this->getBody()->rewind()->getContents();
 	}
+
+	public function __toString()
+	{
+		return $this->getBody();
+	}
 }
 
 ?>
