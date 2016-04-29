@@ -1,7 +1,7 @@
 <?php
 namespace Exedra\Exception;
 
-class InvalidArgumentException extends \InvalidArgumentException
+class InvalidArgumentException extends \Exedra\Exception\LogicException
 {
 	
 }

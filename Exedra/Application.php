@@ -357,7 +357,7 @@ class Application extends \Exedra\Application\Container
 			$msg = 'Querying Route : '.$query;
 		}
 
-		throw new \Exedra\Exception\NotFoundException('Route is not found');
+		throw new \Exedra\Exception\RouteNotFoundException('Route is not found');
 	}
 
 	public function wizard($argv, $class = '\Exedra\Console\Wizard\Arcanist')
