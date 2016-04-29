@@ -41,11 +41,11 @@ Abstract Class InstanceFactory
 	 * @param string class
 	 * @return string
 	 */
-	protected function buildClassPath($class)
+	protected function buildClassPath($class, $module = null)
 	{
 		$path = $this->exe->app->getBaseDir();
 
-		if($module = $this->exe->getModule())
+		if($module)
 			$path .= '/'.$module;
 
 		$path .= '/'.$this->factoryName;
@@ -58,11 +58,11 @@ Abstract Class InstanceFactory
 	 * @param string class
 	 * @return string
 	 */
-	protected function buildClassName($class)
+	protected function buildClassName($class, $module = null)
 	{
 		$className = $this->exe->app->getNamespace();
 
-		if($module = $this->exe->getModule())
+		if($module)
 			$className .= '\\'.$module;
 
 		$className .= '\\'.ucwords($this->factoryName);
@@ -78,18 +78,34 @@ Abstract Class InstanceFactory
 	 * @param array constructorParam
 	 * @return Object
 	 */
-	public function create($className, array $args = array())
+	public function create($definition, array $args = array())
 	{
 		$factoryName = $this->factoryName;
 
+		if(is_array($definition))
+		{
+			$className = $definition['class'];
+
+			$module = isset($definition['module']) ? $definition['module'] : $this->module;
+
+			if(isset($definition['arguments']))
+				$args = array_merge($args, $definition['arguments']);
+		}
+		else
+		{
+			$className = $definition;
+
+			$module = $this->module;
+		}
+
 		// loader.
-		$path = $this->buildClassPath($className);
+		$path = $this->buildClassPath($className, $module);
 
 		// file not found
 		if(!file_exists($path))
 			throw new \Exedra\Exception\NotFoundException($factoryName.' ['.$path.'] does not exists');
 
-		$className = $this->buildClassName($className);
+		$className = $this->buildClassName($className, $module);
 
 		// class name does not exists in the given path.
 		if(!class_exists($className))
@@ -119,14 +135,25 @@ Abstract Class InstanceFactory
 	 * @param array parameter
 	 * @return execution
 	 */
-	public function execute($cname,$method,$parameter = Array())
+	public function execute($cname, $method, $parameter = Array())
 	{
 		if(is_string($cname))
+		{
 			$controller	= $this->create($cname);
+		}
 		else if(is_array($cname))
-			$controller	= $this->create($cname[0],$cname[1]);
+		{
+			// key value definition
+			if(isset($cname['class']))
+				$controller = $this->create($cname);
+			// pass as [controller, argument(s)]
+			else
+				$controller	= $this->create($cname[0], $cname[1]);
+		}
 		else
+		{
 			$controller	= $cname;
+		}
 
 		if(!method_exists($controller, $method))
 		{
