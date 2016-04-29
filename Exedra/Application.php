@@ -268,7 +268,7 @@ class Application extends \Exedra\Application\Container
 			
 			return $exe;
 		}
-		catch(\Exedra\Application\Execution\Exception\Exception $exception)
+		/*catch(\Exedra\Exception\ExecutionException $exception)
 		{
 			$exe = $exception->exe;
 
@@ -280,7 +280,7 @@ class Application extends \Exedra\Application\Container
 				return $this->exitWithMessage($exception->getMessage(), 'Execution Exception [Route : '.$exception->getRouteName().']');
 
 			return $this->execute($failRoute, array('exception' => $exception));
-		}
+		}*/
 		catch(\Exception $exception)
 		{
 			if($failRoute = $this->registry->getFailRoute())
