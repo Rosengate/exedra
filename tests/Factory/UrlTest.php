@@ -36,11 +36,11 @@ class FactoryUrlTest extends PHPUnit_Framework_TestCase
 		{
 			return \Exedra\Http\ServerRequest::createFromArray(array(
 			'method' => 'GET',
-			'uri' => 'http://example.com/hello/world'
+			'uri' => 'http://example.com/hello/world/current'
 			));
 		};
 
-		$this->assertEquals('http://example.com/hello/world', $this->app->url->current());
+		$this->assertEquals('http://example.com/hello/world/current', $this->app->url->current());
 	}
 
 	public function testPrevious()

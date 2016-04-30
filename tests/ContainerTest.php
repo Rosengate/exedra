@@ -4,17 +4,26 @@ class ContainerTest extends PHPUnit_Framework_TestCase
 	public function setUp()
 	{
 		// build a basic case
-		$this->container = new \Exedra\Application\Container;
+		$this->container = new \Exedra\Container\Container;
 	}
 
 	public function testService()
 	{
-		$this->container['services']['db'] = function()
+		$this->container['services']->add('foo', function()
 		{
 			return 'foo-bar';
+		});
+
+		$this->container['services']['bar'] = function()
+		{
+			return 'bar-baz';
 		};
 
-		$this->assertEquals('foo-bar', $this->container->db);
+		$this->assertEquals('foo-bar', $this->container->foo);
+
+		$this->assertEquals('foo-bar', $this->container->get('foo'));
+
+		$this->assertEquals('bar-baz', $this->container->bar);
 	}
 
 	public function testCallable()

@@ -1,7 +1,7 @@
 <?php
 namespace Exedra\Application\Execution;
 
-class Exec extends \Exedra\Application\Container
+class Exec extends \Exedra\Container\Container
 {
 	/**
 	 * Application instance
@@ -59,6 +59,8 @@ class Exec extends \Exedra\Application\Container
 
 	public function __construct(\Exedra\Application $app, \Exedra\Application\Map\Finding $finding)
 	{
+		parent::__construct();
+
 		$this->finding = $finding;
 		$this->app = $app;
 
@@ -96,7 +98,7 @@ class Exec extends \Exedra\Application\Container
 		$app = $this->app;
 		$exe = $this;
 
-		$this->dependencies['services'] = array(
+		$this->dependencies['services']->register(array(
 			"controller"=> array("\Exedra\Application\Factory\Controller", array($this)),
 			// "view"=> array("\Exedra\Application\Factory\View", array($this->exception, $this->loader)),
 			"view" => function() {return new \Exedra\Application\Factory\View($this->loader);},
@@ -115,7 +117,7 @@ class Exec extends \Exedra\Application\Container
 			// 'asset' => array('\Exedra\Application\Factory\Asset', array($this)),
 			'asset' => function(){ return new \Exedra\Application\Factory\Asset($this->url, $this->app->getRootDir(), $this->config->get('asset', array()));},
 			'path' => array('\Exedra\Application\Factory\Path', array($this->loader))
-			);
+			));
 	}
 
 	public function getApp()
@@ -461,5 +463,22 @@ class Exec extends \Exedra\Application\Container
 		$request = $request ? : $this->request;
 
 		return $this->app->execute($route, $parameters, $request);
+	}
+
+	protected function solve($type, $name, array $args = array())
+	{
+		if(!$this->dependencies[$type]->has($name))
+		{
+			if($this->app[$type]->has('@'.$name))
+				return $this->app->dependencyCall($type, $name, $args);
+			else
+				throw new \Exedra\Exception\InvalidArgumentException('Unable to find the ['.$name.'] in the registered dependecy '.$type);
+		}
+		else
+		{
+			$registry = $this->dependencies[$type]->get($name);
+		}
+
+		return $this->resolve($registry, $args);
 	}
 }

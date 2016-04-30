@@ -1,6 +1,16 @@
 <?php
 class ApplicationTest extends PHPUnit_Framework_TestCase
 {
+	public function setUp()
+	{
+		$this->app = new \Exedra\Application(__DIR__.'/Factory/TestApp');
+
+		$this->app->map->any('/')->name('foo')->execute(function($exe)
+		{
+			return 'bar';
+		});
+	}
+
 	public function testCreate()
 	{
 		$app = new \Exedra\Application(__DIR__.'/Factory/TestApp');
@@ -16,12 +26,7 @@ class ApplicationTest extends PHPUnit_Framework_TestCase
 
 	public function testExecute()
 	{
-		$app = new \Exedra\Application(__DIR__.'/Factory/TestApp');
-
-		$app->map->any('/')->name('foo')->execute(function($exe)
-		{
-			return 'bar';
-		});
+		$app = $this->app;
 
 		$this->assertEquals(\Exedra\Application\Execution\Exec::CLASS, get_class($app->execute('foo')));
 
@@ -30,27 +35,116 @@ class ApplicationTest extends PHPUnit_Framework_TestCase
 
 	public function testApplicationRegistries()
 	{
-		$app = new \Exedra\Application(__DIR__.'/Factory/TestApp');
+		$app = $this->app;
 
 		$app['services']['foo'] = function()
 		{
 			return 'bar';
 		};
 
+		$app['services']->add('bar', function()
+		{
+			return 'baz';
+		});
+
 		$app['callables']['foo'] = function($param)
 		{
 			return 'barz'.$param;
 		};
+
+		$app['callables']->add('bar', function($arg)
+		{
+			return 'baz'.$arg;
+		});
 
 		$app['factories']['foo'] = function($param)
 		{
 			return 'baz'.$param;
 		};
 
+		$app['factories']->add('bar', function()
+		{
+			return 'baz';
+		});
+
 		$this->assertEquals('bar', $app->foo);
+
+		$this->assertEquals('baz', $app->bar);
 
 		$this->assertEquals('barzraz', $app->foo('raz'));
 
+		$this->assertEquals('bazraz', $app->bar('raz'));
+
 		$this->assertEquals('bazbar', $app->create('foo', array('bar')));
 	}
+
+	public function testSharedServices()
+	{
+		$app = $this->app;
+
+		$app['services']['@foo'] = function()
+		{
+			return 'bar';
+		};
+
+		$app['services']['@baz'] = function()
+		{
+			return new stdClass;
+		};
+
+		$exe = $app->execute('foo');
+
+		// assert if both application dependency is shared.
+		$this->assertEquals('bar', $app->foo);
+
+		$this->assertEquals('bar', $exe->foo);
+
+		// assert if both application is truly shared.
+		$app->baz->bat = 'qux';
+
+		$this->assertEquals('qux', $exe->baz->bat);
+
+		$exe->baz->bat = 'quux';
+
+		$this->assertEquals('quux', $app->baz->bat);
+	}
+
+	public function testSharedCallables()
+	{
+		$app = $this->app;
+
+		$app['callables']['@foo'] = function()
+		{
+			return 'bar';
+		};
+
+		$exe = $app->execute('foo');
+
+		$this->assertEquals($exe->foo(), 'bar');
+
+		$this->assertEquals($app->foo(), $exe->foo());
+	}
+
+	public function testSharedFactories()
+	{
+		$app = $this->app;
+
+		$app['factories']['@foo'] = function($bat = 'nul')
+		{
+			$obj = new stdClass;
+
+			$obj->bar = $bat;
+
+			return $obj;
+		};
+
+		$exe = $app->execute('foo');
+
+		$obj = $app->make('foo', array('qux'));
+
+		$this->assertEquals($obj->bar, 'qux');
+
+		$this->assertEquals(get_class($app->make('foo')), get_class($exe->make('foo')));
+	}
 }
+

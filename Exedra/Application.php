@@ -1,6 +1,6 @@
 <?php namespace Exedra;
 
-class Application extends \Exedra\Application\Container
+class Application extends \Exedra\Container\Container
 {
 	/**
 	 * Application name. Reflected as your application directory name.
@@ -45,6 +45,8 @@ class Application extends \Exedra\Application\Container
 	 */
 	public function __construct($params, \Exedra\Exedra $exedra = null)
 	{
+		parent::__construct();
+
 		$this->configure(is_array($params) ? $params : array('dir.app' => $params));
 
 		// initialize properties
@@ -111,19 +113,17 @@ class Application extends \Exedra\Application\Container
 	{
 		$app = $this;
 
-		$this->dependencies['services'] = array(
+		$this->dependencies['services']->register(array(
 			'mapFactory' => function(){ return new \Exedra\Application\Map\Factory($this);},
 			'registry'=> array('\Exedra\Application\Registry', array($this)),
 			'request' => function(){ return \Exedra\Http\ServerRequest::createFromGlobals();},
 			"map"=> function() { return $this->mapFactory->createLevel();},
-			// "url" => array("\Exedra\Application\Factory\Url", array($this)),
 			'url' => function() { return new \Exedra\Application\Factory\Url($this->map, $this->request, $this->config);},
 			"config"=> array("\Exedra\Application\Config"),
 			"session"=> array("\Exedra\Application\Session\Session"),
-			// "exception"=> array("\Exedra\Application\Factory\Exception", array($this)),
 			'path' => array('\Exedra\Application\Factory\Path', array($this->loader)),
 			'middleware' => array('\Exedra\Application\Middleware\Registry', array($this))
-			);
+			));
 	}
 
 	/**
@@ -367,6 +367,39 @@ class Application extends \Exedra\Application\Container
 		array_shift($argv);
 
 		$wizard->run($argv);
+	}
+
+	public function dependencyCall($type, $name, array $args = array())
+	{
+		switch($type)
+		{
+			case 'services':
+				return $this->$name;
+			break;
+			case 'callables':
+				return $this->__call($name, $args);
+			break;
+			case 'factories':
+				return $this->create($name, $args);
+			break;
+		}
+	}
+
+	protected function solve($type, $name, array $args = array())
+	{
+		if(!$this->dependencies[$type]->has($name))
+		{
+			if($this->dependencies[$type]->has('@'.$name))
+				$registry = $this->dependencies[$type]->get('@'.$name);
+			else
+				throw new \Exedra\Exception\InvalidArgumentException('Unable to find the ['.$name.'] in the registered dependecy '.$type);
+		}
+		else
+		{
+			$registry = $this->dependencies[$type]->get($name);
+		}
+
+		return $this->resolve($registry, $args);
 	}
 }
 ?>
