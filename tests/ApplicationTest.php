@@ -33,7 +33,7 @@ class ApplicationTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals('bar', $app->execute('foo')->response->getBody());
 	}
 
-	public function testApplicationRegistries()
+	public function testApplicationContainer()
 	{
 		$app = $this->app;
 
@@ -140,11 +140,11 @@ class ApplicationTest extends PHPUnit_Framework_TestCase
 
 		$exe = $app->execute('foo');
 
-		$obj = $app->make('foo', array('qux'));
+		$obj = $app->create('foo', array('qux'));
 
 		$this->assertEquals($obj->bar, 'qux');
 
-		$this->assertEquals(get_class($app->make('foo')), get_class($exe->make('foo')));
+		$this->assertEquals(get_class($app->create('foo')), get_class($exe->create('foo')));
 	}
 }
 

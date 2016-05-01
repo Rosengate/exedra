@@ -18,7 +18,7 @@ class Container implements \ArrayAccess
 	}
 
 	/**
-	 * Dependency registry exist check
+	 * registry exist check
 	 * @param string type
 	 * @return bool
 	 */
@@ -28,7 +28,7 @@ class Container implements \ArrayAccess
 	}
 
 	/**
-	 * Get referenced dependency registry
+	 * Get container registry
 	 * @param string key
 	 * @return \Exedra\Container\Registry
 	 */
@@ -39,7 +39,7 @@ class Container implements \ArrayAccess
 
 	/**
 	 * Register list of type dependencies
-	 * Will definitely dismiss the previous registered dependency
+	 * Will definitely dismiss the previous registry
 	 * @param string service|callable|factory
 	 * @param array registry
 	 */
@@ -62,15 +62,15 @@ class Container implements \ArrayAccess
 	 * @param string type
 	 * @return \Exedra\Container\Registry
 	 */
-	public function getRegistry($type)
+	public function registry($type)
 	{
 		return $this->dependencies[$type];
 	}
 
 	/**
 	 * Invoke the service and save
-	 * @param string dependency
-	 * @return this->get(dependency)
+	 * @param string name
+	 * @return mixed
 	 */
 	public function __get($name)
 	{
@@ -104,20 +104,7 @@ class Container implements \ArrayAccess
 	}
 
 	/**
-	 * Alias to create()
-	 * @param string name
-	 * @param array args
-	 * @return mixed
-	 *
-	 * @throws \InvalidArgumentException
-	 */
-	public function make($name, array $args = array())
-	{
-		return $this->create($name, $args);
-	}
-
-	/**
-	 * Resolve and set the service
+	 * Resolve and set the service as public property.
 	 * @return mixed
 	 */
 	public function get($name)
@@ -129,9 +116,32 @@ class Container implements \ArrayAccess
 	}
 
 	/**
-	 * Solve the given type of dependency
+	 * All-capable dependency call.
+	 * @param string type
+	 * @param string name
+	 * @param array args
+	 * @return mixed
+	 */
+	public function dependencyCall($type, $name, array $args = array())
+	{
+		switch($type)
+		{
+			case 'services':
+				return $this->$name;
+			break;
+			case 'callables':
+				return $this->__call($name, $args);
+			break;
+			case 'factories':
+				return $this->create($name, $args);
+			break;
+		}
+	}
+
+	/**
+	 * Solve the given type of registry
 	 * @param string type services|callables|factories
-	 * @param string name dependency name
+	 * @param string name
 	 * @return mixed
 	 *
 	 * @throws \Exedra\Exception\InvalidArgumentException for failing to find in registry
@@ -139,7 +149,7 @@ class Container implements \ArrayAccess
 	protected function solve($type, $name, array $args = array())
 	{
 		if(!$this->dependencies[$type]->has($name))
-			throw new \Exedra\Exception\InvalidArgumentException('Unable to find the ['.$name.'] in the registered dependecy '.$type);
+			throw new \Exedra\Exception\InvalidArgumentException('Unable to find the ['.$name.'] in the registered '.$type);
 
 		$registry = $this->dependencies[$type]->get($name);
 
@@ -147,7 +157,7 @@ class Container implements \ArrayAccess
 	}
 
 	/**
-	 * Actual resolve the given type of dependency
+	 * Actual resolve the given type of registry
 	 * @param mixed registry
 	 * @return mixed
 	 */
@@ -156,23 +166,83 @@ class Container implements \ArrayAccess
 		if($registry instanceof \Closure)
 			return call_user_func_array($registry->bindTo($this), $args);
 
-		if(is_callable($registry))
-			return call_user_func_array($registry, $args);
+		if(is_string($registry))
+		{
+			if(count($args) == 0)
+				return new $registry();
 
-		if(is_object($registry))
-			return $registry;
+			$reflection = new \ReflectionClass($registry);
+
+			return $reflection->newInstanceArgs($args);
+		}
 
 		if(is_array($registry))
 		{
+			$class=  $registry[0];
+
+			// only fully qualified class name passed
 			if(!isset($registry[1]))
 			{
-				return new $registry[0];
+				return new $class;
 			}
+			// has argument passed
 			else
 			{
 				$reflection = new \ReflectionClass($registry[0]);
 
-				return $reflection->newInstanceArgs($registry[1]);
+				$arguments = array();
+
+				// the second element isn't an array
+				if(!is_array($registry[1]))
+					throw new \Exedra\Exception\InvalidArgumentException('Second element for array based registry must be an array');
+
+				foreach($registry[1] as $arg)
+				{
+					// if isn't string. allow only string.
+					if(!is_string($arg))
+						throw new \Exedra\Exception\InvalidArgumentException('argument must be string');
+
+					switch($arg)
+					{
+						case 'self':
+							$arguments[] = $this;
+						break;
+						default:
+							$split = explode('.', $arg, 2);
+
+							if(isset($split[1]))
+							{
+								switch($split[0])
+								{
+									case 'self':
+										$arguments[] = $this->get($split[1]);
+									break;
+									case 'services':
+										$arguments[] = $this->get($split[1]);
+									break;
+									case 'factories':
+										$arguments[] = $this->create($split[1]);
+									break;
+									case 'callables':
+										$arguments[] = $this->__call($split[1]);
+									break;
+									default:
+										$arguments[] = $this->get($arg);
+									break;
+								}
+							}
+							else
+							{
+								$arguments[] = $this->$arg;
+							}
+						break;
+					}
+				}
+
+				// merge with the one passed
+				$arguments = array_merge($arguments, $args);
+
+				return $reflection->newInstanceArgs($arguments);
 			}
 		}
 

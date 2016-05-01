@@ -1,4 +1,22 @@
 <?php
+class Foo
+{
+
+}
+
+class Bar
+{
+	public function __construct(Foo $foo, $bas)
+	{
+		$this->bas = $bas;
+	}
+
+	public function getBas()
+	{
+		return $this->bas;
+	}
+}
+
 class ContainerTest extends PHPUnit_Framework_TestCase
 {
 	public function setUp()
@@ -44,5 +62,45 @@ class ContainerTest extends PHPUnit_Framework_TestCase
 		};
 
 		$this->assertEquals(\Exedra\Application\Factory\Form\Form::CLASS, get_class($this->container->create('form')));
+	}
+
+	public function testAutoresolve()
+	{
+		$this->container['services']->add('foo', 'Foo');
+
+		$this->container['services']->add('bad', function()
+		{
+			return 'qux';
+		});
+
+		$this->container['services']->add('bar', array('Bar', array('services.foo', 'bad')));
+
+		$this->container['services']->add('bor', array('Bar', array('foo', 'bad')));
+
+		$this->assertEquals('Bar', get_class($this->container->bar));
+
+		$this->assertEquals('qux', $this->container->bar->getBas());
+
+		$this->assertEquals('qux', $this->container->bor->getBas());
+	}
+
+	public function testMergedFactoryArguments()
+	{
+		$this->container['factories']['bar'] = array('Bar', array('factories.foo'));
+
+		$this->container['factories']['foo'] = function()
+		{
+			return new Foo;
+		};
+
+		$this->container['factories']->add('bat', 'Bar');
+
+		$bar = $this->container->create('bar', array('baz'));
+
+		$this->assertEquals('baz', $bar->getBas());
+
+		$bat = $this->container->create('bat', array($this->container->create('foo'), 'qux'));
+
+		$this->assertEquals('qux', $bat->getBas());
 	}
 }

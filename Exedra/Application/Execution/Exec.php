@@ -99,24 +99,24 @@ class Exec extends \Exedra\Container\Container
 		$exe = $this;
 
 		$this->dependencies['services']->register(array(
-			"controller"=> array("\Exedra\Application\Factory\Controller", array($this)),
+			"controller"=> array("\Exedra\Application\Factory\Controller", array('self')),
 			// "view"=> array("\Exedra\Application\Factory\View", array($this->exception, $this->loader)),
 			"view" => function() {return new \Exedra\Application\Factory\View($this->loader);},
-			"middleware"=> array("\Exedra\Application\Factory\Middleware", array($this)),
+			"middleware"=> array("\Exedra\Application\Factory\Middleware", array('self')),
 			// "url"=> array("\Exedra\Application\Execution\Factory\Url", array($this)),
 			'url' => function(){ return new \Exedra\Application\Execution\Factory\Url($this->app->map, $this->request, $this->config, $this);},
 			// "validator"=> array("\Exedra\Application\Utilities\Validator"),
 			"flash"=> function() {return new \Exedra\Application\Session\Flash($this->app->session);},
-			"redirect"=> array("\Exedra\Application\Execution\Redirect", array($this)),
+			"redirect"=> array("\Exedra\Application\Execution\Redirect", array('self')),
 			// "exception"=> array("\Exedra\Application\Execution\Factory\Exception", array($this)),
-			"form"=> array("\Exedra\Application\Execution\Factory\Form", array($this)),
+			"form"=> array("\Exedra\Application\Execution\Factory\Form", array('self')),
 			"session"=> function() {return $this->app->session;},
 			// "file"=> function() use($exe) {return new \Exedra\Application\Factory\File($exe->loader);},
 			// 'middlewares'=> function() use($app) {return new \Exedra\Application\Middleware\Middlewares($app->middleware);},
 			'middlewares' => function() {return $this->app->middleware->getMiddlewares();},
 			// 'asset' => array('\Exedra\Application\Factory\Asset', array($this)),
 			'asset' => function(){ return new \Exedra\Application\Factory\Asset($this->url, $this->app->getRootDir(), $this->config->get('asset', array()));},
-			'path' => array('\Exedra\Application\Factory\Path', array($this->loader))
+			'path' => array('\Exedra\Application\Factory\Path', array('self.loader'))
 			));
 	}
 
@@ -472,7 +472,7 @@ class Exec extends \Exedra\Container\Container
 			if($this->app[$type]->has('@'.$name))
 				return $this->app->dependencyCall($type, $name, $args);
 			else
-				throw new \Exedra\Exception\InvalidArgumentException('Unable to find the ['.$name.'] in the registered dependecy '.$type);
+				throw new \Exedra\Exception\InvalidArgumentException('Unable to find the ['.$name.'] in the registered '.$type);
 		}
 		else
 		{

@@ -79,13 +79,29 @@ class Registry implements \ArrayAccess
 	}
 
 	/**
-	 * Add dependency
+	 * Register new dependency.
+	 * Throw exception if already the dependency already exists.
 	 * @param string name
-	 * @param mixed definition
+	 * @param mixed \Closure|string|array|object
+	 *
+	 * @throws \Exedra\Exception\Exception
 	 */
-	public function add($name, $definition)
+	public function add($name, $pattern)
 	{
-		$this->data[$name] = $definition;
+		if(isset($this->data[$name]))
+			throw new \Exedra\Exception\Exception('Registry by name ['.$name.'] already exist.');
+			
+		$this->data[$name] = $pattern;
+	}
+
+	/**
+	 * Set dependency registry
+	 * @param string name
+	 * @param \Closure|string|array|object
+	 */
+	public function set($name, $pattern)
+	{
+		$this->data[$name] = $pattern;
 	}
 
 	/**

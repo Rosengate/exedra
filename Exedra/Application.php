@@ -111,19 +111,20 @@ class Application extends \Exedra\Container\Container
 	 */
 	protected function serviceRegistry()
 	{
-		$app = $this;
-
 		$this->dependencies['services']->register(array(
 			'mapFactory' => function(){ return new \Exedra\Application\Map\Factory($this);},
-			'registry'=> array('\Exedra\Application\Registry', array($this)),
+			'registry' => array('\Exedra\Application\Registry', array('self')),
 			'request' => function(){ return \Exedra\Http\ServerRequest::createFromGlobals();},
 			"map"=> function() { return $this->mapFactory->createLevel();},
-			'url' => function() { return new \Exedra\Application\Factory\Url($this->map, $this->request, $this->config);},
-			"config"=> array("\Exedra\Application\Config"),
-			"session"=> array("\Exedra\Application\Session\Session"),
-			'path' => array('\Exedra\Application\Factory\Path', array($this->loader)),
-			'middleware' => array('\Exedra\Application\Middleware\Registry', array($this))
+			'url' => array('\Exedra\Application\Factory\Url', array('self.map', 'self.request', 'self.config')),
+			"config"=> '\Exedra\Application\Config',
+			'session' => '\Exedra\Application\Session\Session',
+			'path' => array('\Exedra\Application\Factory\Path', array('self.loader')),
+			'middleware' => array('\Exedra\Application\Middleware\Registry', array('self'))
 			));
+
+		$this->dependencies['factories']->register(array(
+			'exe' => '\Exedra\Application\Execution\Exec'));
 	}
 
 	/**
@@ -233,7 +234,8 @@ class Application extends \Exedra\Container\Container
 			if(!$finding->success())
 				return $this->throwFailedExecution($finding, $query, $parameter);
 
-			$exe = new \Exedra\Application\Execution\Exec($this, $finding);
+			// $exe = new \Exedra\Application\Execution\Exec($this, $finding);
+			$exe = $this->create('exe', array($this, $finding));
 
 			$this->exe = $exe;
 
@@ -360,31 +362,39 @@ class Application extends \Exedra\Container\Container
 		throw new \Exedra\Exception\RouteNotFoundException('Route is not found');
 	}
 
-	public function wizard($argv, $class = '\Exedra\Console\Wizard\Arcanist')
+	/**
+	 * Run wizard
+	 * @param string
+	 */
+	public function wizard($argv, $class = null)
 	{
-		$wizard = new $class($this);
+		if(!$class)
+		{
+			if($this->dependencies['factories']->has('wizard'))
+				$wizard = $this->create('wizard', array($this));
+			else
+				$wizard = new \Exedra\Console\Wizard\Arcanist($this);
+		}
+		else
+		{
+			$wizard = new $class($this);
+		}
 
 		array_shift($argv);
 
 		$wizard->run($argv);
 	}
 
-	public function dependencyCall($type, $name, array $args = array())
-	{
-		switch($type)
-		{
-			case 'services':
-				return $this->$name;
-			break;
-			case 'callables':
-				return $this->__call($name, $args);
-			break;
-			case 'factories':
-				return $this->create($name, $args);
-			break;
-		}
-	}
-
+	/**
+	 * Extended container solve method
+	 * Search for shared symbol for sharable dependency
+	 * @param string type
+	 * @param string name
+	 * @param array args
+	 * @return mixed
+	 *
+	 * @throws \Exedra\Exception\InvalidArgumentException
+	 */
 	protected function solve($type, $name, array $args = array())
 	{
 		if(!$this->dependencies[$type]->has($name))
@@ -392,7 +402,7 @@ class Application extends \Exedra\Container\Container
 			if($this->dependencies[$type]->has('@'.$name))
 				$registry = $this->dependencies[$type]->get('@'.$name);
 			else
-				throw new \Exedra\Exception\InvalidArgumentException('Unable to find the ['.$name.'] in the registered dependecy '.$type);
+				throw new \Exedra\Exception\InvalidArgumentException('Unable to find the ['.$name.'] in the registered '.$type);
 		}
 		else
 		{
