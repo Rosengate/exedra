@@ -19,6 +19,8 @@ class ApplicationTest extends PHPUnit_Framework_TestCase
 
 		$this->assertEquals('TestApp', $app->getNamespace());
 
+		$this->assertEquals('TestApp\\Foo\\Bar', $app->getNamespace('Foo\\Bar'));
+
 		$this->assertEquals(realpath(__DIR__.'/Factory/public'), realpath($app->getPublicDir()));
 
 		$this->assertEquals(realpath(__DIR__.'/Factory'), realpath($app->getRootDir()));

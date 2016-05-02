@@ -1,56 +1,31 @@
 <?php
 namespace Exedra\Application\Factory;
 
-Abstract Class InstanceFactory
+abstract class InstanceFactory
 {
 	/**
-	 * Factory name.
+	 * Base namespace
 	 * @var string
 	 */
-	protected $factoryName;
+	protected $baseNamespace;
 
 	/**
-	 * Structure pattern to be used by \Exedra\Application\Structure\Structure
+	 * Namespace name.
 	 * @var string
 	 */
-	protected $patternName;
+	protected $namespace;
 
 	/**
-	 * Namespaced instance flag
-	 * @var boolean
+	 * Application instance
+	 * @var \Exedra\Application
 	 */
-	protected $isNamespaced = true;
+	protected $app;
 
-	public function __construct(\Exedra\Application\Execution\Exec $exe)
+	public function __construct($baseNamespace, $module = null)
 	{
-		$this->exe = $exe;
+		$this->baseNamespace = $baseNamespace;
 
-		$this->loader = $exe->loader;
-		
-		$this->structure = $exe->app->structure;
-		
-		$this->module = $exe->getModule();
-
-		// if the execution instance has this config.
-		if($exe->config->has('namespaced_factory'))
-			$this->isNamespaced = $exe->config->get('namespaced_factory');
-	}
-
-	/**
-	 * Build class path
-	 * @param string class
-	 * @return string
-	 */
-	protected function buildClassPath($class, $module = null)
-	{
-		$path = $this->exe->app->getBaseDir();
-
-		if($module)
-			$path .= '/'.$module;
-
-		$path .= '/'.$this->factoryName;
-
-		return $path . '/' .$class.'.php';
+		$this->module = $module;
 	}
 
 	/**
@@ -58,14 +33,14 @@ Abstract Class InstanceFactory
 	 * @param string class
 	 * @return string
 	 */
-	protected function buildClassName($class, $module = null)
+	protected function buildClassName($class, $namespace, $module = null)
 	{
-		$className = $this->exe->app->getNamespace();
+		$className = $this->baseNamespace;
 
 		if($module)
 			$className .= '\\'.$module;
 
-		$className .= '\\'.ucwords($this->factoryName);
+		$className .= '\\'.$namespace;
 
 		$className .= '\\'.$class;
 
@@ -73,14 +48,14 @@ Abstract Class InstanceFactory
 	}
 
 	/**
-	 * Create the factory
-	 * @param string className
+	 * Create the instance
+	 * @param string|array relative classname|definition
 	 * @param array constructorParam
 	 * @return Object
 	 */
 	public function create($definition, array $args = array())
 	{
-		$factoryName = $this->factoryName;
+		$className = $definition;
 
 		if(is_array($definition))
 		{
@@ -98,18 +73,11 @@ Abstract Class InstanceFactory
 			$module = $this->module;
 		}
 
-		// loader.
-		$path = $this->buildClassPath($className, $module);
-
-		// file not found
-		if(!file_exists($path))
-			throw new \Exedra\Exception\NotFoundException($factoryName.' ['.$path.'] does not exists');
-
-		$className = $this->buildClassName($className, $module);
-
+		$className = $this->buildClassName($className, $this->namespace, $module);
+		
 		// class name does not exists in the given path.
 		if(!class_exists($className))
-			throw new \Exedra\Exception\NotFoundException('Class named ['.$className.'] does not exists in file '.$path);
+			throw new \Exedra\Exception\NotFoundException('Class named ['.$className.'] does not exists.');
 
 		if(count($args))
 		{
@@ -126,33 +94,32 @@ Abstract Class InstanceFactory
 	}
 
 	/**
-	 * Execute the instance.
-	 * - if cname is string, create controller based on that string.
-	 * - if cname is array, take first element as controller name, and second as construct parameters
+	 * Create an instance and invoke the method
+	 * - if definition is string, create controller based on that string.
+	 * - if definition is array, take first element as controller name, and second as construct parameters
+	 *   - if it has key [class], expect it as class definition.
 	 * - else, expect it as the controller object.
 	 * @param mixed cname
 	 * @param string method
 	 * @param array parameter
 	 * @return execution
 	 */
-	public function execute($cname, $method, $parameter = Array())
+	public function execute($definition, $method, array $args = array())
 	{
-		if(is_string($cname))
+		if(is_string($definition))
 		{
-			$controller	= $this->create($cname);
+			$controller	= $this->create($definition);
 		}
-		else if(is_array($cname))
+		else if(is_array($definition))
 		{
-			// key value definition
-			if(isset($cname['class']))
-				$controller = $this->create($cname);
-			// pass as [controller, argument(s)]
-			else
-				$controller	= $this->create($cname[0], $cname[1]);
+			if(isset($definition['class']))
+				$controller = $this->create($definition);
+			else 
+				$controller	= $this->create($definition[0], $definition[1]);
 		}
 		else
 		{
-			$controller	= $cname;
+			$controller	= $definition;
 		}
 
 		if(!method_exists($controller, $method))
@@ -162,6 +129,6 @@ Abstract Class InstanceFactory
 			throw new \Exedra\Exception\NotFoundException($reflection->getName()." : Method [$method] does not exists.");
 		}
 
-		return call_user_func_array(Array($controller,$method), $parameter);
+		return call_user_func_array(Array($controller,$method), $args);
 	}
 }

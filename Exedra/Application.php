@@ -157,9 +157,9 @@ class Application extends \Exedra\Container\Container
 		return $this->config->get('dir.root') . ($path ? '/' . $path : '');
 	}
 
-	public function getNamespace()
+	public function getNamespace($namespace = null)
 	{
-		return $this->config->get('namespace');
+		return $this->config->get('namespace') . ($namespace ? '\\'.$namespace : '');
 	}
 
 	/**
