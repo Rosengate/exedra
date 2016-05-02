@@ -16,6 +16,24 @@ class Exec extends \Exedra\Container\Container
 	public $route;
 
 	/**
+	 * Request instance
+	 * @var \Exedra\Http\ServerRequest
+	 */
+	public $request;
+
+	/**
+	 * Request instance
+	 * @var \Exedra\Application\Execution\Response
+	 */
+	public $response;
+
+	/**
+	 * Loader instance
+	 * @var \Exedra\Loader loader
+	 */
+	public $loader;
+
+	/**
 	 * Array of (referenced) parameters for this execution.
 	 * @var array
 	 */
@@ -81,12 +99,19 @@ class Exec extends \Exedra\Container\Container
 	{
 		// Initiate loader, registry, route, config, params, and set base route based on finding.
 		$this->loader = new \Exedra\Loader($this->getBaseDir(), $this->app->structure);
+
 		$this->registry = $this->app->registry;
+		
 		$this->route = $this->finding->route;
+		
 		$this->config = $this->finding->getConfig();
+		
 		$this->setBaseRoute($this->finding->getBaseRoute());
+		
 		\Exedra\Functions\Arrays::initiateByNotation($this->params, $this->finding->param());
+		
 		$this->request = $this->finding->getRequest();
+		
 		$this->response = \Exedra\Application\Execution\Response::createEmptyResponse();
 	}
 

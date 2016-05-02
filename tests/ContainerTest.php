@@ -37,6 +37,8 @@ class ContainerTest extends PHPUnit_Framework_TestCase
 			return 'bar-baz';
 		};
 
+		$this->assertEquals($this->container->foo, $this->container->foo);
+
 		$this->assertEquals('foo-bar', $this->container->foo);
 
 		$this->assertEquals('foo-bar', $this->container->get('foo'));

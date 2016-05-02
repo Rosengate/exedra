@@ -4,9 +4,15 @@ class Container implements \ArrayAccess
 {
 	/**
 	 * Container dependencies registry
-	 * @var array of services, callables, and factories
+	 * @var array of registry of services, callables, and factories
 	 */
 	protected $dependencies = array();
+
+	/**
+	 * List of resolved services
+	 * @var array services
+	 */
+	protected $services = array();
 
 	public function __construct()
 	{
@@ -68,13 +74,29 @@ class Container implements \ArrayAccess
 	}
 
 	/**
+	 * Set service on this container
+	 * @param string name
+	 * @param mixed service
+	 */
+	public function __set($name, $service)
+	{
+		$this->services[$name] = $service;
+
+		if(!array_key_exists($name, $this->services))
+			$this->dependencies[$name]->set($name, true);
+	}
+
+	/**
 	 * Invoke the service and save
 	 * @param string name
 	 * @return mixed
 	 */
 	public function __get($name)
 	{
-		return $this->$name = $this->solve('services', $name);
+		if(array_key_exists($name, $this->services))
+			return $this->services[$name];
+
+		return $this->services[$name] = $this->solve('services', $name);
 	}
 
 	/**
@@ -109,10 +131,10 @@ class Container implements \ArrayAccess
 	 */
 	public function get($name)
 	{
-		if(isset($this->$name))
-			return $this->$name;
+		if(array_key_exists($name, $this->services))
+			return $this->services[$name];
 
-		return $this->$name = $this->solve('services', $name);
+		return $this->services[$name] = $this->solve('services', $name);
 	}
 
 	/**
@@ -127,7 +149,7 @@ class Container implements \ArrayAccess
 		switch($type)
 		{
 			case 'services':
-				return $this->$name;
+				return $this->get($name);
 			break;
 			case 'callables':
 				return $this->__call($name, $args);
@@ -233,7 +255,7 @@ class Container implements \ArrayAccess
 							}
 							else
 							{
-								$arguments[] = $this->$arg;
+								$arguments[] = $this->get($arg);
 							}
 						break;
 					}

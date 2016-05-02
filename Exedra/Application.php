@@ -21,6 +21,12 @@ class Application extends \Exedra\Container\Container
 	public $structure = null;
 
 	/**
+	 * Application based loader
+	 * @var \Exedra\Loader
+	 */
+	public $loader;
+
+	/**
 	 * List of executions
 	 * @var array of \Exedra\Application\Execution\Exec
 	 */
@@ -47,6 +53,9 @@ class Application extends \Exedra\Container\Container
 	{
 		parent::__construct();
 
+		// register dependencies.
+		$this->serviceRegistry();
+
 		$this->configure(is_array($params) ? $params : array('dir.app' => $params));
 
 		// initialize properties
@@ -54,9 +63,6 @@ class Application extends \Exedra\Container\Container
 
 		// autoload the current folder
 		$this->loader->autoload('', $this->config->get('namespace'));
-
-		// register dependencies.
-		$this->serviceRegistry();
 	}
 
 	/**
@@ -65,8 +71,6 @@ class Application extends \Exedra\Container\Container
 	 */
 	protected function configure(array $params)
 	{
-		$this->config = new \Exedra\Application\Config;
-
 		if(!isset($params['dir.app']))
 			throw new \Exedra\Exception\InvalidArgumentException('dir.app parameter is required, at least.');
 
