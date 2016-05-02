@@ -50,6 +50,17 @@ class Registry
 	}
 
 	/**
+	 * Resolve middleware pattern
+	 * @param \Exedra\Application\Execution\Exec exe
+	 * @param mixed pattern
+	 * @return \Closure
+	 */
+	public function resolveMiddleware(\Exedra\Application\Execution\Exec $exe, $pattern)
+	{
+		return $this->handlers->resolve($exe, $pattern);
+	}
+
+	/**
 	 * Look up named middleware information
 	 * @param string key
 	 * @return pattern|null

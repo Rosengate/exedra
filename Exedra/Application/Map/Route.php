@@ -718,6 +718,17 @@ class Route
 	}
 
 	/**
+	 * Alias to setExecute
+	 * @param mixed handle
+	 */
+	public function handle($handle)
+	{
+		$this->setProperty('execute', $handle);
+
+		return $this;
+	}
+
+	/**
 	 * Add new level on for this route.
 	 * @param array|string|callback
 	 */

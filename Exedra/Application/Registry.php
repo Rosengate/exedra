@@ -40,6 +40,7 @@ class Registry
 	protected function registerDefaultHandlers()
 	{
 		$this->handlers->register('closure', '\Exedra\Application\Execution\Handler\Closure');
+		
 		$this->handlers->register('controller', '\Exedra\Application\Execution\Handler\Controller');
 	}
 
@@ -50,6 +51,17 @@ class Registry
 	public function setFailRoute($routeName)
 	{
 		$this->failRoute = $routeName;
+	}
+
+	/**
+	 * Resolve the execution handle pattern
+	 * @param \Exedra\Application\Execution\Exec
+	 * @param mixed pattern
+	 * @return \Closure 
+	 */
+	public function resolveHandle(\Exedra\Application\Execution\Exec $exe, $pattern)
+	{
+		return $this->handlers->resolve($exe, $pattern);
 	}
 
 	/**
@@ -69,8 +81,6 @@ class Registry
 	{
 		// wire back to middleware registry for backward fix
 		$this->app->middleware->add($closure);
-
-		// $this->middlewares[] = $closure;
 	}
 
 	/**

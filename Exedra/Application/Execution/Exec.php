@@ -80,22 +80,23 @@ class Exec extends \Exedra\Container\Container
 		parent::__construct();
 
 		$this->finding = $finding;
+
 		$this->app = $app;
 
 		// initiate properties
-		$this->initiateProperties();
+		$this->initializeProperties();
 
 		// initiate dependencies
-		$this->initiateContainer();
+		$this->initializeServices();
 
-		// Initiate middlewares
-		$this->initiateMiddlewares();
+		// Initiate execution handles/middlewares
+		$this->intializeHandles();
 	}
 
 	/**
 	 * Initiate execution properties
 	 */
-	protected function initiateProperties()
+	protected function initializeProperties()
 	{
 		// Initiate loader, registry, route, config, params, and set base route based on finding.
 		$this->loader = new \Exedra\Loader($this->getBaseDir(), $this->app->structure);
@@ -118,7 +119,7 @@ class Exec extends \Exedra\Container\Container
 	/**
 	 * Initiate dependency injection container
 	 */
-	protected function initiateContainer()
+	protected function initializeServices()
 	{
 		$this->dependencies['services']->register(array(
 			'middlewares' => function() {return $this->app->middleware->getMiddlewares();},
@@ -151,13 +152,19 @@ class Exec extends \Exedra\Container\Container
 	}
 
 	/**
-	 * Initiate execution middlewares.
+	 * Initiate middleware/execution handles
 	 */
-	protected function initiateMiddlewares()
+	protected function intializeHandles()
 	{
 		// finding' middleware
 		if($this->finding->hasMiddlewares())
 			$this->middlewares->addByArray($this->finding->getMiddlewares());
+
+		$handle = $this->app->getExecutionRegistry()->resolveHandle($this, $this->finding->route->getProperty('execute'));
+
+		$handle = $this->middlewares->resolve($this, $handle);
+
+		$this->response->setBody($handle($this));
 	}
 
 	/**
@@ -188,27 +195,13 @@ class Exec extends \Exedra\Container\Container
 	}
 
 	/**
-	 * Resolve dependency from dependency injection container, off property $di.
-	 * @return mixed.
+	 * Get execution finding
+	 * @return string
 	 */
-	/*public function __get($property)
+	public function getFinding()
 	{
-		if($this->container->has($property))
-		{
-			$this->$property = $this->container->get($property);
-			return $this->$property;
-		}
-	}*/
-
-	/**
-	 * A magic call to container based method
-	 * @param string name
-	 * @param array args
-	 */
-	/*public function __call($name, $args)
-	{
-		return call_user_func_array(array($this->container, $name), $args);
-	}*/
+		return $this->finding;
+	}
 
 	/**
 	 * Point to the next handler, and execute that handler.

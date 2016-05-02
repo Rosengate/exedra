@@ -9,12 +9,14 @@ class Middlewares extends \ArrayIterator
 	/**
 	 * Registry information
 	 * Everything including handler
+	 * @var \Exedra\Application\Middleware\Registry
 	 */
 	protected $registry;
 
 	public function __construct(\Exedra\Application\Middleware\Registry $registry, array $middlewares = array())
 	{
 		$this->registry = $registry;
+	
 		parent::__construct($middlewares);
 	}
 
@@ -46,18 +48,27 @@ class Middlewares extends \ArrayIterator
 	 * Resolve middlewares all into usable callbacks.
 	 * And save the change
 	 * @param \Exedra\Application\Execution\Exec
+	 * @param \Closure handle - first handle
 	 */
-	public function resolve(\Exedra\Application\Execution\Exec $exe)
+	public function resolve(\Exedra\Application\Execution\Exec $exe, \Closure $handle)
 	{
+		if($this->count() == 0)
+			return $handle;
+
 		$this->rewind();
 
 		while($this->valid())
 		{
-			$middleware = $this->current();
-
-			$this[$this->key()] = $this->registry->handlers->resolve($exe, $middleware);
+			$this[$this->key()] = $this->registry->resolveMiddleware($exe, $this->current());
 
 			$this->next();
 		}
+
+		// set the given execution handler on the last
+		$this[$this->count()] = $handle;
+
+		$this->rewind();
+
+		return $this->current();
 	}
 }

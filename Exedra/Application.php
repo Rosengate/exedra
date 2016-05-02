@@ -161,6 +161,11 @@ class Application extends \Exedra\Container\Container
 		return $this->config->get('dir.root') . ($path ? '/' . $path : '');
 	}
 
+	/**
+	 * Get application namespace
+	 * @param string|null namespace
+	 * @return string
+	 */
 	public function getNamespace($namespace = null)
 	{
 		return $this->config->get('namespace') . ($namespace ? '\\'.$namespace : '');
@@ -177,24 +182,12 @@ class Application extends \Exedra\Container\Container
 	}
 
 	/**
-	 * Get exedra instance
-	 * @return \Exedra\Exedra
+	 * Get application execution registry
+	 * @return \Exedra\Application\Registry
 	 */
-	public function getExedra()
+	public function getExecutionRegistry()
 	{
-		return $this->exedra;
-	}
-
-	/**
-	 * Get last exec instance if have.
-	 * @return \Exedra\Application\Execution\Exec
-	 */
-	public function getLastExecution()
-	{
-		if(($totalExec = count($this->executions)) == 0)
-			return null;
-
-		return $this->executions[$totalExec - 1];
+		return $this->registry;
 	}
 
 	/**
@@ -202,87 +195,53 @@ class Application extends \Exedra\Container\Container
 	 * @param string|array|\Exedra\Http\ServerRequest query
 	 * @param array parameter
 	 * @return \Exedra\Application\Execution\Exec
+	 *
+	 * @throws \Exedra\Exception\RouteNotFoundException
 	 */
 	public function execute($query, array $parameter = array(), \Exedra\Http\ServerRequest $request = null)
 	{
-		try
+		// expect it as route name
+		if(is_string($query))
 		{
-			// expect it as route name
-			if(is_string($query))
+			$finding = $this->map->findByName($query, $parameter, $request);
+		}
+		// expect it either \Exedra\Http\ServerRequest or array
+		else
+		{
+			if($query instanceof \Exedra\Http\ServerRequest)
 			{
-				$finding = $this->map->findByName($query, $parameter, $request);
+				$request = $query;
 			}
-			// expect it either \Exedra\Http\ServerRequest or array
 			else
 			{
-				if($query instanceof \Exedra\Http\ServerRequest)
-				{
-					$request = $query;
-				}
-				else
-				{
-					$data = $query;
-					$query = array();
-					\Exedra\Functions\Arrays::initiateByNotation($query, $data);
-					
-					$request = \Exedra\Http\ServerRequest::createFromArray($query);
-					// $request = new \Exedra\Http\ServerRequest($query);
-				}
-
-				// \Exedra\Application\Map\Finding
-				$finding = $this->map->find($request);
-				$finding->addParameter($parameter);
+				$data = $query;
+				$query = array();
+				\Exedra\Functions\Arrays::initiateByNotation($query, $data);
+				
+				$request = \Exedra\Http\ServerRequest::createFromArray($query);
 			}
 
-			// route not found.
-			if(!$finding->success())
-				return $this->throwFailedExecution($finding, $query, $parameter);
+			// \Exedra\Application\Map\Finding
+			$finding = $this->map->find($request);
 
-			// $exe = new \Exedra\Application\Execution\Exec($this, $finding);
-			$exe = $this->create('exe', array($this, $finding));
-
-			$this->exe = $exe;
-
-			// save to the stack of execution.
-			$this->executions[] = $exe;
-
-			$execution = $finding->route->getProperty('execute');
-			$execution = $this->registry->handlers->resolve($exe, $execution);
-
-			// execute the stacked middleware.
-			if($exe->middlewares->count() > 0)
-			{
-				// $exe->middlewares = new \ArrayIterator($this->registry->getMiddlewares());
-				$exe->middlewares->resolve($exe);
-
-				// set the last of the container as execution.
-				$exe->middlewares->offsetSet($exe->middlewares->count(), $execution);
-
-				// and reset.
-				$exe->middlewares->rewind();
-
-				// execute.
-				$execution = $exe->middlewares->current();
-			}
-
-			// $response = Execution\Resolver::resolve($execution($exe));
-			$exe->response->setBody($execution($exe));
-
-			// clear flash on every application execution (only if it has started).
-			if(\Exedra\Application\Session\Session::hasStarted())
-				$exe->flash->clear();
-			
-			return $exe;
+			$finding->addParameter($parameter);
 		}
-		catch(\Exception $exception)
-		{
-			if($failRoute = $this->registry->getFailRoute())
-				$this->setFailRoute(null);
-			else
-				return $this->exitWithMessage($exception->getMessage(), get_class($exception));
-			
-			return $this->execute($failRoute, array('exception' => $exception));
-		}
+
+		// route not found.
+		if(!$finding->success())
+			throw new \Exedra\Exception\RouteNotFoundException('Route is not found');
+
+		// $exe = new \Exedra\Application\Execution\Exec($this, $finding);
+		$exe = $this->create('exe', array($this, $finding));
+
+		// save to the stack of execution.
+		$this->executions[] = $exe;
+
+		// clear flash on every application execution (only if it has started).
+		if(\Exedra\Application\Session\Session::hasStarted())
+			$exe->flash->clear();
+		
+		return $exe;
 	}
 
 	/**
@@ -293,7 +252,19 @@ class Application extends \Exedra\Container\Container
 	{
 		$request = $request ? : $this->request;
 
-		$exe = $this->execute($request);
+		try
+		{
+			$exe = $this->execute($request);
+		}
+		catch(\Exedra\Exception\Exception $e)
+		{
+			if($failRoute = $this->registry->getFailRoute())
+				$this->setFailRoute(null);
+			else
+				return $this->exitWithMessage($exception->getMessage(), get_class($exception));
+			
+			return $this->execute($failRoute, array('exception' => $exception));
+		}
 
 		$body = $exe->response->getBody();
 
@@ -328,29 +299,6 @@ class Application extends \Exedra\Container\Container
 	protected function exitWithMessage($message, $title = null)
 	{
 		echo "<pre><hr>".($title ? "<u>".$title."</u>\n" : '').$message."<hr>";exit;
-	}
-
-	/**
-	 * Throw failed execution if no route was found.
-	 * @param mixed query
-	 * @param array parameter
-	 * @throws \Exception.
-	 */
-	protected function throwFailedExecution(\Exedra\Application\Map\Finding $finding, $query, array $parameter = array())
-	{
-		if($httpRequest = $finding->request)
-		{
-			$msg = 'Querying Request :'."\n";
-			$msg .= 'Method : '.strtoupper($httpRequest->getMethod())."\n";
-			$msg .= 'Request Path : '.$httpRequest->getUri()->getPath()."\n";
-			$msg .= 'Ajax : '.($httpRequest->isAjax() ? 'ya' : 'no');
-		}
-		else
-		{
-			$msg = 'Querying Route : '.$query;
-		}
-
-		throw new \Exedra\Exception\RouteNotFoundException('Route is not found');
 	}
 
 	/**
