@@ -83,22 +83,22 @@ abstract class InstanceFactory
 		{
 			$reflection	= new \ReflectionClass($className);
 
-			$controller	= $reflection->newInstanceArgs($args);
+			$instance	= $reflection->newInstanceArgs($args);
 		}
 		else
 		{
-			$controller	= new $className;
+			$instance	= new $className;
 		}
 
-		return $controller;
+		return $instance;
 	}
 
 	/**
-	 * Create an instance and invoke the method
-	 * - if definition is string, create controller based on that string.
-	 * - if definition is array, take first element as controller name, and second as construct parameters
+	 * Instantiate and invoke the method
+	 * - if definition is string, instantiate based on that string.
+	 * - if definition is array, take first element as class name, and second as construct parameters
 	 *   - if it has key [class], expect it as class definition.
-	 * - else, expect it as the controller object.
+	 * - else, expect it as the object instance.
 	 * @param mixed cname
 	 * @param string method
 	 * @param array parameter
@@ -108,27 +108,27 @@ abstract class InstanceFactory
 	{
 		if(is_string($definition))
 		{
-			$controller	= $this->create($definition);
+			$object	= $this->create($definition);
 		}
 		else if(is_array($definition))
 		{
 			if(isset($definition['class']))
-				$controller = $this->create($definition);
+				$object = $this->create($definition);
 			else 
-				$controller	= $this->create($definition[0], $definition[1]);
+				$object	= $this->create($definition[0], $definition[1]);
 		}
 		else
 		{
-			$controller	= $definition;
+			$object	= $definition;
 		}
 
-		if(!method_exists($controller, $method))
+		if(!method_exists($object, $method))
 		{
-			$reflection	= new \ReflectionClass($controller);
+			$reflection	= new \ReflectionClass($object);
 
 			throw new \Exedra\Exception\NotFoundException($reflection->getName()." : Method [$method] does not exists.");
 		}
 
-		return call_user_func_array(Array($controller,$method), $args);
+		return call_user_func_array(Array($object,$method), $args);
 	}
 }
