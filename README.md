@@ -119,7 +119,7 @@ $app->map->any('/api')->middleware(\App\Middleware\Api::CLASS)->group(function($
         
         });
         
-        $channels->get('/[:id]')->group(function($channel)
+        $channels->any('/[:id]')->group(function($channel)
         {
             // GET /api/channels/:id
             $channel->get('/')->execute(function()
