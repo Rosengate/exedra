@@ -24,9 +24,16 @@ class Handlers
 	 */
 	protected $handlers = array();
 
-	public function __construct(\Exedra\Application $app)
+	public function __construct()
 	{
-		$this->app = $app;
+		$this->registerDefaultHandlers();
+	}
+
+	protected function registerDefaultHandlers()
+	{
+		$this->register('closure', '\Exedra\Application\Execution\Handler\Closure');
+		
+		$this->register('controller', '\Exedra\Application\Execution\Handler\Controller');
 	}
 
 	/**

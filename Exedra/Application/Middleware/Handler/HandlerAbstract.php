@@ -6,6 +6,7 @@ abstract class HandlerAbstract implements \Exedra\Application\Execution\Handler\
 	public function __construct($name, \Exedra\Application\Execution\Exec $exe)
 	{
 		$this->name = $name;
+		
 		$this->exe = $exe;
 	}
 }

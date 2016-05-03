@@ -38,7 +38,9 @@ class Loader extends HandlerAbstract
 			return false;
 
 		$this->loader = $this->exe->app->loader;
+
 		$this->type = $type;
+		
 		$this->path = $path;
 
 		return true;

@@ -21,13 +21,11 @@ class Registry
 	 */
 	protected $middlewares = array();
 
-	public function __construct(\Exedra\Application $app)
+	public function __construct(Middlewares $middlewares, Handlers $handlers)
 	{
-		$this->app = $app;
+		$this->middlewares = $middlewares;
 
-		$this->middlewares = new \Exedra\Application\Middleware\Middlewares($this);
-
-		$this->handlers = new Handlers;
+		$this->handlers = $handlers;
 	}
 
 	/**
@@ -50,14 +48,36 @@ class Registry
 	}
 
 	/**
-	 * Resolve middleware pattern
 	 * @param \Exedra\Application\Execution\Exec exe
-	 * @param mixed pattern
+	 * @param Middlewares middlewares
+	 * @param \Closure handle
 	 * @return \Closure
 	 */
-	public function resolveMiddleware(\Exedra\Application\Execution\Exec $exe, $pattern)
+	public function resolve(\Exedra\Application\Execution\Exec $exe, Middlewares $middlewares, \Closure $handle)
 	{
-		return $this->handlers->resolve($exe, $pattern);
+		if($middlewares->count() == 0)
+			return $handle;
+
+		$middlewares->rewind();
+
+		while($middlewares->valid())
+		{
+			$middleware = $middlewares->current();
+
+			if(is_string($middleware) && $lookup = $this->lookUp($middleware))
+				$middleware = $lookup;
+
+			$middlewares[$middlewares->key()] = $this->handlers->resolve($exe, $middleware);
+
+			$middlewares->next();
+		}
+
+		// set the given execution handler on the last
+		$middlewares[$middlewares->count()] = $handle;
+
+		$middlewares->rewind();
+
+		return $middlewares->current();
 	}
 
 	/**
@@ -96,7 +116,7 @@ class Registry
 	 */
 	public function getMiddlewares()
 	{
-		$middlewares = new \Exedra\Application\Middleware\Middlewares($this, $this->middlewares->getArrayCopy());
+		$middlewares = new \Exedra\Application\Middleware\Middlewares($this->middlewares->getArrayCopy());
 
 		return $middlewares;
 	}

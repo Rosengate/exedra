@@ -1,5 +1,5 @@
 <?php
-namespace Exedra\Application;
+namespace Exedra\Application\Execution;
 
 /**
  * Handle the registered things on application layer for execution layer..
@@ -8,13 +8,8 @@ namespace Exedra\Application;
 class Registry
 {
 	/**
-	 * List of middleware
-	 * @var array
-	 */
-	protected $middlewares = array();
-
-	/**
 	 * String of route name
+	 * @var string failRoute
 	 */
 	protected $failRoute = null;
 

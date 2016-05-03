@@ -53,6 +53,7 @@ class Finding
 	public function __construct(\Exedra\Application\Map\Route $route = null, array $parameters = array(), \Exedra\Http\ServerRequest $request = null, \Exedra\Application\Config $config)
 	{
 		$this->route = $route;
+
 		$this->request = $request;
 
 		if($route)
@@ -63,6 +64,15 @@ class Finding
 			$this->configs = clone $config;
 			$this->resolve();
 		}
+	}
+
+	/**
+	 * Get route 
+	 * @return \Exedra\Application\Map\Route|null
+	 */
+	public function getRoute()
+	{
+		return $this->route;
 	}
 
 	/**

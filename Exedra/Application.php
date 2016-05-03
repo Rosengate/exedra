@@ -99,7 +99,7 @@ class Application extends \Exedra\Container\Container
 	 */
 	public function setFailRoute($routename)
 	{
-		$this->registry->setFailRoute($routename);
+		$this->execution->setFailRoute($routename);
 	}
 
 	protected function initiateProperties()
@@ -117,18 +117,22 @@ class Application extends \Exedra\Container\Container
 	{
 		$this->dependencies['services']->register(array(
 			'mapFactory' => function(){ return new \Exedra\Application\Map\Factory($this);},
-			'registry' => array('\Exedra\Application\Registry', array('self')),
+			'execution' => array('\Exedra\Application\Execution\Registry', array('factories.executionHandlers')),
+			'middleware' => array('\Exedra\Application\Middleware\Registry', array('factories.middlewares', 'factories.middlewareHandlers')),
 			'request' => function(){ return \Exedra\Http\ServerRequest::createFromGlobals();},
-			"map"=> function() { return $this->mapFactory->createLevel();},
+			'map' => function() { return $this->mapFactory->createLevel();},
 			'url' => array('\Exedra\Application\Factory\Url', array('self.map', 'self.request', 'self.config')),
-			"config"=> '\Exedra\Application\Config',
+			'config' => '\Exedra\Application\Config',
 			'session' => '\Exedra\Application\Session\Session',
-			'path' => array('\Exedra\Application\Factory\Path', array('self.loader')),
-			'middleware' => array('\Exedra\Application\Middleware\Registry', array('self'))
-			));
+			'path' => array('\Exedra\Application\Factory\Path', array('self.loader'))
+		));
 
 		$this->dependencies['factories']->register(array(
-			'exe' => '\Exedra\Application\Execution\Exec'));
+			'exe' => '\Exedra\Application\Execution\Exec',
+			'executionHandlers' => '\Exedra\Application\Execution\Handlers',
+			'middlewares' => '\Exedra\Application\Middleware\Middlewares',
+			'middlewareHandlers' => '\Exedra\Application\Middleware\Handlers'
+		));
 	}
 
 	/**
@@ -187,7 +191,15 @@ class Application extends \Exedra\Container\Container
 	 */
 	public function getExecutionRegistry()
 	{
-		return $this->registry;
+		return $this->execution;
+	}
+
+	/**
+	 * @return \Exedra\Application\Middleware\Registry
+	 */
+	public function getMiddlewareRegistry()
+	{
+		return $this->middleware;
 	}
 
 	/**
@@ -258,7 +270,7 @@ class Application extends \Exedra\Container\Container
 		}
 		catch(\Exedra\Exception\Exception $e)
 		{
-			if($failRoute = $this->registry->getFailRoute())
+			if($failRoute = $this->execution->getFailRoute())
 				$this->setFailRoute(null);
 			else
 				return $this->exitWithMessage($exception->getMessage(), get_class($exception));

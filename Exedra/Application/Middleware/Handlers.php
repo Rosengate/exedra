@@ -34,7 +34,9 @@ class Handlers
 	protected function registerDefaultHandlers()
 	{
 		$this->registry['closure'] = '\Exedra\Application\Middleware\Handler\Closure';
+
 		$this->registry['loader'] = '\Exedra\Application\Middleware\Handler\Loader';
+		
 		$this->registry['className'] = '\Exedra\Application\Middleware\Handler\ClassName';
 
 		// closure as being the first.

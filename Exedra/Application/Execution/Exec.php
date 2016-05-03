@@ -64,12 +64,6 @@ class Exec extends \Exedra\Container\Container
 	public $finding;
 
 	/**
-	 * Referenced registry
-	 * @var \Exedra\Application\Registry
-	 */
-	protected $registry;
-
-	/**
 	 * Execution config instance
 	 * @var \Exedra\Application\Config
 	 */
@@ -101,9 +95,7 @@ class Exec extends \Exedra\Container\Container
 		// Initiate loader, registry, route, config, params, and set base route based on finding.
 		$this->loader = new \Exedra\Loader($this->getBaseDir(), $this->app->structure);
 
-		$this->registry = $this->app->registry;
-		
-		$this->route = $this->finding->route;
+		$this->route = $this->finding->getRoute();
 		
 		$this->config = $this->finding->getConfig();
 		
@@ -153,16 +145,16 @@ class Exec extends \Exedra\Container\Container
 
 	/**
 	 * Initiate middleware/execution handles
+	 * Set response body with the final handle
 	 */
 	protected function intializeHandles()
 	{
-		// finding' middleware
 		if($this->finding->hasMiddlewares())
 			$this->middlewares->addByArray($this->finding->getMiddlewares());
 
-		$handle = $this->app->getExecutionRegistry()->resolveHandle($this, $this->finding->route->getProperty('execute'));
+		$handle = $this->app->getExecutionRegistry()->resolve($this, $this->route->getProperty('execute'));
 
-		$handle = $this->middlewares->resolve($this, $handle);
+		$handle = $this->app->getMiddlewareRegistry()->resolve($this, $this->middlewares, $handle);
 
 		$this->response->setBody($handle($this));
 	}
@@ -483,6 +475,16 @@ class Exec extends \Exedra\Container\Container
 		return $this->app->execute($route, $parameters, $request);
 	}
 
+	/**
+	 * Extended container::solve method
+	 * for shared service/factory/callable check
+	 * @param string type
+	 * @param string name
+	 * @param array args
+	 * @return mixed
+	 *
+	 * @throws \Exedra\Exception\InvalidArgumentException
+	 */
 	protected function solve($type, $name, array $args = array())
 	{
 		if(!$this->dependencies[$type]->has($name))

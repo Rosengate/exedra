@@ -7,30 +7,12 @@ namespace Exedra\Application\Middleware;
 class Middlewares extends \ArrayIterator
 {
 	/**
-	 * Registry information
-	 * Everything including handler
-	 * @var \Exedra\Application\Middleware\Registry
-	 */
-	protected $registry;
-
-	public function __construct(\Exedra\Application\Middleware\Registry $registry, array $middlewares = array())
-	{
-		$this->registry = $registry;
-	
-		parent::__construct($middlewares);
-	}
-
-	/**
 	 * Append a middleware to the collection.
 	 * Main gateway to stacking middleware
 	 * @param mixed middleware
 	 */
 	public function add($middleware)
 	{
-		// do a key lookup against registry.
-		if(is_string($middleware) && $lookup = $this->registry->lookUp($middleware))
-			$middleware = $lookup;
-
 		$this->append($middleware);
 	}
 
@@ -50,7 +32,7 @@ class Middlewares extends \ArrayIterator
 	 * @param \Exedra\Application\Execution\Exec
 	 * @param \Closure handle - first handle
 	 */
-	public function resolve(\Exedra\Application\Execution\Exec $exe, \Closure $handle)
+	public function resolve(\Exedra\Application\Execution\Exec $exe, \Exedra\Application\Middleware\Registry $registry, \Closure $handle)
 	{
 		if($this->count() == 0)
 			return $handle;
@@ -59,7 +41,12 @@ class Middlewares extends \ArrayIterator
 
 		while($this->valid())
 		{
-			$this[$this->key()] = $this->registry->resolveMiddleware($exe, $this->current());
+			$middleware = $this->current();
+
+			if(is_string($middleware) && $lookup = $registry->lookUp($middleware))
+				$middleware = $lookup;
+
+			$this[$this->key()] = $registry->resolveMiddleware($exe, $middleware);
 
 			$this->next();
 		}
