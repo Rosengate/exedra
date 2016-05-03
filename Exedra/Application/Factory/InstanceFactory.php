@@ -108,27 +108,27 @@ abstract class InstanceFactory
 	{
 		if(is_string($definition))
 		{
-			$object	= $this->create($definition);
+			$instance	= $this->create($definition);
 		}
 		else if(is_array($definition))
 		{
 			if(isset($definition['class']))
-				$object = $this->create($definition);
+				$instance = $this->create($definition);
 			else 
-				$object	= $this->create($definition[0], $definition[1]);
+				$instance	= $this->create($definition[0], $definition[1]);
 		}
 		else
 		{
-			$object	= $definition;
+			$instance	= $definition;
 		}
 
-		if(!method_exists($object, $method))
+		if(!method_exists($instance, $method))
 		{
-			$reflection	= new \ReflectionClass($object);
+			$reflection	= new \ReflectionClass($instance);
 
 			throw new \Exedra\Exception\NotFoundException($reflection->getName()." : Method [$method] does not exists.");
 		}
 
-		return call_user_func_array(Array($object,$method), $args);
+		return call_user_func_array(array($instance, $method), $args);
 	}
 }
