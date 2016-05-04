@@ -257,60 +257,46 @@ class Application extends \Exedra\Container\Container
 	}
 
 	/**
-	 * Individually dispatch this application with the given Http request
-	 * @return \Exedra\Http\Response ?
+	 * Dispatch and send the response
 	 */
 	public function dispatch(\Exedra\Http\ServerRequest $request = null)
+	{
+		$this->respond($request)->send();
+	}
+
+	/**
+	 * Dispatch and return the response
+	 * @return \Exedra\Application\Execution\Response
+	 */
+	public function respond(\Exedra\Http\ServerRequest $request = null)
 	{
 		$request = $request ? : $this->request;
 
 		try
 		{
-			$exe = $this->execute($request);
+			$response = $this->execute($request)
+							->finalize()
+							->getResponse();
 		}
 		catch(\Exedra\Exception\Exception $e)
 		{
 			if($failRoute = $this->execution->getFailRoute())
+			{
+				$response = $this->execute($failRoute, array('exception' => $e))
+								->finalize()
+								->getResponse();
+				
 				$this->setFailRoute(null);
-			else
-				return $this->exitWithMessage($e->getMessage(), get_class($e));
-			
-			$exe = $this->execute($failRoute, array('exception' => $e));
-		}
-
-		$body = $exe->response->getBody();
-
-		$response = $exe->response;
-		
-		// recursively check if body is truly not another execution instance
-		// if it is, retrieve both true body and http response, until the final
-		while(true)
-		{
-			if($body instanceof \Exedra\Application\Execution\Exec)
-			{
-				$response = $body->response;
-
-				$body = $body->response->getBody();
 			}
 			else
 			{
-				break;
+				$response = \Exedra\Application\Execution\Response::createEmptyResponse()
+				->setStatus(404)
+				->setBody($e->getMessage());
 			}
 		}
 
-		$response->sendHeader();
-
-		echo $body;
-	}
-
-	/**
-	 * Exit script with given message and title
-	 * @param string message
-	 * @param string title
-	 */
-	protected function exitWithMessage($message, $title = null)
-	{
-		echo "<pre><hr>".($title ? "<u>".$title."</u>\n" : '').$message."<hr>";exit;
+		return $response;
 	}
 
 	/**

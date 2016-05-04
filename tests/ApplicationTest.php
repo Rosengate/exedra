@@ -148,5 +148,52 @@ class ApplicationTest extends PHPUnit_Framework_TestCase
 
 		$this->assertEquals(get_class($app->create('foo')), get_class($exe->create('foo')));
 	}
-}
 
+	public function testDispatch()
+	{
+		$request = \Exedra\Http\ServerRequest::createFromArray(array(
+			'method' => 'GET',
+			'uri' => 'http://google.com:80/foo/bar?baz=bad#fragman',
+			'headers' => array(
+				'referer' => array('http://foo.com')
+				)
+			));
+
+		$app = new \Exedra\Application(__DIR__);
+
+		$app->map->any('/foo/bar')->execute(function()
+		{
+			return 'baz';
+		});
+
+		$response = $app->respond($request);
+
+		// $this->assertEquals(200, $response->getStatusCode());
+
+		$this->assertEquals('baz', $response->getBody());
+	}
+
+	public function testFailedDispatch()
+	{
+		$request = \Exedra\Http\ServerRequest::createFromArray(array(
+			'method' => 'GET',
+			'uri' => 'http://google.com:80/foo/bar/bat?baz=bad#fragman',
+			'headers' => array(
+				'referer' => array('http://foo.com')
+				)
+			));
+
+		$app = new \Exedra\Application(__DIR__);
+
+		$app->map->any('/foo/bar')->execute(function()
+		{
+			return 'baz';
+		});
+
+		$response = $app->respond($request);
+
+		$this->assertEquals(404, $response->getStatusCode());
+
+		$this->assertEquals('Route is not found', $response->getBody());
+	}
+}

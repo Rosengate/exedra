@@ -12,5 +12,14 @@ class Response extends \Exedra\Http\Response
 	public function setBody($body, $mode = null)
 	{
 		$this->body = $body;
+
+		return $this;
+	}
+
+	public function send()
+	{
+		$this->sendHeader();
+
+		echo $this->body;
 	}
 }

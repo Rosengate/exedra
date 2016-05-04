@@ -143,6 +143,11 @@ class Exec extends \Exedra\Container\Container
 		return $this->app;
 	}
 
+	public function getResponse()
+	{
+		return $this->response;
+	}
+
 	/**
 	 * Initiate middleware/execution handles
 	 * Set response body with the final handle
@@ -473,6 +478,27 @@ class Exec extends \Exedra\Container\Container
 		$request = $request ? : $this->request;
 
 		return $this->app->execute($route, $parameters, $request);
+	}
+
+	/**
+	 * Retrieve the actual execution instance
+	 * @return \Exedra\Application\Execution\Exec
+	 */
+	public function finalize()
+	{
+		$exe = $this;
+
+		while(true)
+		{
+			$body = $exe->response->getBody();
+
+			if($body instanceof \Exedra\Application\Execution\Exec)
+				$exe = $body;
+			else
+				break;
+		}
+
+		return $exe;
 	}
 
 	/**
