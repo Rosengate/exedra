@@ -15,12 +15,6 @@ class Application extends \Exedra\Container\Container
 	public $exedra;
 
 	/**
-	 * Application structure
-	 * @var \Exedra\Application\Structure
-	 */
-	public $structure = null;
-
-	/**
 	 * Application based loader
 	 * @var \Exedra\Loader
 	 */
@@ -49,7 +43,7 @@ class Application extends \Exedra\Container\Container
 	 * @param string|array params [if string, expect app directory, else array of directories, and configuration]
 	 * @param \Exedra\Exedra exedra instance
 	 */
-	public function __construct($params, \Exedra\Exedra $exedra = null)
+	public function __construct($params)
 	{
 		parent::__construct();
 
@@ -58,10 +52,8 @@ class Application extends \Exedra\Container\Container
 
 		$this->configure(is_array($params) ? $params : array('dir.app' => $params));
 
-		// initialize properties
-		$this->initiateProperties();
+		$this->loader = new \Exedra\Loader($this->getDir());
 
-		// autoload the current folder
 		$this->loader->autoload('', $this->config->get('namespace'));
 	}
 
@@ -102,14 +94,6 @@ class Application extends \Exedra\Container\Container
 		$this->execution->setFailRoute($routename);
 	}
 
-	protected function initiateProperties()
-	{
-		// create application structure and loader
-		$this->structure = new \Exedra\Application\Structure\Structure;
-
-		$this->loader = new \Exedra\Loader($this->getDir(), $this->structure);
-	}
-
 	/**
 	 * Register dependencies.
 	 */
@@ -124,6 +108,7 @@ class Application extends \Exedra\Container\Container
 			'url' => array('\Exedra\Application\Factory\Url', array('self.map', 'self.request', 'self.config')),
 			'config' => '\Exedra\Application\Config',
 			'session' => '\Exedra\Application\Session\Session',
+			'flash' => '\Exedra\Application\Session\Flash',
 			'path' => array('\Exedra\Application\Factory\Path', array('self.loader'))
 		));
 
@@ -203,78 +188,65 @@ class Application extends \Exedra\Container\Container
 	}
 
 	/**
-	 * Execute application
-	 * @param string|array|\Exedra\Http\ServerRequest query
+	 * @return \Exedra\Http\Request
+	 */
+	public function getRequest()
+	{
+		return $this->request;
+	}
+
+	/**
+	 * Execute application with route name
+	 * @param string|\Exedra\Http\ServerRequest query
 	 * @param array parameter
+	 * @return \Exedra\Application\Execution\Exec
+	 *
+	 * @throws \Exedra\Exception\InvalidArgumentException
+	 */
+	public function execute($routeName, array $parameters = array(), \Exedra\Http\ServerRequest $request = null)
+	{
+		// expect it as route name
+		if(!is_string($routeName))
+			throw new \Exedra\Exception\InvalidArgumentException('Argument 1 must be [string]');
+			
+		return $this->exec($this->map->findByName($routeName, $parameters, $request));
+	}
+
+	/**
+	 * Execute using http request
+	 * @param \Exedra\Http\ServerRequest|null
+	 * @return \Exedra\Application\Execution\Exec
+	 */
+	public function request(\Exedra\Http\ServerRequest $request = null)
+	{
+		return $this->exec($this->map->find($request ? : $this->request));
+	}
+
+	/**
+	 * Create the exec instance by given finding.
+	 * @param \Exedra\Application\Map\Finding finding
 	 * @return \Exedra\Application\Execution\Exec
 	 *
 	 * @throws \Exedra\Exception\RouteNotFoundException
 	 */
-	public function execute($query, array $parameter = array(), \Exedra\Http\ServerRequest $request = null)
+	public function exec(\Exedra\Application\Map\Finding $finding)
 	{
-		// expect it as route name
-		if(is_string($query))
-		{
-			$finding = $this->map->findByName($query, $parameter, $request);
-		}
-		// expect it either \Exedra\Http\ServerRequest or array
-		else
-		{
-			if($query instanceof \Exedra\Http\ServerRequest)
-			{
-				$request = $query;
-			}
-			else
-			{
-				$data = $query;
-				$query = array();
-				\Exedra\Functions\Arrays::initiateByNotation($query, $data);
-				
-				$request = \Exedra\Http\ServerRequest::createFromArray($query);
-			}
-
-			// \Exedra\Application\Map\Finding
-			$finding = $this->map->find($request);
-
-			$finding->addParameter($parameter);
-		}
-
-		// route not found.
 		if(!$finding->success())
 			throw new \Exedra\Exception\RouteNotFoundException('Route is not found');
 
-		// $exe = new \Exedra\Application\Execution\Exec($this, $finding);
-		$exe = $this->create('exe', array($this, $finding));
-
-		// save to the stack of execution.
-		$this->executions[] = $exe;
-
-		// clear flash on every application execution (only if it has started).
-		if(\Exedra\Application\Session\Session::hasStarted())
-			$exe->flash->clear();
-		
-		return $exe;
-	}
-
-	/**
-	 * Dispatch and send the response
-	 */
-	public function dispatch(\Exedra\Http\ServerRequest $request = null)
-	{
-		$this->respond($request)->send();
+		return $this->create('exe', array($this, $finding));
 	}
 
 	/**
 	 * Dispatch and return the response
+	 * @param \Exedra\Http\ServerRequest|null
 	 * @return \Exedra\Application\Execution\Response
 	 */
 	public function respond(\Exedra\Http\ServerRequest $request = null)
 	{
-		$request = $request ? : $this->request;
-
 		try
 		{
-			$response = $this->execute($request)
+			$response = $this->request($request)
 							->finalize()
 							->getResponse();
 		}
@@ -297,6 +269,19 @@ class Application extends \Exedra\Container\Container
 		}
 
 		return $response;
+	}
+
+	/**
+	 * Dispatch and send the response
+	 * Clear any flash
+	 * @param \Exedra\Http\ServerRequest|null
+	 */
+	public function dispatch(\Exedra\Http\ServerRequest $request = null)
+	{
+		if(\Exedra\Application\Session\Flash::hasStarted())
+			$this->flash->clear();
+
+		$this->respond($request)->send();
 	}
 
 	/**

@@ -93,7 +93,7 @@ class Exec extends \Exedra\Container\Container
 	protected function initializeProperties()
 	{
 		// Initiate loader, registry, route, config, params, and set base route based on finding.
-		$this->loader = new \Exedra\Loader($this->getBaseDir(), $this->app->structure);
+		$this->loader = new \Exedra\Loader($this->getBaseDir());
 
 		$this->route = $this->finding->getRoute();
 		
@@ -368,7 +368,7 @@ class Exec extends \Exedra\Container\Container
 	 * @param boolean absolute, if true. will directly return absolute route. The same use of getAbsoluteRoute
 	 * @return string
 	 */
-	public function getRoute($absolute = false)
+	public function getRouteName($absolute = false)
 	{
 		if($absolute !== true)
 		{
@@ -383,8 +383,18 @@ class Exec extends \Exedra\Container\Container
 		}
 		else
 		{
-			return $this->getAbsoluteRoute();
+			return $this->route->getAbsoluteName();
 		}
+	}
+
+	/**
+	 * Alias to getRouteName()
+	 * @param bool absolute
+	 * @return string
+	 */
+	public function getRoute($absolute = false)
+	{
+		return $this->getRouteName($absolute);
 	}
 
 	/** 
@@ -478,6 +488,16 @@ class Exec extends \Exedra\Container\Container
 		$request = $request ? : $this->request;
 
 		return $this->app->execute($route, $parameters, $request);
+	}
+
+	/**
+	 * Alias to app->request()
+	 * @param \Exedra\Http\ServerRequest request
+	 * @return \Exedra\Application\Execution\Exec
+	 */
+	public function request(\Exedra\Http\ServerRequest $request)
+	{
+		return $this->app->request($request);
 	}
 
 	/**

@@ -170,16 +170,16 @@ class RoutingTest extends PHPUnit_Framework_TestCase
 				)]
 			));
 		// route r1 (name based route)
-		$response = $this->app->execute('r1', array('param1'=> 'something'));
-		$this->assertEquals('something', $response->response->getBody());
+		$exe = $this->app->execute('r1', array('param1'=> 'something'));
+		$this->assertEquals('something', $exe->response->getBody());
 
 		// route r2.sr3 (request based route)
-		$response2 = $this->app->execute(['uri' => ['path' => 'hello/world']]);
-		$this->assertEquals('world', $response2->response->getBody());
+		$exe2 = $this->app->request(\Exedra\Http\ServerRequest::createFromArray(['uri' => ['path' => 'hello/world']]));
+		$this->assertEquals('world', $exe2->response->getBody());
 
 		// middleware on r3.sr4
-		$response3 = $this->app->execute(['uri' => ['path' => 'hello/rita/world']]);
-		$this->assertEquals('something', $response3->response->getBody());
+		$exe3 = $this->app->request(\Exedra\Http\ServerRequest::createFromArray(['uri' => ['path' => 'hello/rita/world']]));
+		$this->assertEquals('something', $exe3->response->getBody());
 	}
 
 	public function testPrioritizeExecution()

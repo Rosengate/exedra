@@ -13,27 +13,15 @@ class Loader
 	protected $baseDir;
 
 	/**
-	 * Available only for application and exec instance.
-	 * @var \Exedra\Application\Structure\Structure
-	 */
-	protected $structure = null;
-
-	/**
-	 * List of custom configuration
-	 * @var array
-	 */
-	protected $configurations;
-
-	/**
 	 * List of autoloaded dirs and namespaces
 	 * @var array
 	 */
 	protected $autoloadingRegistry = array();
 
-	public function __construct($baseDir = null, \Exedra\Application\Structure\Structure $structure = null)
+	public function __construct($baseDir = null)
 	{
 		$this->baseDir = !$baseDir ? null : rtrim($baseDir, '/');
-		$this->structure = $structure;
+
 		$this->autoloadRegister();
 	}
 
@@ -52,9 +40,7 @@ class Loader
 
 	/**
 	 * Required the file.
-	 * @param mixed file
-	 * - if string, will take it as purely path.
-	 * - if array, will use the passed value as configuration options
+	 * @param string file
 	 * @param array data
 	 * @return required file
 	 */
@@ -98,8 +84,6 @@ class Loader
 	 */
 	protected function loadFile($file, $data, $once = false)
 	{
-		$file = is_array($file) ? $this->configure($file) : $file;
-
 		$file = $this->refinePath($this->prefixPath($file));
 
 		if(!file_exists($file))
@@ -115,61 +99,12 @@ class Loader
 	}
 
 	/**
-	 * Add custom configuration to path parameter.
-	 * @param string name
-	 * @param callback callback (will pass path, and file[key]), requre the same string of path as return.
-	 */
-	protected function addConfiguration($name, $callback)
-	{
-		$this->configurations[$name] = $callback;
-	}
-
-	/**
-	 * Get the configured path with the given options.
-	 * @param array options
-	 */
-	protected function configure(array $options)
-	{
-		if(!isset($options['path']))
-			throw new \Exedra\Exception\InvalidArgumentException('Path parameter missing.');
-
-		$path = $options['path'];
-
-		foreach($options as $key=>$val)
-		{
-			switch($key)
-			{
-				case 'structure':
-				$structure = $this->structure->get($val);
-
-				// append this structure to the path.
-				$path = $structure.'/'.$path;
-				break;
-			}
-		}
-
-		if(count($this->configurations) > 0)
-		{
-			foreach($this->configurations as $key=>$callback)
-			{
-				if(isset($file[$key]))
-				{
-					$path = $callback($path, $file[$key]);
-				}
-			}
-		}
-
-		return $path;
-	}
-
-	/**
 	 * Check whether file exists.
 	 * @param string path to file.
 	 * @return boolean
 	 */
 	public function has($path)
 	{
-		$path = is_array($path) ? $this->configure($path) : $path;
 		$path = $this->refinePath($this->prefixPath($path));
 
 		return file_exists($path);
@@ -249,7 +184,6 @@ class Loader
 	 */
 	public function getContent($file)
 	{
-		$file = is_array($file) ? $this->configure($file) : $file;
 		$file = $this->refinePath($this->prefixPath($file));
 
 		if(!file_exists($file))
@@ -288,7 +222,6 @@ class Loader
 	 */
 	public function buildPath($path)
 	{
-		$path = is_array($path) ? $this->configure($path) : $path;
 		$path = $this->refinePath($this->prefixPath($path));
 
 		return $path;
@@ -315,16 +248,6 @@ class Loader
 			default:
 			return str_replace("\\", DIRECTORY_SEPARATOR, $path);
 		}
-	}
-
-	/**
-	 * Short syntax checking for structure and path string.
-	 * @param string file
-	 * @return string
-	 */
-	public function isLoadable($file)
-	{
-		return strpos($file, ":") !== false;
 	}
 }
 
