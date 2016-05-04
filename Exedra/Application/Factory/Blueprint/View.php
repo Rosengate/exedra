@@ -42,13 +42,13 @@ class View implements \ArrayAccess
 	 */
 	protected $callbacks	= array();
 
-	public function __construct($path = null, $data = null, \Exedra\Loader $loader)
+	public function __construct($path = null, $data = null)
 	{
 		if($path) $this->setPath($path);
 	
 		if($data) $this->set($data);
 	
-		$this->loader = $loader;
+		// $this->loader = $loader;
 	}
 
 	/**
@@ -236,7 +236,7 @@ class View implements \ArrayAccess
 
 		extract($this->callbackResolve($this->data));
 
-		require $this->loader->buildPath(array('structure' => 'view', 'path' => $this->path));
+		require $this->path;
 
 		return ob_get_clean();
 	}

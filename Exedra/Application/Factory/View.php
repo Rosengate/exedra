@@ -37,7 +37,7 @@ class View
 	}
 
 	/**
-	 * Create view instance.
+	 * Create view instance based on given relative path.
 	 * @param string path
 	 * @param array data
 	 * @return \Exedra\Application\Response\View view
@@ -46,20 +46,16 @@ class View
 	{
 		$path = $this->baseDir ? $this->baseDir . '/' . ltrim($path) : $path;
 
-		// $path = $this->buildPath($path);
-		if(!$this->has($path))
-			throw new \Exedra\Exception\NotFoundException('Unable to find view ['.$path.']');
-		
-		// append .php extension.
 		$path = $this->buildPath($path);
 
+		if(!file_exists($path))
+			throw new \Exedra\Exception\NotFoundException('Unable to find view ['.$path.']');
+		
 		// merge with default data.
 		if(count($this->defaultData) > 0)
 			$data = array_merge($data, $this->defaultData);
 
-		$view	= new Blueprint\View($path, $data, $this->loader);
-		
-		return $view;
+		return new Blueprint\View($path, $data);
 	}
 
 	/**
@@ -73,13 +69,15 @@ class View
 	}
 
 	/**
-	 * Build path with extension
+	 * Absolutely build path based on the relative one
 	 * @param string path
 	 * @return string
 	 */
 	protected function buildPath($path)
 	{
 		$path	= $path. '.' .$this->ext;
+
+		$path = $this->loader->buildPath('View/'. $path);
 
 		return $path;
 	}
@@ -95,7 +93,7 @@ class View
 		if($build)
 			$path = $this->buildPath($path);
 
-		return $this->loader->has(array('structure'=> 'view', 'path'=> $path));
+		return file_exists($path);
 	}
 
 	/**

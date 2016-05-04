@@ -132,27 +132,14 @@ class Factory
 
 	/**
 	 * Create level by pattern
+	 * For now, assume the passed pattern as string
 	 * @param \Exedra\Application\Map\Route
 	 * @param string pattern
 	 * @return \Exedra\Application\Map\Level
 	 */
 	public function createLevelByPattern(Route $route = null, $pattern)
 	{
-		// has structure based path
-		if(strpos($pattern, ':') !== FALSE)
-		{
-			list($structure, $path) = explode(':', $pattern);
-			$loadParameter = array(
-				'structure' => $structure,
-				'path' => $path
-				);
-		}
-		else
-		{
-			$loadParameter = $pattern;
-		}
-
-		$closure = $this->getLoader()->load($loadParameter);
+		$closure = $this->getLoader()->load($pattern);
 
 		// expecting a Map\Level from this loaded file.
 		if(!($closure instanceof \Closure))
