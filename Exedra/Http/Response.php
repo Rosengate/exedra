@@ -101,7 +101,7 @@ class Response extends Message
 			504 => "Gateway Timeout"
 			);
 
-		return $defaultReasons[$status];
+		return isset($defaultReasons[$status]) ? $defaultReasons[$status] : 'Unknown';
 	}
 
 	/**
@@ -119,7 +119,7 @@ class Response extends Message
 	 */
 	public function sendHeader()
 	{
-		header('HTTP '.$this->getProtocolVersion().' '.$this->getStatusCode().' '.$this->getReasonPhrase());
+		header('HTTP/'.$this->getProtocolVersion().' '.$this->getStatusCode().' '.$this->getReasonPhrase());
 
 		foreach($this->headers as $key => $values)
 			header($key.': '.implode(', ', $values));
