@@ -325,7 +325,7 @@ class ServerRequest extends Message
 
 	public function isAjax()
 	{
-		return $this->getHeaderLine('x-requested-with') == 'XMLHttpRequest';
+		return strtolower($this->getHeaderLine('x-requested-with')) == 'xmlhttprequest';
 	}
 
 	public function header()
