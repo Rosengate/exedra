@@ -47,4 +47,11 @@ class LoaderTest extends PHPUnit_Framework_TestCase
 
 		$this->assertEquals(\FooSpace\FooBazClass::CLASS, get_class(new \FooSpace\FooBazClass));
 	}
+
+	public function testBufferedLoad()
+	{
+		$content = $this->loader->loadBuffered('dynamic-dump.php', array('foo' => 'bar'));
+
+		$this->assertEquals('dynamic dump bar', $content);
+	}
 }

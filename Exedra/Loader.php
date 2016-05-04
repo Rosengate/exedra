@@ -75,6 +75,21 @@ class Loader
 	}
 
 	/**
+	 * Do a buffered file inclusion
+	 * @param string file
+	 * @param array data
+	 * @return string
+	 */
+	public function loadBuffered($file, array $data = array())
+	{
+		ob_start();
+
+		$this->load($file, $data);
+
+		return ob_get_clean();
+	}
+
+	/**
 	 * Abstract function for load and loadOnce
 	 * @param mixed file
 	 * @param array data
