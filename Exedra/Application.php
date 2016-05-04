@@ -273,9 +273,9 @@ class Application extends \Exedra\Container\Container
 			if($failRoute = $this->execution->getFailRoute())
 				$this->setFailRoute(null);
 			else
-				return $this->exitWithMessage($exception->getMessage(), get_class($exception));
+				return $this->exitWithMessage($e->getMessage(), get_class($e));
 			
-			return $this->execute($failRoute, array('exception' => $exception));
+			$exe = $this->execute($failRoute, array('exception' => $e));
 		}
 
 		$body = $exe->response->getBody();
