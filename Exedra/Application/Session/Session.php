@@ -18,18 +18,26 @@ class Session
 
 	public function __construct(&$storage = null)
 	{
-		## set storage. default use php _SESSION, if not passed through constructor param.
 		if($storage !== null)
-		{
 			$this->storage = &$storage;
-		}
 		else
-		{
-			if(!isset($_SESSION))
-				session_start();
+			$this->start();
+	}
 
-			$this->storage = &$_SESSION;
-		}
+	/**
+	 * Start the session
+	 */
+	public function start()
+	{
+		if(!self::hasStarted())
+			return;
+
+		session_start();
+
+		if(!isset($_SESSION))
+			session_start();
+
+		$this->storage = &$_SESSION;
 	}
 
 	/**

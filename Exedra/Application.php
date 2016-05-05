@@ -107,8 +107,8 @@ class Application extends \Exedra\Container\Container
 			'map' => function() { return $this->mapFactory->createLevel();},
 			'url' => array('\Exedra\Application\Factory\Url', array('self.map', 'self.request', 'self.config')),
 			'config' => '\Exedra\Application\Config',
-			'session' => '\Exedra\Application\Session\Session',
-			'flash' => '\Exedra\Application\Session\Flash',
+			'@session' => '\Exedra\Application\Session\Session',
+			'@flash' => array('\Exedra\Application\Session\Flash', array('self.session')),
 			'path' => array('\Exedra\Application\Factory\Path', array('self.loader'))
 		));
 

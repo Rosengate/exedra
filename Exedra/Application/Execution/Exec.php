@@ -119,10 +119,8 @@ class Exec extends \Exedra\Container\Container
 			'middleware' => function(){ return new \Exedra\Application\Factory\Middleware($this->app->getNamespace(), $this->getModule());},
 			'controller' => function(){ return new \Exedra\Application\Factory\Controller($this->app->getNamespace(), $this->getModule());},
 			'url' => function(){ return new \Exedra\Application\Execution\Factory\Url($this->app->map, $this->request, $this->config, $this);},
-			"flash"=> function() {return new \Exedra\Application\Session\Flash($this->app->session);},
 			"redirect"=> array("\Exedra\Application\Execution\Redirect", array('self')),
 			"form"=> array("\Exedra\Application\Execution\Factory\Form", array('self')),
-			"session"=> function() {return $this->app->session;},
 			'asset' => function(){ return new \Exedra\Application\Factory\Asset($this->url, $this->app->getRootDir(), $this->config->get('asset', array()));},
 			'path' => array('\Exedra\Application\Factory\Path', array('self.loader'))
 			));
