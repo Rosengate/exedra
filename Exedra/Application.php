@@ -278,7 +278,7 @@ class Application extends \Exedra\Container\Container
 	 */
 	public function dispatch(\Exedra\Http\ServerRequest $request = null)
 	{
-		if(\Exedra\Application\Session\Flash::hasStarted())
+		if(\Exedra\Application\Session\Session::hasStarted())
 			$this->flash->clear();
 
 		$this->respond($request)->send();
