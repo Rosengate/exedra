@@ -29,10 +29,8 @@ class Session
 	 */
 	public function start()
 	{
-		if(!self::hasStarted())
+		if(self::hasStarted())
 			return;
-
-		session_start();
 
 		if(!isset($_SESSION))
 			session_start();
