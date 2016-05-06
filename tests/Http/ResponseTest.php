@@ -28,4 +28,15 @@ class HttpResponseTest extends PHPUnit_Framework_TestCase
 
 		$this->assertEquals(10, $this->response->getHeaderLine('refresh'));
 	}
+
+	public function testHeaderAdd()
+	{
+		$this->response->addHeader('X-Foo', 'bar');
+
+		$this->response->addHeader('X-Foo', 'baz');
+
+		$this->assertEquals('bar, baz', $this->response->getHeaderLine('x-foo'));
+
+		$this->assertEquals(array('bar', 'baz'), $this->response->getHeader('x-foo'));
+	}
 }

@@ -121,7 +121,7 @@ class Response extends Message
 	{
 		header('HTTP/'.$this->getProtocolVersion().' '.$this->getStatusCode().' '.$this->getReasonPhrase());
 
-		foreach($this->headers as $key => $values)
+		foreach($this->headerLines as $key => $values)
 			header($key.': '.implode(', ', $values));
 	}
 

@@ -76,20 +76,17 @@ class Message
 	 */
 	public function getHeaders()
 	{
-		return $this->headers;
+		return $this->headerLines;
 	}
 
 	/**
+	 * Get header values
 	 * @param string name
 	 * @return array
 	 */
 	public function getHeader($header)
 	{
-		foreach($this->headers as $key => $value)
-			if(strtolower($header) == strtolower($key))
-				return $value;
-
-		return array();
+		return isset($this->headers[$name = strtolower($header)]) ? $this->headers[$name] : array();
 	}
 
 	/**
@@ -152,8 +149,6 @@ class Message
 			break;
 		}
 
-		// $this->body = $body;
-
 		return $this;
 	}
 
@@ -164,14 +159,14 @@ class Message
 		return $message->setBody($body, 'r+');
 	}
 
-	public function hasHeader($name)
+	public function hasHeader($header)
 	{
-		return isset($this->headers[self::headerCase($name)]);
+		return isset($this->header[strtolower($header)]);
 	}
 
 	public function headerHas($name, $value)
 	{
-		$name = self::headerCase($name);
+		$name = strtolower($header);
 
 		if(!isset($this->headers[$name]))
 			return false;
@@ -193,6 +188,12 @@ class Message
 		$this->headerLines = $headerLines;
 	}
 
+	/**
+	 * Set header as if it's new
+	 * @param string header
+	 * @param array|string value
+	 * @return void
+	 */
 	public function setHeader($header, $value)
 	{
 		$value = !is_array($value) ? array($value) : array_map('trim', $value);
@@ -203,9 +204,17 @@ class Message
 
 		foreach(array_keys($this->headerLines) as $key)
 			if(strtolower($key) == $name)
-				$this->headerLines[$key] = $value;
+				unset($this->headerLines[$key]);
+
+		$this->headerLines[$header] = $value;
 	}
 
+	/**
+	 * Add header value(s)
+	 * @param string header
+	 * @param string|array value
+	 * @return this
+	 */
 	public function addHeader($header, $value)
 	{
 		$name = strtolower($header);
@@ -217,8 +226,9 @@ class Message
 
 			foreach(array_keys($this->headerLines) as $key)
 				if(strtolower($key) == $name)
-					foreach($value as $v)
-						$this->headerLines[$key][] = trim($v);
+					unset($this->headerLines[$key]);
+
+			$this->headerLines[$header] = $this->headers[$name];
 		}
 		else
 		{
@@ -226,12 +236,18 @@ class Message
 
 			foreach(array_keys($this->headerLines) as $key)
 				if(strtolower($key) == $name)
-					$this->headerLines[$key][] = trim($v);
+					unset($this->headerLines[$key]);
+
+			$this->headerLines[$header] = $this->headers[$name];
 		}
 
 		return $this;
 	}
 
+	/**
+	 * Remove header
+	 * @param string header
+	 */
 	public function removeHeader($header)
 	{
 		$name = strtolower($header);
