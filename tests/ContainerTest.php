@@ -21,6 +21,8 @@ class ContainerTest extends PHPUnit_Framework_TestCase
 {
 	public function setUp()
 	{
+		$this->app = new \Exedra\Application(__DIR__.'/Factory/TestApp');
+
 		// build a basic case
 		$this->container = new \Exedra\Container\Container;
 	}
@@ -44,6 +46,8 @@ class ContainerTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals('foo-bar', $this->container->get('foo'));
 
 		$this->assertEquals('bar-baz', $this->container->bar);
+
+		$this->assertEquals('bar-baz', $this->container['bar']);
 	}
 
 	public function testCallable()
@@ -104,5 +108,17 @@ class ContainerTest extends PHPUnit_Framework_TestCase
 		$bat = $this->container->create('bat', array($this->container->create('foo'), 'qux'));
 
 		$this->assertEquals('qux', $bat->getBas());
+	}
+
+	public function testInvokableService()
+	{
+		$this->container['services']->add('foo', function()
+		{
+			return new \TestApp\FooInvokable;
+		});
+
+		$this->assertEquals('bar', $this->container->foo());
+
+		$this->assertEquals('bar', $this->container['foo']());
 	}
 }

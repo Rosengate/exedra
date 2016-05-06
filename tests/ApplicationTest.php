@@ -149,6 +149,21 @@ class ApplicationTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals(get_class($app->create('foo')), get_class($exe->create('foo')));
 	}
 
+	public function testSharedInvokable()
+	{
+		$app = $this->app;
+
+		$app['services']['@qux'] = \TestApp\FooInvokable::class;
+
+		$exe = $app->execute('foo');
+
+		$this->assertEquals($exe['qux'], $app['qux']);
+
+		$this->assertEquals($exe->qux(), $app->qux());
+
+		$this->assertEquals('bar', $app->qux());
+	}
+
 	public function testDispatch()
 	{
 		$request = \Exedra\Http\ServerRequest::createFromArray(array(

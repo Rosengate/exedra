@@ -113,7 +113,7 @@ class Exec extends \Exedra\Container\Container
 	 */
 	protected function initializeServices()
 	{
-		$this->dependencies['services']->register(array(
+		$this->attributes['services']->register(array(
 			'middlewares' => function() {return $this->app->middleware->getMiddlewares();},
 			'view' => array('\Exedra\Application\Factory\View', array('self.loader')),
 			'middleware' => function(){ return new \Exedra\Application\Factory\Middleware($this->app->getNamespace(), $this->getModule());},
@@ -531,16 +531,32 @@ class Exec extends \Exedra\Container\Container
 	 */
 	protected function solve($type, $name, array $args = array())
 	{
-		if(!$this->dependencies[$type]->has($name))
+		if(!$this->attributes[$type]->has($name))
 		{
 			if($this->app[$type]->has('@'.$name))
+			{
 				return $this->app->dependencyCall($type, $name, $args);
+			}
 			else
+			{
+				$isShared = false;
+
+				if($type == 'callables' && ($this->app['services']->has($name) || $isShared = $this->app['services']->has('@'.$name)))
+				{
+					$service = $this->app->get($isShared ? '@'.$name : $name);
+
+					$this->invokables[$name] = $service;
+
+					if(is_callable($service))
+						return call_user_func_array($service, $args);
+				}
+
 				throw new \Exedra\Exception\InvalidArgumentException('Unable to find the ['.$name.'] in the registered '.$type);
+			}
 		}
 		else
 		{
-			$registry = $this->dependencies[$type]->get($name);
+			$registry = $this->attributes[$type]->get($name);
 		}
 
 		return $this->resolve($registry, $args);

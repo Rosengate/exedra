@@ -54,7 +54,7 @@ class Application extends \Exedra\Container\Container
 
 		$this->loader = new \Exedra\Loader($this->getDir());
 
-		$this->dependencies['providers'] = new \Exedra\Provider\Registry($this);
+		$this->attributes['providers'] = new \Exedra\Provider\Registry($this);
 
 		$this->loader->autoload('', $this->config->get('namespace'));
 	}
@@ -101,7 +101,7 @@ class Application extends \Exedra\Container\Container
 	 */
 	protected function serviceRegistry()
 	{
-		$this->dependencies['services']->register(array(
+		$this->attributes['services']->register(array(
 			'mapFactory' => function(){ return new \Exedra\Application\Map\Factory($this);},
 			'execution' => array('\Exedra\Application\Execution\Registry', array('factories.executionHandlers')),
 			'middleware' => array('\Exedra\Application\Middleware\Registry', array('factories.middlewares', 'factories.middlewareHandlers')),
@@ -114,7 +114,7 @@ class Application extends \Exedra\Container\Container
 			'path' => array('\Exedra\Application\Factory\Path', array('self.loader'))
 		));
 
-		$this->dependencies['factories']->register(array(
+		$this->attributes['factories']->register(array(
 			'exe' => '\Exedra\Application\Execution\Exec',
 			'executionHandlers' => '\Exedra\Application\Execution\Handlers',
 			'middlewares' => '\Exedra\Application\Middleware\Middlewares',
@@ -296,7 +296,7 @@ class Application extends \Exedra\Container\Container
 	{
 		if(!$class)
 		{
-			if($this->dependencies['factories']->has('wizard'))
+			if($this->attributes['factories']->has('wizard'))
 				$wizard = $this->create('wizard', array($this));
 			else
 				$wizard = new \Exedra\Console\Wizard\Arcanist($this);
@@ -323,16 +323,32 @@ class Application extends \Exedra\Container\Container
 	 */
 	protected function solve($type, $name, array $args = array())
 	{
-		if(!$this->dependencies[$type]->has($name))
+		if(!$this->attributes[$type]->has($name))
 		{
-			if($this->dependencies[$type]->has('@'.$name))
-				$registry = $this->dependencies[$type]->get('@'.$name);
+			if($this->attributes[$type]->has('@'.$name))
+			{
+				$registry = $this->attributes[$type]->get('@'.$name);
+			}
 			else
+			{
+				$isShared = false;
+
+				if($type == 'callables' && ($this->attributes['services']->has($name) || $isShared = $this->attributes['services']->has('@'.$name)))
+				{
+					$service = $this->get($isShared ? '@'.$name : $name);
+
+					$this->invokables[$name] = $service;
+
+					if(is_callable($service))
+						return call_user_func_array($service, $args);
+				}
+
 				throw new \Exedra\Exception\InvalidArgumentException('Unable to find the ['.$name.'] in the registered '.$type);
+			}
 		}
 		else
 		{
-			$registry = $this->dependencies[$type]->get($name);
+			$registry = $this->attributes[$type]->get($name);
 		}
 
 		return $this->resolve($registry, $args);

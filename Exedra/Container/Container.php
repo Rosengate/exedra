@@ -3,20 +3,21 @@
 class Container implements \ArrayAccess
 {
 	/**
-	 * Container dependencies registry
-	 * @var array of registry of services, callables, and factories
+	 * Container attributes
+	 * @var array of services, callables, factories, resolved services, and public attributes
 	 */
-	protected $dependencies = array();
+	protected $attributes = array();
 
 	/**
-	 * List of resolved services
-	 * @var array services
+	 * Cached invokables
+	 * @var array invokables
 	 */
-	protected $services = array();
+	protected $invokables = array();
 
 	public function __construct()
 	{
-		$this->dependencies = array(
+		// default container attributes
+		$this->attributes = array(
 			'services' => new \Exedra\Container\Registry,
 			'callables' => new \Exedra\Container\Registry,
 			'factories' => new \Exedra\Container\Registry,
@@ -30,37 +31,48 @@ class Container implements \ArrayAccess
 	 */
 	public function offsetExists($type)
 	{
-		return isset($this->dependencies[$type]);
+		return isset($this->attributes[$type]);
 	}
 
 	/**
-	 * Get container registry
+	 * Get attribute
+	 * If has none, find in services registry.
+	 * Alias to get()
 	 * @param string key
 	 * @return \Exedra\Container\Registry
 	 */
-	public function offsetGet($key)
+	public function offsetGet($name)
 	{
-		return $this->dependencies[$key];
+		if(array_key_exists($name, $this->attributes))
+			return $this->attributes[$name];
+
+		return $this->attributes[$name] = $this->solve('services', $name);
 	}
 
 	/**
-	 * Register list of type dependencies
-	 * Will definitely dismiss the previous registry
-	 * @param string service|callable|factory
+	 * Set attribute
+	 * alias to __set
+	 * @param string 
 	 * @param array registry
 	 */
-	public function offsetSet($type, $registry)
+	public function offsetSet($name, $service)
 	{
-		return $this->dependencies[$type] = $registry;
+		$this->attributes[$name] = $service;
+
+		if(!array_key_exists($name, $this->attributes))
+			$this->attributes['services']->set($name, true);
 	}
 
 	/**
-	 * Empty the dependencies type
+	 * Empty the attribute
 	 * @param string key
 	 */
 	public function offsetUnset($key)
 	{
-		$this->dependencies[$key]->clear();
+		if(!in_array($key, array('services', 'callables', 'factories')))
+			return;
+
+		unset($this->attributes[$key]);
 	}
 
 	/**
@@ -70,33 +82,35 @@ class Container implements \ArrayAccess
 	 */
 	public function registry($type)
 	{
-		return $this->dependencies[$type];
+		return $this->attributes[$type];
 	}
 
 	/**
-	 * Set service on this container
+	 * Set attribute
 	 * @param string name
 	 * @param mixed service
 	 */
 	public function __set($name, $service)
 	{
-		$this->services[$name] = $service;
+		$this->attributes[$name] = $service;
 
-		if(!array_key_exists($name, $this->services))
-			$this->dependencies[$name]->set($name, true);
+		if(!array_key_exists($name, $this->attributes))
+			$this->attributes['services']->set($name, true);
 	}
 
 	/**
-	 * Invoke the service and save
+	 * Get attribute
+	 * If has none, find in services registry.
+	 * Alias to get()
 	 * @param string name
 	 * @return mixed
 	 */
 	public function __get($name)
 	{
-		if(array_key_exists($name, $this->services))
-			return $this->services[$name];
+		if(array_key_exists($name, $this->attributes))
+			return $this->attributes[$name];
 
-		return $this->services[$name] = $this->solve('services', $name);
+		return $this->attributes[$name] = $this->solve('services', $name);
 	}
 
 	/**
@@ -109,6 +123,10 @@ class Container implements \ArrayAccess
 	 */
 	public function __call($name, array $args = array())
 	{
+		// if there's a cached stored.
+		if(isset($this->invokables[$name]))
+			return call_user_func_array($this->invokables[$name], $args);
+
 		return $this->solve('callables', $name, $args);
 	}
 
@@ -126,15 +144,17 @@ class Container implements \ArrayAccess
 	}
 
 	/**
-	 * Resolve and set the service as public property.
+	 * Get attribute
+	 * If has none, find in services registry
+	 * @param string name
 	 * @return mixed
 	 */
 	public function get($name)
 	{
-		if(array_key_exists($name, $this->services))
-			return $this->services[$name];
+		if(array_key_exists($name, $this->attributes))
+			return $this->attributes[$name];
 
-		return $this->services[$name] = $this->solve('services', $name);
+		return $this->attributes[$name] = $this->solve('services', $name);
 	}
 
 	/**
@@ -170,10 +190,26 @@ class Container implements \ArrayAccess
 	 */
 	protected function solve($type, $name, array $args = array())
 	{
-		if(!$this->dependencies[$type]->has($name))
-			throw new \Exedra\Exception\InvalidArgumentException('Unable to find the ['.$name.'] in the registered '.$type);
+		if(!$this->attributes[$type]->has($name))
+		{
+			if($type == 'callables' && $this->attributes['services']->has($name))
+			{
+				// then check on related invokable services
+				$service = $this->get($name);
 
-		$registry = $this->dependencies[$type]->get($name);
+				// if service is invokable.
+				if(is_callable($service))
+				{
+					$this->invokables[$name] = $service;
+					
+					return call_user_func_array($service, $args);
+				}
+			}
+
+			throw new \Exedra\Exception\InvalidArgumentException('Unable to find the ['.$name.'] in the registered '.$type);
+		}
+
+		$registry = $this->attributes[$type]->get($name);
 
 		return $this->resolve($registry, $args);
 	}
