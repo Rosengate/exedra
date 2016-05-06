@@ -54,6 +54,8 @@ class Application extends \Exedra\Container\Container
 
 		$this->loader = new \Exedra\Loader($this->getDir());
 
+		$this->dependencies['providers'] = new \Exedra\Provider\Registry($this);
+
 		$this->loader->autoload('', $this->config->get('namespace'));
 	}
 
