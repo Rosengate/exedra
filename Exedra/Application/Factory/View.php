@@ -52,10 +52,27 @@ class View
 			throw new \Exedra\Exception\NotFoundException('Unable to find view ['.$path.']');
 		
 		// merge with default data.
-		if(count($this->defaultData) > 0)
-			$data = array_merge($data, $this->defaultData);
+		$class = '\Exedra\Application\Factory\Blueprint\View';
 
-		return new Blueprint\View($path, $data);
+		if(is_string($data))
+		{
+			// assume data as fully qualified class name 
+			if($data)
+			{
+				$class = $data;
+
+				$data = array();
+			}
+		}
+		else
+		{
+			if(!is_array($data))
+				throw new \Exedra\Exception\NotFoundException('Argument 2 must be either string or array ['.gettype($data).'] given.');
+		}
+
+		$data = array_merge($data, $this->defaultData);
+
+		return new $class($path, $data);
 	}
 
 	/**
