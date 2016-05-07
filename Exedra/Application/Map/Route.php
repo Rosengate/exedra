@@ -343,29 +343,28 @@ class Route
 				);
 		}
 
-		## 2. route check.
-		$segments	= explode('/',  $routePath);
-		$paths		= explode('/',  $path);
+		// route check
+		$segments = explode('/', $routePath);
+		$paths = explode('/', $path);
 
-		## initialize
-		$matched	= true;
+		// initialize states
+		$matched = true;
 		$isTrailing = false;
-		$pathParams	= Array();
+		$pathParams	= array();
 
-		## route segment loop.
-		$equal	= null;
+		// route segment loop.
+		$equal = null;
 
 		$equalSegmentLength = count($segments) == count($paths);
 
-		foreach($segments as $no=>$segment)
+		foreach($segments as $no => $segment)
 		{
-			## 2.1 non-pattern comparation.
-			// if($segment[0] != "[" || $segment[strlen($segment) - 1] != "]") gives notice due to uninitialized segment.
+			// non-pattern based validation
 			if($segment == '' || ($segment[0] != '[' || $segment[strlen($segment) - 1] != ']'))
 			{
 				$equal	= false;
 
-				## need to move this logic outside perhaps.
+				// need to move this logic outside perhaps.
 				if(!$equalSegmentLength)
 					$matched = false;
 
@@ -382,25 +381,27 @@ class Route
 				continue;
 			}
 
-			## 2.2 pattern comparation
+			// pattern based validation
 			$pattern	= trim($segment, '[]');
-			@list($type, $segmentParamName) = explode(':', $pattern); # split by colon.
+			
+			@list($type, $segmentParamName) = explode(':', $pattern);
 
-			## no color was passed. thus, could't retrieve second value.
+			// no color was passed. thus, could't retrieve second value.
 			if(!$segmentParamName)
 			{
 				$matched	= false;
 				break;
 			}
 
-			## 2.2.3 optional flag.
+			// optional flag
 			$isOptional			= $segmentParamName[strlen($segmentParamName)-1] == '?';
+
 			$segmentParamName	= trim($segmentParamName, '?');
 
-			## 2.2.4 no data at current uri path segment.
-			if(!isset($paths[$no]))
+			// no data at current uri path segment.
+			if(!isset($paths[$no]) || (isset($paths[$no]) && $paths[$no] === ''))
 			{
-				## 2.2.4.1 but if optional, continue searching without breaking.
+				// but if optional, continue searching without breaking.
 				if($isOptional)
 				{
 					$matched	= true;  
@@ -417,7 +418,7 @@ class Route
 				break;
 			}
 
-			### type matching.
+			// type based matching
 			switch($type)
 			{
 				// match all, so do nothing.
@@ -446,19 +447,14 @@ class Route
 					$isTrailing = true;
 					break 2;
 				break;
-				// remainder segments into array
+				// segments remainder into array
 				case '**':
-					/*if(!$isOptional && $no === 0 && $uri === '')
-					{
-						$matched = false;
-						break 2;
-					}*/
-					## get all the rest of path for param, and explode it so it return as list of segment.
+					// get all the rest of path for param, and explode it so it return as list of segment.
 					$explodes = explode('/', $path, $no+1);
 					$pathParams[$segmentParamName]	= explode('/', array_pop($explodes));
 					$matched		= true;
 					$isTrailing		= true;
-					break 2; ## break the param loop, and set matched directly to true.
+					break 2; // break the param loop, and set matched directly to true.
 				break;
 				default:
 					$matched = false;
@@ -466,26 +462,26 @@ class Route
 				break;
 			}
 
-			## need to move this logic outside perhaps.
 			if(count($segments) != count($paths))
 				$matched = false;
 
-			## set parameter.
+			// set parameter of the current segment
 			$pathParams[$segmentParamName]	= $paths[$no];
-		}
+		
+		} // segments loop end
 
-		## build result.
-		$result 	= Array();
+		// build result.
+		$result 	= array();
 
 		$result['continue'] = $equal === false ? false : $continue;
 
-		## pattern matched.
+		// pattern matched flag.
 		$result['matched']	= $matched;
 
-		## pass parameter.
+		// pass parameter.
 		$result['parameter'] = $pathParams;
 
-		## return matched, parameter founds, and remaining_uri (if deeproute)
+		// return matched, parameters founds, and continue flag to continue search
 		return $result;
 	}
 

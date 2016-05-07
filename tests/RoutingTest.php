@@ -196,4 +196,55 @@ class RoutingTest extends PHPUnit_Framework_TestCase
 		
 		$this->assertEquals('r1.sr2', $finding->route->getAbsoluteName());
 	}
+
+	public function testMultioptional()
+	{
+		$this->map->get('mult/[:foo?]/[:bar?]/[:baz?]')->name('foo')->execute(function($exe)
+		{
+			return 'qux'.$exe->param('foo', 'hug').$exe->param('bar', 'tiz').$exe->param('baz', 'rel');
+		})->group(function($mult)
+		{
+			$mult->get('/opt/[:dst?]/[:tst?]/[:rdt?]')->execute(function($exe)
+			{
+				$pre = implode('', $exe->params(['foo', 'bar', 'baz']));
+
+				return $pre.'lud'.$exe->param('dst', 'jux').$exe->param('tst', 'jid').$exe->param('rdt', 'kit');
+			});
+		});
+
+		$exe1 = $this->app->request(\Exedra\Http\ServerRequest::createFromArray(['uri' => ['path' => '/mult']]));
+
+		$exe2 = $this->app->request(\Exedra\Http\ServerRequest::createFromArray(['uri' => ['path' => '/mult/baz']]));
+
+		$exe3 = $this->app->request(\Exedra\Http\ServerRequest::createFromArray(['uri' => ['path' => '/mult/baz/bad']]));
+
+		$exe4 = $this->app->request(\Exedra\Http\ServerRequest::createFromArray(['uri' => ['path' => '/mult/baz/bad/lux']]));
+
+
+		$exe5 = $this->app->request(\Exedra\Http\ServerRequest::createFromArray(['uri' => ['path' => '/mult/baz/bad/lux/opt']]));
+
+		$exe6 = $this->app->request(\Exedra\Http\ServerRequest::createFromArray(['uri' => ['path' => '/mult/baz/bad/lux/opt/nop']]));
+
+		$exe7 = $this->app->request(\Exedra\Http\ServerRequest::createFromArray(['uri' => ['path' => '/mult/baz/bad/lux/opt/nop/top']]));
+
+		$exe8 = $this->app->request(\Exedra\Http\ServerRequest::createFromArray(['uri' => ['path' => '/mult/baz/bad/lux/opt/nop/top/qef']]));
+
+
+		$this->assertEquals('quxhugtizrel', $exe1->response->getBody());
+
+		$this->assertEquals('quxbaztizrel', $exe2->response->getBody());
+
+		$this->assertEquals('quxbazbadrel', $exe3->response->getBody());
+
+		$this->assertEquals('quxbazbadlux', $exe4->response->getBody());
+
+
+		$this->assertEquals('bazbadluxludjuxjidkit', $exe5->response->getBody());
+
+		$this->assertEquals('bazbadluxludnopjidkit', $exe6->response->getBody());
+
+		$this->assertEquals('bazbadluxludnoptopkit', $exe7->response->getBody());
+
+		$this->assertEquals('bazbadluxludnoptopqef', $exe8->response->getBody());
+	}
 }
