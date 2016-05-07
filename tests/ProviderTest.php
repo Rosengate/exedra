@@ -27,4 +27,44 @@ class ProviderTest extends PHPUnit_Framework_TestCase
 
 		$this->assertEquals('bar', $this->app->get('foo'));
 	}
+
+	public function testAttributeMutability()
+	{
+		$this->app['foo'] = 'bar';
+
+		try
+		{
+			$this->app['foo'] = 'baz';
+
+			$thrown = false;
+		}
+		catch(\Exedra\Exception\Exception $e)
+		{
+			$thrown = true;
+		}
+
+		$this->assertTrue($thrown);
+
+		$this->app->setMutables(['foo']);
+		
+		try
+		{
+			$this->app['foo'] = 'bad';
+
+			$thrown = false;
+		}
+		catch(\Exedra\Exception\Exception $e)
+		{
+			$thrown = true;
+		}
+
+		$this->assertFalse($thrown);
+	}
+
+	public function testDeferredProvider()
+	{
+		$this->app['providers']->add(\TestApp\FooProvider::class, array('foo'));
+
+		$this->assertEquals('bar', $this->app->foo);
+	}
 }

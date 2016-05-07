@@ -12,7 +12,7 @@ class Registry
 	 * An index for deferred providers
 	 * @var array providerDeferred
 	 */
-	protected $providerDeferred = array();
+	protected $providersDeferred = array();
 
 	/**
 	 * Application instance
@@ -38,17 +38,31 @@ class Registry
 	 * @param array types
 	 * @return string
 	 */
-	public function add($provider, array $types = array())
+	public function add($provider, array $dependencies = array())
 	{
-		if(count($types) > 0)
+		if(count($dependencies) > 0)
 		{
-			foreach($types as $type => $dependencies)
+			foreach($dependencies as $name)
 			{
-				if(!is_array($dependencies))
-					throw new \Exedra\Exception\InvalidArgumentException('Value of the key-pair type of dependencies must be an array.');
+				@list($type, $dependency) = explode('.', $name, 2);
 
-				foreach($dependencies as $name)
-					$this->providerDeferred[$type][$name] = $provider;
+				if(!$dependency)
+				{
+					$dependency = $type;
+					
+					$type = 'services';
+				}
+				else
+				{
+					if(!in_array($type, 'services', 'callables', 'factories'))
+					{
+						$type = 'services';
+
+						$dependency = $name;
+					}
+				}
+
+				$this->providersDeferred[$type.'.'.$dependency] = $provider;
 			}
 		}
 		// register.
@@ -99,16 +113,18 @@ class Registry
 	}
 
 	/**
-	 * Differed register
+	 * Differed providers register
 	 * Invoked on application container dependency search
-	 * @param string type
-	 * @param string name
+	 * @param string service|factory|callable
+	 * @return string
 	 */
-	public function registerDeferred($type, $name)
+	public function listen($name)
 	{
-		if(!isset($this->providerDeferred[$type][$name]))
+		if(!isset($this->providersDeferred[$name]))
 			return;
 
-		$this->register(new $this->providerDeferred[$type][$name]);
+		$this->register(new $this->providersDeferred[$name]);
+
+		unset($this->providersDeferred[$name]);
 	}
 }

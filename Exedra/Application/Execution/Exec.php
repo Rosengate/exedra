@@ -4,36 +4,6 @@ namespace Exedra\Application\Execution;
 class Exec extends \Exedra\Container\Container
 {
 	/**
-	 * Application instance
-	 * @var \Exedra\Application
-	 */
-	public $app;
-
-	/**
-	 * Route instance.
-	 * @var \Exedra\Application\Map\Route
-	 */
-	public $route;
-
-	/**
-	 * Request instance
-	 * @var \Exedra\Http\ServerRequest
-	 */
-	public $request;
-
-	/**
-	 * Request instance
-	 * @var \Exedra\Application\Execution\Response
-	 */
-	public $response;
-
-	/**
-	 * Loader instance
-	 * @var \Exedra\Loader loader
-	 */
-	public $loader;
-
-	/**
 	 * Array of (referenced) parameters for this execution.
 	 * @var array
 	 */
@@ -50,24 +20,6 @@ class Exec extends \Exedra\Container\Container
 	 * @var string
 	 */
 	protected $failRoute = null;
-
-	/**
-	 * Dependecy injection container
-	 * @var \Exedra\Application\Container
-	 */
-	public $container;
-
-	/**
-	 * Map finding result
-	 * @var \Exedra\Application\Map\Finding
-	 */
-	public $finding;
-
-	/**
-	 * Execution config instance
-	 * @var \Exedra\Application\Config
-	 */
-	public $config;
 
 	public function __construct(\Exedra\Application $app, \Exedra\Application\Map\Finding $finding)
 	{
@@ -93,19 +45,19 @@ class Exec extends \Exedra\Container\Container
 	protected function initializeProperties()
 	{
 		// Initiate loader, registry, route, config, params, and set base route based on finding.
-		$this->loader = new \Exedra\Loader($this->getBaseDir());
+		$this->attributes['loader'] = new \Exedra\Loader($this->getBaseDir());
 
-		$this->route = $this->finding->getRoute();
+		$this->attributes['route'] = $this->finding->getRoute();
 		
-		$this->config = $this->finding->getConfig();
+		$this->attributes['config'] = $this->finding->getConfig();
 		
 		$this->setBaseRoute($this->finding->getBaseRoute());
 		
 		\Exedra\Functions\Arrays::initiateByNotation($this->params, $this->finding->param());
 		
-		$this->request = $this->finding->getRequest();
+		$this->attributes['request'] = $this->finding->getRequest();
 		
-		$this->response = \Exedra\Application\Execution\Response::createEmptyResponse();
+		$this->attributes['response'] = \Exedra\Application\Execution\Response::createEmptyResponse();
 	}
 
 	/**

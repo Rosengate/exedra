@@ -124,6 +124,15 @@ class Registry implements \ArrayAccess
 	}
 
 	/**
+	 * Get all registered dependencies
+	 * @return array
+	 */
+	public function getAll()
+	{
+		return $this->data;
+	}
+
+	/**
 	 * Clear registry
 	 */
 	public function clear()

@@ -3,42 +3,6 @@
 class Application extends \Exedra\Container\Container
 {
 	/**
-	 * Application name. Reflected as your application directory name.
-	 * @var string
-	 */
-	protected $name = null;
-
-	/**
-	 * Exedra
-	 * @var \Exedra\Exedra
-	 */
-	public $exedra;
-
-	/**
-	 * Application based loader
-	 * @var \Exedra\Loader
-	 */
-	public $loader;
-
-	/**
-	 * List of executions
-	 * @var array of \Exedra\Application\Execution\Exec
-	 */
-	protected $executions = array();
-
-	/**
-	 * Dependency injection container
-	 * @var \Exedra\Application\Container
-	 */
-	public $container;
-
-	/**
-	 * Current execution instance.
-	 * @var \Exedra\Application\Execution\Exec
-	 */
-	protected $exe = null;
-
-	/**
 	 * Create a new application
 	 * @param string|array params [if string, expect app directory, else array of directories, and configuration]
 	 * @param \Exedra\Exedra exedra instance
@@ -47,16 +11,17 @@ class Application extends \Exedra\Container\Container
 	{
 		parent::__construct();
 
-		// register dependencies.
+		$this->attributes['providers'] = new \Exedra\Provider\Registry($this);
+		
+		$this->attributes['config'] = new \Exedra\Application\Config;
+		
+		$this->configure(is_array($params) ? $params : array('dir.app' => $params));
+		
+		$this->attributes['loader'] = new \Exedra\Loader($this->getDir());
+
 		$this->serviceRegistry();
 
-		$this->configure(is_array($params) ? $params : array('dir.app' => $params));
-
-		$this->loader = new \Exedra\Loader($this->getDir());
-
-		$this->attributes['providers'] = new \Exedra\Provider\Registry($this);
-
-		$this->loader->autoload('', $this->config->get('namespace'));
+		$this->attributes['loader']->autoload('', $this->config->get('namespace'));
 	}
 
 	/**
@@ -108,7 +73,6 @@ class Application extends \Exedra\Container\Container
 			'request' => function(){ return \Exedra\Http\ServerRequest::createFromGlobals();},
 			'map' => function() { return $this->mapFactory->createLevel();},
 			'url' => array('\Exedra\Application\Factory\Url', array('self.map', 'self.request', 'self.config')),
-			'config' => '\Exedra\Application\Config',
 			'@session' => '\Exedra\Application\Session\Session',
 			'@flash' => array('\Exedra\Application\Session\Flash', array('self.session')),
 			'path' => array('\Exedra\Application\Factory\Path', array('self.loader'))
@@ -190,7 +154,7 @@ class Application extends \Exedra\Container\Container
 	}
 
 	/**
-	 * @return \Exedra\Http\Request
+	 * @return \Exedra\Http\ServerRequest
 	 */
 	public function getRequest()
 	{
@@ -323,6 +287,9 @@ class Application extends \Exedra\Container\Container
 	 */
 	protected function solve($type, $name, array $args = array())
 	{
+		// keep pinging the providers registry.
+		$this->attributes['providers']->listen($type.'.'.$name);
+
 		if(!$this->attributes[$type]->has($name))
 		{
 			if($this->attributes[$type]->has('@'.$name))

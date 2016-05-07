@@ -14,6 +14,12 @@ class Container implements \ArrayAccess
 	 */
 	protected $invokables = array();
 
+	/**
+	 * List of mutables
+	 * @var array mutables
+	 */
+	protected $mutables = array();
+
 	public function __construct()
 	{
 		// default container attributes
@@ -55,12 +61,14 @@ class Container implements \ArrayAccess
 	 * @param string 
 	 * @param array registry
 	 */
-	public function offsetSet($name, $service)
+	public function offsetSet($name, $value)
 	{
-		$this->attributes[$name] = $service;
+		if(array_key_exists($name, $this->attributes) && !isset($this->mutables[$name]))
+			throw new \Exedra\Exception\Exception('Attribute ['.$name.'] is publically immutable and readonly once assigned.');
 
-		if(!array_key_exists($name, $this->attributes))
-			$this->attributes['services']->set($name, true);
+		$this->attributes[$name] = $value;
+
+		$this->attributes['services']->set($name, true);
 	}
 
 	/**
@@ -86,16 +94,28 @@ class Container implements \ArrayAccess
 	}
 
 	/**
-	 * Set attribute
+	 * Set attribute.
 	 * @param string name
 	 * @param mixed service
 	 */
-	public function __set($name, $service)
+	public function __set($name, $value)
 	{
-		$this->attributes[$name] = $service;
+		if(array_key_exists($name, $this->attributes) && !isset($this->mutables[$name]))
+			throw new \Exedra\Exception\Exception('Attribute ['.$name.'] is publically immutable and readonly once assigned.');
 
-		if(!array_key_exists($name, $this->attributes))
-			$this->attributes['services']->set($name, true);
+		$this->attributes[$name] = $value;
+
+		$this->attributes['services']->set($name, true);
+	}
+
+	/**
+	 * Register mutable attributes
+	 * @param array names	
+	 */
+	public function setMutables(array $attributes)
+	{
+		foreach($attributes as $attribute)
+			$this->mutables[$attribute] = true;
 	}
 
 	/**
