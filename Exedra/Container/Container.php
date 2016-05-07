@@ -256,20 +256,12 @@ class Container implements \ArrayAccess
 
 		if(is_array($registry))
 		{
-			$class=  $registry[0];
+			$class = $registry[0];
 
-			// only fully qualified class name passed
-			if(!isset($registry[1]))
+			$arguments = array();
+
+			if(isset($registry[1]))
 			{
-				return new $class;
-			}
-			// has argument passed
-			else
-			{
-				$reflection = new \ReflectionClass($registry[0]);
-
-				$arguments = array();
-
 				// the second element isn't an array
 				if(!is_array($registry[1]))
 					throw new \Exedra\Exception\InvalidArgumentException('Second element for array based registry must be an array');
@@ -316,12 +308,22 @@ class Container implements \ArrayAccess
 						break;
 					}
 				}
+			}
 
-				// merge with the one passed
-				$arguments = array_merge($arguments, $args);
+			// merge with the one passed
+			$arguments = array_merge($arguments, $args);
 
+			if(count($arguments) > 0)
+			{
+				$reflection = new \ReflectionClass($class);
+				
 				return $reflection->newInstanceArgs($arguments);
 			}
+			else
+			{
+				return new $class();
+			}
+
 		}
 
 		throw new \Exedra\Exception\InvalidArgumentException('Unable to resolve the dependency');

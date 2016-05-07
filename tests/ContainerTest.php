@@ -29,6 +29,10 @@ class ContainerTest extends PHPUnit_Framework_TestCase
 
 	public function testService()
 	{
+		$this->container['services']->add('qux', array('\stdClass'));
+
+		$this->assertEquals('stdClass', get_class($this->container->qux));
+
 		$this->container['services']->add('foo', function()
 		{
 			return 'foo-bar';
