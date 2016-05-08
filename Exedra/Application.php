@@ -75,7 +75,8 @@ class Application extends \Exedra\Container\Container
 			'url' => array('\Exedra\Application\Factory\Url', array('self.map', 'self.request', 'self.config')),
 			'@session' => '\Exedra\Application\Session\Session',
 			'@flash' => array('\Exedra\Application\Session\Flash', array('self.session')),
-			'path' => array('\Exedra\Application\Factory\Path', array('self.loader'))
+			'path' => array('\Exedra\Application\Factory\Path', array('self.loader')),
+			'wizard' => array('\Exedra\Console\Wizard\Manager', array('self'))
 		));
 
 		$this->attributes['factories']->register(array(
@@ -253,26 +254,12 @@ class Application extends \Exedra\Container\Container
 	}
 
 	/**
-	 * Run wizard
+	 * Listen to the console arguments.
 	 * @param string
 	 */
-	public function wizard($argv, $class = null)
+	public function wizard(array $arguments)
 	{
-		if(!$class)
-		{
-			if($this->attributes['factories']->has('wizard'))
-				$wizard = $this->create('wizard', array($this));
-			else
-				$wizard = new \Exedra\Console\Wizard\Arcanist($this);
-		}
-		else
-		{
-			$wizard = new $class($this);
-		}
-
-		array_shift($argv);
-
-		$wizard->run($argv);
+		return $this->wizard->listen($arguments);
 	}
 
 	/**
