@@ -8,6 +8,7 @@ class Manager
 	protected $commands = array();
 
 	/**
+	 * Cached wizards
 	 * @var array wizards key-wizard
 	 */
 	protected $wizards = array();
@@ -23,6 +24,18 @@ class Manager
 	 * @var array overwritables
 	 */
 	protected $overwritables = array();
+
+	/**
+	 * List of excluded commands
+	 * @var array excluded
+	 */
+	protected $excluded = array();
+
+	/**
+	 * List of excluded namespaces
+	 * @var array excluded namespace
+	 */
+	protected $excludedNamespaces = array();
 
 
 	public function __construct(\Exedra\Application $app)
@@ -283,6 +296,48 @@ class Manager
 	}
 
 	/**
+	 * Exclude command(s)
+	 * @param array|string exclusion
+	 */
+	public function exclude($command)
+	{
+		if(is_array($command))
+		{
+			foreach($command as $cmd)
+				$this->excluded[] = $cmd;
+		}
+		elseif(is_string($command))
+		{
+			$this->excluded[] = $command;
+		}
+		else
+		{
+			throw new \Exedra\Exception\InvalidArgumentException('Argument 1 must be [array] or [string].');
+		}
+	}
+
+	/**
+	 * Exclude namespace(s)
+	 * @param array|string namespace
+	 */
+	public function excludeNamespace($namespace)
+	{
+		if(is_array($namespace))
+		{
+			foreach($namespace as $ns)
+				$this->excludedNamespaces[] = $ns;
+		}
+		elseif(is_string($namespace))
+		{
+			$this->excludedNamespaces[] = $namespace;
+		}
+		else
+		{
+			throw new \Exedra\Exception\InvalidArgumentException('Argument 1 must be [array] or [string].');
+		}
+	}
+
+	/**
 	 * Resolve meta information reflectively
 	 */
 	protected function resolve()
@@ -317,6 +372,9 @@ class Manager
 					if(isset($this->commands[$name]) && !in_array($name, $this->overwritables))
 						throw new \Exedra\Exception\Exception('Command ['.$name.'] is being overwritten by ['.$class.'] wizard.');
 				}
+
+				if(in_array($namespace, $this->excludedNamespaces) || in_array($name, $this->excluded))
+					continue;
 
 				$this->commands[$name] = array_merge($definition, array(
 					'namespace' => $namespace,
