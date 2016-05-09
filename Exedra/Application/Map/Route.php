@@ -10,7 +10,7 @@ class Route
 	/**
 	 * @var string absolute name
 	 */
-	protected $absoluteName;
+	protected $absoluteName = null;
 
 	/**
 	 * @var array stored full routes
@@ -68,8 +68,10 @@ class Route
 		$notation = self::$notation;
 
 		$this->name = $name;
-		$this->absoluteName = $level->getUpperRoute() ? $level->getUpperRoute()->getAbsoluteName().$notation.$name : $name;
+		
 		$this->level = $level;
+		
+		$this->refreshAbsoluteName();
 
 		if(count($properties) > 0)
 			$this->setProperties($properties);
@@ -582,13 +584,28 @@ class Route
 
 	/**
 	 * Set route name
+	 * Refresh absolute name, everytime name changed.
 	 * @param string name
 	 */
 	public function setName($name)
 	{
 		$this->name = $name;
 
+		$this->refreshAbsoluteName();
+
 		return $this;
+	}
+
+	/**
+	 * Refresh absolute name
+	 */
+	protected function refreshAbsoluteName()
+	{
+		$level = $this->level;
+
+		$name = $this->name;
+
+		$this->absoluteName = $level->getUpperRoute() ? $level->getUpperRoute()->getAbsoluteName().self::$notation.$name : $name;
 	}
 
 	/**
@@ -598,6 +615,8 @@ class Route
 	public function name($name)
 	{
 		$this->name = $name;
+
+		$this->refreshAbsoluteName();
 
 		return $this;
 	}
