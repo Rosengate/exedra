@@ -124,6 +124,68 @@ abstract class Wizardry
 	}
 
 	/**
+	 * Configure an associative array
+	 * @param array associative array
+	 */
+	public function configureAssoc(array $configuration, $validation = null)
+	{
+		$config = array();
+
+		foreach($configuration as $key => $value)
+		{
+			revalidate:
+
+			$this->say('# '.$key.($value ? ' ('.$value.')':'').' : ', false);
+
+			$answer = $this->inputRead();
+
+			$answer = $answer == '' ? $value : $answer;
+
+			if(is_callable($validation))
+			{
+				if($validation($key, $answer) === false)
+					goto revalidate;
+			}
+
+			$config[$key] = $answer;
+		}
+
+		$this->say();
+
+		return $config;
+	}
+
+	/**
+	 * Configure the given key
+	 * @return array associative array
+	 */
+	public function configureKeys(array $keys, $validation = null)
+	{
+		$config = array();
+
+		foreach($keys as $key)
+		{
+			revalidate:
+
+			$this->say('# '.$key.' : ', false);
+
+			$answer = $this->inputRead();
+
+			if(is_callable($validation))
+			{
+				if($validation($key, $answer) === false)
+					goto revalidate;
+			}
+
+			$config[$key] = $answer;
+		}
+
+		$this->say();
+
+		return $config;
+	}
+
+	/**
 	 * Pretty print to console
 	 * @param string text
 	 * @param string wall delimiter
