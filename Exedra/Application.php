@@ -259,6 +259,9 @@ class Application extends \Exedra\Container\Container
 	 */
 	public function wizard(array $arguments)
 	{
+		// shift out file name
+		array_shift($arguments);
+		
 		return $this->wizard->listen($arguments);
 	}
 

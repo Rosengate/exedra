@@ -70,11 +70,6 @@ class Manager
 			return $wizard->say($e->getMessage());
 		}
 
-
-
-		// shift out file name
-		array_shift($arguments);
-
 		if(!isset($arguments[0]) || (isset($arguments[0]) && strpos($arguments[0], '-') === 0))
 		{
 			$wizard->introduce();
