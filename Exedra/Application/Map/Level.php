@@ -125,21 +125,27 @@ class Level extends \ArrayIterator
 	}
 
 	/**
-	 * Make a finding by \Exedra\Http\Request or array
+	 * Make a finding by \Exedra\Http\Request
 	 * @param \Exedra\Http\Request
 	 * @return \Exedra\Application\Map\Finding
 	 */
-	public function find($request)
+	public function findByRequest(\Exedra\Http\ServerRequest $request)
 	{
-		if(!($request instanceof \Exedra\Http\ServerRequest))
-			if(is_array($request))
-				$request = $this->factory->createRequest($request);
-			else
-				return $this->factory->throwException('Argument for map::find() must be either array or \Exedra\Http\Request');
-
 		$result = $this->findRouteByRequest($request, trim($request->getUri()->getPath(), '/'));
 
 		return $this->factory->createFinding($result['route'] ? : null, $result['parameter'], $request);
+	}
+
+	/**
+	 * Find by array based request
+	 * @param array request
+	 * @return \Exedra\Application\Map\Finding
+	 */
+	public function findByArray(array $request)
+	{
+		$request = $this->factory->createRequest($request);
+
+		return $this->findByRequest($request);
 	}
 
 	/**

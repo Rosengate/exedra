@@ -186,7 +186,7 @@ class Application extends \Exedra\Container\Container
 	 */
 	public function request(\Exedra\Http\ServerRequest $request = null)
 	{
-		return $this->exec($this->map->find($request ? : $this->request));
+		return $this->exec($this->map->findByRequest($request ? : $this->request));
 	}
 
 	/**
