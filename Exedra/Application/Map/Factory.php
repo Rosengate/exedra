@@ -42,7 +42,7 @@ class Factory
 	 */
 	public function getMiddlewareRegistry()
 	{
-		return $this->app->middleware;
+		return $this->app->getMiddlewareRegistry();
 	}
 
 	/**
@@ -162,18 +162,6 @@ class Factory
 	public function createFinding(Route $route = null, array $parameters = null, \Exedra\Http\ServerRequest $request = null)
 	{
 		return $this->create('finding', array($route, $parameters, $request, $this->app->config));
-		return new Finding($route, $parameters, $request);
-	}
-
-	/**
-	 * Create request required by map-routing related matters.
-	 * @return \Exedra\Http\Request
-	 */
-	public function createRequest(array $query = array())
-	{
-		return \Exedra\Http\ServerRequest::createFromArray($query);
-		return $this->create('request', array($query));
-		return new \Exedra\Http\ServerRequest($query);
 	}
 
 	public function throwException($message)

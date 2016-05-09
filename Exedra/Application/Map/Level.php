@@ -137,18 +137,6 @@ class Level extends \ArrayIterator
 	}
 
 	/**
-	 * Find by array based request
-	 * @param array request
-	 * @return \Exedra\Application\Map\Finding
-	 */
-	public function findByArray(array $request)
-	{
-		$request = $this->factory->createRequest($request);
-
-		return $this->findByRequest($request);
-	}
-
-	/**
 	 * Make a finding by given absolute name
 	 * @param string name.
 	 * @param array parameters
