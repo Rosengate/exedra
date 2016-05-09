@@ -159,7 +159,17 @@ class Manager
 	 */
 	public function add($class)
 	{
-		$this->classes[] = $class;
+		if(is_array($class))
+		{
+			foreach($class as $cls)
+				$this->classes[] = $class;
+		}
+		else
+		{
+			$this->classes[] = $class;
+		}
+
+		return $this;
 	}
 
 	/**
@@ -280,14 +290,21 @@ class Manager
 	/**
 	 * Set protection
 	 * @param boolean bool
+	 * @return self
 	 */
-	public function setProtection($protected)
+	public function protect($protected = true)
 	{
+		if(!is_bool($protected))
+			throw new \Exedra\Exception\InvalidArgumentException('Argument 1 must be [boolean].');
+
 		$this->isProtected = $protected;
+
+		return $this;
 	}
 
 	/**
 	 * Set list of overwriteable
+	 * Used only when this registry is protected.
 	 * @param array overwriteable
 	 */
 	public function setOverwritables(array $overwritables)
@@ -314,6 +331,8 @@ class Manager
 		{
 			throw new \Exedra\Exception\InvalidArgumentException('Argument 1 must be [array] or [string].');
 		}
+
+		return $this;
 	}
 
 	/**
@@ -335,10 +354,12 @@ class Manager
 		{
 			throw new \Exedra\Exception\InvalidArgumentException('Argument 1 must be [array] or [string].');
 		}
+
+		return $this;
 	}
 
 	/**
-	 * Resolve meta information reflectively
+	 * Resolve commands information reflectively
 	 */
 	protected function resolve()
 	{
