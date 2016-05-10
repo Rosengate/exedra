@@ -39,9 +39,20 @@ class Path
 
 	/**
 	 * Return a new path with appended one.
+	 * @param string path
 	 * @return \Exedra\Application\Factory\Path
 	 */
 	public function create($path)
+	{
+		return new static($this->loader, $this->path ? $this->path.'/'.$path : $path);
+	}
+
+	/**
+	 * Alias to create()
+	 * @param string path
+	 * @return \Exedra\Application\Factory\Path
+	 */
+	public function path($path)
 	{
 		return new static($this->loader, $this->path ? $this->path.'/'.$path : $path);
 	}
