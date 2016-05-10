@@ -308,7 +308,11 @@ class Exec extends \Exedra\Container\Container
 		$params = array();
 
 		foreach($keys as $key)
-			$params[trim($key)] = $this->params[trim($key)];
+		{
+			$key = trim($key);
+
+			$params[$key] = isset($this->params[$key]) ? $this->params[$key] : null;
+		}
 
 		return $params;
 	}
