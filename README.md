@@ -35,7 +35,7 @@ Booting up \Exedra\Application
 ======
 At the end of this file, this is how your sample project directory may look like :
 ~~~
-App
+app
   app.php
 public
   index.php
@@ -44,20 +44,21 @@ wizard
 composer.json
 composer.lock
 ~~~
-#### /App/app.php
-You can write up the boot file (**app.php**) anywhere. But there're several important directory config paths required to be configured.
+#### /app/app.php
+You can write up the boot file (**app.php**) anywhere. But there're several important directory paths required to be configured.
 
-First, create the boot file named **app.php** under App.
+First, create the boot file named **app.php** under folder **app**.
 
 And load the composer autoload accordingly. The **app.php** file should return the same \Exedra\Application instance, so it's usable for the front controller index.php, or wizard (console) later.
 ~~~
 require_once __DIR__.'/../vendor/autoload.php';
 
+// depending on where the file is located.
 $app = new \Exedra\Application(array(
     'namespace' => 'App',
-    'dir.app' => __DIR__',
-    'dir.root' => __DIR__.'/../',
-    'dir.public' => __DIR__.'/../public/'
+    'path.root' => __DIR__.'/../',
+    'path.app' => __DIR__',
+    'path.public' => __DIR__.'/../public/'
     ));
 
 return $app;
@@ -70,7 +71,12 @@ $app = new \Exedra\Application(__DIR__);
 
 return $app;
 ~~~
-By default it'll take the argument as the **dir.app** path, and configure the **namespace**, based on the folder name it's located in, the **dir.root** will be higher one level, and **dir.public** is configured under the **dir.root**.
+By default it'll take the argument as the project **path.root** path, and set the **namespace** to **App**.
+
+So, basically there're 3 paths initially you may need to know.
+- root (/)
+- public (/public)
+- app (/app)
 
 Now, in the same **app.php** let's write some nestful chatting api codes :
 ~~~
