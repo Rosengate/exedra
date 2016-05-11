@@ -274,4 +274,16 @@ abstract class Wizardry
 		}
 	}
 
+	/**
+	 * Show some tick
+	 * @param string message
+	 * @param boolean|true tick
+	 */
+	public function tick($message, $tick = true)
+	{
+		$checked = $tick ? '[X]' : '[ ]';
+
+		$this->say($checked.' '.$message);
+	}
+
 }
