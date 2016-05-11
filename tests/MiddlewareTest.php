@@ -3,7 +3,7 @@ class MiddlewareTest extends PHPUnit_Framework_TestCase
 {
 	public function setUp()
 	{
-		$this->app = new \Exedra\Application(__DIR__.'/Factory/TestApp');
+		$this->app = new \Exedra\Application(__DIR__.'/Factory');
 
 		$this->map = $this->app->map;
 
@@ -14,7 +14,7 @@ class MiddlewareTest extends PHPUnit_Framework_TestCase
 
 				return $exe->next($exe);
 			},
-			'limiter' => \TestApp\Middleware\RateLimiter::CLASS,
+			'limiter' => \App\Middleware\RateLimiter::CLASS,
 			'decorator' => function($exe)
 			{
 				return $exe->text.'-bar-baz!';

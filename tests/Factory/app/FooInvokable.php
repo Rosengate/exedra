@@ -1,4 +1,4 @@
-<?php namespace TestApp;
+<?php namespace App;
 
 class FooInvokable
 {

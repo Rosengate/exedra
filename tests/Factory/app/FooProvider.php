@@ -1,5 +1,5 @@
 <?php
-namespace TestApp;
+namespace App;
 
 class FooProvider implements \Exedra\Provider\ProviderInterface
 {

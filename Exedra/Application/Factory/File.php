@@ -4,19 +4,25 @@ namespace Exedra\Application\Factory;
 /**
  * Simple class for object oriented based path.
  */
-class Path
+class File
 {
 	/**
-	 * Path of the file.
+	 * Relative path of the file.
 	 * @var string|array
 	 */
-	protected $path;
+	protected $filename;
 
-	public function __construct(\Exedra\Loader $loader, $path = null)
+	/**
+	 * File base path
+	 * @var \Exedra\Path
+	 */
+	protected $basePath;
+
+	public function __construct(\Exedra\Path $basePath, $filename = null)
 	{
-		$this->loader = $loader;
+		$this->basePath = $basePath;
 
-		$this->path = $path;
+		$this->filename = $filename;
 	}
 
 	/**
@@ -25,7 +31,7 @@ class Path
 	 */
 	public function isExists()
 	{
-		return $this->loader->has($this->path);
+		return $this->basePath->has($this->filename);
 	}
 
 	/**
@@ -38,32 +44,12 @@ class Path
 	}
 
 	/**
-	 * Return a new path with appended one.
-	 * @param string path
-	 * @return \Exedra\Application\Factory\Path
-	 */
-	public function create($path)
-	{
-		return new static($this->loader, $this->path ? $this->path.'/'.$path : $path);
-	}
-
-	/**
-	 * Alias to create()
-	 * @param string path
-	 * @return \Exedra\Application\Factory\Path
-	 */
-	public function path($path)
-	{
-		return new static($this->loader, $this->path ? $this->path.'/'.$path : $path);
-	}
-
-	/**
 	 * Get full and usable path for this file.
 	 * @return string
 	 */
 	public function toString()
 	{
-		return $this->loader->buildPath($this->path);
+		return $this->basePath->buildPath($this->filename);
 	}
 
 	/**
@@ -73,7 +59,7 @@ class Path
 	 */
 	public function load(array $data = array())
 	{
-		return $this->loader->load($this->path, $data);
+		return $this->basePath->load($this->filename, $data);
 	}
 
 	/**
@@ -85,7 +71,7 @@ class Path
 		if(!$this->isExists())
 			return false;
 
-		return $this->loader->getContent($this->path);
+		return $this->basePath->getContent($this->filename);
 	}
 
 	/**
@@ -104,16 +90,7 @@ class Path
 	 */
 	public function putContents($data = null)
 	{
-		return $this->loader->putContents($this->path, $data);
-	}
-
-	/**
-	 * Create another path when invoked
-	 * @param string
-	 */
-	public function __invoke($path)
-	{
-		return $this->create($path);
+		return $this->basePath->putContents($this->filename, $data);
 	}
 }
 

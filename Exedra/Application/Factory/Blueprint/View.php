@@ -20,12 +20,6 @@ class View implements \ArrayAccess
 	public $data = array();
 
 	/**
-	 * Loader to be used.
-	 * @var \Exedra\Loader
-	 */
-	protected $loader = null;
-
-	/**
 	 * Prepared flag whether content have been rendered internally
 	 * @var boolean flag
 	 */

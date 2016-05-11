@@ -2,9 +2,11 @@
 
 class Application extends \Exedra\Container\Container
 {
+	protected $namespace = 'App';
+
 	/**
 	 * Create a new application
-	 * @param string|array params [if string, expect app directory, else array of directories, and configuration]
+	 * @param string|array params [if string, expect root directory, else array of directories, and configuration]
 	 * @param \Exedra\Exedra exedra instance
 	 */
 	public function __construct($params)
@@ -14,42 +16,34 @@ class Application extends \Exedra\Container\Container
 		$this->attributes['providers'] = new \Exedra\Provider\Registry($this);
 		
 		$this->attributes['config'] = new \Exedra\Application\Config;
-		
-		$this->configure(is_array($params) ? $params : array('dir.app' => $params));
-		
-		$this->attributes['loader'] = new \Exedra\Loader($this->getDir());
 
+		// default the namespace as [App]
+		if(isset($params['namespace']))
+			$this->namespace = $params['namespace'];
+		
+		$this->pathRegistry(is_array($params) ? $params : array('path.root' => $params));
+		
 		$this->serviceRegistry();
-
-		$this->attributes['loader']->autoload('', $this->config->get('namespace'));
 	}
 
 	/**
 	 * Configure default variables
 	 * @param array params
 	 */
-	protected function configure(array $params)
+	protected function pathRegistry(array $params)
 	{
-		if(!isset($params['dir.app']))
-			throw new \Exedra\Exception\InvalidArgumentException('dir.app parameter is required, at least.');
+		if(!isset($params['path.root']))
+			throw new \Exedra\Exception\InvalidArgumentException('[path.root] parameter is required, at least.');
 
-		foreach($params as $key => $value)
-			$this->config->set($key, $value);
+		$this->attributes['path'] = $path = new \Exedra\Path($params['path.root']);
 
-		// root will be one level higher
-		if(!isset($params['dir.root']))
-			$this->config->set('dir.root', $params['dir.app'].'/..');
+		$path->append('app', isset($params['path.app']) ? $params['path.app'] : $params['path.root'].'/app', true);
 
-		// by default, set public dir on one level higher
-		if(!isset($params['dir.public']))
-			$this->config->set('dir.public', $params['dir.app'].'/../public');
+		$path->append('public', isset($params['path.public']) ? $params['path.public'] : $params['path.root'].'/public', true);
 
-		// take namespace from folder name
-		if(!isset($params['namespace']))
-		{
-			$paths = explode('/', str_replace('\\', '/', $params['dir.app']));
-			$this->config->set('namespace', ucwords(end($paths)));
-		}
+		$path->autoload((string) $path['app'], $this->namespace, false);
+
+		$this->attributes['loader'] = $path;
 	}
 
 	/**
@@ -75,7 +69,7 @@ class Application extends \Exedra\Container\Container
 			'url' => array('\Exedra\Application\Factory\Url', array('self.map', 'self.request', 'self.config')),
 			'@session' => '\Exedra\Application\Session\Session',
 			'@flash' => array('\Exedra\Application\Session\Flash', array('self.session')),
-			'path' => array('\Exedra\Application\Factory\Path', array('self.loader')),
+			// 'path' => array('\Exedra\Application\Factory\Path', array('self.loader')),
 			'wizard' => array('\Exedra\Console\Wizard\Manager', array('self'))
 		));
 
@@ -94,7 +88,7 @@ class Application extends \Exedra\Container\Container
 	 */
 	public function getDir($path = null)
 	{
-		return $this->config->get('dir.app') . ($path ? '/' . $path : '');
+		return (string) $this->path['app'] . ($path ? '/' . $path : '');
 	}
 
 	/**
@@ -104,7 +98,7 @@ class Application extends \Exedra\Container\Container
 	 */
 	public function getBaseDir($path = null)
 	{
-		return $this->getDir($path);
+		return (string) $this->path['app'] . ($path ? '/' . $path : '');
 	}
 
 	/**
@@ -114,7 +108,7 @@ class Application extends \Exedra\Container\Container
 	 */
 	public function getRootDir($path = null)
 	{
-		return $this->config->get('dir.root') . ($path ? '/' . $path : '');
+		return (string) $this->path;
 	}
 
 	/**
@@ -124,7 +118,7 @@ class Application extends \Exedra\Container\Container
 	 */
 	public function getNamespace($namespace = null)
 	{
-		return $this->config->get('namespace') . ($namespace ? '\\'.$namespace : '');
+		return $this->namespace . ($namespace ? '\\'.$namespace : '');
 	}
 
 	/**
@@ -134,7 +128,7 @@ class Application extends \Exedra\Container\Container
 	 */
 	public function getPublicDir($path = null)
 	{
-		return $this->config->get('dir.public') . ($path ? '/' . $path : '');
+		return (string) $this->path['public'] . ($path ? '/' . $path : '');
 	}
 
 	/**

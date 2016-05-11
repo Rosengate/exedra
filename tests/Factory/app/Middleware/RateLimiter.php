@@ -1,5 +1,5 @@
 <?php
-namespace TestApp\Middleware;
+namespace App\Middleware;
 
 class RateLimiter
 {

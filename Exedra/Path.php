@@ -4,38 +4,44 @@ namespace Exedra;
 /**
  * General loader for exedra, available on every 3 major instance. Exedra, Application and Exec.
  */
-class Loader
+class Path implements \ArrayAccess
 {
 	/**
 	 * Based directory this loader is based on.
 	 * @var string
 	 */
-	protected $baseDir;
+	protected $basePath;
+
+	/**
+	 * Registry of paths
+	 * @var array
+	 */
+	protected $pathRegistry;
 
 	/**
 	 * List of autoloaded dirs and namespaces
 	 * @var array
 	 */
-	protected $autoloadingRegistry = array();
+	protected $autoloadRegistry = array();
 
-	public function __construct($baseDir = null)
+	public function __construct($basePath = null)
 	{
-		$this->baseDir = !$baseDir ? null : rtrim($baseDir, '/');
+		$this->basePath = !$basePath ? null : rtrim($basePath, '/\\');
 
 		$this->autoloadRegister();
 	}
 
 	/**
-	 * Prefix path with the configured $baseDir
+	 * Prefix path with the configured $basePath
 	 * @param string path
 	 * @return string
 	 */
 	private function prefixPath($path)
 	{
-		if(!$this->baseDir === null)
+		if(!$this->basePath === null)
 			return $path;
 
-		return rtrim($this->baseDir, '/').'/'.$path;
+		return rtrim($this->basePath, '/').'/'.$path;
 	}
 
 	/**
@@ -87,7 +93,7 @@ class Loader
 		$file = $this->refinePath($this->prefixPath($file));
 
 		if(!file_exists($file))
-			throw new \Exedra\Exception\NotFoundException("File not found : $file");
+			throw new \Exedra\Exception\NotFoundException("File [$file] not found");
 
 		extract($data);
 
@@ -118,7 +124,7 @@ class Loader
 	 */
 	public function registerAutoload($basePath, $prefix = '', $relative = true)
 	{
-		$this->autoloadingRegistry[] = array($basePath, $prefix, $relative);
+		$this->autoloadRegistry[] = array($basePath, $prefix, $relative);
 	}
 
 	/**
@@ -138,7 +144,7 @@ class Loader
 	 */
 	public function getBaseDir()
 	{
-		return $this->baseDir;
+		return $this->basePath;
 	}
 
 	/**
@@ -151,9 +157,9 @@ class Loader
 
 		spl_autoload_register(function($class) use($loader)
 		{
-			$baseDir = $this->getBaseDir();
+			$basePath = $this->getBaseDir();
 
-			foreach($this->autoloadingRegistry as $structs)
+			foreach($this->autoloadRegistry as $structs)
 			{
 				$dir = $structs[0];
 				$prefix = $structs[1];
@@ -168,7 +174,7 @@ class Loader
 				$filename = $dir.DIRECTORY_SEPARATOR.(str_replace('\\', DIRECTORY_SEPARATOR, $classDir)).'.php';
 
 				if($relative)
-					$filename = $baseDir.DIRECTORY_SEPARATOR.$filename;
+					$filename = $basePath.DIRECTORY_SEPARATOR.$filename;
 
 				if(file_exists($filename))
 					return require_once $filename;
@@ -187,9 +193,27 @@ class Loader
 		$file = $this->refinePath($this->prefixPath($file));
 
 		if(!file_exists($file))
-			throw new \Exedra\Exception\NotFoundException("File not found : $file");
+			throw new \Exedra\Exception\NotFoundException("File [$file] not found");
 
 		return file_get_contents($file);
+	}
+
+	/**
+	 * Create file instance
+	 * @return \Exedra\Application\Factory\File
+	 */
+	public function file($filename)
+	{
+		return new \Exedra\Application\Factory\File($this, $filename);
+	}
+
+	/**
+	 * Get string based path
+	 * @return string
+	 */
+	public function path($path = null)
+	{
+		return $this->path . ($path ? '/'.$path : '');
 	}
 
 	/**
@@ -228,11 +252,75 @@ class Loader
 	}
 
 	/**
+	 * @param string name
+	 * @param string path
+	 */
+	public function offsetSet($name, $path)
+	{
+
+	}
+
+	/**
+	 * Get a loader through a offset key
+	 * @param string name
+	 */
+	public function offsetGet($name)
+	{
+		// create a loader by the same path and name.
+		if(!isset($this->pathRegistry[$name]))
+			$this->pathRegistry[$name] = new static($this->basePath.'/'.ltrim($name, '/\\'));
+
+		return $this->pathRegistry[$name];
+	}
+
+	/**
+	 * If loader name exists.
+	 * @param string name
+	 * @return boolean
+	 */
+	public function offsetExists($name)
+	{
+		return isset($this->pathRegistry[$name]);
+	}
+
+	/**
+	 * Unset loader
+	 * @param string name
+	 */
+	public function offsetUnset($name)
+	{
+		unset($this->pathRegistry[$name]);
+	}
+
+	/**
+	 * Append a new path for the given name and path
+	 * @param string name
+	 * @param string path
+	 */
+	public function append($name, $path, $absolute = false)
+	{
+		$path = $absolute ? $path : $this->basePath.'/'.ltrim($path, '/\\');
+
+		$this->pathRegistry[$name] = new static($path);
+
+		return $this;
+	}
+
+	/**
+	 * String castable
+	 * @return string
+	 */
+	public function __toString()
+	{
+		return $this->basePath;
+	}
+
+	/**
 	 * Refine path, replace with the right directory separator.
 	 * @param string path
 	 * @return string
 	 */
-	private function refinePath($path)
+	protected function refinePath($path)
 	{
 		switch(PHP_OS)
 		{

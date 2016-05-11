@@ -3,7 +3,7 @@ class LoaderTest extends PHPUnit_Framework_TestCase
 {
 	public function setUp()
 	{
-		$this->loader = new \Exedra\Loader(__DIR__.'/Factory/TestApp');
+		$this->loader = new \Exedra\Path(__DIR__.'/Factory/app');
 	}
 
 	public function testLoad()

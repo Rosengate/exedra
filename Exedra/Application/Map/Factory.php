@@ -45,15 +45,6 @@ class Factory
 		return $this->app->getMiddlewareRegistry();
 	}
 
-	/**
-	 * Get application loader
-	 * @return \Exedra\Loader
-	 */
-	public function getLoader()
-	{
-		return $this->app->loader;
-	}
-
 	public function isExplicit()
 	{
 		return $this->isExplicit;
@@ -132,14 +123,14 @@ class Factory
 
 	/**
 	 * Create level by pattern
-	 * For now, assume the passed pattern as string
+	 * For now, assume the passed pattern as path
 	 * @param \Exedra\Application\Map\Route
 	 * @param string pattern
 	 * @return \Exedra\Application\Map\Level
 	 */
 	public function createLevelByPattern(Route $route = null, $pattern)
 	{
-		$closure = $this->getLoader()->load($pattern);
+		$closure = $this->app->path['app']->load($pattern);
 
 		// expecting a Map\Level from this loaded file.
 		if(!($closure instanceof \Closure))

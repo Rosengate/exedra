@@ -3,7 +3,7 @@ class FactoryControllerTest extends PHPUnit_Framework_TestCase
 {
 	public function setUp()
 	{
-		$app = new \Exedra\Application(__DIR__.'/TestApp');
+		$app = new \Exedra\Application(__DIR__.'/Factory');
 
 		$this->app = $app;
 	}
@@ -28,7 +28,7 @@ class FactoryControllerTest extends PHPUnit_Framework_TestCase
 
 		$this->assertEquals('baz', $this->app->execute('barRoute')->response->getBody());
 
-		$this->assertEquals(\TestApp\Controller\Foo::CLASS, get_class($this->app->execute('bazRoute')->response->getBody()));
+		$this->assertEquals(\App\Controller\Foo::CLASS, get_class($this->app->execute('bazRoute')->response->getBody()));
 	}
 }
 

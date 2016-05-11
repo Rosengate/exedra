@@ -8,10 +8,10 @@ namespace Exedra\Application\Factory;
 class View
 {
 	/**
-	 * Intance of execution based loader.
-	 * @var \Exedra\Loader
+	 * Intance of execution based path.
+	 * @var \Exedra\Path
 	 */
-	protected $loader;
+	protected $path;
 
 	/**
 	 * Default datas for this view.
@@ -31,9 +31,9 @@ class View
 	 */
 	protected $ext = 'php';
 
-	public function __construct(\Exedra\Loader $loader)
+	public function __construct(\Exedra\Path $path)
 	{
-		$this->loader = $loader;
+		$this->path = $path;
 	}
 
 	/**
@@ -94,7 +94,7 @@ class View
 	{
 		$path	= $path. '.' .$this->ext;
 
-		$path = $this->loader->buildPath('View/'. $path);
+		$path = $this->path->buildPath('View/'. $path);
 
 		return $path;
 	}

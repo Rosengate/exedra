@@ -21,7 +21,7 @@ class ContainerTest extends PHPUnit_Framework_TestCase
 {
 	public function setUp()
 	{
-		$this->app = new \Exedra\Application(__DIR__.'/Factory/TestApp');
+		$this->app = new \Exedra\Application(__DIR__.'/Factory');
 
 		// build a basic case
 		$this->container = new \Exedra\Container\Container;
@@ -118,7 +118,7 @@ class ContainerTest extends PHPUnit_Framework_TestCase
 	{
 		$this->container['services']->add('foo', function()
 		{
-			return new \TestApp\FooInvokable;
+			return new \App\FooInvokable;
 		});
 
 		$this->assertEquals('bar', $this->container->foo());

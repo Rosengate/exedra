@@ -45,7 +45,8 @@ class Exec extends \Exedra\Container\Container
 	protected function initializeProperties()
 	{
 		// Initiate loader, registry, route, config, params, and set base route based on finding.
-		$this->attributes['loader'] = new \Exedra\Loader($this->getBaseDir());
+		// $this->attributes['loader'] = new \Exedra\Loader($this->getBaseDir());
+		$this->attributes['path'] = $this->app->path;
 
 		$this->attributes['route'] = $this->finding->getRoute();
 		
@@ -67,7 +68,8 @@ class Exec extends \Exedra\Container\Container
 	{
 		$this->attributes['services']->register(array(
 			'middlewares' => function() {return $this->app->middleware->getMiddlewares();},
-			'view' => array('\Exedra\Application\Factory\View', array('self.loader')),
+			// 'view' => array('\Exedra\Application\Factory\View', array('self.loader')),
+			'view' => function(){ return new \Exedra\Application\Factory\View($this->path['app']);},
 			'middleware' => function(){ return new \Exedra\Application\Factory\Middleware($this->app->getNamespace(), $this->getModule());},
 			'controller' => function(){ return new \Exedra\Application\Factory\Controller($this->app->getNamespace(), $this->getModule());},
 			'url' => function(){ return new \Exedra\Application\Execution\Factory\Url($this->app->map, $this->request, $this->config, $this);},

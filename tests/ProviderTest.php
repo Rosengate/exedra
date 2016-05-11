@@ -3,14 +3,14 @@ class ProviderTest extends PHPUnit_Framework_TestCase
 {
 	public function setUp()
 	{
-		$this->app = new \Exedra\Application(__DIR__.'/Factory/TestApp');
+		$this->app = new \Exedra\Application(__DIR__.'/Factory');
 	}
 
 	public function testRegister()
 	{
-		$this->app['providers']->add(\TestApp\FooProvider::class);
+		$this->app['providers']->add(\App\FooProvider::class);
 
-		$this->app['providers']->register(new \TestApp\ServiceProvider);
+		$this->app['providers']->register(new \App\ServiceProvider);
 
 		$this->assertEquals('bar', $this->app->get('foo'));
 
@@ -21,7 +21,7 @@ class ProviderTest extends PHPUnit_Framework_TestCase
 	{
 		$this->app['providers']->flagAsLateRegistry();
 
-		$this->app['providers']->add(\TestApp\FooProvider::class);
+		$this->app['providers']->add(\App\FooProvider::class);
 
 		$this->app['providers']->boot();
 
@@ -63,7 +63,7 @@ class ProviderTest extends PHPUnit_Framework_TestCase
 
 	public function testDeferredProvider()
 	{
-		$this->app['providers']->add(\TestApp\FooProvider::class, array('foo'));
+		$this->app['providers']->add(\App\FooProvider::class, array('foo'));
 
 		$this->assertEquals('bar', $this->app->foo);
 	}
