@@ -29,7 +29,7 @@ class Manager
 	 * List of excluded commands
 	 * @var array excluded
 	 */
-	protected $excluded = array();
+	protected $excludedCommands = array();
 
 	/**
 	 * List of excluded namespaces
@@ -37,6 +37,17 @@ class Manager
 	 */
 	protected $excludedNamespaces = array();
 
+	/**
+	 * List of hidden commands
+	 * @var array hidden
+	 */
+	protected $hiddenCommands = array();
+
+	/**
+	 * List of hidden namespaces
+	 * @var array hiddenNamespaces
+	 */
+	protected $hiddenNamespaces = array();
 
 	public function __construct(\Exedra\Application $app)
 	{
@@ -316,11 +327,11 @@ class Manager
 		if(is_array($command))
 		{
 			foreach($command as $cmd)
-				$this->excluded[] = $cmd;
+				$this->excludedCommands[] = $cmd;
 		}
 		elseif(is_string($command))
 		{
-			$this->excluded[] = $command;
+			$this->excludedCommands[] = $command;
 		}
 		else
 		{
@@ -354,6 +365,57 @@ class Manager
 	}
 
 	/**
+	 * Hidden command from index
+	 * @param array|string command
+	 */
+	public function hide($command)
+	{
+		if(is_array($command))
+		{
+			foreach($command as $cmd)
+				$this->hiddenCommands[] = $cmd;
+		}
+		else if(is_string($command))
+		{
+			$this->hiddenCommands[] = $command;
+		}
+
+		throw new \Exedra\Exception\InvalidArgumentException('Argument 1 must be [array] or [string]');
+	}
+
+	/**
+	 * Hide namespace from index
+	 * @param array|string namespace
+	 */
+	public function hideNamespace($namespace)
+	{
+		if(is_array($namespace))
+		{
+			foreach($namespace as $ns)
+				$this->hiddenNamespaces[] = $ns;
+		}
+		else if(is_string($namespace))
+		{
+			$this->hiddenNamespaces[] = $namespace;
+		}
+
+		throw new \Exedra\Exception\InvalidArgumentException('Argument 1 must be [array] or [string]');
+	}
+
+	public function isHidden($command)
+	{
+		if(in_array($command, $this->hiddenCommands))
+			return true;
+
+		@list($namespace, $cmd) = explode(':', $command);
+
+		if(in_array($namespace, $this->hiddenNamespaces))
+			return true;
+
+		return false;
+	}
+
+	/**
 	 * Resolve commands information reflectively
 	 */
 	protected function resolve()
@@ -365,7 +427,7 @@ class Manager
 			if(!$reflectedClass->isSubclassOf('\Exedra\Console\Wizard\Wizardry'))
 				throw new \Exedra\Exception\InvalidArgumentException('['.$class.'] must be a subclass of [\Exedra\Console\Wizard\Wizardry]');
 
-			$namespace = $class::getNamespace();
+			$wizardNamespace = $class::getNamespace();
 
 			foreach($reflectedClass->getMethods() as $reflectedMethod)
 			{
@@ -379,7 +441,7 @@ class Manager
 				$command = strtolower(substr($method, 7));
 
 				// get from method based namespace
-				$namespace = isset($definition['namespace']) ? $definition['namespace'] : $namespace;
+				$namespace = isset($definition['namespace']) ? $definition['namespace'] : $wizardNamespace;
 
 				$name = $namespace . ':' . $command;
 

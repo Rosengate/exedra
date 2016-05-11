@@ -27,6 +27,9 @@ class Introducer extends Wizardry
 
 			$this->manager->eachCommand(function($command, array $definition) use(&$choices)
 			{
+				if($this->isHidden($command))
+					return;
+
 				$namespace = $definition['namespace'];
 
 				$choices[$namespace] = $namespace;
@@ -42,6 +45,9 @@ class Introducer extends Wizardry
 			if($group && strpos($command, $group.':') !== 0)
 				return;
 
+			if($this->isHidden($command))
+				return;
+
 			$choices[$command] = $definition['description'].' ('.$command.')';
 		});
 
@@ -51,7 +57,7 @@ class Introducer extends Wizardry
 
 		$this->say();
 
-		if($this->ask('Do you need anything else? [y/n]') == 'y')
+		if(in_array($this->ask('Do you need anything else? [y/n]'), array('y', '')))
 			$this->executeIndex(new Arguments);
 	}
 }
