@@ -11,7 +11,7 @@ class Asset
 
 	/**
 	 * Base path for where exedra may look for it at.
-	 * @var string
+	 * @var \Exedra\Path basePath
 	 */
 	protected $basePath;
 
@@ -23,7 +23,7 @@ class Asset
 
 	protected $assetPaths = array();
 
-	public function __construct(\Exedra\Application\Factory\Url $urlFactory, $basePath, array $config = array())
+	public function __construct(\Exedra\Application\Factory\Url $urlFactory, \Exedra\Path $basePath, array $config = array())
 	{
 		$this->urlFactory = $urlFactory;
 
@@ -31,7 +31,7 @@ class Asset
 
 		$this->initialize();
 
-		$this->setBasePath($basePath);
+		$this->basePath = $basePath;
 	}
 
 	protected function initialize()
@@ -42,9 +42,6 @@ class Asset
 			{
 				case 'persistable':
 				$this->setPersistable($value);
-				break;
-				case 'base_path':
-				$this->setBasePath($value);
 				break;
 				case 'js_path':
 				$this->setJsPath($value);
@@ -71,20 +68,9 @@ class Asset
 	 * @param bool absoluteness of path given
 	 * @return this
 	 */
-	public function setBasePath($path, $absolute = false)
+	public function setBasePath($path)
 	{
-		if(!$absolute)
-		{
-			$root = $this->exe->getApp()->getRootDir();
-
-			$this->basePath = $root.DIRECTORY_SEPARATOR.$path;
-		}
-		else
-		{
-			$this->basePath = $path;
-		}
-
-		return $this;
+		$this->basePath;
 	}
 
 	/**
@@ -138,7 +124,7 @@ class Asset
 		$ds = DIRECTORY_SEPARATOR;
 
 		$filename = (isset($this->assetPaths['js']) ? $this->assetPaths['js'].'/' : '').$filename;
-		
+
 		$filepath = $this->refinePath($this->basePath.$ds.$filename);
 
 		return new Blueprint\Asset($this->urlFactory, 'js', $filepath, $filename, $this->persistable);
@@ -154,7 +140,7 @@ class Asset
 		$ds = DIRECTORY_SEPARATOR;
 		
 		$filename = (isset($this->assetPaths['css']) ? $this->assetPaths['css'].'/' : '').$filename;
-		
+
 		$filepath = $this->refinePath($this->basePath.$ds.$filename);
 
 		return new Blueprint\Asset($this->urlFactory, 'css', $filepath, $filename, $this->persistable);

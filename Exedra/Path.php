@@ -105,11 +105,21 @@ class Path implements \ArrayAccess
 	}
 
 	/**
+	 * Check whether path registry exists.
+	 * @param string path to file.
+	 * @return boolean
+	 */
+	public function has($name)
+	{
+		return isset($this->pathRegistry[$name]);
+	}
+
+	/**
 	 * Check whether file exists.
 	 * @param string path to file.
 	 * @return boolean
 	 */
-	public function has($path)
+	public function isExists($path = null)
 	{
 		$path = $this->refinePath($this->prefixPath($path));
 
