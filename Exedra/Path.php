@@ -16,7 +16,7 @@ class Path implements \ArrayAccess
 	 * Registry of paths
 	 * @var array
 	 */
-	protected $pathRegistry;
+	protected $pathRegistry = array();
 
 	/**
 	 * List of autoloaded dirs and namespaces
@@ -29,19 +29,6 @@ class Path implements \ArrayAccess
 		$this->basePath = !$basePath ? null : rtrim($basePath, '/\\');
 
 		$this->autoloadRegister();
-	}
-
-	/**
-	 * Prefix path with the configured $basePath
-	 * @param string path
-	 * @return string
-	 */
-	private function prefixPath($path)
-	{
-		if(!$this->basePath === null)
-			return $path;
-
-		return rtrim($this->basePath, '/').'/'.$path;
 	}
 
 	/**
@@ -90,7 +77,7 @@ class Path implements \ArrayAccess
 	 */
 	protected function loadFile($file, $data, $once = false)
 	{
-		$file = $this->refinePath($this->prefixPath($file));
+		$file = $this->basePath.'/'.ltrim($file, '/\\');
 
 		if(!file_exists($file))
 			throw new \Exedra\Exception\NotFoundException("File [$file] not found");
@@ -105,25 +92,18 @@ class Path implements \ArrayAccess
 	}
 
 	/**
-	 * Check whether path registry exists.
+	 * Whether given path exists
 	 * @param string path to file.
 	 * @return boolean
 	 */
-	public function has($name)
+	public function has($path)
 	{
-		return isset($this->pathRegistry[$name]);
+		return file_exists($this->basePath.'/'.ltrim($path, '/\\'));
 	}
 
-	/**
-	 * Check whether file exists.
-	 * @param string path to file.
-	 * @return boolean
-	 */
-	public function isExists($path = null)
+	public function isExists()
 	{
-		$path = $this->refinePath($this->prefixPath($path));
-
-		return file_exists($path);
+		return file_exists($this->basePath);
 	}
 
 	/**
@@ -200,7 +180,7 @@ class Path implements \ArrayAccess
 	 */
 	public function getContent($file)
 	{
-		$file = $this->refinePath($this->prefixPath($file));
+		$file = $this->basePath.'/'.ltrim($file, '/\\');
 
 		if(!file_exists($file))
 			throw new \Exedra\Exception\NotFoundException("File [$file] not found");
@@ -209,7 +189,7 @@ class Path implements \ArrayAccess
 	}
 
 	/**
-	 * Create file instance
+	 * Create File instance
 	 * @return \Exedra\Application\Factory\File
 	 */
 	public function file($filename)
@@ -218,12 +198,33 @@ class Path implements \ArrayAccess
 	}
 
 	/**
-	 * Get string based path
-	 * @return string
+	 * Alias to create()
+	 * @param string path
+	 * @return \Exedra\Path
 	 */
-	public function path($path = null)
+	public function path($path)
 	{
-		return $this->path . ($path ? '/'.$path : '');
+		return new \Exedra\Path($this->basePath . ($path ? '/'.ltrim($path, '/\\') : ''));
+	}
+
+	/**
+	 * Create \Exedra\Path based on given path
+	 * @param string path
+	 * @return \Exedra\Path
+	 */
+	public function create($path)
+	{
+		return new \Exedra\Path($this->basePath . ($path ? '/'.ltrim($path, '/\\') : ''));
+	}
+
+	/**
+	 * Get string based path
+	 * Except that the argument is required
+	 * @param string
+	 */
+	public function to($path)
+	{
+		return $this->basePath.'/'.ltrim($path, '/\\');
 	}
 
 	/**
@@ -244,21 +245,9 @@ class Path implements \ArrayAccess
 	 */
 	public function putContents($file, $contents)
 	{
-		$file = $this->buildPath($file);
+		$file = $this->basePath.'/'.ltrim($file, '/\\');
 
 		return file_put_contents($file, $contents);
-	}
-
-	/**
-	 * Usable public function to help with building the path.
-	 * @param mixed path
-	 * @param string
-	 */
-	public function buildPath($path)
-	{
-		$path = $this->refinePath($this->prefixPath($path));
-
-		return $path;
 	}
 
 	/**
@@ -317,35 +306,22 @@ class Path implements \ArrayAccess
 	}
 
 	/**
+	 * Has given name registered.
+	 * @param string name
+	 * @return boolean
+	 */
+	public function hasRegistry($name)
+	{
+		return isset($this->pathRegistry[$Name]);
+	}
+
+	/**
 	 * String castable
 	 * @return string
 	 */
 	public function __toString()
 	{
 		return $this->basePath;
-	}
-
-	/**
-	 * Refine path, replace with the right directory separator.
-	 * @param string path
-	 * @return string
-	 */
-	protected function refinePath($path)
-	{
-		switch(PHP_OS)
-		{
-			case "WINNT":
-			return str_replace("/", DIRECTORY_SEPARATOR,$path);
-			break;
-			case "Linux":
-			return str_replace("\\", DIRECTORY_SEPARATOR, $path);
-			break;
-			case "Darwin":
-			return str_replace("\\", DIRECTORY_SEPARATOR, $path);
-			break;
-			default:
-			return str_replace("\\", DIRECTORY_SEPARATOR, $path);
-		}
 	}
 }
 

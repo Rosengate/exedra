@@ -4,7 +4,7 @@ namespace Exedra\Application\Factory;
 /**
  * Simple class for object oriented based path.
  */
-class File
+class File extends \SplFileInfo
 {
 	/**
 	 * Relative path of the file.
@@ -49,7 +49,7 @@ class File
 	 */
 	public function toString()
 	{
-		return $this->basePath->buildPath($this->filename);
+		return $this->basePath->to($this->filename);
 	}
 
 	/**
@@ -81,6 +81,16 @@ class File
 	public function getContents()
 	{
 		return $this->getContent();
+	}
+
+
+	/**
+	 * Get spl info
+	 * @return \splFileInfo
+	 */
+	public function getSplInfo()
+	{
+		return new \SplFileInfo($this->toString());
 	}
 
 	/**

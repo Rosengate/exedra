@@ -19,7 +19,7 @@ class Loader extends HandlerAbstract
 
 	protected $path;
 
-	protected $loader;
+	protected $basePath;
 
 	/**
 	 * @return bool
@@ -37,7 +37,7 @@ class Loader extends HandlerAbstract
 		if(!$this->isAvailableType($type))
 			return false;
 
-		$this->loader = $this->exe->app->loader;
+		$this->basePath = $this->exe->getApp()->basePath;
 
 		$this->type = $type;
 		
@@ -74,10 +74,10 @@ class Loader extends HandlerAbstract
 
 		$path = array('structure' => 'middleware', 'path' => 'routes/'.$route.'.php');
 
-		if(!$this->loader->has($path))
-			throw new \Exedra\Exception\NotFoundException('Unable to find route based middleware file ['.$this->loader->buildPath($path).']');
+		if(!$this->basePath->has($path))
+			throw new \Exedra\Exception\NotFoundException('Unable to find route based middleware file ['.$this->basePath.'/'.$path.']');
 
-		$closure = $this->loader->load($path);
+		$closure = $this->basePath->load($path);
 
 		if(!($closure instanceof \Closure))
 			throw new \Exedra\Exception\InvalidArgumentException('The loaded file on path ['.$path.'] must return type \Closure');
@@ -89,10 +89,10 @@ class Loader extends HandlerAbstract
 	{
 		$path = array('structure' => 'middleware', 'path' => $this->path);
 
-		if(!$this->loader->has($path))
-			throw new \Exedra\Exception\NotFoundException('Unable to find middleware file ['.$this->loader->buildPath($path).']');
+		if(!$this->basePath->has($path))
+			throw new \Exedra\Exception\NotFoundException('Unable to find middleware file ['.$this->basePath.'/'.$path.']');
 
-		$closure = $this->loader->load($path);
+		$closure = $this->basePath->load($path);
 
 		if(!($closure instanceof \Closure))
 			throw new \Exedra\Exception\InvalidArgumentException('The loaded file on path ['.$path.'] must return type \Closure');

@@ -1,56 +1,41 @@
 <?php
-class FactoryPathTest extends PHPUnit_Framework_TestCase
+class FactoryFileTest extends PHPUnit_Framework_TestCase
 {
 	public function setUp()
 	{
-		$app = new \Exedra\Application(__DIR__);
+		$this->path = new \Exedra\Path(__DIR__);
 
-		$this->factoryPath = new \Exedra\Application\Factory\Path($app->loader);
-	}
-
-	public function testCreate()
-	{
-		$this->testPath = $this->factoryPath->create('PathTest.php');
-
-		$this->assertEquals($this->testPath, __DIR__.DIRECTORY_SEPARATOR.'PathTest.php');
-	}
-
-	public function testMulticreate()
-	{
-		$path = $this->factoryPath->create('folder');
-
-		$newPath = $path->create('doriyaki/dom');
-
-		$this->assertEquals($path.DIRECTORY_SEPARATOR.'doriyaki'.DIRECTORY_SEPARATOR.'dom', (string) $newPath);
+		$this->assertEquals(realpath($this->path->to('PathTest.php')), realpath(__DIR__.'/'.'PathTest.php'));
 	}
 
 	public function testClassName()
 	{
-		$this->testCreate();
-
-		$this->assertEquals($this->testPath instanceof \Exedra\Application\Factory\Path, true);
+		$this->assertTrue($this->path instanceof \Exedra\Path);
 	}
 
 	public function testCheckExists()
 	{
-		$this->testCreate();
-
-		$this->assertEquals($this->testPath->isExists(), true);
+		$this->assertEquals($this->path->isExists(), true);
 	}
 
 	public function testGetContent()
 	{
-		$this->testCreate();
-
-		$this->assertEquals($this->testPath->getContent(), file_get_contents(__DIR__.DIRECTORY_SEPARATOR.'PathTest.php'));
+		$this->assertEquals($this->path->getContents('PathTest.php'), file_get_contents(__DIR__.DIRECTORY_SEPARATOR.'PathTest.php'));
 	}
+
+	/*public function testCreateFile()
+	{
+		$this->assertTrue($this->path->file('PathTest.php')->isExists());
+
+		$this->assertTrue($this->path->file('PathTest.php')->getSplInfo());
+	}*/
 
 	public function testInvoke()
 	{
-		$path = $this->factoryPath->create('foo');
+		$path = $this->path->create('foo');
 
 		$ns = DIRECTORY_SEPARATOR;
 
-		$this->assertEquals($path('bar/baz')->create('qux'), $path.$ns.'bar'.$ns.'baz'.$ns.'qux');
+		// $this->assertEquals($path('bar/baz')->create('qux'), $path.$ns.'bar'.$ns.'baz'.$ns.'qux');
 	}
 }

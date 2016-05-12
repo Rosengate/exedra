@@ -44,8 +44,6 @@ class View
 	 */
 	public function create($path, $data = array())
 	{
-		$path = $this->baseDir ? $this->baseDir . '/' . ltrim($path) : $path;
-
 		$path = $this->buildPath($path);
 
 		if(!file_exists($path))
@@ -76,27 +74,13 @@ class View
 	}
 
 	/**
-	 * Set base dir to be concenatted at the beginning of view path.
-	 * @param string dir
-	 *
-	 */
-	public function setBaseDir($dir)
-	{
-		$this->baseDir = $dir;
-	}
-
-	/**
 	 * Absolutely build path based on the relative one
 	 * @param string path
 	 * @return string
 	 */
 	protected function buildPath($path)
 	{
-		$path	= $path. '.' .$this->ext;
-
-		$path = $this->path->buildPath('View/'. $path);
-
-		return $path;
+		return $this->path.'/View/'.ltrim($path).'.php';
 	}
 
 	/**
@@ -105,12 +89,9 @@ class View
 	 * @param boolean build
 	 * @return boolean
 	 */
-	public function has($path, $build = true)
+	public function has($path)
 	{
-		if($build)
-			$path = $this->buildPath($path);
-
-		return file_exists($path);
+		return file_exists($this->buildPath($path));
 	}
 
 	/**

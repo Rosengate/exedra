@@ -82,9 +82,7 @@ class SessionTest extends PHPUnit_Framework_TestCase
 	{
 		$this->flash->set('test_key', 'test_value');
 
-		$baseKey = $this->flash->getBaseKey();
-
-		$this->assertEquals($this->flash->get('test_key'), 'test_value');
+		$baseKey = \Exedra\Application\Session\Flash::BASE_KEY;
 
 		$this->assertEquals($this->storage[$baseKey]['test_key'], $this->session->get("$baseKey.test_key"));
 
