@@ -29,10 +29,7 @@ class Session
 	 */
 	public function start()
 	{
-		if(self::hasStarted())
-			return;
-
-		if(!isset($_SESSION))
+		if(!self::hasStarted())
 			session_start();
 
 		$this->storage = &$_SESSION;
