@@ -241,10 +241,7 @@ class Application extends \Exedra\Container\Container
 	{
 		$response = $this->respond($request);
 
-		if(\Exedra\Application\Session\Session::hasStarted())
-			$this->flash->clear();
-
-		return $response->send();
+		$response->send();
 	}
 
 	/**

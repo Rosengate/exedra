@@ -1,23 +1,47 @@
 <?php
 namespace Exedra\Application\Session;
 
+/**
+ * By default flash data only cleared on instantiated.
+ * If there's no use of flash data, it'll not be cleared
+ */
 class Flash
 {
 	const BASE_KEY = 'flash';
 
+	/**
+	 * Initialized flag whether data has been init
+	 * @var boolean initialized
+	 */
+	protected $initialized = false;
+
+	/**
+	 * Flash data initialized from session
+	 * @var array data
+	 */
+	protected $data = array();
+
 	public function __construct(\Exedra\Application\Session\Session $session)
 	{
 		$this->session = $session;
+
+		$this->initialize();
 	}
 
 	/**
-	 * Get base key for session
-	 * @return string
+	 * Initialize data by call
+	 * Although instantiating this instance will basically initialize the data.
 	 */
-	public function getBaseKey()
+	public function initialize()
 	{
-		// hash to avoid conflict
-		return md5(self::BASE_KEY);
+		if($this->initialized)
+			return;
+
+		$this->data = $this->session->get(self::BASE_KEY);
+
+		$this->clear();
+
+		$this->initialized = true;
 	}
 
 	/**
@@ -26,38 +50,35 @@ class Flash
 	 * @param mixed val
 	 * @return this
 	 */
-	public function set($key, $val = array())
+	public function set($key, $value)
 	{
-		if(is_array($key))
-		{
-			foreach($key as $k=>$v)
-			{
-				$this->set($k,$v);
-			}
-		}
-		else
-		{
-			$this->session->set($this->getBaseKey().'.'.$key,$val);
-		}
+		$this->session->set(self::BASE_KEY.'.'.$key, $value);
 
 		return $this;
 	}
 
 	/**
-	 * Get the flash by the given key
+	 * Get all flashes
+	 * @return array
+	 */
+	public function all()
+	{
+		return $this->data;
+	}
+
+	/**
+	 * Get flash data
+	 * @return default if array_key isn't exists.
 	 * @param string key
 	 * @param mixed default value
 	 * @return mixed
 	 */
-	public function get($key = null, $default = null)
+	public function get($key, $default = null)
 	{
-		if(!$key)
-			return $this->session->get($this->getBaseKey());
-
-		if($default && !$this->has($key))
+		if(!array_key_exists($key, $this->data) && $default)
 			return $default;
-		
-		return $this->session->get($this->getBaseKey().'.'.$key);
+
+		return $this->data[$key];
 	}
 
 	/**
@@ -67,7 +88,7 @@ class Flash
 	 */
 	public function has($key)
 	{
-		return $this->session->has($this->getBaseKey().'.'.$key);
+		return $this->data[$key];
 	}
 
 	/**
@@ -76,7 +97,8 @@ class Flash
 	 */
 	public function clear()
 	{
-		$this->session->destroy($this->getBaseKey());
+		$this->session->destroy(self::BASE_KEY);
+
 		return $this;
 	}
 }
