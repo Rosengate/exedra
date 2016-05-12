@@ -101,9 +101,16 @@ class Path implements \ArrayAccess
 		return file_exists($this->basePath.'/'.ltrim($path, '/\\'));
 	}
 
-	public function isExists()
+	/**
+	 * Alias to has()
+	 * But with optional argument
+	 * Which can also be used to check the base path existence
+	 * @param string|null path
+	 * @return boolean
+	 */
+	public function isExists($path = null)
 	{
-		return file_exists($this->basePath);
+		return file_exists($this->basePath.($path ? '/'.ltrim($path, '/\\') : ''));
 	}
 
 	/**
