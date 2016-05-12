@@ -2,8 +2,7 @@
 namespace Exedra\Application\Session;
 
 /**
- * By default flash data only cleared on instantiated.
- * If there's no use of flash data, it'll not be cleared
+ * By default flash data ONLY cleared on instantiated.
  */
 class Flash
 {
@@ -37,7 +36,7 @@ class Flash
 		if($this->initialized)
 			return;
 
-		$this->data = $this->session->get(self::BASE_KEY);
+		$this->data = $this->session->get(self::BASE_KEY, array());
 
 		$this->clear();
 
@@ -61,7 +60,7 @@ class Flash
 	 * Get all flashes
 	 * @return array
 	 */
-	public function all()
+	public function getAll()
 	{
 		return $this->data;
 	}
@@ -88,7 +87,7 @@ class Flash
 	 */
 	public function has($key)
 	{
-		return $this->data[$key];
+		return isset($this->data[$key]);
 	}
 
 	/**

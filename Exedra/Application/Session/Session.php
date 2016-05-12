@@ -79,7 +79,7 @@ class Session
 	 * @param mixed value
 	 * @return \Exedra\Application\Session
 	 */
-	public function set($key,$value)
+	public function set($key, $value)
 	{
 		\Exedra\Functions\Arrays::setByNotation($this->getStorage(),$key,$value);
 
@@ -88,13 +88,16 @@ class Session
 
 	/**
 	 * Get the session by the given key.
+	 * Default on null
 	 * @param string key
 	 * @param session value
 	 * @return mixed
 	 */
-	public function get($key)
+	public function get($key, $default = null)
 	{
-		return \Exedra\Functions\Arrays::getByNotation($this->getStorage(), $key);
+		$data = \Exedra\Functions\Arrays::getByNotation($this->getStorage(), $key);
+		
+		return $data === null ? $default : $data;
 	}
 
 	/**
