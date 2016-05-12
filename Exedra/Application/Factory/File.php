@@ -4,7 +4,7 @@ namespace Exedra\Application\Factory;
 /**
  * Simple class for object oriented based path.
  */
-class File extends \SplFileInfo
+class File
 {
 	/**
 	 * Relative path of the file.
@@ -63,15 +63,13 @@ class File extends \SplFileInfo
 	}
 
 	/**
-	 * Require this file content.
+	 * Load this file buffered.
+	 * @param array data
 	 * @return mixed
 	 */
-	public function getContent()
+	public function loadBuffered(array $data = array())
 	{
-		if(!$this->isExists())
-			return false;
-
-		return $this->basePath->getContent($this->filename);
+		return $this->basePath->loadBuffered($this->filename, $data);
 	}
 
 	/**
@@ -80,13 +78,16 @@ class File extends \SplFileInfo
 	 */
 	public function getContents()
 	{
-		return $this->getContent();
+		if(!$this->isExists())
+			throw new \Exedra\Exception\NotFoundException('File ['.$this->basePath.'/'.$this->filename.'] was not found.');
+			
+		return $this->basePath->getContents($this->filename);
 	}
 
 
 	/**
 	 * Get spl info
-	 * @return \splFileInfo
+	 * @return \SplFileInfo
 	 */
 	public function getSplInfo()
 	{

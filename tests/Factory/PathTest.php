@@ -1,5 +1,5 @@
 <?php
-class FactoryFileTest extends PHPUnit_Framework_TestCase
+class FactoryPathTest extends PHPUnit_Framework_TestCase
 {
 	public function setUp()
 	{
