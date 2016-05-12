@@ -6,13 +6,11 @@ p/s : Development is still on-going. It's expected to reach matured state by ver
 
 Introduction
 ======
-This PHP framework focuses mainly on nestable/groupable route mapping, route oriented based middleware/execution and which hopefully will provide much modular application execution. Route is unique, and identifiable by name, tag, queriable by Http Request. Imagine developing an application hierarchically down the depth without losing the identity of the executions you planned, while stacking middlewares down the path on every possible node of route.
+This PHP framework focuses on nestable/groupable routing, mainly through Http Request components, with middleware layerable routes and which hopefully will provide much modular application execution. Route is unique, and identifiable by name, tag, and queriable by Http Request. Imagine developing an application down the depth without losing the identity of the executions you planned, controlling the routes hierarchically with your own layers of middlewares.
+
+The goal is to be contextual, explicit while being simple and minimal at the same time. Hence being microframework would do just enough. It's not meant to contend with the other great contenders like laravel, symfony (they're definitely great frameworks). It will not surprise you with unintended heart attacks, but of course, number of what it intently can do would definitely surprise you. 
 
 Imagine building a plane while flying it!
-
-Goal
-======
-Exedra focuses on being contextual, and explicitful while being simple and minimal at the same time. Hence the goal of being microframework would do just enough. It's not meant to contend with the other great contenders like laravel, symfony, codeignitor. It will not surprise you with unintended heart attacks, but of course, number of what it intently can do would definitely surprise you.
 
 History
 ======
@@ -47,13 +45,14 @@ composer.lock
 #### /app/app.php
 You can write up the boot file (**app.php**) anywhere. But there're several important directory paths required to be configured.
 
-First, create the boot file named **app.php** under folder **app**.
+First, create the boot file named on **/app/app.php**
 
 And load the composer autoload accordingly. The **app.php** file should return the same \Exedra\Application instance, so it's usable for the front controller index.php, or wizard (console) later.
 ~~~
 require_once __DIR__.'/../vendor/autoload.php';
 
 // depending on where the file is located.
+// it's currently assumed that it's under /app/
 $app = new \Exedra\Application(array(
     'namespace' => 'App',
     'path.root' => __DIR__.'/../',
@@ -67,13 +66,13 @@ Or you can code it this way :
 ~~~
 require_once __DIR__.'/../vendor/autoload.php';
 
-$app = new \Exedra\Application(__DIR__);
+$app = new \Exedra\Application(__DIR__.'/../');
 
 return $app;
 ~~~
 By default it'll take the argument as the project **path.root** path, and set the **namespace** to **App**.
 
-So, basically there're 3 paths initially you may need to know.
+So, basically there're just 3 paths initially you may need to know.
 - root (/)
 - public (/public)
 - app (/app)
@@ -198,17 +197,17 @@ Roadmap to 0.3.0
 ======
 - Adapt several PSR's styles and standards
   - PSR-7 Message Interfaces [DONE]
-  - PSR-2 4 spaces indent ?
+  - PSR-2 ?
 - More clarity on HTTP Response [DONE]
 - proper jargon renames
   - 'uri' to 'path' [DONE]
   - builder to factory [DONE]
 - Internal Routing Improvements
-- More type of Exceptions
-- More clarity on application structure
+- More type of Exceptions [PARTIAL]
+- More clarity on application structure [Structure Class removed]
 - Container based \Exedra\Application\Application and \Exedra\Application\Execution\Exec ? [DONE]
 - Move \Exedra\Application\Execution\ and all the related namespaces outsides ?
-- Do more tests
+- Do more tests [PARTIAL]
 
 Thank you!
 ======
