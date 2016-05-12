@@ -36,9 +36,7 @@ class Asset
 
 	protected function initialize()
 	{
-		$configAsset = $this->config->get('asset');
-
-		foreach($configAsset as $key => $value)
+		foreach($this->config as $key => $value)
 		{
 			switch($key)
 			{

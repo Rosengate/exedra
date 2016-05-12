@@ -815,6 +815,15 @@ class Route
 	}
 
 	/**
+	 * Alias to setModule
+	 * @param string module
+	 */
+	public function module($module)
+	{
+		return $this->setProperty('module', $module);
+	}
+
+	/**
 	 * Tag this route
 	 * @param string tag
 	 */
