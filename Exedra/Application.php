@@ -35,6 +35,8 @@ class Application extends \Exedra\Container\Container
 		if(!isset($params['path.root']))
 			throw new \Exedra\Exception\InvalidArgumentException('[path.root] parameter is required, at least.');
 
+		$params['path.root'] = trim($params['path.root'], '/\\');
+
 		$this->attributes['path'] = $path = new \Exedra\Path($params['path.root']);
 
 		$path->append('app', isset($params['path.app']) ? $params['path.app'] : $params['path.root'].'/app', true);

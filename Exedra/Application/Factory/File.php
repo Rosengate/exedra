@@ -95,6 +95,14 @@ class File
 	}
 
 	/**
+	 * Delete the file
+	 */
+	public function delete()
+	{
+		unlink($this->toString());
+	}
+
+	/**
 	 * Put contents to the given path if it's file
 	 * @param string data
 	 * @return mixed
