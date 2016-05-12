@@ -102,15 +102,21 @@ class Application extends Wizardry
 
 		$this->validate($port, $validation);
 
-		$dir = $this->app->config->get('dir.public', 'public');
+		// $dir = $this->app->config->get('dir.public', 'public');
+		$dir = $this->app->path['public'];
 
 		if(!file_exists($dir))
 			return $this->say('Public folder doesn\'t exist. ('.$dir.')');
 
+		if(isset($arguments['router']))
+			$router = ' '.$arguments['router'];
+		else
+			$router = '';
+
 		chdir($dir);
 
-		$this->say('php server started at localhost:'.$port);
+		$this->say('PHP server started at localhost:'.$port.' on folder '.realpath($dir));
 		
-		exec('php -S localhost:'.$port);
+		exec('php -S localhost:'.$port.$router);
 	}
 }

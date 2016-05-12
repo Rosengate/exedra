@@ -451,7 +451,7 @@ class Manager
 						throw new \Exedra\Exception\Exception('Command ['.$name.'] is being overwritten by ['.$class.'] wizard.');
 				}
 
-				if(in_array($namespace, $this->excludedNamespaces) || in_array($name, $this->excluded))
+				if(in_array($namespace, $this->excludedNamespaces) || in_array($name, $this->excludedCommands))
 					continue;
 
 				$this->commands[$name] = array_merge($definition, array(
