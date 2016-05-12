@@ -35,10 +35,10 @@ class Select extends Base
 	 */
 	public function first($value, $label = null)
 	{
-		$label = $label === null ? $value : $label;
-		$value = $label === null ? '' : $value;
-
-		$this->firstValue = array('value' => $value, 'label' => $label);
+		$this->firstValue = array(
+			'label' => $label === null ? $value : $label,
+			'value' => $label === null ? '' : $value
+		);
 
 		return $this;
 	}
