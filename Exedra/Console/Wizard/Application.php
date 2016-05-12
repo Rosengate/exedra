@@ -4,14 +4,15 @@ namespace Exedra\Console\Wizard;
 class Application extends Wizardry
 {
 	/**
-	 * @description List application routes
-	 * @arguments names, params, scan
+	 * @namespace app
+	 * @description List routes
+	 * @arguments name, params
 	 */
-	public function executeRoutes(Arguments $arguments)
+	public function executeRoutes($arguments)
 	{
-		$table = new Tools\Table;
+		$table = new \Exedra\Console\Wizard\Tools\Table;
 
-		$header = $arguments->get('params', array('route', 'method', 'uri'));
+		$header = explode(' ', $arguments->get('params', 'route method tag uri'));
 
 		$table->setHeader($header);
 
@@ -20,7 +21,9 @@ class Application extends Wizardry
 		$this->app->map->each(function(\Exedra\Application\Map\Route $route) use($table, $header, $arguments)
 		{
 			$routeName = $route->getAbsoluteName();
+			
 			$methods = $route->getMethod();
+
 			if(count($methods) == 4)
 				$methods = 'any';
 			else
@@ -42,13 +45,17 @@ class Application extends Wizardry
 			$data = array(
 				'route' => $route->getAbsoluteName(), 
 				'method' => $methods,
-				'uri' => '/'.$route->getPath(true)
+				'uri' => '/'.$route->getPath(true),
+				'tag' => $route->hasProperty('tag') ? $route->getProperty('tag') : ''
 				);
+
 			foreach($header as $col)
 			{
 				$col = strtolower($col);
+
 				$row[] = $data[$col];
 			}
+
 			$table->addRow($row);
 		});
 
@@ -56,6 +63,7 @@ class Application extends Wizardry
 			$table->addOneColumnRow('Not found!');
 
 		$this->say('Showing list of routes : ');
+
 		$this->tabulize($table);
 	}
 
