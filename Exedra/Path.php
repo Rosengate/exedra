@@ -323,6 +323,15 @@ class Path implements \ArrayAccess
 	}
 
 	/**
+	 * Get as string
+	 * @return string
+	 */
+	public function toString()
+	{
+		return $this->basePath;
+	}
+
+	/**
 	 * String castable
 	 * @return string
 	 */
