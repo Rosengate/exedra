@@ -64,8 +64,8 @@ class Application extends \Exedra\Container\Container
 	{
 		$this->attributes['services']->register(array(
 			'mapFactory' => function(){ return new \Exedra\Application\Map\Factory($this);},
-			'execution' => array('\Exedra\Application\Execution\Registry', array('factories.executionHandlers')),
-			'middleware' => array('\Exedra\Application\Middleware\Registry', array('factories.middlewares', 'factories.middlewareHandlers')),
+			'execution' => array('\Exedra\Application\Execution\Registry', array('factories.execution.handlers')),
+			'middleware' => array('\Exedra\Application\Middleware\Registry', array('factories.middlewares', 'factories.middleware.handlers')),
 			'request' => function(){ return \Exedra\Http\ServerRequest::createFromGlobals();},
 			'map' => function() { return $this->mapFactory->createLevel();},
 			'url' => array('\Exedra\Application\Factory\Url', array('self.map', 'self.request', 'self.config')),
@@ -75,10 +75,10 @@ class Application extends \Exedra\Container\Container
 		));
 
 		$this->attributes['factories']->register(array(
-			'exe' => '\Exedra\Application\Execution\Exec',
-			'executionHandlers' => '\Exedra\Application\Execution\Handlers',
+			'execution.exe' => '\Exedra\Application\Execution\Exec',
+			'execution.handlers' => '\Exedra\Application\Execution\Handlers',
 			'middlewares' => '\Exedra\Application\Middleware\Middlewares',
-			'middlewareHandlers' => '\Exedra\Application\Middleware\Handlers'
+			'middleware.handlers' => '\Exedra\Application\Middleware\Handlers'
 		));
 	}
 
@@ -196,11 +196,12 @@ class Application extends \Exedra\Container\Container
 		if(!$finding->success())
 			throw new \Exedra\Exception\RouteNotFoundException('Route is not found');
 
-		return $this->create('exe', array($this, $finding));
+		return $this->create('execution.exe', array($this, $finding));
 	}
 
 	/**
 	 * Dispatch and return the response
+	 * Handle uncaught \Exedra\Exception\Exception
 	 * @param \Exedra\Http\ServerRequest|null
 	 * @return \Exedra\Application\Execution\Response
 	 */
