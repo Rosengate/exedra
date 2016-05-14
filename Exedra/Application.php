@@ -39,9 +39,9 @@ class Application extends \Exedra\Container\Container
 
 		$this->attributes['path'] = $path = new \Exedra\Path($params['path.root']);
 
-		$path->append('app', isset($params['path.app']) ? $params['path.app'] : $params['path.root'].'/app', true);
+		$path->register('app', isset($params['path.app']) ? $params['path.app'] : $params['path.root'].'/app', true);
 
-		$path->append('public', isset($params['path.public']) ? $params['path.public'] : $params['path.root'].'/public', true);
+		$path->register('public', isset($params['path.public']) ? $params['path.public'] : $params['path.root'].'/public', true);
 
 		$path->autoload((string) $path['app'], $this->namespace, false);
 
@@ -71,7 +71,6 @@ class Application extends \Exedra\Container\Container
 			'url' => array('\Exedra\Application\Factory\Url', array('self.map', 'self.request', 'self.config')),
 			'@session' => '\Exedra\Application\Session\Session',
 			'@flash' => array('\Exedra\Application\Session\Flash', array('self.session')),
-			// 'path' => array('\Exedra\Application\Factory\Path', array('self.loader')),
 			'wizard' => array('\Exedra\Console\Wizard\Manager', array('self'))
 		));
 

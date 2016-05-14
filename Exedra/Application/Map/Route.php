@@ -541,25 +541,31 @@ class Route
 	 *
 	 * @throws \Exedra\Exception\InvalidArgumentException
 	 */
-	public function resolveLevel($level)
+	public function resolveLevel($pattern)
 	{
-		$type = @get_class($level) ? : gettype($level);
+		$type = @get_class($pattern) ? : gettype($pattern);
 
 		switch($type)
 		{
 			case 'Closure':
-				$closure = $level;
-				$level = $this->level->factory->createLevel($this);
+				$closure = $pattern;
+
+				$level = $this->level->factory->createLevel(array(), $this);
+				
 				$closure($level);
+				
 				$this->properties['subroutes'] = $level;
+				
 				return $level;
 			break;
 			case 'string':
-				$this->properties['subroutes'] = $level = $this->level->factory->createLevelByPattern($this, $level);
+				$this->properties['subroutes'] = $level = $this->level->factory->createLevelFromString($pattern, $this);
+				
 				return $level;
 			break;
 			case 'array':
-				$this->properties['subroutes'] = $level = $this->level->factory->createLevel($this, $level);
+				$this->properties['subroutes'] = $level = $this->level->factory->createLevel($pattern, $this);
+				
 				return $level;
 			break;
 			default:

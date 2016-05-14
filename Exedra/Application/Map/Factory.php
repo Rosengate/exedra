@@ -24,6 +24,12 @@ class Factory
 	protected $reflections = array();
 
 	/**
+	 * Routing path
+	 * @param \Exedra\Path
+	 */
+	protected $path;
+
+	/**
 	 * Define explicitness of the routing.
 	 * @var bool
 	 */
@@ -34,6 +40,23 @@ class Factory
 		$this->app = $app;
 
 		$this->registerRoutingComponents();
+	}
+
+	/**
+	 * Get routes base path
+	 * @return \Exedra\Path
+	 */
+	public function getRoutesPath()
+	{
+		if(!$this->path)
+		{
+			if($this->app->path->hasRegistry('routes'))
+				$this->path = $this->app->path['routes'];
+			else
+				$this->path = $this->app->path->register('routes', $this->app->path['app'].'/Routes', true);
+		}
+
+		return $this->path;
 	}
 
 	/**
@@ -115,28 +138,32 @@ class Factory
 	 * @param array of routes
 	 * @return \Exedra\Application\Map\Level
 	 */
-	public function createLevel(Route $route = null, array $routes = array())
+	public function createLevel(array $routes = array(), Route $route = null)
 	{
 		return $this->create('level', array($this, $route, $routes));
-		return new Level($this, $route, $routes);
 	}
 
 	/**
-	 * Create level by pattern
+	 * Create level by given path
 	 * For now, assume the passed pattern as path
 	 * @param \Exedra\Application\Map\Route
 	 * @param string pattern
 	 * @return \Exedra\Application\Map\Level
 	 */
-	public function createLevelByPattern(Route $route = null, $pattern)
+	public function createLevelFromString($path, $route = null)
 	{
-		$closure = $this->app->path['app']->load($pattern);
+		$path = $this->getRoutesPath()->to($path);
 
-		// expecting a Map\Level from this loaded file.
+		if(!file_exists($path))
+			throw new \Exedra\Exception\NotFoundException('File ['.$path.'] does not exists.');
+		
+		$closure = require_once $path;
+
+		// expecting a \Closure from this loaded file.
 		if(!($closure instanceof \Closure))
-			return $this->throwException('Expecting closure for the subroutes');
+			return $this->throwException('Failed to create a route level. The path ['.$path.'] must return a \Closure.');
 
-		$level = $this->createLevel($route);
+		$level = $this->create('level', array($this, $route));
 
 		$closure($level);
 

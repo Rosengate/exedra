@@ -263,7 +263,9 @@ class Path implements \ArrayAccess
 	 */
 	public function offsetSet($name, $path)
 	{
-
+		$path = $this->basePath.'/'.ltrim($path, '/\\');
+		
+		$this->pathRegistry[$name] = new static($path);
 	}
 
 	/**
@@ -274,7 +276,7 @@ class Path implements \ArrayAccess
 	{
 		// create a loader by the same path and name.
 		if(!isset($this->pathRegistry[$name]))
-			$this->pathRegistry[$name] = new static($this->basePath.'/'.ltrim($name, '/\\'));
+			throw new \Exedra\Exception\NotFoundException('Path with registry ['.$name.'] does not exist.');
 
 		return $this->pathRegistry[$name];
 	}
@@ -299,17 +301,17 @@ class Path implements \ArrayAccess
 	}
 
 	/**
-	 * Append a new path for the given name and path
+	 * Register a new path for the given name and path
 	 * @param string name
 	 * @param string path
 	 */
-	public function append($name, $path, $absolute = false)
+	public function register($name, $path, $absolute = false)
 	{
 		$path = $absolute ? $path : $this->basePath.'/'.ltrim($path, '/\\');
 
 		$this->pathRegistry[$name] = new static($path);
 
-		return $this;
+		return $this->pathRegistry[$name];
 	}
 
 	/**
@@ -319,7 +321,7 @@ class Path implements \ArrayAccess
 	 */
 	public function hasRegistry($name)
 	{
-		return isset($this->pathRegistry[$Name]);
+		return isset($this->pathRegistry[$name]);
 	}
 
 	/**

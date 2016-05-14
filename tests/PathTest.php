@@ -1,18 +1,20 @@
 <?php
-class LoaderTest extends PHPUnit_Framework_TestCase
+class PathTest extends PHPUnit_Framework_TestCase
 {
 	public function setUp()
 	{
-		$this->loader = new \Exedra\Path(__DIR__.'/Factory');
+		$this->path = new \Exedra\Path(__DIR__.'/Factory');
+
+		$this->path['app'] = 'app';
 	}
 
 	public function testLoad()
 	{
-		$this->assertTrue($this->loader['app']->has('View/TestView.php'));
+		$this->assertTrue($this->path['app']->has('View/TestView.php'));
 
 		ob_start();
 
-		$this->loader['app']->load('View/TestView.php');
+		$this->path['app']->load('View/TestView.php');
 
 		$content = ob_get_clean();
 
@@ -23,7 +25,7 @@ class LoaderTest extends PHPUnit_Framework_TestCase
 	{
 		ob_start();
 
-		$this->loader['app']->load('View/TestView.php', array(
+		$this->path['app']->load('View/TestView.php', array(
 			'testData' => 'foo-bar'
 			));
 
@@ -34,23 +36,23 @@ class LoaderTest extends PHPUnit_Framework_TestCase
 
 	public function testGetContents()
 	{
-		$this->assertEquals('foo-bar', $this->loader['app']->getContents('text-dump'));
+		$this->assertEquals('foo-bar', $this->path['app']->getContents('text-dump'));
 	}
 
 	public function testAutoload()
 	{
-		$this->loader['app']->autoload('AutoloadedDir');
+		$this->path['app']->autoload('AutoloadedDir');
 
 		$this->assertEquals(FooBarClass::CLASS, get_class(new FooBarClass));
 
-		$this->loader['app']->autoload('AutoloadedDir', 'FooSpace');
+		$this->path['app']->autoload('AutoloadedDir', 'FooSpace');
 
 		$this->assertEquals(\FooSpace\FooBazClass::CLASS, get_class(new \FooSpace\FooBazClass));
 	}
 
 	public function testBufferedLoad()
 	{
-		$content = $this->loader['app']->loadBuffered('dynamic-dump.php', array('foo' => 'bar'));
+		$content = $this->path['app']->loadBuffered('dynamic-dump.php', array('foo' => 'bar'));
 
 		$this->assertEquals('dynamic dump bar', $content);
 	}
