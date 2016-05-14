@@ -93,7 +93,7 @@ $app->map->any('/api')->middleware(\App\Middleware\Api::CLASS)->group(function($
     // or inversely, you can register the middleware into the current route, through this level.
     $api->middleware(\App\Middleware\ApiAuth::CLASS);
     
-    $api->any('/users')->group(function(users)
+    $api->any('/users')->group(function($users)
     {
         // create new user
         // POST /api/users
