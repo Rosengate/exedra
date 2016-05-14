@@ -71,7 +71,7 @@ class Application extends \Exedra\Container\Container
 			'url' => array('\Exedra\Application\Factory\Url', array('self.map', 'self.request', 'self.config')),
 			'@session' => '\Exedra\Application\Session\Session',
 			'@flash' => array('\Exedra\Application\Session\Flash', array('self.session')),
-			'wizard' => array('\Exedra\Console\Wizard\Manager', array('self'))
+			'wizard' => array('\Exedra\Wizard\Manager', array('self'))
 		));
 
 		$this->attributes['factories']->register(array(

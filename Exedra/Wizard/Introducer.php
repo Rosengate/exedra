@@ -1,5 +1,5 @@
 <?php
-namespace Exedra\Console\Wizard;
+namespace Exedra\Wizard;
 
 class Introducer extends Wizardry
 {

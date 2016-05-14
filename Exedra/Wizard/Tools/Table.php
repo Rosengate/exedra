@@ -1,5 +1,5 @@
 <?php
-namespace Exedra\Console\Tools;
+namespace Exedra\Wizard\Tools;
 
 class Table
 {

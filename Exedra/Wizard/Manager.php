@@ -1,5 +1,5 @@
 <?php
-namespace Exedra\Console\Wizard;
+namespace Exedra\Wizard;
 
 class Manager
 {
@@ -54,7 +54,7 @@ class Manager
 		$this->app = $app;
 
 		// register application wizard
-		$this->add('Exedra\Console\Wizard\Application');
+		$this->add('Exedra\Wizard\Application');
 	}
 
 	/**
@@ -66,7 +66,7 @@ class Manager
 		if($this->app['factories']->has('wizard.introducer'))
 			$wizard = $this->app->create('wizard.introducer');
 		else
-			$wizard = new \Exedra\Console\Wizard\Introducer($this, $this->app);
+			$wizard = new \Exedra\Wizard\Introducer($this, $this->app);
 
 		try
 		{
@@ -424,8 +424,8 @@ class Manager
 		{
 			$reflectedClass = new \ReflectionClass($class);
 
-			if(!$reflectedClass->isSubclassOf('\Exedra\Console\Wizard\Wizardry'))
-				throw new \Exedra\Exception\InvalidArgumentException('['.$class.'] must be a subclass of [\Exedra\Console\Wizard\Wizardry]');
+			if(!$reflectedClass->isSubclassOf('\Exedra\Wizard\Wizardry'))
+				throw new \Exedra\Exception\InvalidArgumentException('['.$class.'] must be a subclass of [\Exedra\Wizard\Wizardry]');
 
 			$wizardNamespace = $class::getNamespace();
 

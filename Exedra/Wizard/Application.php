@@ -1,5 +1,5 @@
 <?php
-namespace Exedra\Console\Wizard;
+namespace Exedra\Wizard;
 
 class Application extends Wizardry
 {
@@ -10,7 +10,7 @@ class Application extends Wizardry
 	 */
 	public function executeRoutes($arguments)
 	{
-		$table = new \Exedra\Console\Wizard\Tools\Table;
+		$table = new \Exedra\Wizard\Tools\Table;
 
 		$header = explode(' ', $arguments->get('params', 'route method tag uri'));
 

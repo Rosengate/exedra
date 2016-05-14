@@ -1,5 +1,5 @@
 <?php
-namespace Exedra\Console\Wizard;
+namespace Exedra\Wizard;
 
 abstract class Wizardry
 {
@@ -19,7 +19,7 @@ abstract class Wizardry
 
 	/**
 	 * Wizard manager
-	 * @var \Exedra\Console\Wizard\Manager
+	 * @var \Exedra\Wizard\Manager
 	 */
 	protected $manager;
 
@@ -33,7 +33,7 @@ abstract class Wizardry
 		return static::$namespace ? : 'app';
 	}
 
-	public function __construct(\Exedra\Console\Wizard\Manager $manager, \Exedra\Application $app)
+	public function __construct(\Exedra\Wizard\Manager $manager, \Exedra\Application $app)
 	{
 		$this->manager = $manager;
 
@@ -251,7 +251,7 @@ abstract class Wizardry
 
 	/**
 	 * Tabulize the given table
-	 * @param \Exedra\Console\Wizard\Tools\Table table
+	 * @param \Exedra\Wizard\Tools\Table table
 	 */
 	public function tabulize(Tools\Table $table)
 	{
