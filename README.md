@@ -62,7 +62,7 @@ $app = new \Exedra\Application(array(
 
 return $app;
 ~~~
-Or you can code it this way :
+Or you can just give the path.root as string.
 ~~~
 require_once __DIR__.'/../vendor/autoload.php';
 
@@ -70,12 +70,24 @@ $app = new \Exedra\Application(__DIR__.'/../');
 
 return $app;
 ~~~
-By default it'll take the argument as the project **path.root** path, and set the **namespace** to **App**.
+By default it'll configure the project root (**path.root**), set the namespace of your app to **App** and set the following path defaultly :
+- path.public (root+ '/public')
+- path.app (root+ '/app')
 
-So, basically there're just 3 paths initially you may need to know.
-- root (/)
-- public (/public)
-- app (/app)
+On the instantiation of the instance, it will autoload the configured **path.app** with the given namespace.
+
+So, basically there're just 3 paths initially you may need to know. **root**, **app** and **public**. To get these paths later in your app, just retrieve it as a service from the application instance :
+```
+// root
+$rootDir = (string) $app->path;
+
+// app
+$appDir = (string) $app->path['app'];
+
+// public
+$publicDir = (string) $app->path['public'];
+```
+These services return as an instance of \Exedra\Path, and is castable to string.
 
 Now, in the same **app.php** let's write some nestful chatting api codes :
 ~~~
@@ -145,7 +157,7 @@ return $app;
 ~~~
 
 #### /public/index.php
-Create your front controller file (**index.php**) under your public folder (**dir.public**). And require the **app.php** file;
+Create your front controller file (**index.php**) under your public folder (**path.public**). And require the **app.php** file;
 ~~~
 $app = require_once __DIR__.'/../App/app.php';
 
@@ -165,7 +177,7 @@ execute the wizard with php :
 ~~~
 php wizard
 ~~~
-and choose the serve option. it'll serve based on the **dir.public** path configured.
+and choose the serve option. it'll serve based on the **path.public** path configured.
 
 Another Examples
 ======
