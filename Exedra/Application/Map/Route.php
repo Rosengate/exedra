@@ -921,6 +921,15 @@ class Route
 
 		return $this;
 	}
+
+	/**
+	 * Whether the route is requestable
+	 * @return boolean
+	 */
+	public function isRequestable()
+	{
+		return $this->getPath() !== false;
+	}
 }
 
 
