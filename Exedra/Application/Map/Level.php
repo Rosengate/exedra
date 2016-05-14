@@ -31,6 +31,32 @@ class Level extends \ArrayIterator
 	}
 
 	/**
+	 * Change level factory.
+	 * Subroutes behaviour are expected to change
+	 * Accept fully qualied class name or an instance of Factory.
+	 * @param \Exedra\Application\Map\Factory|string factory instance, or string of the class name.
+	 */
+	public function setFactory($factory)
+	{
+		if(is_string($factory))
+			$factory = new $factory($this->factory->getApp());
+
+		if(!($factory instanceof \Exedra\Application\Map\Factory))
+			throw new \Exedra\Exception\InvalidArgumentException('The map factory must be the the type of [\Exedra\Application\Map\Factory].');
+
+		$this->factory = $factory;
+	}
+
+	/**
+	 * Get factory instance this Level is based on
+	 * @return \Exedra\Application\Map\Factory
+	 */
+	public function getFactory()
+	{
+		return $this->factory;
+	}
+
+	/**
 	 * Inversely set middleware on upper route
 	 * If there's this level is on the top (not route dependant), register middleware on app
 	 * @param mixed middleware

@@ -60,6 +60,15 @@ class Factory
 	}
 
 	/**
+	 * Get application instance
+	 * @return \Exedra\Application
+	 */
+	public function getApp()
+	{
+		return $this->app;
+	}
+
+	/**
 	 * Get middleware registry from \Exedra\Application
 	 * @return \Exedra\Application\Middleware\Registry
 	 */
