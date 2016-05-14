@@ -1,4 +1,6 @@
 <?php
+use Exedra\Http\ServerRequest;
+
 class RoutingTest extends PHPUnit_Framework_TestCase
 {
 	public function setUp()
@@ -25,7 +27,7 @@ class RoutingTest extends PHPUnit_Framework_TestCase
 
 	public function createRequest(array $params)
 	{
-		return \Exedra\Http\ServerRequest::createFromArray($params);
+		return ServerRequest::createFromArray($params);
 	}
 
 	public function testApp()
@@ -179,11 +181,11 @@ class RoutingTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals('something', $exe->response->getBody());
 
 		// route r2.sr3 (request based route)
-		$exe2 = $this->app->request(\Exedra\Http\ServerRequest::createFromArray(['uri' => ['path' => 'hello/world']]));
+		$exe2 = $this->app->request(ServerRequest::createFromArray(['uri' => ['path' => 'hello/world']]));
 		$this->assertEquals('world', $exe2->response->getBody());
 
 		// middleware on r3.sr4
-		$exe3 = $this->app->request(\Exedra\Http\ServerRequest::createFromArray(['uri' => ['path' => 'hello/rita/world']]));
+		$exe3 = $this->app->request(ServerRequest::createFromArray(['uri' => ['path' => 'hello/rita/world']]));
 		$this->assertEquals('something', $exe3->response->getBody());
 	}
 
@@ -202,6 +204,26 @@ class RoutingTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals('r1.sr2', $finding->route->getAbsoluteName());
 	}
 
+	public function testSpecifiedNamedParam()
+	{
+		$app = new \Exedra\Application(__DIR__);
+
+		$app->map->any('/[foo|bar:name]/[baz|bad:type]')->execute(function($exe)
+		{
+			return $exe->param('name').' '.$exe->param('type');
+		});
+
+		$this->assertEquals($app->respond(ServerRequest::createFromArray(['uri' => ['path' => '/foo/baz']]))->getBody(), 'foo baz');
+
+		$this->assertEquals($app->respond(ServerRequest::createFromArray(['uri' => ['path' => '/bar/bad']]))->getBody(), 'bar bad');
+
+		$this->assertTrue($app->map->findByRequest(ServerRequest::createFromArray(['uri' => ['path' => '/foo/bad']]))->success());
+
+		$this->assertFalse($app->map->findByRequest(ServerRequest::createFromArray(['uri' => ['path' => '/bas/bad']]))->success());
+
+		$this->assertFalse($app->map->findByRequest(ServerRequest::createFromArray(['uri' => ['path' => '/foo/qux']]))->success());
+	}
+
 	public function testMultioptional()
 	{
 		$this->map->get('mult/[:foo?]/[:bar?]/[:baz?]')->name('foo')->execute(function($exe)
@@ -217,22 +239,22 @@ class RoutingTest extends PHPUnit_Framework_TestCase
 			});
 		});
 
-		$exe1 = $this->app->request(\Exedra\Http\ServerRequest::createFromArray(['uri' => ['path' => '/mult']]));
+		$exe1 = $this->app->request(ServerRequest::createFromArray(['uri' => ['path' => '/mult']]));
 
-		$exe2 = $this->app->request(\Exedra\Http\ServerRequest::createFromArray(['uri' => ['path' => '/mult/baz']]));
+		$exe2 = $this->app->request(ServerRequest::createFromArray(['uri' => ['path' => '/mult/baz']]));
 
-		$exe3 = $this->app->request(\Exedra\Http\ServerRequest::createFromArray(['uri' => ['path' => '/mult/baz/bad']]));
+		$exe3 = $this->app->request(ServerRequest::createFromArray(['uri' => ['path' => '/mult/baz/bad']]));
 
-		$exe4 = $this->app->request(\Exedra\Http\ServerRequest::createFromArray(['uri' => ['path' => '/mult/baz/bad/lux']]));
+		$exe4 = $this->app->request(ServerRequest::createFromArray(['uri' => ['path' => '/mult/baz/bad/lux']]));
 
 
-		$exe5 = $this->app->request(\Exedra\Http\ServerRequest::createFromArray(['uri' => ['path' => '/mult/baz/bad/lux/opt']]));
+		$exe5 = $this->app->request(ServerRequest::createFromArray(['uri' => ['path' => '/mult/baz/bad/lux/opt']]));
 
-		$exe6 = $this->app->request(\Exedra\Http\ServerRequest::createFromArray(['uri' => ['path' => '/mult/baz/bad/lux/opt/nop']]));
+		$exe6 = $this->app->request(ServerRequest::createFromArray(['uri' => ['path' => '/mult/baz/bad/lux/opt/nop']]));
 
-		$exe7 = $this->app->request(\Exedra\Http\ServerRequest::createFromArray(['uri' => ['path' => '/mult/baz/bad/lux/opt/nop/top']]));
+		$exe7 = $this->app->request(ServerRequest::createFromArray(['uri' => ['path' => '/mult/baz/bad/lux/opt/nop/top']]));
 
-		$exe8 = $this->app->request(\Exedra\Http\ServerRequest::createFromArray(['uri' => ['path' => '/mult/baz/bad/lux/opt/nop/top/qef']]));
+		$exe8 = $this->app->request(ServerRequest::createFromArray(['uri' => ['path' => '/mult/baz/bad/lux/opt/nop/top/qef']]));
 
 
 		$this->assertEquals('quxhugtizrel', $exe1->response->getBody());

@@ -386,7 +386,7 @@ class Route
 			// pattern based validation
 			$pattern	= trim($segment, '[]');
 			
-			@list($type, $segmentParamName) = explode(':', $pattern);
+			@list($pattern, $segmentParamName) = explode(':', $pattern);
 
 			// no color was passed. thus, could't retrieve second value.
 			if(!$segmentParamName)
@@ -420,8 +420,8 @@ class Route
 				break;
 			}
 
-			// type based matching
-			switch($type)
+			// pattern based matching
+			switch($pattern)
 			{
 				// match all, so do nothing.
 				case '':
@@ -449,7 +449,8 @@ class Route
 					$isTrailing = true;
 					break 2;
 				break;
-				// segments remainder into array
+				// segments remainder into array.
+				// to be deprecated.
 				case '**':
 					// get all the rest of path for param, and explode it so it return as list of segment.
 					$explodes = explode('/', $path, $no+1);
@@ -459,8 +460,14 @@ class Route
 					break 2; // break the param loop, and set matched directly to true.
 				break;
 				default:
-					$matched = false;
-					break 2;
+					// split pattern with 
+					$split = explode('|', $pattern);
+
+					if(!in_array($paths[$no], $split))
+					{
+						$matched = false;
+						break 2;
+					}
 				break;
 			}
 
