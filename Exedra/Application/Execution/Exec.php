@@ -67,9 +67,8 @@ class Exec extends \Exedra\Container\Container
 	protected function initializeServices()
 	{
 		$this->attributes['services']->register(array(
+			'view' => function(){ return new \Exedra\Application\Factory\View($this->getModulePath('View'));},
 			'middlewares' => function() {return $this->app->middleware->getMiddlewares();},
-			// 'view' => array('\Exedra\Application\Factory\View', array('self.loader')),
-			'view' => function(){ return new \Exedra\Application\Factory\View($this->path['app']);},
 			'middleware' => function(){ return new \Exedra\Application\Factory\Middleware($this->app->getNamespace(), $this->getModule());},
 			'controller' => function(){ return new \Exedra\Application\Factory\Controller($this->app->getNamespace(), $this->getModule());},
 			'url' => function(){ return new \Exedra\Application\Execution\Factory\Url($this->app->map, $this->request, $this->config, $this);},
@@ -78,6 +77,20 @@ class Exec extends \Exedra\Container\Container
 			'asset' => function(){ return new \Exedra\Application\Factory\Asset($this->url, $this->app->path['public'], $this->config->get('asset', array()));},
 			'path' => array('\Exedra\Application\Factory\Path', array('self.loader'))
 			));
+	}
+
+	/**
+	 * Get module path
+	 * @param string path
+	 * @return \Exedra\Path
+	 */
+	public function getModulePath($path = null)
+	{
+		$path = $path ? ltrim($path, '/\\') : '';
+
+		$base = $this->path['app'];
+
+		return ($module = $this->getModule()) ? $base->create($module.'/'.$path) : $base->create($path);
 	}
 
 	/**

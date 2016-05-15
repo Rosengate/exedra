@@ -3,12 +3,12 @@ namespace Exedra\Application\Factory;
 
 /**
  * Exedra View Factory
+ * @param \Exedra\Path path
  */
-
 class View
 {
 	/**
-	 * Intance of execution based path.
+	 * Path to View directory
 	 * @var \Exedra\Path
 	 */
 	protected $path;
@@ -18,18 +18,6 @@ class View
 	 * @var array
 	 */
 	protected $defaultData = array();
-
-	/**
-	 * Base dir
-	 * @var string|null
-	 */
-	protected $baseDir = null;
-
-	/**
-	 * View default extension.
-	 * @var string
-	 */
-	protected $ext = 'php';
 
 	public function __construct(\Exedra\Path $path)
 	{
@@ -80,7 +68,7 @@ class View
 	 */
 	protected function buildPath($path)
 	{
-		return $this->path.'/View/'.ltrim($path).'.php';
+		return $this->path->to(ltrim($path, '/\\') . '.php');
 	}
 
 	/**
