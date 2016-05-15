@@ -205,9 +205,11 @@ class Manager
 		else
 			$wizard = $this->wizards[$definition['class']];
 
+		$arguments = new Arguments($arguments);
+		
 		try
 		{
-			$arguments = new Arguments($definition['arguments'], $arguments);
+			$arguments->validate($definition['arguments']);
 		}
 		catch(\Exedra\Exception\InvalidArgumentException $e)
 		{

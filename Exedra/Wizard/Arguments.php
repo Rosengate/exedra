@@ -5,25 +5,30 @@ class Arguments implements \ArrayAccess
 {
 	protected $data = array();
 
-	public function __construct(array $base, array $arguments = array())
+	public function __construct(array $arguments = array())
 	{
 		$this->data = $arguments;
+	}
 
+	public function validate(array $commandArguments)
+	{
 		$unfounds = array();
 
 		// validate against base arguments
-		foreach($arguments as $arg => $value)
+		foreach($this->data as $arg => $value)
 		{
 			$found = false;
 
-			foreach($base as $baseArg)
+			foreach($commandArguments as $baseArg)
 			{
 				if(strpos($baseArg, $arg) === 0)
 					$found = true;
 			}
 
 			if(!$found)
+			{
 				$unfounds[] = $arg;
+			}
 		}
 
 		if(count($unfounds) > 0)
