@@ -126,52 +126,64 @@ class Path implements \ArrayAccess
 
 	/**
 	 * Alias to registerAutoload
-	 * @param string basePath
-	 * @param string prefix (optional), a namespace prefix
-	 * @param boolean relative (optional, default : true), if false, will consider the basePath given as absolute.
+	 * @param string paths
+	 * @param string|null namespace
+	 * @param boolean|true relative, if false, will consider the path given as absolute.
 	 */
-	public function autoload($basePath, $prefix = '', $relative = true)
+	public function autoload($path, $namespace = '', $relative = true)
 	{
-		return $this->registerAutoload($basePath, $prefix, $relative);
+		return $this->registerAutoload($path, $namespace, $relative);
 	}
 
 	/**
-	 * Get base directory this loader is based on
-	 * @return string
+	 * Psr autoload
+	 * @param string namespace
+	 * @param string path
 	 */
-	public function getBaseDir()
+	public function autoloadPsr4($namespace, $path, $relative = true)
 	{
-		return $this->basePath;
+		return $this->registerAutoload($path, $namespace, $relative);
+	}
+
+	/**
+	 * Get list of autoloaded registry
+	 * @return array
+	 */
+	public function getAutoloadRegistry()
+	{
+		return $this->autoloadRegistry;
 	}
 
 	/**
 	 * Register autoloading
-	 * @return null
+	 * @return void
 	 */
 	protected function autoloadRegister()
 	{
-		$loader = $this;
+		$path = $this;
 
-		spl_autoload_register(function($class) use($loader)
+		spl_autoload_register(function($class) use($path)
 		{
-			$basePath = $this->getBaseDir();
+			$basePath = (string) $path;
 
-			foreach($this->autoloadRegistry as $structs)
+			foreach($path->getAutoloadRegistry() as $structs)
 			{
-				$dir = $structs[0];
-				$prefix = $structs[1];
+				$autoloadPath = $structs[0];
+
+				$namespace = $structs[1];
+				
 				$relative = $structs[2];
 
-				if($prefix != '' && strpos($class, $prefix) !== 0)
+				if($namespace != '' && strpos($class, $namespace) !== 0)
 					continue;
 
-				// remove prefix from path.
-				$classDir = substr($class, strlen($prefix));
+				// remove namespace from path.
+				$classDir = substr($class, strlen($namespace));
 
-				$filename = $dir.DIRECTORY_SEPARATOR.(str_replace('\\', DIRECTORY_SEPARATOR, $classDir)).'.php';
+				$filename = $autoloadPath.DIRECTORY_SEPARATOR.(str_replace('\\', DIRECTORY_SEPARATOR, $classDir)).'.php';
 
 				if($relative)
-					$filename = $basePath.DIRECTORY_SEPARATOR.$filename;
+					$filename = $path.DIRECTORY_SEPARATOR.$filename;
 
 				if(file_exists($filename))
 					return require_once $filename;
@@ -269,8 +281,11 @@ class Path implements \ArrayAccess
 	}
 
 	/**
-	 * Get a loader through a offset key
+	 * Alias to get()
 	 * @param string name
+	 * @return \Exedra\Path
+	 *
+	 * @throws \Exedra\Exception\NotFoundException
 	 */
 	public function offsetGet($name)
 	{
@@ -310,6 +325,22 @@ class Path implements \ArrayAccess
 		$path = $absolute ? $path : $this->basePath.'/'.ltrim($path, '/\\');
 
 		$this->pathRegistry[$name] = new static($path);
+
+		return $this->pathRegistry[$name];
+	}
+
+	/**
+	 * Get a registered path
+	 * @param string name
+	 * @return \Exedra\Path
+	 *
+	 * @throws \Exedra\Excepton\NotFoundException
+	 */
+	public function get($name)
+	{
+		// create a loader by the same path and name.
+		if(!isset($this->pathRegistry[$name]))
+			throw new \Exedra\Exception\NotFoundException('Path with registry ['.$name.'] does not exist.');
 
 		return $this->pathRegistry[$name];
 	}
