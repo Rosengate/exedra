@@ -195,8 +195,6 @@ class Manager
 	 */
 	public function command($command, array $arguments = array())
 	{
-		$arguments = new Arguments($arguments);
-
 		if(!isset($this->commands[$command]))
 			throw new \Exedra\Exception\NotFoundException('Command ['.$command.'] does not exists');
 
@@ -206,6 +204,15 @@ class Manager
 			$this->wizards[$definition['class']] = $wizard = new $definition['class']($this, $this->app);
 		else
 			$wizard = $this->wizards[$definition['class']];
+
+		try
+		{
+			$arguments = new Arguments($definition['arguments'], $arguments);
+		}
+		catch(\Exedra\Exception\InvalidArgumentException $e)
+		{
+			return $wizard->say($e->getMessage());
+		}
 
 		@list($namespace, $command) = explode(':', $command);
 

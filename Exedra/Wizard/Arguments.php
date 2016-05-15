@@ -5,9 +5,29 @@ class Arguments implements \ArrayAccess
 {
 	protected $data = array();
 
-	public function __construct(array $data = array())
+	public function __construct(array $base, array $arguments = array())
 	{
-		$this->data = $data;
+		$this->data = $arguments;
+
+		$unfounds = array();
+
+		// validate against base arguments
+		foreach($arguments as $arg => $value)
+		{
+			$found = false;
+
+			foreach($base as $baseArg)
+			{
+				if(strpos($baseArg, $arg) === 0)
+					$found = true;
+			}
+
+			if(!$found)
+				$unfounds[] = $arg;
+		}
+
+		if(count($unfounds) > 0)
+			throw new \Exedra\Exception\InvalidArgumentException('Unable to find argument(s) with name ['.implode(', ', $unfounds).']');
 	}
 
 	public function offsetGet($name)
