@@ -105,11 +105,12 @@ class File
 	/**
 	 * Put contents to the given path if it's file
 	 * @param string data
+	 * @param int flag file_put_contents flag
 	 * @return mixed
 	 */
-	public function putContents($data = null)
+	public function putContents($data = null, $flag = null, $context = null)
 	{
-		return $this->basePath->putContents($this->filename, $data);
+		return $this->basePath->putContents($this->filename, $data, $flag, $context);
 	}
 }
 

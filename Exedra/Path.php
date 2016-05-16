@@ -260,13 +260,15 @@ class Path implements \ArrayAccess
 	/**
 	 * Put the content of file of the path
 	 * @param string file name
+	 * @param string contents
+	 * @param int flag
 	 * @return mixed file contents
 	 */
-	public function putContents($file, $contents)
+	public function putContents($file, $contents, $flag = null, $context = null)
 	{
 		$file = $this->basePath.'/'.ltrim($file, '/\\');
 
-		return file_put_contents($file, $contents);
+		return file_put_contents($file, $contents, $flag, $context);
 	}
 
 	/**
