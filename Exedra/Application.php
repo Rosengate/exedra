@@ -208,7 +208,7 @@ class Application extends \Exedra\Container\Container
 	 * @param \Exedra\Http\ServerRequest|null
 	 * @return \Exedra\Application\Execution\Response
 	 */
-	public function respond(\Exedra\Http\ServerRequest $request = null)
+	public function respond(\Exedra\Http\ServerRequest $request)
 	{
 		try
 		{
@@ -220,7 +220,7 @@ class Application extends \Exedra\Container\Container
 		{
 			if($failRoute = $this->execution->getFailRoute())
 			{
-				$response = $this->execute($failRoute, array('exception' => $e))
+				$response = $this->execute($failRoute, array('exception' => $e), $request)
 								->finalize()
 								->getResponse();
 				
@@ -244,7 +244,7 @@ class Application extends \Exedra\Container\Container
 	 */
 	public function dispatch(\Exedra\Http\ServerRequest $request = null)
 	{
-		$response = $this->respond($request);
+		$response = $this->respond($request ? : $this->request);
 
 		$response->send();
 	}
@@ -307,4 +307,3 @@ class Application extends \Exedra\Container\Container
 		return $this->resolve($registry, $args);
 	}
 }
-?>

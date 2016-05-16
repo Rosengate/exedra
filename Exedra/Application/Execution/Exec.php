@@ -446,6 +446,18 @@ class Exec extends \Exedra\Container\Container
 	}
 
 	/**
+	 * Forward current request to the given route
+	 * @param string route
+	 * @param array args
+	 */
+	public function forward($route, array $args = array())
+	{
+		$route = $this->baseRoute($route);
+
+		return $this->app->execute($route, $args, $this->request);
+	}
+
+	/**
 	 * Execute a scope based route
 	 * @param string route
 	 * @param array parameter.
