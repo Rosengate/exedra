@@ -27,7 +27,7 @@ class Application extends \Exedra\Container\Container
 	}
 
 	/**
-	 * Configure default variables
+	 * Configure default paths
 	 * @param array params
 	 */
 	protected function pathRegistry(array $params)
@@ -39,11 +39,14 @@ class Application extends \Exedra\Container\Container
 
 		$this->attributes['path'] = $path = new \Exedra\Path($params['path.root']);
 
+		$path->register('root', $path); // recursive reference.
+
 		$path->register('app', isset($params['path.app']) ? $params['path.app'] : $params['path.root'].'/app', true);
 
 		$path->register('public', isset($params['path.public']) ? $params['path.public'] : $params['path.root'].'/public', true);
 
-		$path->autoload((string) $path['app'], $this->namespace, false);
+		// autoload the current app folder.
+		$path['app']->autoloadPsr4($this->namespace, '');
 
 		$this->attributes['loader'] = $path;
 	}

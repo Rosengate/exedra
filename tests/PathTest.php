@@ -21,6 +21,17 @@ class PathTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals('Test View Content', $content);
 	}
 
+	public function testReferred()
+	{
+		$this->path['referred'] = $this->path;
+
+		$this->path->register('referred2', $this->path);
+
+		$this->assertEquals($this->path['referred'], $this->path['referred2']);
+
+		$this->assertEquals($this->path, $this->path['referred']);
+	}
+
 	public function testLoadWithVariable()
 	{
 		ob_start();

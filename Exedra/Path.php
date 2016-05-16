@@ -272,11 +272,19 @@ class Path implements \ArrayAccess
 	}
 
 	/**
+	 * Alias to register() except without absolute flag
 	 * @param string name
 	 * @param string path
 	 */
 	public function offsetSet($name, $path)
 	{
+		if($path instanceof \Exedra\Path)
+		{
+			$this->pathRegistry[$name] = $path;
+
+			return;
+		}
+
 		$path = $this->basePath.'/'.ltrim($path, '/\\');
 		
 		$this->pathRegistry[$name] = new static($path);
@@ -324,6 +332,9 @@ class Path implements \ArrayAccess
 	 */
 	public function register($name, $path, $absolute = false)
 	{
+		if($path instanceof \Exedra\Path)
+			return $this->pathRegistry[$name] = $path;
+
 		$path = $absolute ? $path : $this->basePath.'/'.ltrim($path, '/\\');
 
 		$this->pathRegistry[$name] = new static($path);
