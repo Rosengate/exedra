@@ -76,19 +76,7 @@ By default it'll configure the project root (**path.root**), set the namespace o
 
 On the instantiation of the instance, it will autoload the configured **path.app** with the given namespace.
 
-So, basically there're just 3 paths initially you may need to know. **root**, **app** and **public**. To get these paths later in your app, just retrieve it as a service from the application instance :
-```
-// root
-$rootDir = (string) $app->path;
-
-// app
-$appDir = (string) $app->path['app'];
-
-// public
-$publicDir = (string) $app->path['public'];
-```
-These services return as an instance of \Exedra\Path, and is castable to string.
-
+#### /app/app.php sample routing
 Now, in the same **app.php** let's write some nestful chatting api codes :
 ~~~
 // global middleware
