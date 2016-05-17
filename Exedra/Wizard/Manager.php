@@ -39,6 +39,7 @@ class Manager
 
 	/**
 	 * List of hidden commands
+	 * Command is executable
 	 * @var array hidden
 	 */
 	protected $hiddenCommands = array();
@@ -343,7 +344,7 @@ class Manager
 	 * Exclude command(s)
 	 * @param array|string exclusion
 	 */
-	public function exclude($command)
+	public function excludeCommand($command)
 	{
 		if(is_array($command))
 		{
@@ -389,7 +390,7 @@ class Manager
 	 * Show only given commands
 	 * @param array commands
 	 */
-	public function showOnly(array $commands)
+	public function showOnlyCommands(array $commands)
 	{
 		$this->onlyCommands = $commands;
 	}
@@ -398,16 +399,16 @@ class Manager
 	 * Show only given namespaces
 	 * @param array namespaces
 	 */
-	public function showOnlyNamespace(array $namespaces)
+	public function showOnlyNamespaces(array $namespaces)
 	{
-		$this->onlyNamespaces = $namespace;
+		$this->onlyNamespaces = $namespaces;
 	}
 
 	/**
 	 * Hidden command from index
 	 * @param array|string command
 	 */
-	public function hide($command)
+	public function hideCommand($command)
 	{
 		if(is_array($command))
 		{
@@ -490,7 +491,7 @@ class Manager
 
 				if($hasOnlyCommandList || $hasOnlyNamespaceList)
 				{
-					if(!in_array($name, $this->hasOnlyCommandList)  && !in_array($namespace, $this->hasOnlyNamespaceList))
+					if(!in_array($name, $this->onlyCommands)  && !in_array($namespace, $this->onlyNamespaces))
 						continue;
 				}
 				else
