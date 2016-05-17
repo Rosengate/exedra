@@ -44,6 +44,18 @@ class Manager
 	protected $hiddenCommands = array();
 
 	/**
+	 * List of only available commands
+	 * @var array onlyCommands
+	 */
+	protected $onlyCommands = array();
+
+	/**
+	 * List of only available namespaces
+	 * @var array onlyNamespaces
+	 */
+	protected $onlyNamespaces = array();
+
+	/**
 	 * List of hidden namespaces
 	 * @var array hiddenNamespaces
 	 */
@@ -374,6 +386,24 @@ class Manager
 	}
 
 	/**
+	 * Show only given commands
+	 * @param array commands
+	 */
+	public function showOnly(array $commands)
+	{
+		$this->onlyCommands = $commands;
+	}
+
+	/**
+	 * Show only given namespaces
+	 * @param array namespaces
+	 */
+	public function showOnlyNamespace(array $namespaces)
+	{
+		$this->onlyNamespaces = $namespace;
+	}
+
+	/**
 	 * Hidden command from index
 	 * @param array|string command
 	 */
@@ -429,6 +459,10 @@ class Manager
 	 */
 	protected function resolve()
 	{
+		$hasOnlyCommandList = count($this->onlyCommands) > 0;
+
+		$hasOnlyNamespaceList = count($this->onlyNamespaces) > 0;
+
 		foreach($this->classes as $class)
 		{
 			$reflectedClass = new \ReflectionClass($class);
@@ -454,14 +488,22 @@ class Manager
 
 				$name = $namespace . ':' . $command;
 
+				if($hasOnlyCommandList || $hasOnlyNamespaceList)
+				{
+					if(!in_array($name, $this->hasOnlyCommandList)  && !in_array($namespace, $this->hasOnlyNamespaceList))
+						continue;
+				}
+				else
+				{
+					if(in_array($namespace, $this->excludedNamespaces) || in_array($name, $this->excludedCommands))
+						continue;
+				}
+
 				if($this->isProtected())
 				{
 					if(isset($this->commands[$name]) && !in_array($name, $this->overwritables))
 						throw new \Exedra\Exception\Exception('Command ['.$name.'] is being overwritten by ['.$class.'] wizard.');
 				}
-
-				if(in_array($namespace, $this->excludedNamespaces) || in_array($name, $this->excludedCommands))
-					continue;
 
 				$this->commands[$name] = array_merge($definition, array(
 					'namespace' => $namespace,
