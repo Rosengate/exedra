@@ -73,13 +73,13 @@ class Level extends \ArrayIterator
 	}
 
 	/**
-	 * Alias to setMiddleware
+	 * Alias to addMiddleware
 	 * @param mixed middleware
 	 * @return this
 	 */
 	public function middleware($middleware)
 	{
-		return $this->setMiddleware($middleware);
+		return $this->addMiddleware($middleware);
 	}
 
 	/**
