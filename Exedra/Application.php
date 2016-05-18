@@ -71,7 +71,7 @@ class Application extends \Exedra\Container\Container
 			'middleware' => array('\Exedra\Application\Middleware\Registry', array('factories.middlewares', 'factories.middleware.handlers')),
 			'request' => function(){ return \Exedra\Http\ServerRequest::createFromGlobals();},
 			'map' => function() { return $this->mapFactory->createLevel();},
-			'url' => array('\Exedra\Application\Factory\Url', array('self.map', 'self.request', 'self.config')),
+			'url' => function() { return new \Exedra\Application\Factory\Url($this->map, $this->request, $this->config->get('app.url', null), $this->config->get('asset.url', null));},
 			'@session' => '\Exedra\Application\Session\Session',
 			'@flash' => array('\Exedra\Application\Session\Flash', array('self.session')),
 			'wizard' => array('\Exedra\Wizard\Manager', array('self'))

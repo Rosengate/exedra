@@ -7,29 +7,43 @@ namespace Exedra\Application\Factory;
 class Url
 {
 	/**
-	 * Base url
+	 * Absolute Base url
 	 * @var string
 	 */
 	protected $baseUrl;
 
 	/**
-	 * Base asset url
+	 * Absolute base asset url
+	 * If not given on construct, will use the baseUrl
 	 * @var string
 	 */
 	protected $assetUrl;
 
+	/**
+	 * Request instance
+	 * @var \Exedra\Http\ServerRequest|null
+	 */
+	protected $request;
+
+	/**
+	 * Application map
+	 * @param \Exedra\Application\Map\Level
+	 */
+	protected $map;
+
 	public function __construct(
 		\Exedra\Application\Map\Level $router,
 		\Exedra\Http\ServerRequest $request = null,
-		\Exedra\Application\Config $config)
+		$appUrl = null,
+		$assetUrl = null)
 	{
 		$this->map = $router;
 
 		$this->request = $request;
 
-		$this->setBase($config->get('app.url') ? : ($request ? $request->getUri()->getScheme().'://'.$request->getUri()->getAuthority() : null ));
+		$this->setBase($appUrl ? : ($request ? $request->getUri()->getScheme().'://'.$request->getUri()->getAuthority() : null ));
 
-		$this->setAsset($config->get('asset.url') ? : $this->baseUrl);
+		$this->setAsset($assetUrl ? : $this->baseUrl);
 	}
 
 	/**
@@ -39,7 +53,7 @@ class Url
 	public function previous()
 	{
 		if(!$this->request)
-			return null;
+			throw new \Exedra\Execution\Exception('Http Request does not exist.');
 
 		$referer = $this->request->getHeaderLine('referer');
 
@@ -141,7 +155,7 @@ class Url
 	public function current(array $query = array())
 	{
 		if(!$this->request)
-			return;
+			throw new \Exedra\Exception\InvalidArgumentException('Http Request does not exist.');
 
 		$uri = $this->request->getUri();
 

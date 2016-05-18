@@ -13,12 +13,13 @@ class Url extends \Exedra\Application\Factory\Url
 	public function __construct(
 		\Exedra\Application\Map\Level $router,
 		\Exedra\Http\ServerRequest $request = null,
-		\Exedra\Application\Config $config,
+		$appUrl = null,
+		$assetUrl = null,
 		\Exedra\Application\Execution\Exec $exe)
 	{
 		$this->exe = $exe;
 
-		parent::__construct($router, $request, $config);
+		parent::__construct($router, $request, $appUrl, $assetUrl);
 	}
 
 	/**

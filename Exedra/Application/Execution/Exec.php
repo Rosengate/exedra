@@ -71,7 +71,7 @@ class Exec extends \Exedra\Container\Container
 			'middlewares' => function() {return $this->app->middleware->getMiddlewares();},
 			'middleware' => function(){ return new \Exedra\Application\Factory\Middleware($this->app->getNamespace(), $this->getModule());},
 			'controller' => function(){ return new \Exedra\Application\Factory\Controller($this->app->getNamespace(), $this->getModule());},
-			'url' => function(){ return new \Exedra\Application\Execution\Factory\Url($this->app->map, $this->request, $this->config, $this);},
+			'url' => function(){ return new \Exedra\Application\Execution\Factory\Url($this->app->map, $this->request, $this->config->get('app.url', null), $this->config->get('asset.url', null), $this);},
 			"redirect"=> array("\Exedra\Application\Execution\Redirect", array('self')),
 			"form"=> array("\Exedra\Application\Execution\Factory\Form", array('self')),
 			'asset' => function(){ return new \Exedra\Application\Factory\Asset($this->url, $this->app->path['public'], $this->config->get('asset', array()));},
