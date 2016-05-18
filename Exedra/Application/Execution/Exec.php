@@ -16,12 +16,27 @@ class Exec extends \Exedra\Container\Container
 	protected $baseRoute = null;
 
 	/**
+	 * Collection of middleware
+	 * @var \Exedra\Application\Middleware\Middlewares
+	 */
+	protected $middlewares;
+
+	/**
+	 * Middleware registry of application instance
+	 * @var \Exedra\Application\Middleware\Registry
+	 */
+	protected $middlewareRegistry;
+
+	/**
 	 * Route for handling exception
 	 * @var string
 	 */
 	protected $failRoute = null;
 
-	public function __construct(\Exedra\Application $app, \Exedra\Application\Map\Finding $finding)
+	public function __construct(
+		\Exedra\Application $app,
+		\Exedra\Application\Middleware\Registry $middlewareRegistry,
+		\Exedra\Application\Map\Finding $finding)
 	{
 		parent::__construct();
 
@@ -29,23 +44,26 @@ class Exec extends \Exedra\Container\Container
 
 		$this->app = $app;
 
-		// initiate properties
-		$this->initializeProperties();
+		$this->middlewareRegistry = $middlewareRegistry;
+
+		$this->middlewares = $middlewareRegistry->getMiddlewaresCopy();
+
+		// initiate attributes
+		$this->initializeAttributes();
 
 		// initiate dependencies
 		$this->initializeServices();
 
 		// Initiate execution handles/middlewares
-		$this->intializeHandles();
+		$this->handle();
 	}
 
 	/**
-	 * Initiate execution properties
+	 * Initiate execution attributes
 	 */
-	protected function initializeProperties()
+	protected function initializeAttributes()
 	{
 		// Initiate loader, registry, route, config, params, and set base route based on finding.
-		// $this->attributes['loader'] = new \Exedra\Loader($this->getBaseDir());
 		$this->attributes['path'] = $this->app->path;
 
 		$this->attributes['route'] = $this->finding->getRoute();
@@ -68,7 +86,6 @@ class Exec extends \Exedra\Container\Container
 	{
 		$this->attributes['services']->register(array(
 			'view' => function(){ return new \Exedra\Application\Factory\View($this->getModulePath('View'));},
-			'middlewares' => function() {return $this->app->middleware->getMiddlewares();},
 			'controller' => function(){ return new \Exedra\Application\Factory\Controller($this->app->getNamespace(), $this->getModule());},
 			'url' => function(){ return new \Exedra\Application\Execution\Factory\Url($this->app->map, $this->request, $this->config->get('app.url', null), $this->config->get('asset.url', null), $this);},
 			"redirect"=> array("\Exedra\Application\Execution\Redirect", array('self')),
@@ -107,23 +124,27 @@ class Exec extends \Exedra\Container\Container
 		return $this->app;
 	}
 
+	/**
+	 * Get response instance
+	 * @return \Exedra\Application\Execution\Response
+	 */
 	public function getResponse()
 	{
 		return $this->response;
 	}
 
 	/**
-	 * Initiate middleware/execution handles
+	 * Handle middlewares, execution
 	 * Set response body with the final handle
 	 */
-	protected function intializeHandles()
+	protected function handle()
 	{
 		if($this->finding->hasMiddlewares())
 			$this->middlewares->addByArray($this->finding->getMiddlewares());
 
 		$handle = $this->app->getExecutionRegistry()->resolve($this, $this->route->getProperty('execute'));
 
-		$handle = $this->app->getMiddlewareRegistry()->resolve($this, $this->middlewares, $handle);
+		$handle = $this->middlewareRegistry->resolve($this, $this->middlewares, $handle);
 
 		$this->response->setBody($handle($this));
 	}

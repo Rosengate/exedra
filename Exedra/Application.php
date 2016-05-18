@@ -198,7 +198,7 @@ class Application extends \Exedra\Container\Container
 		if(!$finding->success())
 			throw new \Exedra\Exception\RouteNotFoundException('Route is not found');
 
-		return $this->create('execution.exe', array($this, $finding));
+		return $this->create('execution.exe', array($this, $this->middleware, $finding));
 	}
 
 	/**

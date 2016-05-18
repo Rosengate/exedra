@@ -128,7 +128,7 @@ class Registry
 	 * Get cloned list of middlewares
 	 * @return \Exedra\Application\Middleware\Middlewares
 	 */
-	public function getMiddlewares()
+	public function getMiddlewaresCopy()
 	{
 		$middlewares = new \Exedra\Application\Middleware\Middlewares($this->middlewares->getArrayCopy());
 
