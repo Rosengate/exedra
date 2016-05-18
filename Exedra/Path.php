@@ -192,22 +192,6 @@ class Path implements \ArrayAccess
 	}
 
 	/**
-	 * Get the content of file of the path
-	 * @param string file name
-	 * @return mixed file contents
-	 * @throws \Exception
-	 */
-	public function getContent($file)
-	{
-		$file = $this->basePath.'/'.ltrim($file, '/\\');
-
-		if(!file_exists($file))
-			throw new \Exedra\Exception\NotFoundException("File [$file] not found");
-
-		return file_get_contents($file);
-	}
-
-	/**
 	 * Create File instance
 	 * @return \Exedra\Application\Factory\File
 	 */
@@ -247,14 +231,20 @@ class Path implements \ArrayAccess
 	}
 
 	/**
-	 * Alias to getContent
+	 * Get the contents of file of the path
 	 * @param string file name
 	 * @return string file contents
+	 *
 	 * @throws \Exception
 	 */
 	public function getContents($file)
 	{
-		return $this->getContent($file);
+		$file = $this->basePath.'/'.ltrim($file, '/\\');
+
+		if(!file_exists($file))
+			throw new \Exedra\Exception\NotFoundException("File [$file] not found");
+
+		return file_get_contents($file);
 	}
 
 	/**

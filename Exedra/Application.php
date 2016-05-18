@@ -41,9 +41,11 @@ class Application extends \Exedra\Container\Container
 
 		$path->register('root', $path); // recursive reference.
 
-		$path->register('app', isset($params['path.app']) ? $params['path.app'] : $params['path.root'].'/app', true);
+		$path->register('app', isset($params['path.app']) ? $params['path.app'] : $path->to('app'), true);
 
-		$path->register('public', isset($params['path.public']) ? $params['path.public'] : $params['path.root'].'/public', true);
+		$path->register('public', isset($params['path.public']) ? $params['path.public'] : $path->to('public'), true);
+
+		$path->register('routes', isset($params['path.routes']) ? $params['path.routes'] : $path['app']->to('Routes'), true);
 
 		// autoload the current app folder.
 		$path['app']->autoloadPsr4($this->namespace, '');

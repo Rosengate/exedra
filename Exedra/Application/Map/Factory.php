@@ -49,12 +49,7 @@ class Factory
 	public function getRoutesPath()
 	{
 		if(!$this->path)
-		{
-			if($this->app->path->hasRegistry('routes'))
-				$this->path = $this->app->path['routes'];
-			else
-				$this->path = $this->app->path->register('routes', $this->app->path['app'].'/Routes', true);
-		}
+			$this->path = $this->app->path['routes'];
 
 		return $this->path;
 	}
