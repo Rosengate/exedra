@@ -47,7 +47,17 @@ You can write up the boot file (**app.php**) anywhere. But there're several impo
 
 First, create the boot file named on **/app/app.php**
 
-And load the composer autoload accordingly. The **app.php** file should return the same \Exedra\Application instance, so it's usable for the front controller index.php, or wizard (console) later.
+And load the composer autoload accordingly. The **app.php** file should return the same \Exedra\Application instance, so it's usable for the front controller public/index.php, or wizard (console) later.
+
+The first argument takes a string as your project root directory (**path.root**).
+~~~
+require_once __DIR__.'/../vendor/autoload.php';
+
+$app = new \Exedra\Application(__DIR__.'/../');
+
+return $app;
+~~~
+Or you may pass an array of paths and namespace like below :
 ~~~
 require_once __DIR__.'/../vendor/autoload.php';
 
@@ -57,22 +67,13 @@ $app = new \Exedra\Application(array(
     'namespace' => 'App',
     'path.root' => __DIR__.'/../',
     'path.app' => __DIR__',
-    'path.public' => __DIR__.'/../public/'
+    'path.public' => __DIR__.'/../public/',
+    'path.routes' => __DIR__
     ));
 
 return $app;
 ~~~
-Or you can just give the path.root as string.
-~~~
-require_once __DIR__.'/../vendor/autoload.php';
-
-$app = new \Exedra\Application(__DIR__.'/../');
-
-return $app;
-~~~
-By default it'll configure the project root (**path.root**), set the namespace of your app to **App** and set the following path defaultly :
-- path.public (root+ '/public')
-- path.app (root+ '/app')
+These are optional, only path.root is required.
 
 On the instantiation of the instance, it will autoload the configured **path.app** with the given namespace.
 
