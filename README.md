@@ -73,7 +73,13 @@ $app = new \Exedra\Application(array(
 
 return $app;
 ~~~
-These are optional, only path.root is required.
+These are optional and internally configured if not passed, only path.root is required. Originally it, may look something like this
+```
+| ─ root       // path.root
+|   ─ app      // path.app
+|     ─ Routes //path.routes
+|   ─ public   //path.public
+```
 
 On the instantiation of the instance, it will autoload the configured **path.app** with the given namespace.
 
