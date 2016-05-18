@@ -10,22 +10,14 @@ class Registry
 	protected $registry = array();
 
 	/**
-	 * Handlers instance
-	 * @var \Exedra\Application\Middleware\Handlers
-	 */
-	public $handlers;
-
-	/**
 	 * List of global middlewares
 	 * @var \Exedra\Application\Middleware\Middlewares middlewares
 	 */
 	protected $middlewares = array();
 
-	public function __construct(Middlewares $middlewares, Handlers $handlers)
+	public function __construct(Middlewares $middlewares)
 	{
 		$this->middlewares = $middlewares;
-
-		$this->handlers = $handlers;
 	}
 
 	/**
@@ -48,6 +40,7 @@ class Registry
 	}
 
 	/**
+	 * Resolve given collection of middleware
 	 * @param \Exedra\Application\Execution\Exec exe
 	 * @param Middlewares middlewares
 	 * @param \Closure handle
@@ -64,10 +57,12 @@ class Registry
 		{
 			$middleware = $middlewares->current();
 
-			if(is_string($middleware) && $lookup = $this->lookUp($middleware))
-				$middleware = $lookup;
+			if(is_string($middleware) && isset($this->registry[$middleware]))
+				$middleware = $this->registry[$middleware];
 
-			$middlewares[$middlewares->key()] = $this->handlers->resolve($exe, $middleware);
+			$method = 'resolveByType'.ucfirst(strtolower(gettype($middleware)));
+
+			$middlewares[$middlewares->key()] = $this->$method($exe, $middleware);
 
 			$middlewares->next();
 		}
@@ -81,20 +76,39 @@ class Registry
 	}
 
 	/**
-	 * Look up named middleware information
-	 * @param string key
-	 * @return pattern|null
+	 * Resolve given pattern of string
+	 * @param \Exedra\Application\Execution\Exec exe
+	 * @param string middleware
+	 * @return \Closure
 	 */
-	public function lookUp($key)
+	protected function resolveByTypeString($exe, $middleware)
 	{
-		if(isset($this->registry[$key]))
-			return $this->registry[$key];
-
-		return null;
+		// assume given middleware pattern as class name
+		return function() use($middleware)
+		{
+			$middleware = new $middleware;
+			
+			return call_user_func_array(array($middleware, 'handle'), func_get_args());
+		};
 	}
 
 	/**
-	 * Key based middleware registrer
+	 * Resolve given object
+	 * @param \Exedra\Application\Execution\Exec exe
+	 * @param object middleware
+	 *
+	 * @throws \Exedra\Exception\InvalidArgumentException
+	 */
+	protected function resolveByTypeObject($exe, $middleware)
+	{
+		if($middleware instanceof \Closure)
+			return $middleware;
+
+		throw new \Exedra\Exception\InvalidArgumentException('Unable to resolve middleware with type [object].');
+	}
+
+	/**
+	 * Key based middleware register
 	 * @param string key
 	 * @param mixed pattern|null
 	 * @return self
