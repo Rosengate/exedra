@@ -10,12 +10,12 @@ class Registry
 	protected $registry = array();
 
 	/**
-	 * List of global middlewares
-	 * @var \Exedra\Application\Middleware\Middlewares middlewares
+	 * Collection of middlewares
+	 * @var \Exedra\Application\Middleware\Collection middlewares
 	 */
-	protected $middlewares = array();
+	protected $middlewares;
 
-	public function __construct(Middlewares $middlewares)
+	public function __construct(Collection $middlewares)
 	{
 		$this->middlewares = $middlewares;
 	}
@@ -42,37 +42,26 @@ class Registry
 	/**
 	 * Resolve given collection of middleware
 	 * @param \Exedra\Application\Execution\Exec exe
-	 * @param Middlewares middlewares
+	 * @param Collection middlewares
 	 * @param \Closure handle
 	 * @return \Closure
 	 */
-	public function resolve(\Exedra\Application\Execution\Exec $exe, Middlewares $middlewares, \Closure $handle)
+	public function resolve(\Exedra\Application\Execution\Exec $exe, Collection $middlewares)
 	{
 		if($middlewares->count() == 0)
 			return $handle;
 
 		$middlewares->rewind();
 
-		while($middlewares->valid())
+		foreach($middlewares as $middleware)
 		{
-			$middleware = $middlewares->current();
-
 			if(is_string($middleware) && isset($this->registry[$middleware]))
 				$middleware = $this->registry[$middleware];
 
 			$method = 'resolveByType'.ucfirst(strtolower(gettype($middleware)));
 
 			$middlewares[$middlewares->key()] = $this->$method($exe, $middleware);
-
-			$middlewares->next();
 		}
-
-		// set the given execution handler on the last
-		$middlewares[$middlewares->count()] = $handle;
-
-		$middlewares->rewind();
-
-		return $middlewares->current();
 	}
 
 	/**
@@ -125,14 +114,12 @@ class Registry
 	}
 
 	/**
-	 * Get cloned list of middlewares
-	 * @return \Exedra\Application\Middleware\Middlewares
+	 * Get collection of middlewares
+	 * @return \Exedra\Application\Middleware\Collection
 	 */
-	public function getMiddlewaresCopy()
+	public function getCollection()
 	{
-		$middlewares = new \Exedra\Application\Middleware\Middlewares($this->middlewares->getArrayCopy());
-
-		return $middlewares;
+		return $this->middlewares;
 	}
 }
 

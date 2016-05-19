@@ -4,7 +4,7 @@ namespace Exedra\Application\Middleware;
 /**
  * A collection of middleware
  */
-class Middlewares extends \ArrayIterator
+class Collection extends \ArrayIterator
 {
 	/**
 	 * Append a middleware to the collection.

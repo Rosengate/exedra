@@ -156,7 +156,7 @@ class Finding
 	/**
 	 * @return array middlewares
 	 */
-	public function &getMiddlewares()
+	public function getMiddlewares()
 	{
 		return $this->middlewares;
 	}

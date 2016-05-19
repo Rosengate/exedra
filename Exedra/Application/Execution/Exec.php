@@ -46,8 +46,6 @@ class Exec extends \Exedra\Container\Container
 
 		$this->middlewareRegistry = $middlewareRegistry;
 
-		$this->middlewares = $middlewareRegistry->getMiddlewaresCopy();
-
 		// initiate attributes
 		$this->initializeAttributes();
 
@@ -56,7 +54,7 @@ class Exec extends \Exedra\Container\Container
 
 		// Initiate execution handles/middlewares
 		$this->handle();
-	}
+	}	
 
 	/**
 	 * Initiate execution attributes
@@ -96,6 +94,35 @@ class Exec extends \Exedra\Container\Container
 	}
 
 	/**
+	 * Handle application execution
+	 */
+	protected function handle()
+	{
+		$middlewares = $this->middlewareRegistry->getCollection()->getArrayCopy();
+
+		// create new collection from global registry
+		$this->middlewares = $middlewares = $this->app->create('middleware.collection', array($middlewares));
+
+		// append finding based middlewares
+		foreach($this->finding->getMiddlewares() as $middleware)
+			$middlewares->append($middleware);
+
+		// resolve registry
+		$this->middlewareRegistry->resolve($this, $middlewares);
+
+		// add final handle
+		$middlewares->add($this->app->getExecutionRegistry()->resolve($this, $this->route->getProperty('execute')));
+
+		$middlewares->rewind();
+
+		// first handle.
+		$handle = $middlewares->current();
+
+		// execute.
+		$this->response->setBody($handle($this));
+	}
+
+	/**
 	 * Get module path
 	 * @param string path
 	 * @return \Exedra\Path
@@ -119,6 +146,10 @@ class Exec extends \Exedra\Container\Container
 		return $this->app->getNamespace($module = $this->getModule() ? '\\' . $module : '') . ($namespace ? '\\'.$namespace : '');
 	}
 
+	/**
+	 * Get application instance
+	 * @return \Exedra\Application
+	 */
 	public function getApp()
 	{
 		return $this->app;
@@ -131,22 +162,6 @@ class Exec extends \Exedra\Container\Container
 	public function getResponse()
 	{
 		return $this->response;
-	}
-
-	/**
-	 * Handle middlewares, execution
-	 * Set response body with the final handle
-	 */
-	protected function handle()
-	{
-		if($this->finding->hasMiddlewares())
-			$this->middlewares->addByArray($this->finding->getMiddlewares());
-
-		$handle = $this->app->getExecutionRegistry()->resolve($this, $this->route->getProperty('execute'));
-
-		$handle = $this->middlewareRegistry->resolve($this, $this->middlewares, $handle);
-
-		$this->response->setBody($handle($this));
 	}
 
 	/**
