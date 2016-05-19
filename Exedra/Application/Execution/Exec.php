@@ -35,7 +35,7 @@ class Exec extends \Exedra\Container\Container
 
 	public function __construct(
 		\Exedra\Application $app,
-		\Exedra\Application\Middleware\Registry $middlewareRegistry,
+		\Exedra\Middleware\Registry $middlewareRegistry,
 		\Exedra\Routing\Finding $finding)
 	{
 		parent::__construct();

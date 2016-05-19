@@ -1,5 +1,5 @@
 <?php
-namespace Exedra\Application\Middleware;
+namespace Exedra\Middleware;
 
 class Registry
 {
@@ -11,7 +11,7 @@ class Registry
 
 	/**
 	 * Collection of middlewares
-	 * @var \Exedra\Application\Middleware\Collection middlewares
+	 * @var \Exedra\Middleware\Collection middlewares
 	 */
 	protected $middlewares;
 
@@ -115,7 +115,7 @@ class Registry
 
 	/**
 	 * Get collection of middlewares
-	 * @return \Exedra\Application\Middleware\Collection
+	 * @return \Exedra\Middleware\Collection
 	 */
 	public function getCollection()
 	{

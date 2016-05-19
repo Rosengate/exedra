@@ -71,7 +71,7 @@ class Application extends \Exedra\Container\Container
 		$this->attributes['services']->register(array(
 			'mapFactory' => function(){ return new \Exedra\Routing\Factory($this);},
 			'execution' => array('\Exedra\Application\Execution\Registry', array('factories.execution.handlers')),
-			'middleware' => array('\Exedra\Application\Middleware\Registry', array('factories.middleware.collection')),
+			'middleware' => array('\Exedra\Middleware\Registry', array('factories.middleware.collection')),
 			'request' => function(){ return \Exedra\Http\ServerRequest::createFromGlobals();},
 			'map' => function() { return $this->mapFactory->createLevel();},
 			'url' => function() { return new \Exedra\Application\Factory\Url($this->map, $this->request, $this->config->get('app.url', null), $this->config->get('asset.url', null));},
@@ -83,7 +83,7 @@ class Application extends \Exedra\Container\Container
 		$this->attributes['factories']->register(array(
 			'execution.exe' => '\Exedra\Application\Execution\Exec',
 			'execution.handlers' => '\Exedra\Application\Execution\Handlers',
-			'middleware.collection' => '\Exedra\Application\Middleware\Collection',
+			'middleware.collection' => '\Exedra\Middleware\Collection',
 		));
 	}
 
@@ -147,7 +147,7 @@ class Application extends \Exedra\Container\Container
 	}
 
 	/**
-	 * @return \Exedra\Application\Middleware\Registry
+	 * @return \Exedra\Middleware\Registry
 	 */
 	public function getMiddlewareRegistry()
 	{

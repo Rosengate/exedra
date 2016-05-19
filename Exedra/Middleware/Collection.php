@@ -1,5 +1,5 @@
 <?php
-namespace Exedra\Application\Middleware;
+namespace Exedra\Middleware;
 
 /**
  * A collection of middleware
