@@ -1,7 +1,7 @@
 <?php
 namespace Exedra\Application\Execution\Factory;
 
-class Form extends \Exedra\Application\Factory\Form\Form
+class Form extends \Exedra\Form\Form
 {
 	public function __construct(\Exedra\Application\Execution\Exec $exe)
 	{
@@ -12,11 +12,17 @@ class Form extends \Exedra\Application\Factory\Form\Form
 	}
 
 	/**
-	 * Flash request->post() into form_data
+	 * Flash given data
+	 * If not passed, flash form data
+	 * @param array data
+	 * @return self
 	 */
 	public function flash(array $data = array())
 	{
-		$data = count($data) > 0 ? $data : $this->exe->request->post();
+		if(!$this->exe->request)
+			return null;
+
+		$data = count($data) > 0 ? $data : $this->exe->request->getParsedBody();
 
 		if(count($data) > 0)
 			$this->exe->flash->set('form_data', $data);

@@ -3,7 +3,7 @@ class FormTest extends PHPUnit_Framework_TestCase
 {
 	public function setUp()
 	{
-		$this->form = new \Exedra\Application\Factory\Form\Form;
+		$this->form = new \Exedra\Form\Form;
 	}
 
 	public function testInputText()

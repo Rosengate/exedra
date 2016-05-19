@@ -68,10 +68,10 @@ class ContainerTest extends PHPUnit_Framework_TestCase
 	{
 		$this->container['factories']['form'] = function()
 		{
-			return new \Exedra\Application\Factory\Form\Form;
+			return new \Exedra\Form\Form;
 		};
 
-		$this->assertEquals(\Exedra\Application\Factory\Form\Form::CLASS, get_class($this->container->create('form')));
+		$this->assertEquals(\Exedra\Form\Form::CLASS, get_class($this->container->create('form')));
 	}
 
 	public function testAutoresolve()
