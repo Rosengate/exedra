@@ -27,7 +27,8 @@ class Application extends \Exedra\Container\Container
 	}
 
 	/**
-	 * Configure default paths
+	 * Configure default paths.
+	 * root, app, public, routes
 	 * @param array params
 	 */
 	protected function pathRegistry(array $params)
@@ -74,8 +75,8 @@ class Application extends \Exedra\Container\Container
 			'request' => function(){ return \Exedra\Http\ServerRequest::createFromGlobals();},
 			'map' => function() { return $this->mapFactory->createLevel();},
 			'url' => function() { return new \Exedra\Application\Factory\Url($this->map, $this->request, $this->config->get('app.url', null), $this->config->get('asset.url', null));},
-			'@session' => '\Exedra\Application\Session\Session',
-			'@flash' => array('\Exedra\Application\Session\Flash', array('self.session')),
+			'@session' => '\Exedra\Session\Session',
+			'@flash' => array('\Exedra\Session\Flash', array('self.session')),
 			'wizard' => array('\Exedra\Wizard\Manager', array('self'))
 		));
 

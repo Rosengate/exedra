@@ -1,5 +1,5 @@
 <?php
-namespace Exedra\Application\Session;
+namespace Exedra\Session;
 
 /**
  * By default flash data ONLY cleared on instantiated.
@@ -20,7 +20,7 @@ class Flash
 	 */
 	protected $data = array();
 
-	public function __construct(\Exedra\Application\Session\Session $session)
+	public function __construct(\Exedra\Session\Session $session)
 	{
 		$this->session = $session;
 

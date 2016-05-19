@@ -1,5 +1,5 @@
 <?php
-namespace Exedra\Application\Session;
+namespace Exedra\Session;
 
 /**
  * A simple session manager based on php native session
@@ -39,7 +39,7 @@ class Session
 	 * Point the current storage to the prefixing point.
 	 * This session manager will later point every session operation (has, get, set, getAll, destroy) on this key level
 	 * Another prefix will not to a new prefix, except append to the current reference.
-	 * @return \Exedra\Application\Session
+	 * @return \Exedra\Session\Session
 	 */
 	public function setPrefix($prefix)
 	{
@@ -74,7 +74,7 @@ class Session
 	 * Set a session by the given key.
 	 * @param string key
 	 * @param mixed value
-	 * @return \Exedra\Application\Session
+	 * @return \Exedra\Session\Session
 	 */
 	public function set($key, $value)
 	{
@@ -119,7 +119,7 @@ class Session
 	/**
 	 * Destroy session, or only the given key.
 	 * @param string key
-	 * @return \Exedra\Application\Session
+	 * @return \Exedra\Session\Session
 	 */
 	public function destroy($key = null)
 	{

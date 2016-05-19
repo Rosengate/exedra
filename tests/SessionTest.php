@@ -5,9 +5,9 @@ class SessionTest extends PHPUnit_Framework_TestCase
 	{
 		$this->storage = array();
 
-		$this->session = new \Exedra\Application\Session\Session($this->storage);
+		$this->session = new \Exedra\Session\Session($this->storage);
 
-		$this->flash = new \Exedra\Application\Session\Flash($this->session);
+		$this->flash = new \Exedra\Session\Flash($this->session);
 	}
 
 	public function testAssign()
@@ -82,7 +82,7 @@ class SessionTest extends PHPUnit_Framework_TestCase
 	{
 		$this->flash->set('test_key', 'test_value');
 
-		$baseKey = \Exedra\Application\Session\Flash::BASE_KEY;
+		$baseKey = \Exedra\Session\Flash::BASE_KEY;
 
 		$this->assertEquals($this->storage[$baseKey]['test_key'], $this->session->get("$baseKey.test_key"));
 
