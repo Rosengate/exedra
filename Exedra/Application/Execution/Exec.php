@@ -94,18 +94,16 @@ class Exec extends \Exedra\Container\Container
 	}
 
 	/**
+	 * Initialize middlewares
 	 * Handle application execution
+	 * Set response body
 	 */
 	protected function handle()
 	{
-		$middlewares = $this->middlewareRegistry->getCollection()->getArrayCopy();
+		$middlewares = array_merge($this->middlewareRegistry->getCollection()->getArrayCopy(), $this->finding->getMiddlewares());
 
-		// create new collection from global registry
+		// create new collection from global registry and finding.
 		$this->middlewares = $middlewares = $this->app->create('middleware.collection', array($middlewares));
-
-		// append finding based middlewares
-		foreach($this->finding->getMiddlewares() as $middleware)
-			$middlewares->append($middleware);
 
 		// resolve registry
 		$this->middlewareRegistry->resolve($this, $middlewares);

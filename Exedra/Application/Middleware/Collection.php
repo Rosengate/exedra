@@ -15,14 +15,4 @@ class Collection extends \ArrayIterator
 	{
 		$this->append($middleware);
 	}
-
-	/**
-	 * Add middleware by array.
-	 * @param array middlewares
-	 */
-	public function addByArray(array $middlewares)
-	{
-		foreach($middlewares as $middleware)
-			$this->add($middleware);
-	}
 }
