@@ -1,21 +1,20 @@
 <?php
-namespace Exedra\Application\Execution\Factory;
+namespace Exedra\Runtime\Factory;
 
 class Url extends \Exedra\Application\Factory\Url
 {
 	/**
 	 * Exec instance
-	 * @var \Exedra\Application\Execution\Exec
+	 * @var \Exedra\Runtime\Exec
 	 */
 	protected $exe;
 
-	// public function __construct(\Exedra\Application\Execution\Exec $exe)
 	public function __construct(
 		\Exedra\Routing\Level $router,
 		\Exedra\Http\ServerRequest $request = null,
 		$appUrl = null,
 		$assetUrl = null,
-		\Exedra\Application\Execution\Exec $exe)
+		\Exedra\Runtime\Exec $exe)
 	{
 		$this->exe = $exe;
 

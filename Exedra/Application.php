@@ -70,7 +70,7 @@ class Application extends \Exedra\Container\Container
 			'config' => '\Exedra\Config',
 			'routing.factory' => array('\Exedra\Routing\Factory', array('self')),
 			'map' => function() { return $this['routing.factory']->createLevel();},
-			'execution' => array('\Exedra\Application\Execution\Registry', array('factories.execution.handlers')),
+			'execution' => array('\Exedra\Runtime\Registry', array('factories.execution.handlers')),
 			'middleware' => array('\Exedra\Middleware\Registry', array('factories.middleware.collection')),
 			'request' => function(){ return \Exedra\Http\ServerRequest::createFromGlobals();},
 			'url' => function() { return new \Exedra\Application\Factory\Url($this->map, $this->request, $this->config->get('app.url', null), $this->config->get('asset.url', null));},
@@ -80,8 +80,8 @@ class Application extends \Exedra\Container\Container
 		));
 
 		$this->attributes['factories']->register(array(
-			'execution.exe' => '\Exedra\Application\Execution\Exec',
-			'execution.handlers' => '\Exedra\Application\Execution\Handlers',
+			'execution.exe' => '\Exedra\Runtime\Exec',
+			'execution.handlers' => '\Exedra\Runtime\Handlers',
 			'middleware.collection' => '\Exedra\Middleware\Collection',
 		));
 	}
@@ -165,7 +165,7 @@ class Application extends \Exedra\Container\Container
 	 * Execute application with route name
 	 * @param string|\Exedra\Http\ServerRequest query
 	 * @param array parameter
-	 * @return \Exedra\Application\Execution\Exec
+	 * @return \Exedra\Runtime\Exec
 	 *
 	 * @throws \Exedra\Exception\InvalidArgumentException
 	 */
@@ -181,7 +181,7 @@ class Application extends \Exedra\Container\Container
 	/**
 	 * Execute using http request
 	 * @param \Exedra\Http\ServerRequest|null
-	 * @return \Exedra\Application\Execution\Exec
+	 * @return \Exedra\Runtime\Exec
 	 */
 	public function request(\Exedra\Http\ServerRequest $request = null)
 	{
@@ -191,7 +191,7 @@ class Application extends \Exedra\Container\Container
 	/**
 	 * Create the exec instance by given finding.
 	 * @param \Exedra\Routing\Finding finding
-	 * @return \Exedra\Application\Execution\Exec
+	 * @return \Exedra\Runtime\Exec
 	 *
 	 * @throws \Exedra\Exception\RouteNotFoundException
 	 */
@@ -207,7 +207,7 @@ class Application extends \Exedra\Container\Container
 	 * Dispatch and return the response
 	 * Handle uncaught \Exedra\Exception\Exception
 	 * @param \Exedra\Http\ServerRequest|null
-	 * @return \Exedra\Application\Execution\Response
+	 * @return \Exedra\Runtime\Response
 	 */
 	public function respond(\Exedra\Http\ServerRequest $request)
 	{
@@ -229,7 +229,7 @@ class Application extends \Exedra\Container\Container
 			}
 			else
 			{
-				$response = \Exedra\Application\Execution\Response::createEmptyResponse()
+				$response = \Exedra\Runtime\Response::createEmptyResponse()
 				->setStatus(404)
 				->setBody($e->getMessage());
 			}

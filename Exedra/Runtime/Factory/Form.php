@@ -1,9 +1,9 @@
 <?php
-namespace Exedra\Application\Execution\Factory;
+namespace Exedra\Runtime\Factory;
 
 class Form extends \Exedra\Form\Form
 {
-	public function __construct(\Exedra\Application\Execution\Exec $exe)
+	public function __construct(\Exedra\Runtime\Exec $exe)
 	{
 		$this->exe = $exe;
 

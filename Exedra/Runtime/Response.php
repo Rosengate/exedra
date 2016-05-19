@@ -1,5 +1,5 @@
 <?php
-namespace Exedra\Application\Execution;
+namespace Exedra\Runtime;
 
 /**
  * An application execution oriented response

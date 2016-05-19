@@ -1,9 +1,9 @@
 <?php
-namespace Exedra\Application\Execution\Handler;
+namespace Exedra\Runtime\Handler;
 
 interface HandlerInterface
 {
-	public function __construct($name, \Exedra\Application\Execution\Exec $exe);
+	public function __construct($name, \Exedra\Runtime\Exec $exe);
 
 	/**
 	 * Validate given handler pattern

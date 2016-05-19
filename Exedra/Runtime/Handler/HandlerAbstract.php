@@ -1,11 +1,11 @@
 <?php
-namespace Exedra\Application\Execution\Handler;
+namespace Exedra\Runtime\Handler;
 
 abstract class HandlerAbstract implements HandlerInterface
 {
 	protected $name;
 
-	public function __construct($name, \Exedra\Application\Execution\Exec $exe)
+	public function __construct($name, \Exedra\Runtime\Exec $exe)
 	{
 		$this->name = $name;
 		$this->exe = $exe;

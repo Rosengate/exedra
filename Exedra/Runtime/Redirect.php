@@ -1,9 +1,9 @@
 <?php
-namespace Exedra\Application\Execution;
+namespace Exedra\Runtime;
 
 class Redirect
 {
-	public function __construct(\Exedra\Application\Execution\Exec $exe)
+	public function __construct(\Exedra\Runtime\Exec $exe)
 	{
 		$this->exe = $exe;
 	}

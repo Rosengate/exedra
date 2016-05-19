@@ -1,5 +1,5 @@
 <?php
-namespace Exedra\Application\Execution;
+namespace Exedra\Runtime;
 
 /**
  * Handle list of registered execution handler
@@ -31,9 +31,9 @@ class Handlers
 
 	protected function registerDefaultHandlers()
 	{
-		$this->register('closure', '\Exedra\Application\Execution\Handler\Closure');
+		$this->register('closure', '\Exedra\Runtime\Handler\Closure');
 		
-		$this->register('controller', '\Exedra\Application\Execution\Handler\Controller');
+		$this->register('controller', '\Exedra\Runtime\Handler\Controller');
 	}
 
 	/**
@@ -59,14 +59,14 @@ class Handlers
 
 	/**
 	 * Resolve a handler
-	 * @param \Exedra\Application\Execution\Exec exe
+	 * @param \Exedra\Runtime\Exec exe
 	 * @param mixed pattern
 	 * @return \Closure
 	 *
 	 * @throws \Exedra\Exception\InvalidArgumentException
 	 * @throws \Exedra\Exception\NotFoundException
 	 */
-	public function resolve(\Exedra\Application\Execution\Exec $exe, $pattern)
+	public function resolve(\Exedra\Runtime\Exec $exe, $pattern)
 	{
 		foreach($this->registry as $name => $className)
 		{

@@ -1,5 +1,5 @@
 <?php
-namespace Exedra\Application\Execution;
+namespace Exedra\Runtime;
 
 class Exec extends \Exedra\Container\Container
 {
@@ -74,7 +74,7 @@ class Exec extends \Exedra\Container\Container
 		
 		$this->attributes['request'] = $this->finding->getRequest();
 		
-		$this->attributes['response'] = \Exedra\Application\Execution\Response::createEmptyResponse();
+		$this->attributes['response'] = \Exedra\Runtime\Response::createEmptyResponse();
 	}
 
 	/**
@@ -85,9 +85,9 @@ class Exec extends \Exedra\Container\Container
 		$this->attributes['services']->register(array(
 			'view' => function(){ return new \Exedra\Application\Factory\View($this->getModulePath('View'));},
 			'controller' => function(){ return new \Exedra\Application\Factory\Controller($this->app->getNamespace(), $this->getModule());},
-			'url' => function(){ return new \Exedra\Application\Execution\Factory\Url($this->app->map, $this->request, $this->config->get('app.url', null), $this->config->get('asset.url', null), $this);},
-			"redirect"=> array("\Exedra\Application\Execution\Redirect", array('self')),
-			"form"=> array("\Exedra\Application\Execution\Factory\Form", array('self')),
+			'url' => function(){ return new \Exedra\Runtime\Factory\Url($this->app->map, $this->request, $this->config->get('app.url', null), $this->config->get('asset.url', null), $this);},
+			"redirect"=> array("\Exedra\Runtime\Redirect", array('self')),
+			"form"=> array("\Exedra\Runtime\Factory\Form", array('self')),
 			'asset' => function(){ return new \Exedra\Application\Factory\Asset($this->url, $this->app->path['public'], $this->config->get('asset', array()));},
 			'path' => array('\Exedra\Application\Factory\Path', array('self.loader'))
 			));
@@ -155,7 +155,7 @@ class Exec extends \Exedra\Container\Container
 
 	/**
 	 * Get response instance
-	 * @return \Exedra\Application\Execution\Response
+	 * @return \Exedra\Runtime\Response
 	 */
 	public function getResponse()
 	{
@@ -507,7 +507,7 @@ class Exec extends \Exedra\Container\Container
 	/**
 	 * Alias to app->request()
 	 * @param \Exedra\Http\ServerRequest request
-	 * @return \Exedra\Application\Execution\Exec
+	 * @return \Exedra\Runtime\Exec
 	 */
 	public function request(\Exedra\Http\ServerRequest $request)
 	{
@@ -516,7 +516,7 @@ class Exec extends \Exedra\Container\Container
 
 	/**
 	 * Retrieve the actual execution instance
-	 * @return \Exedra\Application\Execution\Exec
+	 * @return \Exedra\Runtime\Exec
 	 */
 	public function finalize()
 	{
@@ -526,7 +526,7 @@ class Exec extends \Exedra\Container\Container
 		{
 			$body = $exe->response->getBody();
 
-			if($body instanceof \Exedra\Application\Execution\Exec)
+			if($body instanceof \Exedra\Runtime\Exec)
 				$exe = $body;
 			else
 				break;

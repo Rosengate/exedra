@@ -1,5 +1,5 @@
 <?php
-namespace Exedra\Application\Execution;
+namespace Exedra\Runtime;
 
 /**
  * Handle the registered things on application layer for execution layer..
@@ -15,11 +15,11 @@ class Registry
 
 	/**
 	 * Handlers registry class
-	 * @var \Exedra\Application\Execution\Handlers
+	 * @var \Exedra\Runtime\Handlers
 	 */
 	public $handlers;
 
-	public function __construct(\Exedra\Application\Execution\Handlers $handlers)
+	public function __construct(\Exedra\Runtime\Handlers $handlers)
 	{
 		$this->handlers = $handlers;
 	}
@@ -35,11 +35,11 @@ class Registry
 
 	/**
 	 * Resolve the execution handle pattern
-	 * @param \Exedra\Application\Execution\Exec
+	 * @param \Exedra\Runtime\Exec
 	 * @param mixed pattern
 	 * @return \Closure 
 	 */
-	public function resolve(\Exedra\Application\Execution\Exec $exe, $pattern)
+	public function resolve(\Exedra\Runtime\Exec $exe, $pattern)
 	{
 		return $this->handlers->resolve($exe, $pattern);
 	}

@@ -1,5 +1,5 @@
 <?php
-namespace Exedra\Application\Execution\Handler;
+namespace Exedra\Runtime\Handler;
 
 class Closure extends HandlerAbstract
 {
