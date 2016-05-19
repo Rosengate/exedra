@@ -1,5 +1,5 @@
 <?php
-namespace Exedra\Application\Factory;
+namespace Exedra\Factory;
 
 class Asset
 {
@@ -23,7 +23,7 @@ class Asset
 
 	protected $assetPaths = array();
 
-	public function __construct(\Exedra\Application\Factory\Url $urlFactory, \Exedra\Path $basePath, array $config = array())
+	public function __construct(\Exedra\Factory\Url $urlFactory, \Exedra\Path $basePath, array $config = array())
 	{
 		$this->urlFactory = $urlFactory;
 
@@ -117,7 +117,7 @@ class Asset
 	/**
 	 * Instantiate a javascript Asset 
 	 * @param string
-	 * @return \Exedra\Application\Factory\Blueprint\Asset
+	 * @return \Exedra\Factory\Blueprint\Asset
 	 */
 	public function js($filename)
 	{
@@ -133,7 +133,7 @@ class Asset
 	/**
 	 * Instantiate a css asset
 	 * @param string
-	 * @return \Exedra\Application\Factory\Blueprint\Asset
+	 * @return \Exedra\Factory\Blueprint\Asset
 	 */
 	public function css($filename)
 	{

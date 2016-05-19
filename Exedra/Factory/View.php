@@ -1,5 +1,5 @@
 <?php
-namespace Exedra\Application\Factory;
+namespace Exedra\Factory;
 
 /**
  * Exedra View Factory
@@ -38,7 +38,7 @@ class View
 			throw new \Exedra\Exception\NotFoundException('Unable to find view ['.$path.']');
 		
 		// merge with default data.
-		$class = '\Exedra\Application\Factory\Blueprint\View';
+		$class = '\Exedra\Factory\Blueprint\View';
 
 		if(is_string($data))
 		{

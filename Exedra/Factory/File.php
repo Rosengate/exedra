@@ -1,5 +1,5 @@
 <?php
-namespace Exedra\Application\Factory;
+namespace Exedra\Factory;
 
 /**
  * Simple class for object oriented based path.
@@ -83,7 +83,6 @@ class File
 			
 		return $this->basePath->getContents($this->filename);
 	}
-
 
 	/**
 	 * Get spl info

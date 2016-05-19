@@ -1,5 +1,5 @@
 <?php
-namespace Exedra\Application\Factory\Blueprint;
+namespace Exedra\Factory\Blueprint;
 
 class Asset
 {
@@ -9,7 +9,7 @@ class Asset
 
 	protected $persistable = false;
 
-	public function __construct(\Exedra\Application\Factory\Url $urlFactory, $type, $filepath, $filename, $persistable = false)
+	public function __construct(\Exedra\Factory\Url $urlFactory, $type, $filepath, $filename, $persistable = false)
 	{
 		if(!in_array($type, array('js', 'css')))
 			throw new \InvalidArgumentException('Accept only js and css');

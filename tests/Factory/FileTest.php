@@ -5,7 +5,7 @@ class FactoryFileTest extends PHPUnit_Framework_TestCase
 	{
 		$this->basePath = new \Exedra\Path(__DIR__);
 
-		$this->file = new \Exedra\Application\Factory\File($this->basePath, 'PathTest.php');
+		$this->file = new \Exedra\Factory\File($this->basePath, 'PathTest.php');
 	}
 
 	public function testPathCreateFile()

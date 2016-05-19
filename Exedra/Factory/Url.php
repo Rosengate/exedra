@@ -1,5 +1,5 @@
 <?php
-namespace Exedra\Application\Factory;
+namespace Exedra\Factory;
 
 /**
  * A route oriented url generator
