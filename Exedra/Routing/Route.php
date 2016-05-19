@@ -1,4 +1,4 @@
-<?php namespace Exedra\Application\Map;
+<?php namespace Exedra\Routing;
 
 class Route
 {
@@ -36,7 +36,7 @@ class Route
 
 	/**
 	 * Level this route is bound to
-	 * @var \Exedra\Application\Map\Level
+	 * @var \Exedra\Routing\Level
 	 */
 	protected $level;
 
@@ -117,7 +117,7 @@ class Route
 
 	/**
 	 * Get current level this route was bound to.
-	 * @return \Exedra\Application\Map\Level
+	 * @return \Exedra\Routing\Level
 	 */
 	public function getLevel()
 	{
@@ -523,13 +523,13 @@ class Route
 	/**
 	 * Get sublevel of this route
 	 * Resolve the level in case of Closure, string and array
-	 * @return \Exedra\Application\Map\Level
+	 * @return \Exedra\Routing\Level
 	 */
 	public function getSubroutes()
 	{
 		$level = $this->properties['subroutes'];
 
-		if($level instanceof \Exedra\Application\Map\Level)
+		if($level instanceof \Exedra\Routing\Level)
 			return $level;
 
 		return $this->resolveLevel($level);
@@ -537,7 +537,7 @@ class Route
 
 	/**
 	 * Resolve level in case of Closure, string and array
-	 * @return \Exedra\Application\Map\Level
+	 * @return \Exedra\Routing\Level
 	 *
 	 * @throws \Exedra\Exception\InvalidArgumentException
 	 */

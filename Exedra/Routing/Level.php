@@ -1,10 +1,10 @@
-<?php namespace Exedra\Application\Map;
+<?php namespace Exedra\Routing;
 
 class Level extends \ArrayIterator
 {
 	/**
 	 * Reference to the route this level was bound to.
-	 * @var \Exedra\Application\Map\Route
+	 * @var \Exedra\Routing\Route
 	 */
 	public $route;
 
@@ -16,7 +16,7 @@ class Level extends \ArrayIterator
 
 	/**
 	 * Factory injected to this level.
-	 * @var \Exedra\Application\Map\Factory
+	 * @var \Exedra\Routing\Factory
 	 */
 	public $factory;
 
@@ -34,22 +34,22 @@ class Level extends \ArrayIterator
 	 * Change level factory.
 	 * Subroutes behaviour are expected to change
 	 * Accept fully qualied class name or an instance of Factory.
-	 * @param \Exedra\Application\Map\Factory|string factory instance, or string of the class name.
+	 * @param \Exedra\Routing\Factory|string factory instance, or string of the class name.
 	 */
 	public function setFactory($factory)
 	{
 		if(is_string($factory))
 			$factory = new $factory($this->factory->getApp());
 
-		if(!($factory instanceof \Exedra\Application\Map\Factory))
-			throw new \Exedra\Exception\InvalidArgumentException('The map factory must be the the type of [\Exedra\Application\Map\Factory].');
+		if(!($factory instanceof \Exedra\Routing\Factory))
+			throw new \Exedra\Exception\InvalidArgumentException('The map factory must be the the type of [\Exedra\Routing\Factory].');
 
 		$this->factory = $factory;
 	}
 
 	/**
 	 * Get factory instance this Level is based on
-	 * @return \Exedra\Application\Map\Factory
+	 * @return \Exedra\Routing\Factory
 	 */
 	public function getFactory()
 	{
@@ -131,7 +131,7 @@ class Level extends \ArrayIterator
 
 	/**
 	 * Add route to this level.
-	 * @param \Exedra\Application\Map\Route
+	 * @param \Exedra\Routing\Route
 	 * @return this
 	 */
 	public function addRoute(Route $route)
@@ -143,7 +143,7 @@ class Level extends \ArrayIterator
 
 	/**
 	 * Get the route this level was bound to.
-	 * @return \Exedra\Application\Map\Route
+	 * @return \Exedra\Routing\Route
 	 */
 	public function getUpperRoute()
 	{
@@ -153,7 +153,7 @@ class Level extends \ArrayIterator
 	/**
 	 * Make a finding by \Exedra\Http\Request
 	 * @param \Exedra\Http\Request
-	 * @return \Exedra\Application\Map\Finding
+	 * @return \Exedra\Routing\Finding
 	 */
 	public function findByRequest(\Exedra\Http\ServerRequest $request)
 	{
@@ -167,7 +167,7 @@ class Level extends \ArrayIterator
 	 * @param string name.
 	 * @param array parameters
 	 * @param \Exedra\Http\ServerRequest request forwarded request, for this Finding
-	 * @return \Exedra\Application\Map\Finding
+	 * @return \Exedra\Routing\Finding
 	 */
 	public function findByName($name, array $parameters = array(), \Exedra\Http\ServerRequest $request = null)
 	{
@@ -216,7 +216,7 @@ class Level extends \ArrayIterator
 	 * - general.books.detail
 	 * - general.#bookDetail.comments
 	 * @param mixed routeName by dot notation or array.
-	 * @return \Exedra\Application\Map\Route|false
+	 * @return \Exedra\Routing\Route|false
 	 */
 	public function findRoute($name)
 	{
@@ -229,7 +229,7 @@ class Level extends \ArrayIterator
 	/**
 	 * A recursive search of route given by an absolute search string relative to this level
 	 * @param string routeName
-	 * @return \Exedra\Application\Map\Route|false
+	 * @return \Exedra\Routing\Route|false
 	 */
 	protected function findRouteRecursively($routeName)
 	{
@@ -275,7 +275,7 @@ class Level extends \ArrayIterator
 
 	/**
 	 * @param string tag
-	 * @return \Exedra\Application\Map\Route|null
+	 * @return \Exedra\Routing\Route|null
 	 */
 	public function findRouteByTag($tag)
 	{
@@ -292,7 +292,7 @@ class Level extends \ArrayIterator
 	 * A recursivable functionality to find route under this level, by the given request instance.
 	 * @param array of result containing parameter 
 	 * @param array passedParameters - highly otional.
-	 * @return array {route: \Exedra\Application\Map\Route|false, parameter: array}
+	 * @return array {route: \Exedra\Routing\Route|false, parameter: array}
 	 */
 	public function findRouteByRequest(\Exedra\Http\ServerRequest $request, $levelUriPath, array $passedParameters = array())
 	{

@@ -1,10 +1,10 @@
 <?php
-namespace Exedra\Application\Map;
+namespace Exedra\Routing;
 
 class Finding
 {
 	/**
-	 * @var \Exedra\Application\Map\Route route
+	 * @var \Exedra\Routing\Route route
 	 */
 	public $route;
 
@@ -47,10 +47,10 @@ class Finding
 	public $configs;
 
 	/**
-	 * @param \Exedra\Application\Map\Route or null
+	 * @param \Exedra\Routing\Route or null
 	 * @param array parameters
 	 */
-	public function __construct(\Exedra\Application\Map\Route $route = null, array $parameters = array(), \Exedra\Http\ServerRequest $request = null, \Exedra\Application\Config $config)
+	public function __construct(\Exedra\Routing\Route $route = null, array $parameters = array(), \Exedra\Http\ServerRequest $request = null, \Exedra\Application\Config $config)
 	{
 		$this->route = $route;
 
@@ -68,7 +68,7 @@ class Finding
 
 	/**
 	 * Get route 
-	 * @return \Exedra\Application\Map\Route|null
+	 * @return \Exedra\Routing\Route|null
 	 */
 	public function getRoute()
 	{

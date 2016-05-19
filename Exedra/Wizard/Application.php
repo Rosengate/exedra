@@ -18,7 +18,7 @@ class Application extends Wizardry
 
 		$previousRoute = null;
 
-		$this->app->map->each(function(\Exedra\Application\Map\Route $route) use($table, $header, $arguments)
+		$this->app->map->each(function(\Exedra\Routing\Route $route) use($table, $header, $arguments)
 		{
 			$routeName = $route->getAbsoluteName();
 			

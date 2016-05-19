@@ -11,7 +11,7 @@ class Url extends \Exedra\Application\Factory\Url
 
 	// public function __construct(\Exedra\Application\Execution\Exec $exe)
 	public function __construct(
-		\Exedra\Application\Map\Level $router,
+		\Exedra\Routing\Level $router,
 		\Exedra\Http\ServerRequest $request = null,
 		$appUrl = null,
 		$assetUrl = null,

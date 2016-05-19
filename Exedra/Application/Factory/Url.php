@@ -27,12 +27,12 @@ class Url
 
 	/**
 	 * Application map
-	 * @param \Exedra\Application\Map\Level
+	 * @param \Exedra\Routing\Level
 	 */
 	protected $map;
 
 	public function __construct(
-		\Exedra\Application\Map\Level $router,
+		\Exedra\Routing\Level $router,
 		\Exedra\Http\ServerRequest $request = null,
 		$appUrl = null,
 		$assetUrl = null)
@@ -125,7 +125,7 @@ class Url
 		// build query
 		$query = http_build_query($query);
 
-		// get \Exedra\Application\Map\Route by name.
+		// get \Exedra\Routing\Route by name.
 		$route = $this->map->findRoute($routeName);
 
 		if(!$route)

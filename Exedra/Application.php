@@ -68,7 +68,7 @@ class Application extends \Exedra\Container\Container
 	protected function serviceRegistry()
 	{
 		$this->attributes['services']->register(array(
-			'mapFactory' => function(){ return new \Exedra\Application\Map\Factory($this);},
+			'mapFactory' => function(){ return new \Exedra\Routing\Factory($this);},
 			'execution' => array('\Exedra\Application\Execution\Registry', array('factories.execution.handlers')),
 			'middleware' => array('\Exedra\Application\Middleware\Registry', array('factories.middlewares')),
 			'request' => function(){ return \Exedra\Http\ServerRequest::createFromGlobals();},
@@ -190,12 +190,12 @@ class Application extends \Exedra\Container\Container
 
 	/**
 	 * Create the exec instance by given finding.
-	 * @param \Exedra\Application\Map\Finding finding
+	 * @param \Exedra\Routing\Finding finding
 	 * @return \Exedra\Application\Execution\Exec
 	 *
 	 * @throws \Exedra\Exception\RouteNotFoundException
 	 */
-	public function exec(\Exedra\Application\Map\Finding $finding)
+	public function exec(\Exedra\Routing\Finding $finding)
 	{
 		if(!$finding->success())
 			throw new \Exedra\Exception\RouteNotFoundException('Route is not found');

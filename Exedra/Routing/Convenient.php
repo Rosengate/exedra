@@ -1,13 +1,13 @@
 <?php
-namespace Exedra\Application\Map;
+namespace Exedra\Routing;
 
-class Convenient extends \Exedra\Application\Map\Level
+class Convenient extends \Exedra\Routing\Level
 {
 	/**
 	 * Convenient route adding method
 	 * @param string|array method
 	 * @param string path
-	 * @return \Exedra\Application\Map\Convenient\Route
+	 * @return \Exedra\Routing\Convenient
 	 */
 	public function add($method = null, $path = null, $params = null)
 	{
