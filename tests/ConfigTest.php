@@ -3,7 +3,7 @@ class ConfigTest extends PHPUnit_Framework_TestCase
 {
 	public function setUp()
 	{
-		$this->config = new \Exedra\Application\Config;
+		$this->config = new \Exedra\Config;
 	}
 
 	public function testSetGet()

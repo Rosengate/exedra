@@ -1,4 +1,5 @@
-<?php namespace Exedra\Application;
+<?php
+namespace Exedra;
 
 class Config implements \ArrayAccess
 {
@@ -25,6 +26,7 @@ class Config implements \ArrayAccess
 		}
 
 		\Exedra\Functions\Arrays::setByNotation($this->storage,$key, $value);
+		
 		return $this;
 	}
 

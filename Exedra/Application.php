@@ -15,8 +15,6 @@ class Application extends \Exedra\Container\Container
 
 		$this->attributes['providers'] = new \Exedra\Provider\Registry($this);
 		
-		$this->attributes['config'] = new \Exedra\Application\Config;
-
 		// default the namespace as [App]
 		if(isset($params['namespace']))
 			$this->namespace = $params['namespace'];
@@ -69,6 +67,7 @@ class Application extends \Exedra\Container\Container
 	protected function serviceRegistry()
 	{
 		$this->attributes['services']->register(array(
+			'config' => '\Exedra\Config',
 			'mapFactory' => function(){ return new \Exedra\Routing\Factory($this);},
 			'execution' => array('\Exedra\Application\Execution\Registry', array('factories.execution.handlers')),
 			'middleware' => array('\Exedra\Middleware\Registry', array('factories.middleware.collection')),

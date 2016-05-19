@@ -42,7 +42,7 @@ class Finding
 	public $request = null;
 
 	/**
-	 * @var \Exedra\Application\Config Configs
+	 * @var \Exedra\Config Configs
 	 */
 	public $configs;
 
@@ -50,7 +50,7 @@ class Finding
 	 * @param \Exedra\Routing\Route or null
 	 * @param array parameters
 	 */
-	public function __construct(\Exedra\Routing\Route $route = null, array $parameters = array(), \Exedra\Http\ServerRequest $request = null, \Exedra\Application\Config $config)
+	public function __construct(\Exedra\Routing\Route $route = null, array $parameters = array(), \Exedra\Http\ServerRequest $request = null, \Exedra\Config $config)
 	{
 		$this->route = $route;
 
@@ -60,7 +60,7 @@ class Finding
 		{
 			$this->addParameter($parameters);
 			// $this->parameters = $parameters;
-			// $this->configs = new \Exedra\Application\Config;
+			// $this->configs = new \Exedra\Config;
 			$this->configs = clone $config;
 			$this->resolve();
 		}
@@ -172,7 +172,7 @@ class Finding
 
 	/**
 	 * Config bag of this finding
-	 * @return \Exedra\Application\Config
+	 * @return \Exedra\Config
 	 */
 	public function getConfig()
 	{
