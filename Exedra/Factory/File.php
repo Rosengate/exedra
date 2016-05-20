@@ -1,10 +1,7 @@
 <?php
 namespace Exedra\Factory;
 
-/**
- * Simple class for object oriented based path.
- */
-class File
+class File extends \SplFileInfo
 {
 	/**
 	 * Relative path of the file.
@@ -13,15 +10,10 @@ class File
 	protected $filename;
 
 	/**
-	 * File base path
-	 * @var \Exedra\Path
+	 * @param string filename
 	 */
-	protected $basePath;
-
-	public function __construct(\Exedra\Path $basePath, $filename = null)
+	public function __construct($filename)
 	{
-		$this->basePath = $basePath;
-
 		$this->filename = $filename;
 	}
 
@@ -31,7 +23,7 @@ class File
 	 */
 	public function isExists()
 	{
-		return $this->basePath->has($this->filename);
+		return file_exists($this->filename);
 	}
 
 	/**
@@ -49,7 +41,7 @@ class File
 	 */
 	public function toString()
 	{
-		return $this->basePath->to($this->filename);
+		return $this->filename;
 	}
 
 	/**
@@ -59,7 +51,21 @@ class File
 	 */
 	public function load(array $data = array())
 	{
-		return $this->basePath->load($this->filename, $data);
+		extract($data);
+
+		return require $this->filename;
+	}
+
+	/**
+	 * Require the file once
+	 * @param array data
+	 * @return mixed
+	 */
+	public function loadOnce(array $data = array())
+	{
+		extract($data);
+
+		return require_once $this->filename;
 	}
 
 	/**
@@ -69,7 +75,13 @@ class File
 	 */
 	public function loadBuffered(array $data = array())
 	{
-		return $this->basePath->loadBuffered($this->filename, $data);
+		ob_start();
+
+		extract($data);
+
+		require $this->filename;
+
+		return ob_get_clean();
 	}
 
 	/**
@@ -79,18 +91,20 @@ class File
 	public function getContents()
 	{
 		if(!$this->isExists())
-			throw new \Exedra\Exception\NotFoundException('File ['.$this->basePath.'/'.$this->filename.'] was not found.');
-			
-		return $this->basePath->getContents($this->filename);
+			throw new \Exedra\Exception\NotFoundException('File ['.$this->filename.'] was not found.');
+
+		return file_get_contents($this->filename);
 	}
 
 	/**
-	 * Get spl info
-	 * @return \SplFileInfo
+	 * Open the file
+	 * @return \SplFileObject
+	 *
+	 * @throws \RuntimeException
 	 */
-	public function getSplInfo()
+	public function open($mode)
 	{
-		return new \SplFileInfo($this->toString());
+		return new \SplFileObject($this->toString(), $mode);
 	}
 
 	/**
@@ -109,7 +123,7 @@ class File
 	 */
 	public function putContents($data = null, $flag = null, $context = null)
 	{
-		return $this->basePath->putContents($this->filename, $data, $flag, $context);
+		file_put_contents($this->filename, $data, $flag, $context);
 	}
 }
 

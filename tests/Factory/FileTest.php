@@ -5,7 +5,7 @@ class FactoryFileTest extends PHPUnit_Framework_TestCase
 	{
 		$this->basePath = new \Exedra\Path(__DIR__);
 
-		$this->file = new \Exedra\Factory\File($this->basePath, 'PathTest.php');
+		$this->file = new \Exedra\Factory\File($this->basePath->to('PathTest.php'));
 	}
 
 	public function testPathCreateFile()
@@ -18,9 +18,9 @@ class FactoryFileTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals(realpath((string) $this->file), realpath(__DIR__.'/PathTest.php'));
 	}
 
-	public function testGetSplInfo()
+	public function testIsFileInfo()
 	{
-		$this->assertTrue($this->file->getSplInfo() instanceof \SplFileInfo);
+		$this->assertTrue($this->file instanceof \SplFileInfo);
 	}
 
 	public function testLoadBuffered()
