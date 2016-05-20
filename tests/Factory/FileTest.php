@@ -5,7 +5,7 @@ class FactoryFileTest extends PHPUnit_Framework_TestCase
 	{
 		$this->basePath = new \Exedra\Path(__DIR__);
 
-		$this->file = new \Exedra\Factory\File($this->basePath->to('PathTest.php'));
+		$this->file = new \Exedra\File($this->basePath->to('PathTest.php'));
 	}
 
 	public function testPathCreateFile()
@@ -26,5 +26,15 @@ class FactoryFileTest extends PHPUnit_Framework_TestCase
 	public function testLoadBuffered()
 	{
 		$this->assertEquals('dynamic dump bar', $this->basePath->file('app/dynamic-dump.php')->loadBuffered(array('foo' => 'bar')));
+	}
+
+	public function testIsExists()
+	{
+		$this->assertTrue($this->file->isExists());
+	}
+
+	public function testOpen()
+	{
+		$this->assertTrue($this->file->open() instanceof \SplFileObject);
 	}
 }

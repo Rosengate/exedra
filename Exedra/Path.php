@@ -193,11 +193,11 @@ class Path implements \ArrayAccess
 
 	/**
 	 * Create File instance
-	 * @return \Exedra\Factory\File
+	 * @return \Exedra\File
 	 */
 	public function file($filename)
 	{
-		return new \Exedra\Factory\File($this->to($filename));
+		return new \Exedra\File($this->to($filename));
 	}
 
 	/**

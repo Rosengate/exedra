@@ -1,5 +1,5 @@
 <?php
-namespace Exedra\Factory;
+namespace Exedra;
 
 class File extends \SplFileInfo
 {
@@ -9,11 +9,10 @@ class File extends \SplFileInfo
 	 */
 	protected $filename;
 
-	/**
-	 * @param string filename
-	 */
 	public function __construct($filename)
 	{
+		parent::__construct($filename);
+
 		$this->filename = $filename;
 	}
 
@@ -24,24 +23,6 @@ class File extends \SplFileInfo
 	public function isExists()
 	{
 		return file_exists($this->filename);
-	}
-
-	/**
-	 * Cast into string
-	 * @return string
-	 */
-	public function __toString()
-	{
-		return $this->toString();
-	}
-
-	/**
-	 * Get full and usable path for this file.
-	 * @return string
-	 */
-	public function toString()
-	{
-		return $this->filename;
 	}
 
 	/**
@@ -102,9 +83,9 @@ class File extends \SplFileInfo
 	 *
 	 * @throws \RuntimeException
 	 */
-	public function open($mode)
+	public function open($mode = 'r')
 	{
-		return new \SplFileObject($this->toString(), $mode);
+		return new \SplFileObject((string) realpath($this->filename), $mode);
 	}
 
 	/**
