@@ -197,7 +197,7 @@ class Application extends \Exedra\Container\Container
 	 */
 	public function exec(\Exedra\Routing\Finding $finding)
 	{
-		if(!$finding->success())
+		if(!$finding->isSuccess())
 			throw new \Exedra\Exception\RouteNotFoundException('Route is not found');
 
 		return $this->create('execution.exe', array($this, $this->middleware, $finding));

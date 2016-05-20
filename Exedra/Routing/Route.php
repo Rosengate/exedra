@@ -13,7 +13,8 @@ class Route
 	protected $absoluteName = null;
 
 	/**
-	 * @var array stored full routes
+	 * 
+	 * @var array fullRoutes
 	 */
 	protected $fullRoutes = null;
 
@@ -65,8 +66,6 @@ class Route
 
 	public function __construct(Level $level, $name, array $properties = array())
 	{
-		$notation = self::$notation;
-
 		$this->name = $name;
 		
 		$this->level = $level;
@@ -137,6 +136,8 @@ class Route
 	 * Get an absolutely resolved uri path
 	 * @param params param for named parameter.
 	 * @return uri path of all of the related routes to this, with replaced named parameter.
+	 *
+	 * @throws \Exedra\Exception\InvalidArgumentException
 	 */
 	public function getAbsolutePath($params = array())
 	{
@@ -177,11 +178,13 @@ class Route
 	public function getFullRoutes()
 	{
 		// if has saved already, return that.
-		if($this->fullRoutes != null)
+		if($this->fullRoutes !== null)
 			return $this->fullRoutes;
 
 		$routes = array();
+
 		$routes[] = $this;
+		
 		$level = $this->level;
 
 		while($route = $level->getUpperRoute())
@@ -203,16 +206,16 @@ class Route
 	 */
 	public function getParentRoute()
 	{
-		$notation = self::$notation;
-
 		$absoluteRoute	= $this->getAbsoluteName();
-		$absoluteRoutes	= explode($notation,$absoluteRoute);
+
+		$absoluteRoutes	= explode('.', $absoluteRoute);
 
 		if(count($absoluteRoutes) == 1)
 			return null;
 
 		array_pop($absoluteRoutes);
-		$parentRoute	= implode($notation,$absoluteRoutes);
+
+		$parentRoute	= implode('.', $absoluteRoutes);
 		
 		return $parentRoute;
 	}
@@ -284,10 +287,6 @@ class Route
 		// print_r($query);die;
 		foreach(array('method', 'path', 'ajax') as $key)
 		{
-			// by default, if parameter was set, but query not provided anything.
-			// if($this->hasProperty($key) && !isset($query[$key]))
-			// 	return array('route'=> false, 'parameter'=> false);
-			
 			// if this parameter wasn't set, skip validation.
 			if(!$this->hasProperty($key))
 				continue;
@@ -524,6 +523,8 @@ class Route
 	 * Get sublevel of this route
 	 * Resolve the level in case of Closure, string and array
 	 * @return \Exedra\Routing\Level
+	 *
+	 * @throws \Exedra\Exception\InvalidArgumentException
 	 */
 	public function getSubroutes()
 	{
@@ -569,7 +570,7 @@ class Route
 				return $level;
 			break;
 			default:
-				throw new \Exedra\Exception\InvalidArgumentException('Unable to resolve route level. It must be type of Closure, string, or array');
+				throw new \Exedra\Exception\InvalidArgumentException('Unable to resolve route level. It must be type of \Closure, string, or array');
 			break;
 		}
 	}
@@ -610,7 +611,7 @@ class Route
 	}
 
 	/**
-	 * Refresh absolute name
+	 * Rebuild absolute name
 	 */
 	protected function refreshAbsoluteName()
 	{
@@ -618,7 +619,7 @@ class Route
 
 		$name = $this->name;
 
-		$this->absoluteName = $level->getUpperRoute() ? $level->getUpperRoute()->getAbsoluteName().self::$notation.$name : $name;
+		$this->absoluteName = $level->getUpperRoute() ? $level->getUpperRoute()->getAbsoluteName().'.'.$name : $name;
 	}
 
 	/**
@@ -800,6 +801,7 @@ class Route
 
 	/**
 	 * Add middleware to existing
+	 * @param mixed middleware
 	 */
 	public function addMiddleware($middleware)
 	{
@@ -807,6 +809,8 @@ class Route
 			$middleware = 'route='.$this->getAbsoluteName();
 		
 		$this->properties['middleware'][] = $middleware;
+
+		return $this;
 	}
 
 	/**

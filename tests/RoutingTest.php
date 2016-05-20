@@ -217,11 +217,11 @@ class RoutingTest extends PHPUnit_Framework_TestCase
 
 		$this->assertEquals($app->respond(ServerRequest::createFromArray(['uri' => ['path' => '/bar/bad']]))->getBody(), 'bar bad');
 
-		$this->assertTrue($app->map->findByRequest(ServerRequest::createFromArray(['uri' => ['path' => '/foo/bad']]))->success());
+		$this->assertTrue($app->map->findByRequest(ServerRequest::createFromArray(['uri' => ['path' => '/foo/bad']]))->isSuccess());
 
-		$this->assertFalse($app->map->findByRequest(ServerRequest::createFromArray(['uri' => ['path' => '/bas/bad']]))->success());
+		$this->assertFalse($app->map->findByRequest(ServerRequest::createFromArray(['uri' => ['path' => '/bas/bad']]))->isSuccess());
 
-		$this->assertFalse($app->map->findByRequest(ServerRequest::createFromArray(['uri' => ['path' => '/foo/qux']]))->success());
+		$this->assertFalse($app->map->findByRequest(ServerRequest::createFromArray(['uri' => ['path' => '/foo/qux']]))->isSuccess());
 	}
 
 	public function testMultioptional()

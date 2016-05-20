@@ -35,6 +35,8 @@ class Level extends \ArrayIterator
 	 * Subroutes behaviour are expected to change
 	 * Accept fully qualied class name or an instance of Factory.
 	 * @param \Exedra\Routing\Factory|string factory instance, or string of the class name.
+	 *
+	 * @throws \Exedra\Exception\InvalidArgumentException
 	 */
 	public function setFactory($factory)
 	{
@@ -233,7 +235,7 @@ class Level extends \ArrayIterator
 	 */
 	protected function findRouteRecursively($routeName)
 	{
-		$routeNames = !is_array($routeName) ? explode(Route::$notation, $routeName) : $routeName;
+		$routeNames = !is_array($routeName) ? explode('.', $routeName) : $routeName;
 		$routeName = array_shift($routeNames);
 		$isTag = strpos($routeName, '#') === 0;
 

@@ -4,21 +4,25 @@ namespace Exedra\Routing;
 class Finding
 {
 	/**
+	 * Found route
 	 * @var \Exedra\Routing\Route route
 	 */
 	public $route;
 
 	/**
+	 * List of found middlewares
 	 * @var array middlewares
 	 */
 	public $middlewares = array();
 
 	/**
+	 * Route meta information
 	 * @var array meta
 	 */
 	protected $meta = array();
 
 	/**
+	 * Route parameters
 	 * @var array parameters
 	 */
 	public $parameters = array();
@@ -39,12 +43,12 @@ class Finding
 	 * Request instance
 	 * @var \Exedra\Http\Request|null
 	 */
-	public $request = null;
+	protected $request = null;
 
 	/**
 	 * @var \Exedra\Config Configs
 	 */
-	public $configs;
+	protected $config;
 
 	/**
 	 * @param \Exedra\Routing\Route or null
@@ -59,9 +63,9 @@ class Finding
 		if($route)
 		{
 			$this->addParameter($parameters);
-			// $this->parameters = $parameters;
-			// $this->configs = new \Exedra\Config;
-			$this->configs = clone $config;
+
+			$this->config = clone $config;
+			
 			$this->resolve();
 		}
 	}
@@ -77,6 +81,7 @@ class Finding
 
 	/**
 	 * Append the given parameters.
+	 * @param array parameters
 	 */
 	public function addParameter(array $parameters)
 	{
@@ -100,16 +105,22 @@ class Finding
 	}
 
 	/**
-	 * @return boolean, whether this finding is success or not.
+	 * Whether finding is successful
+	 * @return boolean
 	 */
-	public function success()
+	public function isSuccess()
 	{
 		return $this->route ? true : false;
 	}
 
+	/**
+	 * Resolve finding informations
+	 * resolve module, baseRoute, middlewares, meta, config
+	 */
 	public function resolve()
 	{
 		$this->module = null;
+
 		$this->baseRoute = null;
 
 		foreach($this->route->getFullRoutes() as $route)
@@ -140,7 +151,7 @@ class Finding
 
 			// pass conig.
 			if($route->hasProperty('config'))
-				$this->configs->set($route->getProperty('config'));
+				$this->config->set($route->getProperty('config'));
 		}
 	}
 
@@ -162,21 +173,12 @@ class Finding
 	}
 
 	/**
-	 * Check has configs
-	 * @return boolean
-	 */
-	public function hasConfigs()
-	{
-		return count($this->configs) > 0;
-	}
-
-	/**
 	 * Config bag of this finding
 	 * @return \Exedra\Config
 	 */
 	public function getConfig()
 	{
-		return $this->configs;
+		return $this->config;
 	}
 
 	/**

@@ -2,25 +2,27 @@
 namespace Exedra\Routing;
 
 /**
- * A factory that handle the route/level/finding and HTTP request creation
+ * A factory that handle the route/level/finding creation
  * This instance is injected into each level created
  */
-
 class Factory
 {
-	/**
-	 * Loader for lazy loading functionality
-	 */
-	protected $loader;
-
 	/**
 	 * Application instance
 	 * @var \Exedra\Application app
 	 */
 	protected $app;
 
+	/**
+	 * Classes registry
+	 * @var array registry
+	 */
 	protected $registry = array();
 
+	/**
+	 * Reflection of classes on creating
+	 * @var array reflections
+	 */
 	protected $reflections = array();
 
 	/**
@@ -29,15 +31,11 @@ class Factory
 	 */
 	protected $path;
 
-	/**
-	 * Define explicitness of the routing.
-	 * @var bool
-	 */
-	protected $isExplicit = false;
-
 	public function __construct(\Exedra\Application $app)
 	{
 		$this->app = $app;
+
+		$this->path = $app->path['routes'];
 
 		$this->registerRoutingComponents();
 	}
@@ -48,9 +46,6 @@ class Factory
 	 */
 	public function getRoutesPath()
 	{
-		if(!$this->path)
-			$this->path = $this->app->path['routes'];
-
 		return $this->path;
 	}
 
@@ -72,22 +67,15 @@ class Factory
 		return $this->app->getMiddlewareRegistry();
 	}
 
-	public function isExplicit()
-	{
-		return $this->isExplicit;
-	}
-
 	/**
-	 * Register basic components [Finding, ServerRequest, Exception]
+	 * Register basic components [finding, route, level]
 	 */
 	protected function registerRoutingComponents()
 	{
 		$this->register(array(
 			'finding' => '\Exedra\Routing\Finding',
 			'route' => '\Exedra\Routing\Route',
-			'level' => '\Exedra\Routing\Convenient',
-			'request' => '\Exedra\Http\ServerRequest',
-			'exception' => '\Exception'
+			'level' => '\Exedra\Routing\Convenient'
 			));
 
 		return $this;
@@ -103,6 +91,7 @@ class Factory
 		foreach($registry as $name => $classname)
 		{
 			$this->registry[$name] = $classname;
+
 			unset($this->reflections[$name]);
 		}
 
@@ -153,6 +142,8 @@ class Factory
 	 * @param \Exedra\Routing\Route
 	 * @param string pattern
 	 * @return \Exedra\Routing\Level
+	 *
+	 * @throws \Exedra\Exception\InvalidArgumentException
 	 */
 	public function createLevelFromString($path, $route = null)
 	{
@@ -161,11 +152,11 @@ class Factory
 		if(!file_exists($path))
 			throw new \Exedra\Exception\NotFoundException('File ['.$path.'] does not exists.');
 		
-		$closure = require_once $path;
+		$closure = require $path;
 
 		// expecting a \Closure from this loaded file.
 		if(!($closure instanceof \Closure))
-			return $this->throwException('Failed to create a route level. The path ['.$path.'] must return a \Closure.');
+			throw new \Exedra\Exception\InvalidArgumentException('Failed to create routing level. The path ['.$path.'] must return a \Closure.');
 
 		$level = $this->create('level', array($this, $route));
 
@@ -184,10 +175,5 @@ class Factory
 	public function createFinding(Route $route = null, array $parameters = null, \Exedra\Http\ServerRequest $request = null)
 	{
 		return $this->create('finding', array($route, $parameters, $request, $this->app->config));
-	}
-
-	public function throwException($message)
-	{
-		throw $this->create('exception', array($message));
 	}
 }
