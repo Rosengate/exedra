@@ -1,20 +1,16 @@
 Exédra
 ======
-A multi-tier nestful routing oriented PHP Framework.
+A multi-tier nestful routing oriented PHP Microframework.
 
-p/s : Development is still on-going. It's expected to reach matured state by version 0.2.5
+p/s : About to be released on stable version
 
 Introduction
 ======
-This PHP framework focuses on nestable/groupable routing, mainly through Http Request components, with middleware layerable routes and which hopefully will provide much modular application execution. Route is unique, and identifiable by name, tag, and queriable by Http Request. Imagine developing an application down the depth without losing the identity of the executions you planned, controlling the routes hierarchically with your own layers of middlewares.
+This PHP microframework focuses on nestable/groupable routing, mainly through Http Request components, with middlewarable routes and which hopefully will provide much modular application execution. Route is unique, and identifiable by name, tag, and queriable by Http Request. Imagine developing an application down the depth without losing the identity of the executions you planned, controlling the routes hierarchically with your own layers of middlewares.
 
-The goal is to be contextual, explicit while being simple and minimal at the same time. Hence being microframework would do just enough. It's not meant to contend with the other great contenders like laravel, symfony (they're definitely great frameworks). It will not surprise you with unintended heart attacks, but of course, number of what it intently can do would definitely surprise you. 
+The goal is to be contextual, explicitful while being simple and minimal at the same time. Hence the focus on just being microframework. It will not surprise you with unintended heart attacks, but of course, number of what it intently can do would definitely surprise you. 
 
 Imagine building a plane while flying it!
-
-History
-======
-The first unreleased version of exedra has so much constraining ungroupable routing capability, and has a lot of static usages (which is extremely violating). This version was intended to fix them, give more controllable multi-tier nestable routing ability and hopefully would adapt to modern web development practices, while staying simple, flexible and contextual at the same time.
 
 Installation
 ======
@@ -27,42 +23,45 @@ composer require rosengate/exedra dev-master
 
 Documentation
 ===
-Documentation and the homebase for exedra is currently hosted here : http://exedra.rosengate.com (not updated)
+Documentation and the homebase for exedra is currently hosted here : http://exedra.rosengate.com (currently not updated)
 
 Booting up \Exedra\Application
 ======
 At the end of this file, this is how your sample project directory may look like :
-~~~
-app
-  app.php
-public
-  index.php
-vendor
-wizard
-composer.json
-composer.lock
-~~~
+```
+| app
+| ─ app.php
+| public
+| ─ index.php
+| vendor
+| wizard
+| composer.json
+| composer.lock
+```
 #### /app/app.php
 You can write up the boot file (**app.php**) anywhere. But there're several important directory paths required to be configured.
 
 First, create the boot file named on **/app/app.php**
 
+##### Returns the \Exedra\Application
 And load the composer autoload accordingly. The **app.php** file should return the same \Exedra\Application instance, so it's usable for the front controller public/index.php, or wizard (console) later.
 
-The first argument takes a string as your project root directory (**path.root**).
-~~~
+Construct the application with your root directory (**path.root**) as the first argument.
+```
+<?php
+// assuming that this app.php is located under /app/
 require_once __DIR__.'/../vendor/autoload.php';
 
 $app = new \Exedra\Application(__DIR__.'/../');
 
 return $app;
-~~~
+```
 Or you may pass an array of paths and namespace like below :
-~~~
+```
+<?php
+// assuming that this app.php is located under /app/
 require_once __DIR__.'/../vendor/autoload.php';
 
-// depending on where the file is located.
-// it's currently assumed that it's under /app/
 $app = new \Exedra\Application(array(
     'namespace' => 'App',
     'path.root' => __DIR__.'/../',
@@ -72,20 +71,20 @@ $app = new \Exedra\Application(array(
     ));
 
 return $app;
-~~~
+```
 These are optional and internally configured if not passed, only path.root is required. Originally it, may look something like this
 ```
-| ─ root       // path.root
-|   ─ app      // path.app
-|     ─ Routes //path.routes
-|   ─ public   //path.public
+| .        //path.root
+| app      //path.app
+| ─ Routes //path.routes
+| public   //path.public
 ```
 
 On the instantiation of the instance, it will autoload the configured **path.app** with the given namespace.
 
 #### /app/app.php sample routing
 Now, in the same **app.php** let's write some nestful chatting api codes :
-~~~
+```
 // global middleware
 $app->map->middleware(function($exe)
 {
@@ -149,35 +148,41 @@ $app->map->any('/api')->middleware(\App\Middleware\Api::CLASS)->group(function($
 });
 
 return $app;
-~~~
+```
 
 #### /public/index.php
 Create your front controller file (**index.php**) under your public folder (**path.public**). And require the **app.php** file;
-~~~
+```
+<?php 
 $app = require_once __DIR__.'/../App/app.php';
 
 $app->dispatch();
-~~~
+```
 
 #### /wizard
 Create a file named **wizard**, in your project root directory, or anywhere convenient to you. And require the **app.php** again.
-~~~
+```
+<?php
 $app = require_once __DIR__.'/App/app.php';
 
 $app->wizard($argv);
-~~~
+```
+Run the wizard intro
+```
+php wizard
+```
 
 #### Start Basic PHP Server
 execute the wizard with php :
-~~~
-php wizard
-~~~
+```
+php wizard serve
+```
 and choose the serve option. it'll serve based on the **path.public** path configured.
 
 Another Examples
 ======
 ##### Default routing
-~~~
+```
 $app->map->addRoutes(array(
     'book' => array(
         'uri' => '/books',
@@ -195,7 +200,7 @@ $app->map->addRoutes(array(
         )
     )
 ));
-~~~
+```
 Some of the projects built on top of exedra :
 
 http://github.com/rosengate/exedra-web (hosted at exedra.rosengate.com)
@@ -209,11 +214,11 @@ Roadmap to 0.3.0
 - proper jargon renames
   - 'uri' to 'path' [DONE]
   - builder to factory [DONE]
-- Internal Routing Improvements
+- Internal Routing Improvements [PARTIAL]
 - More type of Exceptions [PARTIAL]
 - More clarity on application structure [Structure Class removed]
 - Container based \Exedra\Application\Application and \Exedra\Application\Execution\Exec ? [DONE]
-- Move \Exedra\Application\Execution\ and all the related namespaces outsides ?
+- Move \Exedra\Application\Execution\ and all the related namespaces outsides ? [DONE]
 - Do more tests [PARTIAL]
 
 Thank you!
