@@ -70,7 +70,7 @@ class Exe extends \Exedra\Container\Container
 		
 		$this->setBaseRoute($this->finding->getBaseRoute());
 		
-		\Exedra\Functions\Arrays::initiateByNotation($this->params, $this->finding->param());
+		\Exedra\Support\DotArray::initialize($this->params, $this->finding->param());
 		
 		$this->attributes['request'] = $this->finding->getRequest();
 		
@@ -275,7 +275,7 @@ class Exe extends \Exedra\Container\Container
 	 */
 	public function param($name, $default = null)
 	{
-		return \Exedra\Functions\Arrays::hasByNotation($this->params, $name) ? \Exedra\Functions\Arrays::getByNotation($this->params, $name) : $default;
+		return \Exedra\Support\DotArray::has($this->params, $name) ? \Exedra\Support\DotArray::get($this->params, $name) : $default;
 	}
 
 	/**
@@ -304,7 +304,7 @@ class Exe extends \Exedra\Container\Container
 	 */
 	public function hasParam($name)
 	{
-		return \Exedra\Functions\Arrays::hasByNotation($this->params, $name);
+		return \Exedra\Support\DotArray::has($this->params, $name);
 	}
 
 	/**
@@ -315,7 +315,7 @@ class Exe extends \Exedra\Container\Container
 	 */
 	public function setParam($key, $value = null)
 	{
-		\Exedra\Functions\Arrays::setByNotation($this->params, $key, $value);
+		\Exedra\Support\DotArray::set($this->params, $key, $value);
 	}
 
 	/**

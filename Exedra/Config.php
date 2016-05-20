@@ -25,7 +25,7 @@ class Config implements \ArrayAccess
 			return $this;
 		}
 
-		\Exedra\Functions\Arrays::setByNotation($this->storage,$key, $value);
+		\Exedra\Support\DotArray::set($this->storage, $key, $value);
 		
 		return $this;
 	}
@@ -40,7 +40,7 @@ class Config implements \ArrayAccess
 		if(!$this->has($key))
 			return $default;
 
-		return \Exedra\Functions\Arrays::getByNotation($this->storage, $key);
+		return \Exedra\Support\DotArray::get($this->storage, $key);
 	}
 
 	/**
@@ -58,7 +58,7 @@ class Config implements \ArrayAccess
 	 */
 	public function has($key)
 	{
-		return \Exedra\Functions\Arrays::hasByNotation($this->storage, $key);
+		return \Exedra\Support\DotArray::has($this->storage, $key);
 	}
 
 	/**
@@ -81,7 +81,7 @@ class Config implements \ArrayAccess
 		if(!$this->has($key))
 			return null;
 
-		return \Exedra\Functions\Arrays::getReferenceByNotation($this->storage, $key);
+		return \Exedra\Support\DotArray::getReference($this->storage, $key);
 	}
 
 	/**
@@ -100,6 +100,6 @@ class Config implements \ArrayAccess
 	 */
 	public function offsetUnset($key)
 	{
-		\Exedra\Functions\Arrays::deleteByNotation($this->storage, $key);
+		\Exedra\Support\DotArray::delete($this->storage, $key);
 	}
 }

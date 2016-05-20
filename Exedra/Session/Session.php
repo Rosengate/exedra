@@ -43,7 +43,7 @@ class Session
 	 */
 	public function setPrefix($prefix)
 	{
-		$storage = &\Exedra\Functions\Arrays::getReferenceByNotation($this->getStorage(), $prefix);
+		$storage = &\Exedra\Support\DotArray::getReference($this->getStorage(), $prefix);
 
 		$this->set($prefix, $storage);
 
@@ -78,7 +78,7 @@ class Session
 	 */
 	public function set($key, $value)
 	{
-		\Exedra\Functions\Arrays::setByNotation($this->getStorage(),$key,$value);
+		\Exedra\Support\DotArray::set($this->getStorage(), $key,$value);
 
 		return $this;
 	}
@@ -92,7 +92,7 @@ class Session
 	 */
 	public function get($key, $default = null)
 	{
-		$data = \Exedra\Functions\Arrays::getByNotation($this->getStorage(), $key);
+		$data = \Exedra\Support\DotArray::get($this->getStorage(), $key);
 		
 		return $data === null ? $default : $data;
 	}
@@ -113,7 +113,7 @@ class Session
 	 */
 	public function has($key)
 	{
-		return \Exedra\Functions\Arrays::hasByNotation($this->storage,$key);
+		return \Exedra\Support\DotArray::has($this->storage, $key);
 	}
 
 	/**
@@ -123,7 +123,8 @@ class Session
 	 */
 	public function destroy($key = null)
 	{
-		\Exedra\Functions\Arrays::deleteByNotation($this->storage,$key);
+		\Exedra\Support\DotArray::delete($this->storage, $key);
+		
 		return $this;
 	}
 }
