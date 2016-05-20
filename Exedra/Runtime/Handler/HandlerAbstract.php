@@ -5,7 +5,7 @@ abstract class HandlerAbstract implements HandlerInterface
 {
 	protected $name;
 
-	public function __construct($name, \Exedra\Runtime\Exec $exe)
+	public function __construct($name, \Exedra\Runtime\Exe $exe)
 	{
 		$this->name = $name;
 		$this->exe = $exe;

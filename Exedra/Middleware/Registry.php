@@ -41,12 +41,12 @@ class Registry
 
 	/**
 	 * Resolve given collection of middleware
-	 * @param \Exedra\Runtime\Exec exe
+	 * @param \Exedra\Runtime\Exe exe
 	 * @param Collection middlewares
 	 * @param \Closure handle
 	 * @return \Closure
 	 */
-	public function resolve(\Exedra\Runtime\Exec $exe, Collection $middlewares)
+	public function resolve(\Exedra\Runtime\Exe $exe, Collection $middlewares)
 	{
 		if($middlewares->count() == 0)
 			return $handle;
@@ -66,7 +66,7 @@ class Registry
 
 	/**
 	 * Resolve given pattern of string
-	 * @param \Exedra\Runtime\Exec exe
+	 * @param \Exedra\Runtime\Exe exe
 	 * @param string middleware
 	 * @return \Closure
 	 */
@@ -83,7 +83,7 @@ class Registry
 
 	/**
 	 * Resolve given object
-	 * @param \Exedra\Runtime\Exec exe
+	 * @param \Exedra\Runtime\Exe exe
 	 * @param object middleware
 	 *
 	 * @throws \Exedra\Exception\InvalidArgumentException

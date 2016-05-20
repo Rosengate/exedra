@@ -3,7 +3,7 @@ namespace Exedra\Runtime\Factory;
 
 class Form extends \Exedra\Form\Form
 {
-	public function __construct(\Exedra\Runtime\Exec $exe)
+	public function __construct(\Exedra\Runtime\Exe $exe)
 	{
 		$this->exe = $exe;
 

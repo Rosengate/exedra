@@ -1,7 +1,7 @@
 <?php
 namespace Exedra\Runtime;
 
-class Exec extends \Exedra\Container\Container
+class Exe extends \Exedra\Container\Container
 {
 	/**
 	 * Array of (referenced) parameters for this execution.
@@ -506,7 +506,7 @@ class Exec extends \Exedra\Container\Container
 	/**
 	 * Alias to app->request()
 	 * @param \Exedra\Http\ServerRequest request
-	 * @return \Exedra\Runtime\Exec
+	 * @return \Exedra\Runtime\Exe
 	 */
 	public function request(\Exedra\Http\ServerRequest $request)
 	{
@@ -515,7 +515,7 @@ class Exec extends \Exedra\Container\Container
 
 	/**
 	 * Retrieve the actual execution instance
-	 * @return \Exedra\Runtime\Exec
+	 * @return \Exedra\Runtime\Exe
 	 */
 	public function finalize()
 	{
@@ -525,7 +525,7 @@ class Exec extends \Exedra\Container\Container
 		{
 			$body = $exe->response->getBody();
 
-			if($body instanceof \Exedra\Runtime\Exec)
+			if($body instanceof \Exedra\Runtime\Exe)
 				$exe = $body;
 			else
 				break;

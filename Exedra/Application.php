@@ -80,7 +80,7 @@ class Application extends \Exedra\Container\Container
 		));
 
 		$this->attributes['factories']->register(array(
-			'execution.exe' => '\Exedra\Runtime\Exec',
+			'execution.exe' => '\Exedra\Runtime\Exe',
 			'execution.handlers' => '\Exedra\Runtime\Handlers',
 			'middleware.collection' => '\Exedra\Middleware\Collection',
 		));
@@ -165,7 +165,7 @@ class Application extends \Exedra\Container\Container
 	 * Execute application with route name
 	 * @param string|\Exedra\Http\ServerRequest query
 	 * @param array parameter
-	 * @return \Exedra\Runtime\Exec
+	 * @return \Exedra\Runtime\Exe
 	 *
 	 * @throws \Exedra\Exception\InvalidArgumentException
 	 */
@@ -181,7 +181,7 @@ class Application extends \Exedra\Container\Container
 	/**
 	 * Execute using http request
 	 * @param \Exedra\Http\ServerRequest|null
-	 * @return \Exedra\Runtime\Exec
+	 * @return \Exedra\Runtime\Exe
 	 */
 	public function request(\Exedra\Http\ServerRequest $request = null)
 	{
@@ -191,7 +191,7 @@ class Application extends \Exedra\Container\Container
 	/**
 	 * Create the exec instance by given finding.
 	 * @param \Exedra\Routing\Finding finding
-	 * @return \Exedra\Runtime\Exec
+	 * @return \Exedra\Runtime\Exe
 	 *
 	 * @throws \Exedra\Exception\RouteNotFoundException
 	 */

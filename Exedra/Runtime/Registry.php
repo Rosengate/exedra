@@ -35,11 +35,11 @@ class Registry
 
 	/**
 	 * Resolve the execution handle pattern
-	 * @param \Exedra\Runtime\Exec
+	 * @param \Exedra\Runtime\Exe
 	 * @param mixed pattern
 	 * @return \Closure 
 	 */
-	public function resolve(\Exedra\Runtime\Exec $exe, $pattern)
+	public function resolve(\Exedra\Runtime\Exe $exe, $pattern)
 	{
 		return $this->handlers->resolve($exe, $pattern);
 	}

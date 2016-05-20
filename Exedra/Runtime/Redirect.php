@@ -3,7 +3,7 @@ namespace Exedra\Runtime;
 
 class Redirect
 {
-	public function __construct(\Exedra\Runtime\Exec $exe)
+	public function __construct(\Exedra\Runtime\Exe $exe)
 	{
 		$this->exe = $exe;
 	}

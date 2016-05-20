@@ -5,7 +5,7 @@ class Url extends \Exedra\Factory\Url
 {
 	/**
 	 * Exec instance
-	 * @var \Exedra\Runtime\Exec
+	 * @var \Exedra\Runtime\Exe
 	 */
 	protected $exe;
 
@@ -14,7 +14,7 @@ class Url extends \Exedra\Factory\Url
 		\Exedra\Http\ServerRequest $request = null,
 		$appUrl = null,
 		$assetUrl = null,
-		\Exedra\Runtime\Exec $exe)
+		\Exedra\Runtime\Exe $exe)
 	{
 		$this->exe = $exe;
 

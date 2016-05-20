@@ -59,14 +59,14 @@ class Handlers
 
 	/**
 	 * Resolve a handler
-	 * @param \Exedra\Runtime\Exec exe
+	 * @param \Exedra\Runtime\Exe exe
 	 * @param mixed pattern
 	 * @return \Closure
 	 *
 	 * @throws \Exedra\Exception\InvalidArgumentException
 	 * @throws \Exedra\Exception\NotFoundException
 	 */
-	public function resolve(\Exedra\Runtime\Exec $exe, $pattern)
+	public function resolve(\Exedra\Runtime\Exe $exe, $pattern)
 	{
 		foreach($this->registry as $name => $className)
 		{
