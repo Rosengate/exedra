@@ -3,10 +3,6 @@ namespace Exedra\Runtime\Factory;
 
 class Url extends \Exedra\Factory\Url
 {
-	/**
-	 * Exec instance
-	 * @var \Exedra\Runtime\Exe
-	 */
 	protected $exe;
 
 	public function __construct(
@@ -22,20 +18,6 @@ class Url extends \Exedra\Factory\Url
 	}
 
 	/**
-	 * Rebuild current route
-	 * @param array data
-	 * @param array query
-	 * @return string
-	 */
-	/*public function current(array $data = array(), array $query = array())
-	{
-		// merge both finding parameters and the given data (prioritized)
-		$data = array_merge($this->exe->finding->param(), $data);
-
-		return $this->create('@'.$this->exe->getRoute(true), $data, $query);
-	}*/
-
-	/**
 	 * Get url of parent route
 	 * @param array data
 	 * @param array query
@@ -48,6 +30,13 @@ class Url extends \Exedra\Factory\Url
 		return $this->create('@'.$this->exe->getParentRoute(), $data, $query);
 	}
 
+	/**
+	 * Create url by the given route name
+	 * @param string name
+	 * @param array named parameter
+	 * @param array query array
+	 * @return string
+	 */
 	public function create($routeName, array $data = array(), array $query = array())
 	{
 		$routeName = $this->exe->baseRoute($routeName);

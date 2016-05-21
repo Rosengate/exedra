@@ -23,6 +23,15 @@ class Form
 	protected $override = array();
 
 	/**
+	 * Initialize given data
+	 * @param array data
+	 */
+	public function initialize(array $data = array())
+	{
+		$this->set($data);
+	}
+
+	/**
 	 * Set form data
 	 * @param string|array key
 	 * @param string|boolean value
