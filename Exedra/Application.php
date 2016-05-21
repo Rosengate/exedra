@@ -305,6 +305,6 @@ class Application extends \Exedra\Container\Container
 			$registry = $this->attributes[$type]->get($name);
 		}
 
-		return $this->resolve($registry, $args);
+		return $this->resolve($name, $registry, $args);
 	}
 }

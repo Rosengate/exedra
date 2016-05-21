@@ -71,8 +71,9 @@ class ServerRequest extends Message
 
 	/**
 	 * Instantiate request from php _SERVER variable
+	 * @param array server
 	 */
-	public static function createFromGlobals($server = array())
+	public static function createFromGlobals(array $server = array())
 	{
 		$server = !$server ? $_SERVER : $server;
 
@@ -119,6 +120,10 @@ class ServerRequest extends Message
 		);
 	}
 
+	/**
+	 * Create request from given array
+	 * @param array params
+	 */
 	public static function createFromArray(array $params)
 	{
 		return new static(
@@ -131,15 +136,6 @@ class ServerRequest extends Message
 			isset($params['queryParams']) ? $params['queryParams'] : array(),
 			isset($params['parsedBody']) ? $params['parsedBody'] : array()
 		);
-	}
-
-	public static function create($method, array $headers, array $uriParts)
-	{
-		return new static(
-			$method,
-			new Uri($uriParts),
-			$headers
-			);
 	}
 
 	public function getRequestTarget()

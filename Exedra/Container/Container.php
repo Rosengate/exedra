@@ -231,7 +231,7 @@ class Container implements \ArrayAccess
 
 		$registry = $this->attributes[$type]->get($name);
 
-		return $this->resolve($registry, $args);
+		return $this->resolve($name, $registry, $args);
 	}
 
 	/**
@@ -239,38 +239,33 @@ class Container implements \ArrayAccess
 	 * @param mixed registry
 	 * @return mixed
 	 */
-	protected function resolve($registry, array $args = array())
+	protected function resolve($name, $registry, array $args = array())
 	{
 		if($registry instanceof \Closure)
 			return call_user_func_array($registry->bindTo($this), $args);
 
 		if(is_string($registry))
-		{
-			if(count($args) == 0)
-				return new $registry();
+			return $this->instantiate($registry, $args);
 
-			$reflection = new \ReflectionClass($registry);
-
-			return $reflection->newInstanceArgs($args);
-		}
-
+		// assume index 0 as class name
 		if(is_array($registry))
 		{
 			$class = $registry[0];
 
 			$arguments = array();
 
+			// argument passed
 			if(isset($registry[1]))
 			{
 				// the second element isn't an array
 				if(!is_array($registry[1]))
-					throw new \Exedra\Exception\InvalidArgumentException('Second element for array based registry must be an array');
+					throw new \Exedra\Exception\InvalidArgumentException('Second value for array based ['.$name.'] registry must be an array');
 
 				foreach($registry[1] as $arg)
 				{
 					// if isn't string. allow only string.
 					if(!is_string($arg))
-						throw new \Exedra\Exception\InvalidArgumentException('argument must be string');
+						throw new \Exedra\Exception\InvalidArgumentException('Argument for array based ['.$name.'] registry must be string');
 
 					switch($arg)
 					{
@@ -313,20 +308,40 @@ class Container implements \ArrayAccess
 			// merge with the one passed
 			$arguments = array_merge($arguments, $args);
 
-			if(count($arguments) > 0)
-			{
-				$reflection = new \ReflectionClass($class);
-				
-				return $reflection->newInstanceArgs($arguments);
-			}
-			else
-			{
-				return new $class();
-			}
-
+			return $this->instantiate($class, $arguments);
 		}
 
-		throw new \Exedra\Exception\InvalidArgumentException('Unable to resolve the dependency');
+		throw new \Exedra\Exception\InvalidArgumentException('Unable to resolve the ['.$name.'] registry');
+	}
+
+	protected function instantiate($class, array $arguments)
+	{
+		switch(count($arguments))
+		{
+			case 0:
+				return new $class();
+			break;
+			case 1:
+				return new $class($arguments[0]);
+			break;
+			case 2:
+				return new $class($arguments[0], $arguments[1]);
+			break;
+			case 3:
+				return new $class($arguments[0], $arguments[1], $arguments[2]);
+			break;
+			case 4:
+				return new $class($arguments[0], $arguments[1], $arguments[2], $arguments[3]);
+			break;
+			case 5:
+				return new $class($arguments[0], $arguments[1], $arguments[2], $arguments[3], $arguments[4]);
+			break;
+			default:
+				$reflection = new \ReflectionClass($class);
+			
+				return $reflection->newInstanceArgs($arguments);
+			break;
+		}
 	}
 }
 

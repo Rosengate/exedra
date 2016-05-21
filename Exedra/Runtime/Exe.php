@@ -443,7 +443,8 @@ class Exe extends \Exedra\Container\Container
 	}
 
 	/**
-	 * Base the given route. Or return an absolute route, if absolute character was given at the beginning of the given string.
+	 * Base the given route.
+	 * Or return an absolute route, if absolute character was given at the beginning of the given string.
 	 * @param string route
 	 */
 	public function baseRoute($route)
@@ -576,6 +577,6 @@ class Exe extends \Exedra\Container\Container
 			$registry = $this->attributes[$type]->get($name);
 		}
 
-		return $this->resolve($registry, $args);
+		return $this->resolve($name, $registry, $args);
 	}
 }

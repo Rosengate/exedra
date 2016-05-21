@@ -6,6 +6,10 @@ namespace Exedra\Provider;
  */
 class Registry
 {
+	/**
+	 * List of registered provider
+	 * @param array providers
+	 */
 	protected $providers = array();
 
 	/**
@@ -68,7 +72,6 @@ class Registry
 		// register.
 		else
 		{
-
 			if($this->lateRegistry == true)
 			{
 				$this->providers[$provider] = false;

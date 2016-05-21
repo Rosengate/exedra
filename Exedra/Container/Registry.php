@@ -5,20 +5,9 @@ class Registry implements \ArrayAccess
 {
 	protected $data = array();
 
-	protected $name;
-
 	public function __construct(array $registry = array())
 	{
 		$this->data = $registry;
-	}
-
-	/**
-	 * Get registry name
-	 * @return string
-	 */
-	public function getName()
-	{
-		return $this->name;
 	}
 
 	/**
