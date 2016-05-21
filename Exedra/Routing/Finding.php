@@ -41,7 +41,9 @@ class Finding
 
 	/**
 	 * Request instance
-	 * @var \Exedra\Http\Request|null
+	 * Since exedra didn't implement it
+	 * It'll not be typehinted
+	 * @var \Psr\Http\Message\RequestInterface|null
 	 */
 	protected $request = null;
 
@@ -54,7 +56,7 @@ class Finding
 	 * @param \Exedra\Routing\Route or null
 	 * @param array parameters
 	 */
-	public function __construct(\Exedra\Routing\Route $route = null, array $parameters = array(), \Exedra\Http\ServerRequest $request = null)
+	public function __construct(\Exedra\Routing\Route $route = null, array $parameters = array(), $request = null)
 	{
 		$this->route = $route;
 

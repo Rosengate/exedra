@@ -26,14 +26,14 @@ class Factory
 	protected $reflections = array();
 
 	/**
-	 * Routing path
-	 * @param \Exedra\Path
+	 * Absolute path to the location of routes
+	 * @param string path
 	 */
 	protected $path;
 
-	public function __construct(\Exedra\Path $path)
+	public function __construct($path)
 	{
-		$this->path = $path;
+		$this->path = rtrim($path, '/\\');
 
 		$this->registerRoutingComponents();
 	}
@@ -128,7 +128,7 @@ class Factory
 	 */
 	public function createLevelFromString($path, $route = null)
 	{
-		$path = $this->getRoutesPath()->to($path);
+		$path = $this->path.'/'.ltrim($path, '/\\');
 
 		if(!file_exists($path))
 			throw new \Exedra\Exception\NotFoundException('File ['.$path.'] does not exists.');
