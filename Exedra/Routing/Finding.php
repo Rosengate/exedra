@@ -46,15 +46,15 @@ class Finding
 	protected $request = null;
 
 	/**
-	 * @var \Exedra\Config Configs
+	 * @var array config
 	 */
-	protected $config;
+	protected $config = array();
 
 	/**
 	 * @param \Exedra\Routing\Route or null
 	 * @param array parameters
 	 */
-	public function __construct(\Exedra\Routing\Route $route = null, array $parameters = array(), \Exedra\Http\ServerRequest $request = null, \Exedra\Config $config)
+	public function __construct(\Exedra\Routing\Route $route = null, array $parameters = array(), \Exedra\Http\ServerRequest $request = null)
 	{
 		$this->route = $route;
 
@@ -62,10 +62,8 @@ class Finding
 
 		if($route)
 		{
-			$this->addParameter($parameters);
+			$this->addParameters($parameters);
 
-			$this->config = clone $config;
-			
 			$this->resolve();
 		}
 	}
@@ -80,15 +78,13 @@ class Finding
 	}
 
 	/**
-	 * Append the given parameters.
+	 * Append given parameters
 	 * @param array parameters
 	 */
-	public function addParameter(array $parameters)
+	public function addParameters(array $parameters)
 	{
 		foreach($parameters as $key => $param)
-		{
 			$this->parameters[$key] = $param;
-		}
 	}
 
 	/**
@@ -133,12 +129,12 @@ class Finding
 			if($route->hasProperty('base') && $route->getProperty('base') === true)
 				$this->baseRoute = $route->getAbsoluteName();
 
-			// has middleware.
-			if($route->hasProperty('middleware'))
-			{
-				foreach($route->getProperty('middleware') as $middleware)
-					$this->middlewares[] = $middleware;
-			}
+			foreach($route->getLevel()->getMiddlewares() as $middleware)
+				$this->middlewares[] = $middleware;
+
+			// append all route middlewares
+			foreach($route->getProperty('middleware') as $middleware)
+				$this->middlewares[] = $middleware;
 
 			$meta = $route->getMeta();
 
@@ -151,7 +147,7 @@ class Finding
 
 			// pass conig.
 			if($route->hasProperty('config'))
-				$this->config->set($route->getProperty('config'));
+				$this->config = array_merge($this->config, $route->getProperty('config'));
 		}
 	}
 

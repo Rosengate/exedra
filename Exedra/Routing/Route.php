@@ -3,18 +3,22 @@
 class Route
 {
 	/**
+	 * Route name
 	 * @var string name
 	 */
 	protected $name;
 
 	/**
+	 * An absolute string full name
 	 * @var string absolute name
 	 */
 	protected $absoluteName = null;
 
 	/**
 	 * 
-	 * @var array fullRoutes
+	 * An array list of routes to this route.
+	 * Initialized on getFullRoutes() called
+	 * @var array|null fullRoutes
 	 */
 	protected $fullRoutes = null;
 
@@ -778,25 +782,37 @@ class Route
 
 	/**
 	 * Set middleware(s) on this route.
-	 * Will reset any
+	 * Will reset previously added middleware
+	 * If given argument is an array, add the list
+	 * Else, will be pushed as one middleware
 	 * @param mixed middleware
 	 */
 	public function setMiddleware($middleware)
 	{
+		// reset on each call
+		$this->properties['middleware'] = array();
+
 		if(!is_array($middleware))
 		{
-			$this->addMiddleware($middleware);
+			$this->properties['middleware'][] = $middleware;
 		}
 		else
 		{
-			// reset if array was passed.
-			$this->properties['middleware'] = array();
-
 			foreach($middleware as $m)
-				$this->addMiddleware($m);
+				$this->properties['middleware'][] = $m;
 		}
 
 		return $this;
+	}
+
+	/**
+	 * Add an array of middlewares
+	 * @param string
+	 */
+	public function addMiddlewares(array $middlewares)
+	{
+		foreach($middlewares as $middleware)
+			$this->properties['middleware'][] = $middleware;
 	}
 
 	/**
@@ -805,21 +821,20 @@ class Route
 	 */
 	public function addMiddleware($middleware)
 	{
-		if($middleware === true && $this->level->factory->isExplicit())
-			$middleware = 'route='.$this->getAbsoluteName();
-		
 		$this->properties['middleware'][] = $middleware;
 
 		return $this;
 	}
 
 	/**
-	 * Alias to setMiddleware
+	 * Alias to addMiddleware
 	 * @param mixed middleware handler
 	 */
 	public function middleware($middleware)
 	{
-		return $this->setMiddleware($middleware);
+		$this->properties['middleware'][] = $middleware;
+
+		return $this;
 	}
 
 	/**

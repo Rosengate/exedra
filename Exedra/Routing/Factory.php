@@ -3,7 +3,7 @@ namespace Exedra\Routing;
 
 /**
  * A factory that handle the route/level/finding creation
- * This instance is injected into each level created
+ * This instance is injected into each created level
  */
 class Factory
 {
@@ -31,40 +31,21 @@ class Factory
 	 */
 	protected $path;
 
-	public function __construct(\Exedra\Application $app)
+	public function __construct(\Exedra\Path $path)
 	{
-		$this->app = $app;
-
-		$this->path = $app->path['routes'];
+		$this->path = $path;
 
 		$this->registerRoutingComponents();
 	}
 
 	/**
 	 * Get routes base path
+	 * Used when subroutes specified as string
 	 * @return \Exedra\Path
 	 */
 	public function getRoutesPath()
 	{
 		return $this->path;
-	}
-
-	/**
-	 * Get application instance
-	 * @return \Exedra\Application
-	 */
-	public function getApp()
-	{
-		return $this->app;
-	}
-
-	/**
-	 * Get middleware registry from \Exedra\Application
-	 * @return \Exedra\Application\Middleware\Registry
-	 */
-	public function getMiddlewareRegistry()
-	{
-		return $this->app->getMiddlewareRegistry();
 	}
 
 	/**
@@ -166,14 +147,14 @@ class Factory
 	}
 
 	/**
-	 * Create finding object
+	 * Create route finding
 	 * @param \Exedra\Routing\Route result's route.
 	 * @param array parameters
-	 * @param \Exedra\Http\Request
+	 * @param \Exedra\Http\ServerRequest
 	 * @return \Exedra\Routing\Finding
 	 */
 	public function createFinding(Route $route = null, array $parameters = null, \Exedra\Http\ServerRequest $request = null)
 	{
-		return $this->create('finding', array($route, $parameters, $request, $this->app->config));
+		return $this->create('finding', array($route, $parameters, $request));
 	}
 }

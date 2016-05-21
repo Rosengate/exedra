@@ -66,7 +66,9 @@ class Exe extends \Exedra\Container\Container
 
 		$this->attributes['route'] = $this->finding->getRoute();
 		
-		$this->attributes['config'] = $this->finding->getConfig();
+		$this->attributes['config'] = clone $this->app->config;
+
+		$this->attributes['config']->set($this->finding->getConfig());
 		
 		$this->setBaseRoute($this->finding->getBaseRoute());
 		

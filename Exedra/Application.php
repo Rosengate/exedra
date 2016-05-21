@@ -68,7 +68,7 @@ class Application extends \Exedra\Container\Container
 	{
 		$this->attributes['services']->register(array(
 			'config' => '\Exedra\Config',
-			'routing.factory' => array('\Exedra\Routing\Factory', array('self')),
+			'routing.factory' => function(){ return new \Exedra\Routing\Factory($this->path['routes']);},
 			'map' => function() { return $this['routing.factory']->createLevel();},
 			'execution' => array('\Exedra\Runtime\Registry', array('factories.execution.handlers')),
 			'middleware' => array('\Exedra\Middleware\Registry', array('factories.middleware.collection')),

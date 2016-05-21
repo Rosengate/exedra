@@ -15,6 +15,13 @@ class Level extends \ArrayIterator
 	protected $routeCache = array();
 
 	/**
+	 * Level based middlewares
+	 * Addable on level not bound to any route
+	 * @var array middlewares
+	 */
+	protected $middlewares = array();
+
+	/**
 	 * Factory injected to this level.
 	 * @var \Exedra\Routing\Factory
 	 */
@@ -69,7 +76,7 @@ class Level extends \ArrayIterator
 		if($this->route)
 			$this->route->setMiddleware($middleware);
 		else
-			$this->factory->getMiddlewareRegistry()->add($middleware);
+			$this->middlewares = array($middleware);
 
 		return $this;
 	}
@@ -95,9 +102,18 @@ class Level extends \ArrayIterator
 		if($this->route)
 			$this->route->addMiddleware($middleware);
 		else
-			$this->factory->getMiddlewareRegistry()->add($middleware);
+			$this->middlewares[] = $middleware;
 
 		return $this;
+	}
+
+	/**
+	 * Get Level based middlewares
+	 * @return array
+	 */
+	public function getMiddlewares()
+	{
+		return $this->middlewares;
 	}
 
 	/**
