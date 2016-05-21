@@ -10,14 +10,14 @@ class Registry
 	protected $registry = array();
 
 	/**
-	 * Collection of middlewares
-	 * @var \Exedra\Middleware\Collection middlewares
+	 * Routing full map
+	 * @var \Exedra\Routing\Level
 	 */
-	protected $middlewares;
+	protected $map;
 
-	public function __construct(Collection $middlewares)
+	public function __construct(\Exedra\Routing\Level $map)
 	{
-		$this->middlewares = $middlewares;
+		$this->map = $map;
 	}
 
 	/**
@@ -26,15 +26,7 @@ class Registry
 	 */
 	public function add($middleware)
 	{
-		if(is_array($middleware))
-		{
-			foreach($middleware as $m)
-				$this->middlewares->add($m);
-		}
-		else
-		{
-			$this->middlewares->add($middleware);
-		}
+		$this->map->addMiddleware($middleware);
 
 		return $this;
 	}
@@ -111,15 +103,6 @@ class Registry
 			$this->registry[$key] = $pattern;
 
 		return $this;
-	}
-
-	/**
-	 * Get collection of middlewares
-	 * @return \Exedra\Middleware\Collection
-	 */
-	public function getCollection()
-	{
-		return $this->middlewares;
 	}
 }
 

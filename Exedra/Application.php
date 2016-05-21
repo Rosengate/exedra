@@ -71,7 +71,7 @@ class Application extends \Exedra\Container\Container
 			'routing.factory' => function(){ return new \Exedra\Routing\Factory((string) $this->path['routes']);},
 			'map' => function() { return $this['routing.factory']->createLevel();},
 			'execution' => array('\Exedra\Runtime\Registry', array('factories.execution.handlers')),
-			'middleware' => array('\Exedra\Middleware\Registry', array('factories.middleware.collection')),
+			'middleware' => array('\Exedra\Middleware\Registry', array('self.map')),
 			'request' => function(){ return \Exedra\Http\ServerRequest::createFromGlobals();},
 			'url' => function() { return new \Exedra\Factory\Url($this->map, $this->request, $this->config->get('app.url', null), $this->config->get('asset.url', null));},
 			'@session' => '\Exedra\Session\Session',

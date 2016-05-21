@@ -101,7 +101,7 @@ class Exe extends \Exedra\Container\Container
 	 */
 	protected function handle()
 	{
-		$middlewares = array_merge($this->middlewareRegistry->getCollection()->getArrayCopy(), $this->finding->getMiddlewares());
+		$middlewares =  $this->finding->getMiddlewares();
 
 		// create new collection from global registry and finding.
 		$this->middlewares = $middlewares = $this->app->create('middleware.collection', array($middlewares));
