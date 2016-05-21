@@ -81,8 +81,7 @@ class Application extends \Exedra\Container\Container
 
 		$this->attributes['factories']->register(array(
 			'execution.exe' => '\Exedra\Runtime\Exe',
-			'execution.handlers' => '\Exedra\Runtime\Handlers',
-			'middleware.collection' => '\Exedra\Middleware\Collection',
+			'execution.handlers' => '\Exedra\Runtime\Handlers'
 		));
 	}
 

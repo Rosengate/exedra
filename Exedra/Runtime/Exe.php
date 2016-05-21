@@ -16,10 +16,10 @@ class Exe extends \Exedra\Container\Container
 	protected $baseRoute = null;
 
 	/**
-	 * Collection of middleware
-	 * @var \Exedra\Application\Middleware\Middlewares
+	 * stack of callables
+	 * @var array callStack
 	 */
-	protected $middlewares;
+	protected $callStack;
 
 	/**
 	 * Middleware registry of application instance
@@ -95,27 +95,22 @@ class Exe extends \Exedra\Container\Container
 	}
 
 	/**
-	 * Initialize middlewares
+	 * Initialize call stacks
 	 * Handle application execution
 	 * Set response body
 	 */
 	protected function handle()
 	{
-		$middlewares =  $this->finding->getMiddlewares();
-
-		// create new collection from global registry and finding.
-		$this->middlewares = $middlewares = $this->app->create('middleware.collection', array($middlewares));
+		$this->callStack = $this->finding->getMiddlewares();
 
 		// resolve registry
-		$this->middlewareRegistry->resolve($this, $middlewares);
+		$this->middlewareRegistry->resolve($this, $this->callStack);
 
 		// add final handle
-		$middlewares->add($this->app->getExecutionRegistry()->resolve($this, $this->route->getProperty('execute')));
-
-		$middlewares->rewind();
+		$this->callStack[] = $this->app->getExecutionRegistry()->resolve($this, $this->route->getProperty('execute'));
 
 		// first handle.
-		$handle = $middlewares->current();
+		$handle = reset($this->callStack);
 
 		// execute.
 		$this->response->setBody($handle($this));
@@ -200,15 +195,12 @@ class Exe extends \Exedra\Container\Container
 	}
 
 	/**
-	 * Point to the next handler, and execute that handler.
+	 * Point and execute the next handler
+	 * @return mixed
 	 */
 	public function next()
 	{
-		// move to next middleware
-		$this->middlewares->next();
-
-		// and execute
-		return call_user_func_array($this->middlewares->current(), func_get_args());
+		return call_user_func_array(next($this->callStack), func_get_args());
 	}
 
 	/**

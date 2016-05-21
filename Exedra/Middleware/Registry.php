@@ -38,18 +38,18 @@ class Registry
 	 * @param \Closure handle
 	 * @return \Closure
 	 */
-	public function resolve(\Exedra\Runtime\Exe $exe, Collection $middlewares)
+	public function resolve(\Exedra\Runtime\Exe $exe, array &$middlewares)
 	{
-		$middlewares->rewind();
+		reset($middlewares);
 
-		foreach($middlewares as $middleware)
+		foreach($middlewares as $no => $middleware)
 		{
 			if(is_string($middleware) && isset($this->registry[$middleware]))
 				$middleware = $this->registry[$middleware];
 
 			$method = 'resolveByType'.ucfirst(strtolower(gettype($middleware)));
 
-			$middlewares[$middlewares->key()] = $this->$method($exe, $middleware);
+			$middlewares[$no] = $this->$method($exe, $middleware);
 		}
 	}
 
