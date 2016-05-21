@@ -26,26 +26,26 @@ class Factory
 	protected $reflections = array();
 
 	/**
-	 * Absolute path to the location of routes
+	 * Routes lookup path
+	 * Used when a string based subroutes is passed
 	 * @param string path
 	 */
-	protected $path;
+	protected $lookupPath;
 
-	public function __construct($path)
+	public function __construct($lookupPath)
 	{
-		$this->path = rtrim($path, '/\\');
+		$this->lookupPath = rtrim($lookupPath, '/\\');
 
 		$this->registerRoutingComponents();
 	}
 
 	/**
-	 * Get routes base path
-	 * Used when subroutes specified as string
-	 * @return \Exedra\Path
+	 * Get routes lookup path
+	 * @return string
 	 */
-	public function getRoutesPath()
+	public function geLookupPath()
 	{
-		return $this->path;
+		return $this->lookupPath;
 	}
 
 	/**
@@ -128,7 +128,7 @@ class Factory
 	 */
 	public function createLevelFromString($path, $route = null)
 	{
-		$path = $this->path.'/'.ltrim($path, '/\\');
+		$path = $this->lookupPath.'/'.ltrim($path, '/\\');
 
 		if(!file_exists($path))
 			throw new \Exedra\Exception\NotFoundException('File ['.$path.'] does not exists.');

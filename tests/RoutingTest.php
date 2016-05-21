@@ -6,7 +6,7 @@ class RoutingTest extends PHPUnit_Framework_TestCase
 	public function setUp()
 	{
 		// build a basic case
-		$app = $this->app = new \Exedra\Application(__DIR__);
+		$app = $this->app = new \Exedra\Application(__DIR__.'/Factory');
 
 		$app->map->addRoutes(array(
 			'one'=>['path' =>'path-one', 'execute'=> 'controller=hello@world'],
@@ -273,5 +273,12 @@ class RoutingTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals('bazbadluxludnoptopkit', $exe7->response->getBody());
 
 		$this->assertEquals('bazbadluxludnoptopqef', $exe8->response->getBody());
+	}
+
+	public function testLookupBasedSubroutes()
+	{
+		$this->map->get('/')->name('fooo')->group('bar.php');
+
+		$this->assertEquals($this->app->execute('fooo.bad')->response->getBody(), 'baz');
 	}
 }
