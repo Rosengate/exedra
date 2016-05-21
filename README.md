@@ -185,15 +185,15 @@ Another Examples
 ```
 $app->map->addRoutes(array(
     'book' => array(
-        'uri' => '/books',
+        'path' => '/books',
         'subroutes' => array(
             'list' => array(
-                'uri' => '',
                 'method' => 'GET',
+                'path' => '/',
                 'execute' => 'controller=Book@List',
             'view' => array(
-                'uri' => '[:id]',
                 'method' => 'GET',
+                'path' => '/[:id]',
                 'execute' => ''controller=Book@View'
                 )
             )
