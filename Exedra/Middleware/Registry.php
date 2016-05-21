@@ -40,9 +40,6 @@ class Registry
 	 */
 	public function resolve(\Exedra\Runtime\Exe $exe, Collection $middlewares)
 	{
-		if($middlewares->count() == 0)
-			return $handle;
-
 		$middlewares->rewind();
 
 		foreach($middlewares as $middleware)
