@@ -58,7 +58,7 @@ class Application extends \Exedra\Container\Container
 	 */
 	public function setFailRoute($routename)
 	{
-		$this->execution->setFailRoute($routename);
+		$this->runtime->setFailRoute($routename);
 	}
 
 	/**
@@ -70,7 +70,7 @@ class Application extends \Exedra\Container\Container
 			'config' => '\Exedra\Config',
 			'routing.factory' => function(){ return new \Exedra\Routing\Factory((string) $this->path['routes']);},
 			'map' => function() { return $this['routing.factory']->createLevel();},
-			'execution' => array('\Exedra\Runtime\Registry', array('factories.execution.handlers')),
+			'runtime' => array('\Exedra\Runtime\Registry', array('factories.runtime.handlers')),
 			'middleware' => array('\Exedra\Middleware\Registry', array('self.map')),
 			'request' => function(){ return \Exedra\Http\ServerRequest::createFromGlobals();},
 			'url' => function() { return new \Exedra\Factory\Url($this->map, $this->request, $this->config->get('app.url', null), $this->config->get('asset.url', null));},
@@ -80,8 +80,8 @@ class Application extends \Exedra\Container\Container
 		));
 
 		$this->attributes['factories']->register(array(
-			'execution.exe' => '\Exedra\Runtime\Exe',
-			'execution.handlers' => '\Exedra\Runtime\Handlers'
+			'runtime.exe' => '\Exedra\Runtime\Exe',
+			'runtime.handlers' => '\Exedra\Runtime\Handlers'
 		));
 	}
 
@@ -136,12 +136,12 @@ class Application extends \Exedra\Container\Container
 	}
 
 	/**
-	 * Get application execution registry
-	 * @return \Exedra\Application\Registry
+	 * Get application runtime registry
+	 * @return \Exedra\Runtime\Registry
 	 */
-	public function getExecutionRegistry()
+	public function getRuntimeRegistry()
 	{
-		return $this->execution;
+		return $this->runtime;
 	}
 
 	/**
@@ -199,7 +199,7 @@ class Application extends \Exedra\Container\Container
 		if(!$finding->isSuccess())
 			throw new \Exedra\Exception\RouteNotFoundException('Route is not found');
 
-		return $this->create('execution.exe', array($this, $this->middleware, $finding));
+		return $this->create('runtime.exe', array($this, $this->middleware, $finding));
 	}
 
 	/**
@@ -218,7 +218,7 @@ class Application extends \Exedra\Container\Container
 		}
 		catch(\Exedra\Exception\Exception $e)
 		{
-			if($failRoute = $this->execution->getFailRoute())
+			if($failRoute = $this->runtime->getFailRoute())
 			{
 				$response = $this->execute($failRoute, array('exception' => $e), $request)
 								->finalize()

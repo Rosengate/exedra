@@ -329,6 +329,11 @@ class ServerRequest extends Message
 		return $this->headers;
 	}
 
+	public function isMethod($method)
+	{
+		return strtolower($method) == strtolower($this->method);
+	}
+
 	public function resolveUri()
 	{
 		return $this->resolveUriPath();
