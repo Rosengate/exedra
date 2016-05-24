@@ -43,7 +43,7 @@ class Application extends Wizardry
 			$row = array();
 
 			$data = array(
-				'route' => $route->getAbsoluteName(), 
+				'name' => $route->getAbsoluteName(), 
 				'method' => $methods,
 				'uri' => '/'.$route->getPath(true),
 				'tag' => $route->hasProperty('tag') ? $route->getProperty('tag') : ''
