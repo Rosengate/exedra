@@ -167,17 +167,24 @@ $app = require_once __DIR__.'/App/app.php';
 
 $app->wizard($argv);
 ```
-Run the wizard intro
+##### Run the wizard intro on cli
 ```
 php wizard
 ```
+##### Start Basic PHP Server
+```
+php wizard serve -p 9000
+```
+and it'll serve based on the **path.public** path configured, with port 9000.
 
-#### Start Basic PHP Server
-execute the wizard with php :
+##### wizard help
 ```
-php wizard serve
+php wizard /?
 ```
-and choose the serve option. it'll serve based on the **path.public** path configured.
+##### command specific help
+```
+php wizard routes /?
+```
 
 Another Examples
 ======
