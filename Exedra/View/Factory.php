@@ -1,11 +1,11 @@
 <?php
-namespace Exedra\Factory;
+namespace Exedra\View;
 
 /**
  * Exedra View Factory
  * @param \Exedra\Path path
  */
-class View
+class Factory
 {
 	/**
 	 * Path to View directory
@@ -27,7 +27,7 @@ class View
 	/**
 	 * Create view instance based on given relative path.
 	 * @param string path
-	 * @param array data
+	 * @param string|array data (array to be deprecated)
 	 * @return \Exedra\Application\Response\View view
 	 */
 	public function create($path, $data = array())
@@ -38,7 +38,7 @@ class View
 			throw new \Exedra\Exception\NotFoundException('Unable to find view ['.$path.']');
 		
 		// merge with default data.
-		$class = '\Exedra\Factory\Blueprint\View';
+		$class = '\Exedra\View\View';
 
 		if(is_string($data))
 		{

@@ -5,7 +5,7 @@ class FactoryViewTest extends PHPUnit_Framework_TestCase
 	{
 		$app = new \Exedra\Application(__DIR__);
 
-		$this->factoryView = new \Exedra\Factory\View($app->loader['app']->create('View'));
+		$this->factoryView = new \Exedra\View\Factory($app->loader['app']->create('View'));
 	}
 
 	public function viewCreate()
@@ -17,7 +17,7 @@ class FactoryViewTest extends PHPUnit_Framework_TestCase
 	{
 		$view = $this->viewCreate();
 
-		$this->assertEquals($view instanceof \Exedra\Factory\Blueprint\View, true);
+		$this->assertTrue($view instanceof \Exedra\View\View);
 	}
 
 	public function testRender()

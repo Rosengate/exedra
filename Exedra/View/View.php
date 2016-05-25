@@ -1,5 +1,5 @@
 <?php
-namespace Exedra\Factory\Blueprint;
+namespace Exedra\View;
 
 /**
  * Blueprint for View
