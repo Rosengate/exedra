@@ -13,7 +13,7 @@ class Application extends Wizardry
 	{
 		$table = new \Exedra\Wizard\Tools\Table;
 
-		$header = explode(' ', $arguments->get('property', 'route method tag uri'));
+		$header = explode(' ', $arguments->get('property', 'name method tag uri'));
 
 		$table->setHeader($header);
 
