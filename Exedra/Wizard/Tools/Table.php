@@ -9,6 +9,13 @@ class Table
 
 	protected $oneColRows = array();
 
+	protected  $border;
+
+	public function __construct($border = true)
+	{
+		$this->border = $border;
+	}
+
 	public function setHeader(array $array)
 	{
 		$this->header = $array;
@@ -39,6 +46,8 @@ class Table
 	{
 		$lengths = array();
 
+		$totalLength = 0;
+
 		$rows = $this->rows;
 
 		// to calculate length
@@ -57,11 +66,12 @@ class Table
 		}
 
 		// create format
-		$mask = '|';
+		$mask = $this->border ? '|' : ' ';
 		$totalLength = 2 * count($lengths) + count($lengths) - 1;
+
 		foreach($lengths as $length)
 		{
-			$mask .= ' %-'.$length.'s |';
+			$mask .= ' %-'.$length.'s '.($this->border ? '|' : ' ');
 			$totalLength += $length;
 		}
 
@@ -70,15 +80,27 @@ class Table
 		$header = $this->header;
 		$rows = $this->rows;
 
+		$totalLength = $totalLength < 0 ? 0 : $totalLength;
+
 		$line = '+'.str_repeat('-', $totalLength)."+\n";
 
-		echo $line;
+		if(count($this->header) > 0)
+		{
+			if($this->border)
+				echo $line;
+			
+			// header
+			$params = array_merge(array($mask), $header);
 
-		// heaer
-		$params = array_merge(array($mask), array_map('strtolower', $header));
-		echo call_user_func_array('sprintf', $params);
+			echo call_user_func_array('sprintf', $params);
+		}
+		else
+		{
+			$params = array($mask);
+		}
 
-		echo $line;
+		if($this->border)
+			echo $line;
 
 		// rows
 		foreach($rows as $row)
@@ -92,13 +114,20 @@ class Table
 		{
 			$length = $totalLength;
 
-			$space = str_repeat(' ', ($length/2) - (strlen($value)/2));
-			$mask = '|'.$space.'%-'.($length - (strlen($space) * 2)).'s'.$space.'|'."\n";
+			$border = $this->border ? '|' : ' ';
 
+			$lengo = ($length/2) - (strlen($value)/2);
+
+			$lengo = $lengo < 0 ? 0 : $lengo;
+
+			$space = str_repeat(' ', $lengo);
+
+			$mask = $border.$space.'%-'.($length - (strlen($space) * 2)).'s'.$space.$border."\n";
 
 			echo sprintf($mask, $value);
 		}
 
-		echo $line;
+		if($this->border)
+			echo $line;
 	}
 }

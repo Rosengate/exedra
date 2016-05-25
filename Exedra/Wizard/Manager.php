@@ -62,6 +62,16 @@ class Manager
 	 */
 	protected $hiddenNamespaces = array();
 
+	/**
+	 * An introducer wizard
+	 * @var \Exedra\Wizard\Introducer
+	 */
+	protected $introducer;
+
+	protected $commandParamAliases = array(
+		'args' => 'arguments'
+		);
+
 	public function __construct(\Exedra\Application $app)
 	{
 		$this->app = $app;
@@ -81,6 +91,8 @@ class Manager
 		else
 			$wizard = new \Exedra\Wizard\Introducer($this, $this->app);
 
+		$this->introducer = $wizard;
+
 		try
 		{
 			$this->resolve();
@@ -94,11 +106,19 @@ class Manager
 			return $wizard->say($e->getMessage());
 		}
 
-		if(!isset($arguments[0]) || (isset($arguments[0]) && strpos($arguments[0], '-') === 0))
+		$needHelp = false;
+
+		if(!isset($arguments[0]) || (isset($arguments[0]) && (strpos($arguments[0], '-') === 0 || in_array($arguments[0], array('/?', '--help')))))
 		{
 			$wizard->introduce();
 
+			if(isset($arguments[0]))
+				$needHelp = in_array($arguments[0], array('/?', '--help'));
+
 			$args = $this->parseArguments($arguments);
+
+			if($needHelp)
+				$args['help'] = true;
 
 			return $wizard->executeIndex(new Arguments($args));
 		}
@@ -126,7 +146,41 @@ class Manager
 		// shift out command argument
 		array_shift($arguments);
 
+		if(count($arguments) > 0 && in_array($arguments[count($arguments)-1], array('/?', '--help')))
+		{
+			return $this->showHelp($command);
+		}
+
 		return $this->command($command, $this->parseArguments($arguments));
+	}
+
+	public function showHelp($command)
+	{
+		// say description
+		$definition = $this->commands[$command];
+
+		$wizard = $this->introducer;
+
+		$table = new Tools\Table(false);
+
+		$wizard->say('Command : ');
+			$wizard->say('  name '.$command);
+			$wizard->say('  wizard '.$definition['class']);
+			$wizard->say('  description '.$definition['description']);
+
+		$wizard->say();
+
+		$wizard->say('Arguments :');
+
+		foreach($definition['arguments'] as $arg => $argDefinition)
+			$table->addRow(array('-'.$arg, $argDefinition));
+
+		if(count($definition['arguments']) == 0)
+			$table->addRow("This command has no argument(s)");
+
+		$wizard->tabulize($table);
+
+		$wizard->say();
 	}
 
 	/**
@@ -226,7 +280,9 @@ class Manager
 		}
 		catch(\Exedra\Exception\InvalidArgumentException $e)
 		{
-			return $wizard->say($e->getMessage());
+			$wizard->say($e->getMessage());
+
+			return $this->showHelp($command);
 		}
 
 		@list($namespace, $command) = explode(':', $command);
@@ -279,16 +335,37 @@ class Manager
 
 		$data = array();
 
+		$lastParam = null;
+
 		foreach($lines[1] as $line)
 		{
 			$line = trim($line);
 
 			if($line[0] !== '@')
+			{
+				if($lastParam)
+					$lastParam .= '\n'.$line;
+
 				continue;
+			}
 
 			@list($key, $value) = explode(' ', $line, 2);
 
-			$data[substr($key, 1)] = trim($value);
+			$key = substr($key, 1);
+
+			\Exedra\Support\DotArray::set($data, $key, trim($value));
+
+			$lastParam = &\Exedra\Support\DotArray::getReference($data, $key);
+		}
+
+		foreach($data as $key => $value)
+		{
+			if(!isset($this->commandParamAliases[$key]))
+				continue;
+
+			unset($data[$key]);
+
+			$data[$this->commandParamAliases[$key]] = $value;
 		}
 
 		return $data;
@@ -506,10 +583,22 @@ class Manager
 						throw new \Exedra\Exception\Exception('Command ['.$name.'] is being overwritten by ['.$class.'] wizard.');
 				}
 
+				$arguments = array();
+
+				if(isset($definition['arguments']))
+				{
+					if(is_string($definition['arguments']))
+						foreach(array_map('trim', explode(',', $definition['arguments'])) as $arg)
+							$arguments[$arg] = '';
+					else
+						$arguments = $definition['arguments'];
+				}
+
 				$this->commands[$name] = array_merge($definition, array(
 					'namespace' => $namespace,
 					'description' => isset($definition['description']) ? $definition['description'] : '',
-					'arguments' => isset($definition['arguments']) ? array_map('trim', explode(',', $definition['arguments'])) : array(),
+					// 'arguments' => isset($definition['arguments']) ? array_map('trim', explode(',', $definition['arguments'])) : array(),
+					'arguments' => $arguments,
 					'class' => $class,
 					'command' => $command
 				));

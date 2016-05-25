@@ -48,17 +48,35 @@ class Introducer extends Wizardry
 			if($this->manager->isHidden($command))
 				return;
 
+				
 			$choices[$command] = $definition['description'].' ('.$command.')';
 		});
 
-		$command = $this->askChoices('At your command, sire.', $choices);
+		if($needHelp = $arguments->get('help', false))
+			$command = $this->askChoices('Which command do you need help with?', $choices);
+		else
+			$command = $this->askChoices('At your command, sire.', $choices);
 
-		$this->manager->command($command);
+		if($needHelp)
+			$this->manager->showHelp($command);
+		else
+			$this->manager->command($command);
 
 		$this->say();
 
-		if(in_array($this->ask('Do you need anything else? [y/n]'), array('y', '')))
-			$this->executeIndex(new Arguments);
+		if($arguments->get('help', false))
+		{
+			$text = 'Continue with the help? [y/n]';
+			$args = new Arguments(array('help' => true));
+		}
+		else
+		{
+			$text = 'Do you need anything else? [y/n]';
+			$args = new Arguments;
+		}
+
+		if(in_array($this->ask($text), array('y', '')))
+			return $this->executeIndex($args);
 	}
 }
 

@@ -19,9 +19,9 @@ class Arguments implements \ArrayAccess
 		{
 			$found = false;
 
-			foreach($commandArguments as $baseArg)
+			foreach($commandArguments as $key => $baseArg)
 			{
-				if(strpos($baseArg, $arg) === 0)
+				if(strpos($key, $arg) === 0)
 					$found = true;
 			}
 
@@ -32,7 +32,7 @@ class Arguments implements \ArrayAccess
 		}
 
 		if(count($unfounds) > 0)
-			throw new \Exedra\Exception\InvalidArgumentException('Unable to find argument(s) with name ['.implode(', ', $unfounds).']');
+			throw new \Exedra\Exception\InvalidArgumentException('Unable to find option(s) with name ['.implode(', ', $unfounds).']');
 	}
 
 	public function offsetGet($name)

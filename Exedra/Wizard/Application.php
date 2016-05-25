@@ -6,13 +6,14 @@ class Application extends Wizardry
 	/**
 	 * @namespace app
 	 * @description List routes
-	 * @arguments name, params
+	 * @arguments.name list only routes with given name
+	 * @arguments.property specify route properties
 	 */
 	public function executeRoutes($arguments)
 	{
 		$table = new \Exedra\Wizard\Tools\Table;
 
-		$header = explode(' ', $arguments->get('params', 'route method tag uri'));
+		$header = explode(' ', $arguments->get('property', 'route method tag uri'));
 
 		$table->setHeader($header);
 
@@ -69,7 +70,8 @@ class Application extends Wizardry
 
 	/**
 	 * @description Serve application
-	 * @arguments port
+	 * @arguments.port port to be served on
+	 * @arguments.router router file to be served through
 	 */
 	public function executeServe(Arguments $arguments)
 	{
