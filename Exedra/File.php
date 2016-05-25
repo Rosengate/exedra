@@ -71,9 +71,6 @@ class File extends \SplFileInfo
 	 */
 	public function getContents()
 	{
-		if(!$this->isExists())
-			throw new \Exedra\Exception\NotFoundException('File ['.$this->filename.'] was not found.');
-
 		return file_get_contents($this->filename);
 	}
 
