@@ -150,7 +150,10 @@ class Route
 		$paths = array();
 
 		foreach($routes as $route)
-			$paths[] = $route->pathParameterReplace($params);
+		{
+			if($path)
+				$paths[] = $path; 
+		}
 
 		return trim(implode('/', $paths), '/');
 	}
@@ -951,5 +954,3 @@ class Route
 	}
 }
 
-
-?>
