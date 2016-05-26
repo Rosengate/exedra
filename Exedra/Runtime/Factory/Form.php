@@ -1,4 +1,3 @@
-
 <?php
 namespace Exedra\Runtime\Factory;
 
@@ -17,8 +16,8 @@ class Form extends \Exedra\Form\Form
 	 */
 	public function initialize(array $data = array())
 	{
-		if($exe->flash->has('form_data'))
-			$this->set($exe->flash->get('form_data'));
+		if($this->exe->flash->has('form_data'))
+			$this->set($this->exe->flash->get('form_data'));
 
 		parent::initialize($data);
 	}
