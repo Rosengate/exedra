@@ -151,6 +151,8 @@ class Route
 
 		foreach($routes as $route)
 		{
+			$path = $route->pathParameterReplace($params);
+			
 			if($path)
 				$paths[] = $path; 
 		}
