@@ -9,11 +9,37 @@ class Textarea extends Base
 	 */
 	public function open()
 	{
-		$name = $this->name;
-		$id = $this->id ? : $name;
 		$attributes = $this->buildAttributes();
 
-		return '<textarea name="'.$name.'" id="'.$id.'" '.$attributes.'>';
+		return '<textarea '.$attributes.'>';
+	}
+
+	/**
+	 * Build input attribute
+	 * Also build input class attribtue
+	 * @return string
+	 */
+	protected function buildAttributes()
+	{
+		$attrs = array();
+
+		$class = '';
+
+		$attributes = $this->attributes;
+
+		if(isset($attributes['value']))
+			unset($attributes['value']);
+
+		if(count($this->classes) > 0)
+			$class = 'class="'.implode(' ', $this->classes).'" ';
+		
+		if(count($this->attributeString) > 0)
+			$attrs = $this->attributeString;
+
+		foreach($attributes as $key => $value)
+			$attrs[] = $key.'="'.$value.'"';
+
+		return $class.implode(' ', $attrs);
 	}
 
 	/**

@@ -5,9 +5,10 @@ class Input extends Base
 {
 	protected $type;
 
-	public function __construct($type, $name)
+	public function __construct($type, $name = null)
 	{
 		parent::__construct($name);
+
 		$this->type($type);
 	}
 
@@ -29,14 +30,14 @@ class Input extends Base
 	 */
 	public function toString()
 	{
-		$name = $this->name;
-		$id = $this->id ? : $name;
-		$value = isset($this->override) ? $this->override : ($this->value ? : '');
-
 		$type = $this->type;
+
+		if($this->override)
+			$this->attributes['value'] = $this->override;
+
 		$attributes = $this->buildAttributes();
 
-		return '<input type="'.$type.'" name="'.$name.'" id="'.$id.'" value="'.$value.'" '.$attributes.' />';
+		return '<input type="'.$type.'" '.$attributes.' />';
 	}
 }
 

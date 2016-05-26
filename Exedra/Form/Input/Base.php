@@ -4,12 +4,6 @@ namespace Exedra\Form\Input;
 class Base
 {
 	/**
-	 * Value attribute
-	 * @var string value
-	 */
-	protected $value;
-
-	/**
 	 * List of attribute in key value pairs
 	 * @var array attributes
 	 */
@@ -20,18 +14,6 @@ class Base
 	 * @var array attributeString
 	 */
 	protected $attributeString = array();
-
-	/**
-	 * input name
-	 * @var string name
-	 */
-	protected $name;
-
-	/**
-	 * Input id
-	 * @var string id
-	 */
-	protected $id;
 
 	/**
 	 * List of input class
@@ -45,9 +27,10 @@ class Base
 	 */
 	protected $override;
 
-	public function __construct($name)
+	public function __construct($name = null)
 	{
-		$this->name($name);
+		if($name)
+			$this->name($name);
 	}
 
 	/**
@@ -57,7 +40,7 @@ class Base
 	 */
 	public function id($id)
 	{
-		$this->id = $id;
+		$this->attr('id', $id);
 
 		return $this;
 	}
@@ -69,7 +52,7 @@ class Base
 	 */
 	public function name($name)
 	{
-		$this->name = $name;
+		$this->attributes['name'] = $name;
 
 		return $this;
 	}
@@ -93,7 +76,7 @@ class Base
 	 */
 	public function value($value)
 	{
-		$this->value = $value;
+		$this->attributes['value'] = $value;
 
 		return $this;
 	}
@@ -169,7 +152,7 @@ class Base
 	 */
 	public function getValue()
 	{
-		$value = $this->override ? : ($this->value ? : '');
+		$value = $this->override ? : ($this->attributes['value'] ? : null);
 
 		return $value;
 	}

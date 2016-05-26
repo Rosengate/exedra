@@ -149,12 +149,15 @@ class Form
 	 * @param string value
 	 * @return \Exedra\Form\Input\Input
 	 */
-	protected function createInput($type, $name, $value = null, $attr = null)
+	protected function createInput($type, $name = null, $value = null, $attr = null)
 	{
 		if($type == 'textarea')
 			$input = new Input\Textarea($name);
 		else
 			$input = new Input\Input($type, $name);
+
+		if($name)
+			$input->attr('id', $name);
 
 		if($value)
 			$input->value($value);
@@ -179,9 +182,12 @@ class Form
 	 * @param string first (optional)
 	 * @return \Exedra\Form\Input\Select
 	 */
-	public function select($name, array $options = array(), $value = null, $attr = null, $first = null)
+	public function select($name = null, array $options = array(), $value = null, $attr = null, $first = null)
 	{
 		$select = new Input\Select($name);
+
+		if($name)
+			$select->attr('id', $name);
 
 		if(count($options) > 0)
 			$select->options($options);
@@ -209,7 +215,7 @@ class Form
 	 * Create html text input
 	 * @return Input\Input
 	 */
-	public function text($name, $value = null, $attr = null)
+	public function text($name = null, $value = null, $attr = null)
 	{
 		return $this->createInput('text', $name, $value, $attr);
 	}
@@ -218,7 +224,7 @@ class Form
 	 * Create html password input
 	 * @return Input\Input
 	 */
-	public function password($name, $value = null, $attr = null)
+	public function password($name = null, $value = null, $attr = null)
 	{
 		return $this->createInput('password', $name, $value, $attr);
 	}
@@ -227,7 +233,7 @@ class Form
 	 * Create html textarea input
 	 * @return Input\Input
 	 */
-	public function textarea($name, $value = null, $attr = null)
+	public function textarea($name = null, $value = null, $attr = null)
 	{
 		return $this->createInput('textarea', $name, $value, $attr);
 	}
@@ -236,7 +242,7 @@ class Form
 	 * Create html 5 date input
 	 * @return Input\Input
 	 */
-	public function date($name, $value = null, $attr = null)
+	public function date($name = null, $value = null, $attr = null)
 	{
 		return $this->createInput('date', $name, $value, $attr);
 	}
@@ -245,7 +251,7 @@ class Form
 	 * Create html 5 time input
 	 * @return Input\Input
 	 */
-	public function time($name, $value = null, $attr = null)
+	public function time($name = null, $value = null, $attr = null)
 	{
 		return $this->createInput('time', $name, $value, $attr);
 	}
@@ -254,7 +260,7 @@ class Form
 	 * Create html file input
 	 * @return Input\Input
 	 */
-	public function file($name, $value = null, $attr = null)
+	public function file($name = null, $value = null, $attr = null)
 	{
 		return $this->createInput('file', $name, $value, $attr);
 	}
@@ -263,7 +269,7 @@ class Form
 	* Create html hidden input
 	* @return Input\Input
 	*/
-	public function hidden($name, $value = null, $attr = null)
+	public function hidden($name = null, $value = null, $attr = null)
 	{
 		return $this->createInput('hidden', $value, $attr);
 	}
@@ -272,7 +278,7 @@ class Form
 	 * Create html checkbox input
 	 * @return Input\Input
 	 */
-	public function checkbox($name, $value, $status = false)
+	public function checkbox($name = null, $value = null, $status = false)
 	{
 		$input = $this->createInput('checkbox', $value);
 
@@ -280,5 +286,14 @@ class Form
 			$input->attr('checked', true);
 
 		return $input;
+	}
+
+	/**
+	 * Create html submit input
+	 * @return Input\Input
+	 */
+	public function submit($name = null, $value = null, $attr = null)
+	{
+		return $this->createInput('submit', $name, $value, $attr);
 	}
 }
