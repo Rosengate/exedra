@@ -64,7 +64,7 @@ class Container implements \ArrayAccess
 	public function offsetSet($name, $value)
 	{
 		if(array_key_exists($name, $this->attributes) && !isset($this->mutables[$name]))
-			throw new \Exedra\Exception\Exception('Attribute ['.$name.'] is publically immutable and readonly once assigned.');
+			throw new \Exedra\Exception\Exception('['.get_class($this).'] Attribute ['.$name.'] is publically immutable and readonly once assigned.');
 
 		$this->attributes[$name] = $value;
 
@@ -101,7 +101,7 @@ class Container implements \ArrayAccess
 	public function __set($name, $value)
 	{
 		if(array_key_exists($name, $this->attributes) && !isset($this->mutables[$name]))
-			throw new \Exedra\Exception\Exception('Attribute ['.$name.'] is publically immutable and readonly once assigned.');
+			throw new \Exedra\Exception\Exception('['.get_class($this).'] Attribute ['.$name.'] is publically immutable and readonly once assigned.');
 
 		$this->attributes[$name] = $value;
 
@@ -226,7 +226,7 @@ class Container implements \ArrayAccess
 				}
 			}
 
-			throw new \Exedra\Exception\InvalidArgumentException('Unable to find the ['.$name.'] in the registered '.$type);
+			throw new \Exedra\Exception\InvalidArgumentException('['.get_class($this).'] Unable to find the ['.$name.'] registry in the registered '.$type .'.');
 		}
 
 		$registry = $this->attributes[$type]->get($name);
@@ -259,13 +259,13 @@ class Container implements \ArrayAccess
 			{
 				// the second element isn't an array
 				if(!is_array($registry[1]))
-					throw new \Exedra\Exception\InvalidArgumentException('Second value for array based ['.$name.'] registry must be an array');
+					throw new \Exedra\Exception\InvalidArgumentException('['.get_class($this).'] Second value for array based ['.$name.'] registry must be an array');
 
 				foreach($registry[1] as $arg)
 				{
 					// if isn't string. allow only string.
 					if(!is_string($arg))
-						throw new \Exedra\Exception\InvalidArgumentException('Argument for array based ['.$name.'] registry must be string');
+						throw new \Exedra\Exception\InvalidArgumentException('['.get_class($this).'] Argument for array based ['.$name.'] registry must be string');
 
 					switch($arg)
 					{
@@ -311,7 +311,7 @@ class Container implements \ArrayAccess
 			return $this->instantiate($class, $arguments);
 		}
 
-		throw new \Exedra\Exception\InvalidArgumentException('Unable to resolve the ['.$name.'] registry');
+		throw new \Exedra\Exception\InvalidArgumentException('['.get_class($this).'] Unable to resolve the ['.$name.'] registry');
 	}
 
 	protected function instantiate($class, array $arguments)
