@@ -3,10 +3,11 @@
 class Container implements \ArrayAccess
 {
 	/**
-	 * Container attributes
-	 * @var array of services, callables, factories, resolved services, and public attributes
+	 * Container resolved services
+	 * registries (services, factories, callables), resolved services, and publicly registered service
+	 * @var array services
 	 */
-	protected $attributes = array();
+	protected $services = array();
 
 	/**
 	 * Cached invokables
@@ -22,8 +23,8 @@ class Container implements \ArrayAccess
 
 	public function __construct()
 	{
-		// default container attributes
-		$this->attributes = array(
+		// default container registries
+		$this->services = array(
 			'services' => new \Exedra\Container\Registry,
 			'callables' => new \Exedra\Container\Registry,
 			'factories' => new \Exedra\Container\Registry,
@@ -37,11 +38,11 @@ class Container implements \ArrayAccess
 	 */
 	public function offsetExists($type)
 	{
-		return isset($this->attributes[$type]);
+		return isset($this->services[$type]);
 	}
 
 	/**
-	 * Get attribute
+	 * Get service
 	 * If has none, find in services registry.
 	 * Alias to get()
 	 * @param string key
@@ -49,30 +50,30 @@ class Container implements \ArrayAccess
 	 */
 	public function offsetGet($name)
 	{
-		if(array_key_exists($name, $this->attributes))
-			return $this->attributes[$name];
+		if(array_key_exists($name, $this->services))
+			return $this->services[$name];
 
-		return $this->attributes[$name] = $this->solve('services', $name);
+		return $this->services[$name] = $this->solve('services', $name);
 	}
 
 	/**
-	 * Set attribute
+	 * Set service
 	 * alias to __set
 	 * @param string 
 	 * @param array registry
 	 */
 	public function offsetSet($name, $value)
 	{
-		if(array_key_exists($name, $this->attributes) && !isset($this->mutables[$name]))
-			throw new \Exedra\Exception\Exception('['.get_class($this).'] Attribute ['.$name.'] is publically immutable and readonly once assigned.');
+		if(array_key_exists($name, $this->services) && !isset($this->mutables[$name]))
+			throw new \Exedra\Exception\Exception('['.get_class($this).'] Service ['.$name.'] is publically immutable and readonly once assigned.');
 
-		$this->attributes[$name] = $value;
+		$this->services[$name] = $value;
 
-		$this->attributes['services']->set($name, true);
+		$this->services['services']->set($name, true);
 	}
 
 	/**
-	 * Empty the attribute
+	 * Empty the service
 	 * @param string key
 	 */
 	public function offsetUnset($key)
@@ -80,7 +81,7 @@ class Container implements \ArrayAccess
 		if(!in_array($key, array('services', 'callables', 'factories')))
 			return;
 
-		unset($this->attributes[$key]);
+		unset($this->services[$key]);
 	}
 
 	/**
@@ -90,36 +91,36 @@ class Container implements \ArrayAccess
 	 */
 	public function registry($type)
 	{
-		return $this->attributes[$type];
+		return $this->services[$type];
 	}
 
 	/**
-	 * Set attribute.
+	 * Set service.
 	 * @param string name
 	 * @param mixed service
 	 */
 	public function __set($name, $value)
 	{
-		if(array_key_exists($name, $this->attributes) && !isset($this->mutables[$name]))
-			throw new \Exedra\Exception\Exception('['.get_class($this).'] Attribute ['.$name.'] is publically immutable and readonly once assigned.');
+		if(array_key_exists($name, $this->services) && !isset($this->mutables[$name]))
+			throw new \Exedra\Exception\Exception('['.get_class($this).'] Service ['.$name.'] is publically immutable and readonly once assigned.');
 
-		$this->attributes[$name] = $value;
+		$this->services[$name] = $value;
 
-		$this->attributes['services']->set($name, true);
+		$this->services['services']->set($name, true);
 	}
 
 	/**
-	 * Register mutable attributes
+	 * Register mutable services
 	 * @param array names	
 	 */
-	public function setMutables(array $attributes)
+	public function setMutables(array $services)
 	{
-		foreach($attributes as $attribute)
-			$this->mutables[$attribute] = true;
+		foreach($services as $service)
+			$this->mutables[$service] = true;
 	}
 
 	/**
-	 * Get attribute
+	 * Get service
 	 * If has none, find in services registry.
 	 * Alias to get()
 	 * @param string name
@@ -127,10 +128,10 @@ class Container implements \ArrayAccess
 	 */
 	public function __get($name)
 	{
-		if(array_key_exists($name, $this->attributes))
-			return $this->attributes[$name];
+		if(array_key_exists($name, $this->services))
+			return $this->services[$name];
 
-		return $this->attributes[$name] = $this->solve('services', $name);
+		return $this->services[$name] = $this->solve('services', $name);
 	}
 
 	/**
@@ -164,17 +165,17 @@ class Container implements \ArrayAccess
 	}
 
 	/**
-	 * Get attribute
+	 * Get service
 	 * If has none, find in services registry
 	 * @param string name
 	 * @return mixed
 	 */
 	public function get($name)
 	{
-		if(array_key_exists($name, $this->attributes))
-			return $this->attributes[$name];
+		if(array_key_exists($name, $this->services))
+			return $this->services[$name];
 
-		return $this->attributes[$name] = $this->solve('services', $name);
+		return $this->services[$name] = $this->solve('services', $name);
 	}
 
 	/**
@@ -210,9 +211,9 @@ class Container implements \ArrayAccess
 	 */
 	protected function solve($type, $name, array $args = array())
 	{
-		if(!$this->attributes[$type]->has($name))
+		if(!$this->services[$type]->has($name))
 		{
-			if($type == 'callables' && $this->attributes['services']->has($name))
+			if($type == 'callables' && $this->services['services']->has($name))
 			{
 				// then check on related invokable services
 				$service = $this->get($name);
@@ -229,7 +230,7 @@ class Container implements \ArrayAccess
 			throw new \Exedra\Exception\InvalidArgumentException('['.get_class($this).'] Unable to find the ['.$name.'] registry in the registered '.$type .'.');
 		}
 
-		$registry = $this->attributes[$type]->get($name);
+		$registry = $this->services[$type]->get($name);
 
 		return $this->resolve($name, $registry, $args);
 	}

@@ -13,7 +13,7 @@ class Application extends \Exedra\Container\Container
 	{
 		parent::__construct();
 
-		$this->attributes['providers'] = new \Exedra\Provider\Registry($this);
+		$this->services['providers'] = new \Exedra\Provider\Registry($this);
 		
 		// default the namespace as [App]
 		if(isset($params['namespace']))
@@ -36,7 +36,7 @@ class Application extends \Exedra\Container\Container
 
 		$params['path.root'] = rtrim($params['path.root'], '/\\');
 
-		$this->attributes['path'] = $path = new \Exedra\Path($params['path.root']);
+		$this->services['path'] = $path = new \Exedra\Path($params['path.root']);
 
 		$path->register('root', $path); // recursive reference.
 
@@ -49,7 +49,7 @@ class Application extends \Exedra\Container\Container
 		// autoload the current app folder.
 		$path['app']->autoloadPsr4($this->namespace, '');
 
-		$this->attributes['loader'] = $path;
+		$this->services['loader'] = $path;
 	}
 
 	/**
@@ -66,7 +66,7 @@ class Application extends \Exedra\Container\Container
 	 */
 	protected function serviceRegistry()
 	{
-		$this->attributes['services']->register(array(
+		$this->services['services']->register(array(
 			'config' => '\Exedra\Config',
 			'routing.factory' => function(){ return new \Exedra\Routing\Factory((string) $this->path['routes']);},
 			'map' => function() { return $this['routing.factory']->createLevel();},
@@ -76,10 +76,10 @@ class Application extends \Exedra\Container\Container
 			'url' => function() { return new \Exedra\Factory\Url($this->map, $this->request, $this->config->get('app.url', null), $this->config->get('asset.url', null));},
 			'@session' => '\Exedra\Session\Session',
 			'@flash' => array('\Exedra\Session\Flash', array('self.session')),
-			'wizard' => array('\Exedra\Wizard\Manager', array('self'))
+			'@module' => function(){ return new \Exedra\Module\Registry($this, $this->path['app'], $this->getNamespace());}
 		));
 
-		$this->attributes['factories']->register(array(
+		$this->services['factories']->register(array(
 			'runtime.exe' => '\Exedra\Runtime\Exe',
 			'runtime.handlers' => '\Exedra\Runtime\Handlers'
 		));
@@ -274,19 +274,19 @@ class Application extends \Exedra\Container\Container
 	protected function solve($type, $name, array $args = array())
 	{
 		// keep pinging the providers registry.
-		$this->attributes['providers']->listen($type.'.'.$name);
+		$this->services['providers']->listen($type.'.'.$name);
 
-		if(!$this->attributes[$type]->has($name))
+		if(!$this->services[$type]->has($name))
 		{
-			if($this->attributes[$type]->has('@'.$name))
+			if($this->services[$type]->has('@'.$name))
 			{
-				$registry = $this->attributes[$type]->get('@'.$name);
+				$registry = $this->services[$type]->get('@'.$name);
 			}
 			else
 			{
 				$isShared = false;
 
-				if($type == 'callables' && ($this->attributes['services']->has($name) || $isShared = $this->attributes['services']->has('@'.$name)))
+				if($type == 'callables' && ($this->services['services']->has($name) || $isShared = $this->services['services']->has('@'.$name)))
 				{
 					$service = $this->get($isShared ? '@'.$name : $name);
 
@@ -301,7 +301,7 @@ class Application extends \Exedra\Container\Container
 		}
 		else
 		{
-			$registry = $this->attributes[$type]->get($name);
+			$registry = $this->services[$type]->get($name);
 		}
 
 		return $this->resolve($name, $registry, $args);

@@ -46,45 +46,45 @@ class Exe extends \Exedra\Container\Container
 
 		$this->middlewareRegistry = $middlewareRegistry;
 
-		// initiate attributes
-		$this->initializeAttributes();
-
-		// initiate dependencies
+		// initiate services
 		$this->initializeServices();
+
+		// initiate service registry
+		$this->serviceRegistry();
 
 		// Initiate execution handles/middlewares
 		$this->handle();
 	}	
 
 	/**
-	 * Initiate execution attributes
+	 * Initialize execution services
 	 */
-	protected function initializeAttributes()
+	protected function initializeServices()
 	{
 		// Initiate loader, registry, route, config, params, and set base route based on finding.
-		$this->attributes['path'] = $this->app->path;
+		$this->services['path'] = $this->app->path;
 
-		$this->attributes['route'] = $this->finding->getRoute();
+		$this->services['route'] = $this->finding->getRoute();
 		
-		$this->attributes['config'] = clone $this->app->config;
+		$this->services['config'] = clone $this->app->config;
 
-		$this->attributes['config']->set($this->finding->getConfig());
+		$this->services['config']->set($this->finding->getConfig());
 		
 		$this->setBaseRoute($this->finding->getBaseRoute());
 		
 		\Exedra\Support\DotArray::initialize($this->params, $this->finding->param());
 		
-		$this->attributes['request'] = $this->finding->getRequest();
+		$this->services['request'] = $this->finding->getRequest();
 		
-		$this->attributes['response'] = \Exedra\Runtime\Response::createEmptyResponse();
+		$this->services['response'] = \Exedra\Runtime\Response::createEmptyResponse();
 	}
 
 	/**
 	 * Initiate dependency injection container
 	 */
-	protected function initializeServices()
+	protected function serviceRegistry()
 	{
-		$this->attributes['services']->register(array(
+		$this->services['services']->register(array(
 			'view' => function(){ return new \Exedra\View\Factory($this->getModulePath('View'));},
 			'controller' => function(){ return new \Exedra\Factory\Controller($this->app->getNamespace(), $this->getModule());},
 			'url' => function(){ return new \Exedra\Runtime\Factory\Url($this->app->map, $this->request, $this->config->get('app.url', null), $this->config->get('asset.url', null), $this);},
@@ -542,7 +542,7 @@ class Exe extends \Exedra\Container\Container
 	 */
 	protected function solve($type, $name, array $args = array())
 	{
-		if(!$this->attributes[$type]->has($name))
+		if(!$this->services[$type]->has($name))
 		{
 			if($this->app[$type]->has('@'.$name))
 			{
@@ -567,7 +567,7 @@ class Exe extends \Exedra\Container\Container
 		}
 		else
 		{
-			$registry = $this->attributes[$type]->get($name);
+			$registry = $this->services[$type]->get($name);
 		}
 
 		return $this->resolve($name, $registry, $args);
