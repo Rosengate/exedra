@@ -23,10 +23,22 @@ class Registry implements \ArrayAccess
 	 */
 	protected $baseNamespace;
 
+	/**
+	 * List of resolved module
+	 * @var array modules
+	 */
 	protected $modules = array();
 
+	/**
+	 * List of module registry
+	 * @var array registry
+	 */
 	protected $registry = array();
 
+	/**
+	 * List of module configures
+	 * @var array configures
+	 */
 	protected $configures = array();
 
 	public function __construct(\Exedra\Application $app, \Exedra\Path $path, $baseNamespace = null)
@@ -82,26 +94,36 @@ class Registry implements \ArrayAccess
 	 * @param string namespace
 	 * @return \Exedra\Module\Module
 	 */
-	protected function createDefaultModule($namespace)
+	protected function createModule($namespace, $class = null)
 	{
+		$path = $this->path->create(str_replace('\\', '/', $namespace));
+
 		if($this->baseNamespace)
-		{
 			$namespace = $this->baseNamespace.'\\'.$namespace;
 
-			$path = $this->path->create($namespace);
-		}
-
-		return $this->app->create('module', array($this->app, $namespace, $path));
+		if($class)
+			return new $class($this->app, $path, $namespace);
+		else
+			return $this->app->create('module', array($this->app, $path, $namespace));
 	}
 
 	/**
 	 * Configure module
+	 * Applied on module resolve
+	 * If already resolved, applied on the spot.
 	 * @param string name
 	 * @param \Closure configure
 	 */
 	public function configure($name, \Closure $callback)
 	{
-		$this->configures[$name][] = $callback;
+		if(!isset($this->modules[$name]))
+		{
+			$this->configures[$name][] = $callback;
+
+			return;
+		}
+
+		$callback($this->modules[$name]);
 	}
 
 	/**
@@ -118,18 +140,18 @@ class Registry implements \ArrayAccess
 	}
 
 	/**
+	 * Get/resolve module
 	 * @param string name
 	 * @return \Exedra\Module\Module
 	 */
-	public function offsetGet($name)
+	public function get($name)
 	{
 		if(isset($this->modules[$name]))
 			return $this->modules[$name];
 		
 		if(!isset($this->registry[$name]))
 		{
-			// $this->modules[$name] = $this->createDefaultModule();
-			$module = $this->createDefaultModule($name);
+			$module = $this->createModule($name);
 		}
 		else
 		{
@@ -139,19 +161,19 @@ class Registry implements \ArrayAccess
 			// expect a class name
 			if(is_string($registry))
 			{
-				$module = new $registry;
+				$module = $this->createModule($name, $registry);
 			}
 			else if($registry instanceof \Closure)
 			{
-				$module = $registry($this->app);
-
-				if(!$module instanceof \Exedra\Module\Module)
-					throw new \Exedra\Exception\InvalidArgumentException('\Closure for registry of module ['.$name.'] must be type of \Exedra\Module\Module');
+				$module = $registry($this->app, $name);
 			}
 			else
 			{
 				throw new \Exedra\Exception\Exception('Module registry must be either String or \Closure');
 			}
+
+			if(!$module instanceof \Exedra\Module\Module)
+				throw new \Exedra\Exception\InvalidArgumentException('Resolve of module ['.$name.'] must be type of \Exedra\Module\Module');
 		}
 
 		// resolves with the configures.
@@ -162,6 +184,16 @@ class Registry implements \ArrayAccess
 		}
 
 		return $this->modules[$name] = $module;
+	}
+
+	/**
+	 * Alias to Get
+	 * @param string name
+	 * @return \Exedra\Module\Module
+	 */
+	public function offsetGet($name)
+	{
+		return $this->get($name);
 	}
 }
 

@@ -227,7 +227,7 @@ class Container implements \ArrayAccess
 				}
 			}
 
-			throw new \Exedra\Exception\InvalidArgumentException('['.get_class($this).'] Unable to find the ['.$name.'] registry in the registered '.$type .'.');
+			throw new \Exedra\Exception\InvalidArgumentException('['.get_class($this).'] Unable to find ['.$name.'] registry in the registered '.$type .'.');
 		}
 
 		$registry = $this->services[$type]->get($name);

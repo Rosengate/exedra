@@ -81,7 +81,8 @@ class Application extends \Exedra\Container\Container
 
 		$this->services['factories']->register(array(
 			'runtime.exe' => '\Exedra\Runtime\Exe',
-			'runtime.handlers' => '\Exedra\Runtime\Handlers'
+			'runtime.handlers' => '\Exedra\Runtime\Handlers',
+			'module' => '\Exedra\Module\Module'
 		));
 	}
 
@@ -296,7 +297,7 @@ class Application extends \Exedra\Container\Container
 						return call_user_func_array($service, $args);
 				}
 
-				throw new \Exedra\Exception\InvalidArgumentException('Unable to find the ['.$name.'] in the registered '.$type);
+				throw new \Exedra\Exception\InvalidArgumentException('['.get_class($this).'] Unable to find ['.$name.'] in the registered '.$type);
 			}
 		}
 		else

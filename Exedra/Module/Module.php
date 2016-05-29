@@ -9,7 +9,7 @@ class Module extends \Exedra\Container\Container
 	 */
 	protected $namespace;
 
-	public function __construct(\Exedra\Application $app, $namespace, \Exedra\Path $path)
+	public function __construct(\Exedra\Application $app, \Exedra\Path $path, $namespace = null)
 	{
 		parent::__construct();
 
@@ -17,7 +17,7 @@ class Module extends \Exedra\Container\Container
 
 		$this->services['path'] = $path;
 
-		$this->namespace = $namespace;
+		$this->namespace = str_replace('/', '\\', $namespace);
 
 		$this->boot();
 	}
