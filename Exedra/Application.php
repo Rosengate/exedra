@@ -19,9 +19,9 @@ class Application extends \Exedra\Container\Container
 		if(isset($params['namespace']))
 			$this->namespace = $params['namespace'];
 		
-		$this->pathRegistry(is_array($params) ? $params : array('path.root' => $params));
+		$this->setUpPath(is_array($params) ? $params : array('path.root' => $params));
 		
-		$this->serviceRegistry();
+		$this->setUp();
 	}
 
 	/**
@@ -29,7 +29,7 @@ class Application extends \Exedra\Container\Container
 	 * root, app, public, routes
 	 * @param array params
 	 */
-	protected function pathRegistry(array $params)
+	protected function setUpPath(array $params)
 	{
 		if(!isset($params['path.root']))
 			throw new \Exedra\Exception\InvalidArgumentException('[path.root] parameter is required, at least.');
@@ -62,9 +62,9 @@ class Application extends \Exedra\Container\Container
 	}
 
 	/**
-	 * Register dependencies.
+	 * Setup dependency registry.
 	 */
-	protected function serviceRegistry()
+	protected function setUp()
 	{
 		$this->services['services']->register(array(
 			'config' => '\Exedra\Config',

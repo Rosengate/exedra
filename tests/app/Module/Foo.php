@@ -3,9 +3,9 @@ namespace App\Module;
 
 class Foo extends \Exedra\Module\Module
 {
-	public function boot()
+	public function setUp()
 	{
-		parent::boot();
+		parent::setUp();
 
 		$this->services['services']->add('bar', function()
 		{

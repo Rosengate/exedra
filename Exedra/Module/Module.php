@@ -19,7 +19,7 @@ class Module extends \Exedra\Container\Container
 
 		$this->namespace = str_replace('/', '\\', $namespace);
 
-		$this->boot();
+		$this->setUp();
 	}
 
 	public function getPath()
@@ -33,9 +33,9 @@ class Module extends \Exedra\Container\Container
 	}
 
 	/**
-	 * Register modules based components
+	 * Setup dependency registry
 	 */
-	protected function boot()
+	protected function setUp()
 	{
 		$this->services['services']->register(array(
 			'view' => function() {

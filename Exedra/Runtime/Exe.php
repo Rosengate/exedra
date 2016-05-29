@@ -50,7 +50,7 @@ class Exe extends \Exedra\Container\Container
 		$this->initializeServices();
 
 		// initiate service registry
-		$this->serviceRegistry();
+		$this->setUp();
 
 		// Initiate execution handles/middlewares
 		$this->handle();
@@ -80,9 +80,9 @@ class Exe extends \Exedra\Container\Container
 	}
 
 	/**
-	 * Initiate dependency injection container
+	 * Setup dependency registry
 	 */
-	protected function serviceRegistry()
+	protected function setUp()
 	{
 		$this->services['services']->register(array(
 			'view' => function(){ return new \Exedra\View\Factory($this->getModulePath('View'));},
