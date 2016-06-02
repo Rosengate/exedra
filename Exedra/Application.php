@@ -76,6 +76,7 @@ class Application extends \Exedra\Container\Container
 			'url' => function() { return new \Exedra\Factory\Url($this->map, $this->request, $this->config->get('app.url', null), $this->config->get('asset.url', null));},
 			'@session' => '\Exedra\Session\Session',
 			'@flash' => array('\Exedra\Session\Flash', array('self.session')),
+			'wizard' => array('\Exedra\Wizard\Manager', array('self')),
 			'@module' => function(){ return new \Exedra\Module\Registry($this, $this->path['app'], $this->getNamespace());}
 		));
 
