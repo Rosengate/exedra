@@ -271,16 +271,16 @@ class Form
 	*/
 	public function hidden($name = null, $value = null, $attr = null)
 	{
-		return $this->createInput('hidden', $value, $attr);
+		return $this->createInput('hidden', $name, $value, $attr);
 	}
 
 	/**
 	 * Create html checkbox input
 	 * @return Input\Input
 	 */
-	public function checkbox($name = null, $value = null, $status = false)
+	public function checkbox($name = null, $value = null, $status = false, $attr = null)
 	{
-		$input = $this->createInput('checkbox', $value);
+		$input = $this->createInput('checkbox', $name, $value, $attr);
 
 		if($status)
 			$input->attr('checked', true);
