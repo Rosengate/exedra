@@ -85,11 +85,11 @@ class Exe extends \Exedra\Container\Container
 	protected function setUp()
 	{
 		$this->services['services']->register(array(
-			'view' => function(){ return new \Exedra\View\Factory($this->getModulePath('View'));},
-			'controller' => function(){ return new \Exedra\Factory\Controller($this->app->getNamespace(), $this->getModule());},
+			'view' => function(){ return new \Exedra\View\Factory($this->path->create('View'));},
+			'controller' => function(){ return new \Exedra\Factory\Controller($this->app->getNamespace());},
 			'url' => function(){ return new \Exedra\Runtime\Factory\Url($this->app->map, $this->request, $this->config->get('app.url', null), $this->config->get('asset.url', null), $this);},
-			"redirect"=> array("\Exedra\Runtime\Redirect", array('self')),
-			"form"=> array("\Exedra\Runtime\Factory\Form", array('self')),
+			'redirect' => array("\Exedra\Runtime\Redirect", array('self')),
+			'form' => array("\Exedra\Runtime\Factory\Form", array('self')),
 			// thinking of deprecating the asset as service
 			'asset' => function(){ return new \Exedra\Factory\Asset($this->url, $this->app->path['public'], $this->config->get('asset', array()));}
 			));
