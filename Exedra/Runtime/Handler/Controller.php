@@ -11,11 +11,6 @@ class Controller extends HandlerAbstract
 		return false;
 	}
 
-	protected function parameterize($pattern)
-	{
-		return $pattern;
-	}
-
 	public function resolve($pattern)
 	{
 		return function($exe) use($pattern)

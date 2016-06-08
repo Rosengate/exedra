@@ -3,7 +3,7 @@ namespace Exedra\Runtime\Handler;
 
 interface HandlerInterface
 {
-	public function __construct($name, \Exedra\Runtime\Exe $exe);
+	public function __construct(\Exedra\Runtime\Exe $exe);
 
 	/**
 	 * Validate given handler pattern

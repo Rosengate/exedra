@@ -70,14 +70,31 @@ class Handlers
 	{
 		foreach($this->registry as $name => $className)
 		{
-			$handler = isset($this->handlers[$name]) ? $this->handlers[$name] : $this->handlers[$name] = new $className($name, $exe);
+			if(isset($this->handlers[$name]))
+			{
+				$handler = $this->handlers[$name];
+			}
+			else
+			{
+				if(is_string($className))
+				{
+					$handler = new $className($exe);
+				}
+				else if(is_object($className))
+				{
+					if($className instanceof \Closure)
+					{
+						$className($handler = new \Exedra\Runtime\Handler\Handler($exe));
+					}
+				}
+			}
 
 			if($handler->validate($pattern) === true)
 			{
-				$resolve = $handler->prepare($pattern);
+				$resolve = $handler->resolve($pattern);
 
 				if(!(is_callable($resolve)))
-					throw new \Exedra\Exception\InvalidArgumentException('The resolve() method for handler ['.$name.'] must return \Closure or callable');
+					throw new \Exedra\Exception\InvalidArgumentException('The resolve() method for handler ['.get_class($handler).'] must return \Closure or callable');
 
 				return $resolve;
 			}
