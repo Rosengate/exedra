@@ -117,6 +117,24 @@ class Session
 	}
 
 	/**
+	 * Get PHP native session id
+	 * @return string
+	 */
+	public function id()
+	{
+		return session_id();
+	}
+
+	/**
+	 * PHP session_write_close
+	 * @return void
+	 */
+	public function close()
+	{
+		session_write_close();
+	}
+
+	/**
 	 * Destroy session, or only the given key.
 	 * @param string key
 	 * @return \Exedra\Session\Session
