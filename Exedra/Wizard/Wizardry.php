@@ -249,6 +249,16 @@ abstract class Wizardry
 		return $answers[$this->ask(array_merge($choices, array('', 'Option : ')), $choiceNumbers)];
 	}
 
+	public function confirm($question)
+	{
+		$answer = $this->ask($question, array('yes', 'no'));
+
+		if(!in_array($answer, array('yes', 'no')))
+			return $this->confirm($question);
+
+		return in_array($answer, array('yes'));
+	}
+
 	/**
 	 * Tabulize the given table
 	 * @param \Exedra\Wizard\Tools\Table table
