@@ -13,7 +13,7 @@ class Application extends \Exedra\Container\Container
 	{
 		parent::__construct();
 
-		$this->services['providers'] = new \Exedra\Provider\Registry($this);
+		$this->services['provider'] = new \Exedra\Provider\Registry($this);
 		
 		// default the namespace as [App]
 		if(isset($params['namespace']))
@@ -275,8 +275,8 @@ class Application extends \Exedra\Container\Container
 	 */
 	protected function solve($type, $name, array $args = array())
 	{
-		// keep pinging the providers registry.
-		$this->services['providers']->listen($type.'.'.$name);
+		// keep pinging the provider registry.
+		$this->services['provider']->listen($type.'.'.$name);
 
 		if(!$this->services[$type]->has($name))
 		{
