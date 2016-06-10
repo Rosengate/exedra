@@ -4,7 +4,7 @@ class Container implements \ArrayAccess
 {
 	/**
 	 * Container resolved services
-	 * registries (services, factories, callables), resolved services, and publicly registered service
+	 * resolved services, and publicly accessible service
 	 * @var array services
 	 */
 	protected $services = array();
@@ -25,9 +25,9 @@ class Container implements \ArrayAccess
 	{
 		// default container registries
 		$this->services = array(
-			'services' => new \Exedra\Container\Registry,
-			'callables' => new \Exedra\Container\Registry,
-			'factories' => new \Exedra\Container\Registry,
+			'service' => new \Exedra\Container\Registry,
+			'callable' => new \Exedra\Container\Registry,
+			'factory' => new \Exedra\Container\Registry,
 		);
 	}
 
@@ -53,7 +53,7 @@ class Container implements \ArrayAccess
 		if(array_key_exists($name, $this->services))
 			return $this->services[$name];
 
-		return $this->services[$name] = $this->solve('services', $name);
+		return $this->services[$name] = $this->solve('service', $name);
 	}
 
 	/**
@@ -69,7 +69,7 @@ class Container implements \ArrayAccess
 
 		$this->services[$name] = $value;
 
-		$this->services['services']->set($name, true);
+		$this->services['service']->set($name, true);
 	}
 
 	/**
@@ -78,7 +78,7 @@ class Container implements \ArrayAccess
 	 */
 	public function offsetUnset($key)
 	{
-		if(!in_array($key, array('services', 'callables', 'factories')))
+		if(!in_array($key, array('service', 'callable', 'factory')))
 			return;
 
 		unset($this->services[$key]);
@@ -106,7 +106,7 @@ class Container implements \ArrayAccess
 
 		$this->services[$name] = $value;
 
-		$this->services['services']->set($name, true);
+		$this->services['service']->set($name, true);
 	}
 
 	/**
@@ -131,7 +131,7 @@ class Container implements \ArrayAccess
 		if(array_key_exists($name, $this->services))
 			return $this->services[$name];
 
-		return $this->services[$name] = $this->solve('services', $name);
+		return $this->services[$name] = $this->solve('service', $name);
 	}
 
 	/**
@@ -148,7 +148,7 @@ class Container implements \ArrayAccess
 		if(isset($this->invokables[$name]))
 			return call_user_func_array($this->invokables[$name], $args);
 
-		return $this->solve('callables', $name, $args);
+		return $this->solve('callable', $name, $args);
 	}
 
 	/**
@@ -161,7 +161,7 @@ class Container implements \ArrayAccess
 	 */
 	public function create($name, array $args = array())
 	{
-		return $this->solve('factories', $name, $args);
+		return $this->solve('factory', $name, $args);
 	}
 
 	/**
@@ -175,7 +175,7 @@ class Container implements \ArrayAccess
 		if(array_key_exists($name, $this->services))
 			return $this->services[$name];
 
-		return $this->services[$name] = $this->solve('services', $name);
+		return $this->services[$name] = $this->solve('service', $name);
 	}
 
 	/**
@@ -189,13 +189,13 @@ class Container implements \ArrayAccess
 	{
 		switch($type)
 		{
-			case 'services':
+			case 'service':
 				return $this->get($name);
 			break;
-			case 'callables':
+			case 'callable':
 				return $this->__call($name, $args);
 			break;
-			case 'factories':
+			case 'factory':
 				return $this->create($name, $args);
 			break;
 		}
@@ -213,7 +213,7 @@ class Container implements \ArrayAccess
 	{
 		if(!$this->services[$type]->has($name))
 		{
-			if($type == 'callables' && $this->services['services']->has($name))
+			if($type == 'callable' && $this->services['service']->has($name))
 			{
 				// then check on related invokable services
 				$service = $this->get($name);
@@ -283,13 +283,13 @@ class Container implements \ArrayAccess
 									case 'self':
 										$arguments[] = $this->$split[1];
 									break;
-									case 'services':
+									case 'service':
 										$arguments[] = $this->get($split[1]);
 									break;
-									case 'factories':
+									case 'factory':
 										$arguments[] = $this->create($split[1]);
 									break;
-									case 'callables':
+									case 'callable':
 										$arguments[] = $this->__call($split[1]);
 									break;
 									default:

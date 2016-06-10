@@ -66,11 +66,11 @@ class Application extends \Exedra\Container\Container
 	 */
 	protected function setUp()
 	{
-		$this->services['services']->register(array(
+		$this->services['service']->register(array(
 			'config' => '\Exedra\Config',
 			'routing.factory' => function(){ return new \Exedra\Routing\Factory((string) $this->path['routes']);},
 			'map' => function() { return $this['routing.factory']->createLevel();},
-			'runtime' => array('\Exedra\Runtime\Registry', array('factories.runtime.handlers')),
+			'runtime' => array('\Exedra\Runtime\Registry', array('factory.runtime.handlers')),
 			'middleware' => array('\Exedra\Middleware\Registry', array('self.map')),
 			'request' => function(){ return \Exedra\Http\ServerRequest::createFromGlobals();},
 			'url' => function() { return new \Exedra\Factory\Url($this->map, $this->request, $this->config->get('app.url', null), $this->config->get('asset.url', null));},
@@ -80,7 +80,7 @@ class Application extends \Exedra\Container\Container
 			'@module' => function(){ return new \Exedra\Module\Registry($this, $this->path['app'], $this->getNamespace());}
 		));
 
-		$this->services['factories']->register(array(
+		$this->services['factory']->register(array(
 			'runtime.exe' => '\Exedra\Runtime\Exe',
 			'runtime.handlers' => '\Exedra\Runtime\Handlers',
 			'module' => '\Exedra\Module\Module'
@@ -288,7 +288,7 @@ class Application extends \Exedra\Container\Container
 			{
 				$isShared = false;
 
-				if($type == 'callables' && ($this->services['services']->has($name) || $isShared = $this->services['services']->has('@'.$name)))
+				if($type == 'callables' && ($this->services['service']->has($name) || $isShared = $this->services['service']->has('@'.$name)))
 				{
 					$service = $this->get($isShared ? '@'.$name : $name);
 

@@ -21,7 +21,7 @@ class ModuleTest extends PHPUnit_Framework_TestCase
 	{
 		$this->app['module']->configure('Backend', function($module)
 		{
-			$module['services']->add('foo', function()
+			$module['service']->add('foo', function()
 			{
 				return 'bar';
 			});

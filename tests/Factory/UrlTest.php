@@ -32,7 +32,7 @@ class FactoryUrlTest extends PHPUnit_Framework_TestCase
 
 	public function testCurrent()
 	{
-		$this->app['services']['request'] = function()
+		$this->app['service']['request'] = function()
 		{
 			return \Exedra\Http\ServerRequest::createFromArray(array(
 			'method' => 'GET',
@@ -63,7 +63,7 @@ class FactoryUrlTest extends PHPUnit_Framework_TestCase
 			'asset.url' => 'http://example.com/foo/assets'
 			));
 
-		$this->app['services']['request'] = function()
+		$this->app['service']['request'] = function()
 		{
 			return null;
 		};

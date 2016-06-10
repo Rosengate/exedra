@@ -84,7 +84,7 @@ class Exe extends \Exedra\Container\Container
 	 */
 	protected function setUp()
 	{
-		$this->services['services']->register(array(
+		$this->services['service']->register(array(
 			'view' => function(){ return new \Exedra\View\Factory($this->path->create('View'));},
 			'controller' => function(){ return new \Exedra\Factory\Controller($this->app->getNamespace());},
 			'url' => function(){ return new \Exedra\Runtime\Factory\Url($this->app->map, $this->request, $this->config->get('app.url', null), $this->config->get('asset.url', null), $this);},
@@ -552,7 +552,7 @@ class Exe extends \Exedra\Container\Container
 			{
 				$isShared = false;
 
-				if($type == 'callables' && ($this->app['services']->has($name) || $isShared = $this->app['services']->has('@'.$name)))
+				if($type == 'callable' && ($this->app['service']->has($name) || $isShared = $this->app['service']->has('@'.$name)))
 				{
 					$service = $this->app->get($isShared ? '@'.$name : $name);
 

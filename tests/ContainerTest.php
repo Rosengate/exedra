@@ -29,16 +29,16 @@ class ContainerTest extends PHPUnit_Framework_TestCase
 
 	public function testService()
 	{
-		$this->container['services']->add('qux', array('\stdClass'));
+		$this->container['service']->add('qux', array('\stdClass'));
 
 		$this->assertEquals('stdClass', get_class($this->container->qux));
 
-		$this->container['services']->add('foo', function()
+		$this->container['service']->add('foo', function()
 		{
 			return 'foo-bar';
 		});
 
-		$this->container['services']['bar'] = function()
+		$this->container['service']['bar'] = function()
 		{
 			return 'bar-baz';
 		};
@@ -56,7 +56,7 @@ class ContainerTest extends PHPUnit_Framework_TestCase
 
 	public function testCallable()
 	{
-		$this->container['callables']['getSomething'] = function($foo)
+		$this->container['callable']['getSomething'] = function($foo)
 		{
 			return 'something-'.$foo;
 		};
@@ -66,7 +66,7 @@ class ContainerTest extends PHPUnit_Framework_TestCase
 
 	public function testFactory()
 	{
-		$this->container['factories']['form'] = function()
+		$this->container['factory']['form'] = function()
 		{
 			return new \Exedra\Form\Form;
 		};
@@ -76,16 +76,16 @@ class ContainerTest extends PHPUnit_Framework_TestCase
 
 	public function testAutoresolve()
 	{
-		$this->container['services']->add('foo', 'Foo');
+		$this->container['service']->add('foo', 'Foo');
 
-		$this->container['services']->add('bad', function()
+		$this->container['service']->add('bad', function()
 		{
 			return 'qux';
 		});
 
-		$this->container['services']->add('bar', array('Bar', array('services.foo', 'bad')));
+		$this->container['service']->add('bar', array('Bar', array('service.foo', 'bad')));
 
-		$this->container['services']->add('bor', array('Bar', array('foo', 'bad')));
+		$this->container['service']->add('bor', array('Bar', array('foo', 'bad')));
 
 		$this->assertEquals('Bar', get_class($this->container->bar));
 
@@ -96,14 +96,14 @@ class ContainerTest extends PHPUnit_Framework_TestCase
 
 	public function testMergedFactoryArguments()
 	{
-		$this->container['factories']['bar'] = array('Bar', array('factories.foo'));
+		$this->container['factory']['bar'] = array('Bar', array('factory.foo'));
 
-		$this->container['factories']['foo'] = function()
+		$this->container['factory']['foo'] = function()
 		{
 			return new Foo;
 		};
 
-		$this->container['factories']->add('bat', 'Bar');
+		$this->container['factory']->add('bat', 'Bar');
 
 		$bar = $this->container->create('bar', array('baz'));
 
@@ -116,7 +116,7 @@ class ContainerTest extends PHPUnit_Framework_TestCase
 
 	public function testInvokableService()
 	{
-		$this->container['services']->add('foo', function()
+		$this->container['service']->add('foo', function()
 		{
 			return new \App\FooInvokable;
 		});

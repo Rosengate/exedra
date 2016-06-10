@@ -7,7 +7,7 @@ class Foo extends \Exedra\Module\Module
 	{
 		parent::setUp();
 
-		$this->services['services']->add('bar', function()
+		$this->services['service']->add('bar', function()
 		{
 			return 'baz';
 		});

@@ -39,32 +39,32 @@ class ApplicationTest extends PHPUnit_Framework_TestCase
 	{
 		$app = $this->app;
 
-		$app['services']['foo'] = function()
+		$app['service']['foo'] = function()
 		{
 			return 'bar';
 		};
 
-		$app['services']->add('bar', function()
+		$app['service']->add('bar', function()
 		{
 			return 'baz';
 		});
 
-		$app['callables']['foo'] = function($param)
+		$app['callable']['foo'] = function($param)
 		{
 			return 'barz'.$param;
 		};
 
-		$app['callables']->add('bar', function($arg)
+		$app['callable']->add('bar', function($arg)
 		{
 			return 'baz'.$arg;
 		});
 
-		$app['factories']['foo'] = function($param)
+		$app['factory']['foo'] = function($param)
 		{
 			return 'baz'.$param;
 		};
 
-		$app['factories']->add('bar', function()
+		$app['factory']->add('bar', function()
 		{
 			return 'baz';
 		});
@@ -80,16 +80,16 @@ class ApplicationTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals('bazbar', $app->create('foo', array('bar')));
 	}
 
-	public function testSharedServices()
+	public function testSharedService()
 	{
 		$app = $this->app;
 
-		$app['services']['@foo'] = function()
+		$app['service']['@foo'] = function()
 		{
 			return 'bar';
 		};
 
-		$app['services']['@baz'] = function()
+		$app['service']['@baz'] = function()
 		{
 			return new stdClass;
 		};
@@ -111,11 +111,11 @@ class ApplicationTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals('quux', $app->baz->bat);
 	}
 
-	public function testSharedCallables()
+	public function testSharedCallable()
 	{
 		$app = $this->app;
 
-		$app['callables']['@foo'] = function()
+		$app['callable']['@foo'] = function()
 		{
 			return 'bar';
 		};
@@ -127,11 +127,11 @@ class ApplicationTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals($app->foo(), $exe->foo());
 	}
 
-	public function testSharedFactories()
+	public function testSharedFactory()
 	{
 		$app = $this->app;
 
-		$app['factories']['@foo'] = function($bat = 'nul')
+		$app['factory']['@foo'] = function($bat = 'nul')
 		{
 			$obj = new stdClass;
 
@@ -153,7 +153,7 @@ class ApplicationTest extends PHPUnit_Framework_TestCase
 	// {
 	// 	$app = $this->app;
 
-	// 	$app['services']['@qux'] = \App\FooInvokable::class;
+	// 	$app['service']['@qux'] = \App\FooInvokable::class;
 
 	// 	$exe = $app->execute('foo');
 

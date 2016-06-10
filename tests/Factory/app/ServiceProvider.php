@@ -5,7 +5,7 @@ class ServiceProvider implements \Exedra\Provider\ProviderInterface
 {
 	public function register(\Exedra\Application $app)
 	{
-		$app['services']->add('bar', function()
+		$app['service']->add('bar', function()
 		{
 			return 'baz';
 		});

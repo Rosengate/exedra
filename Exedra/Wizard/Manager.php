@@ -86,7 +86,7 @@ class Manager
 	 */
 	public function listen(array $arguments)
 	{
-		if($this->app['factories']->has('wizard.introducer'))
+		if($this->app['factory']->has('wizard.introducer'))
 			$wizard = $this->app->create('wizard.introducer');
 		else
 			$wizard = new \Exedra\Wizard\Introducer($this, $this->app);

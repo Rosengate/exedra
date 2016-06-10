@@ -54,13 +54,13 @@ class Registry
 				{
 					$dependency = $type;
 					
-					$type = 'services';
+					$type = 'service';
 				}
 				else
 				{
-					if(!in_array($type, 'services', 'callables', 'factories'))
+					if(!in_array($type, 'service', 'callable', 'factory'))
 					{
-						$type = 'services';
+						$type = 'service';
 
 						$dependency = $name;
 					}

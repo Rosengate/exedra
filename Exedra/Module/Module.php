@@ -37,7 +37,7 @@ class Module extends \Exedra\Container\Container
 	 */
 	protected function setUp()
 	{
-		$this->services['services']->register(array(
+		$this->services['service']->register(array(
 			'view' => function() {
 				return new \Exedra\View\Factory($this->getPath()->create('View'));
 			},
