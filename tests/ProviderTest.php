@@ -8,9 +8,9 @@ class ProviderTest extends PHPUnit_Framework_TestCase
 
 	public function testRegister()
 	{
-		$this->app['providers']->add(\App\FooProvider::class);
+		$this->app['provider']->add(\App\FooProvider::class);
 
-		$this->app['providers']->register(new \App\ServiceProvider);
+		$this->app['provider']->register(new \App\ServiceProvider);
 
 		$this->assertEquals('bar', $this->app->get('foo'));
 
@@ -19,11 +19,11 @@ class ProviderTest extends PHPUnit_Framework_TestCase
 
 	public function testLateRegistry()
 	{
-		$this->app['providers']->flagAsLateRegistry();
+		$this->app['provider']->flagAsLateRegistry();
 
-		$this->app['providers']->add(\App\FooProvider::class);
+		$this->app['provider']->add(\App\FooProvider::class);
 
-		$this->app['providers']->boot();
+		$this->app['provider']->boot();
 
 		$this->assertEquals('bar', $this->app->get('foo'));
 	}
@@ -63,7 +63,7 @@ class ProviderTest extends PHPUnit_Framework_TestCase
 
 	public function testDeferredProvider()
 	{
-		$this->app['providers']->add(\App\FooProvider::class, array('foo'));
+		$this->app['provider']->add(\App\FooProvider::class, array('foo'));
 
 		$this->assertEquals('bar', $this->app->foo);
 	}
