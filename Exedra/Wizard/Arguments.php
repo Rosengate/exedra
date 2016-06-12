@@ -10,6 +10,15 @@ class Arguments implements \ArrayAccess
 		$this->data = $arguments;
 	}
 
+	/**
+	 * Clone with a given arguments
+	 * @param array arguments
+	 */
+	public function with(array $arguments)
+	{
+		return new static(array_merge($this->data, $arguments));
+	}
+
 	public function validate(array $commandArguments)
 	{
 		$unfounds = array();
