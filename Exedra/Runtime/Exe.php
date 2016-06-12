@@ -85,7 +85,7 @@ class Exe extends \Exedra\Container\Container
 	protected function setUp()
 	{
 		$this->services['service']->register(array(
-			'view' => function(){ return new \Exedra\View\Factory($this->path->create('View'));},
+			'view' => function(){ return new \Exedra\View\Factory($this->path['app']->create('View'));},
 			'controller' => function(){ return new \Exedra\Factory\Controller($this->app->getNamespace());},
 			'url' => function(){ return new \Exedra\Runtime\Factory\Url($this->app->map, $this->request, $this->config->get('app.url', null), $this->config->get('asset.url', null), $this);},
 			'redirect' => array("\Exedra\Runtime\Redirect", array('self')),
