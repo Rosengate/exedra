@@ -36,7 +36,7 @@ class Factory
 	{
 		$this->lookupPath = rtrim($lookupPath, '/\\');
 
-		$this->registerRoutingComponents();
+		$this->setUp();
 	}
 
 	/**
@@ -51,7 +51,7 @@ class Factory
 	/**
 	 * Register basic components [finding, route, level]
 	 */
-	protected function registerRoutingComponents()
+	protected function setUp()
 	{
 		$this->register(array(
 			'finding' => '\Exedra\Routing\Finding',
