@@ -123,7 +123,7 @@ class Level extends \ArrayIterator
 	public function addRoutes(array $routes)
 	{
 		foreach($routes as $name => $routeData)
-			$this->addRoute($this->factory->createRoute($this, $name, $routeData));
+			$this->addRoute($this->routes[$name] = $this->factory->createRoute($this, $name, $routeData));
 
 		return $this;
 	}
