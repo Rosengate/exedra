@@ -288,7 +288,7 @@ class Application extends \Exedra\Container\Container
 			{
 				$isShared = false;
 
-				if($type == 'callables' && ($this->services['service']->has($name) || $isShared = $this->services['service']->has('@'.$name)))
+				if($type == 'callable' && ($this->services['service']->has($name) || $isShared = $this->services['service']->has('@'.$name)))
 				{
 					$service = $this->get($isShared ? '@'.$name : $name);
 
