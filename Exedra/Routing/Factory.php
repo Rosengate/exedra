@@ -43,7 +43,7 @@ class Factory
 	 * Get routes lookup path
 	 * @return string
 	 */
-	public function geLookupPath()
+	public function getLookupPath()
 	{
 		return $this->lookupPath;
 	}
