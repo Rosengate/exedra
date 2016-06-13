@@ -48,7 +48,7 @@ class Level extends \ArrayIterator
 	public function setFactory($factory)
 	{
 		if(is_string($factory))
-			$factory = new $factory($this->factory->getApp());
+			$factory = new $factory($this->factory->getLookupPath());
 
 		if(!($factory instanceof \Exedra\Routing\Factory))
 			throw new \Exedra\Exception\InvalidArgumentException('The map factory must be the the type of [\Exedra\Routing\Factory].');
