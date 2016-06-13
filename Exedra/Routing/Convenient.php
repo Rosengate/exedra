@@ -56,12 +56,15 @@ class Convenient extends \Exedra\Routing\Level
 	 * @param string name
 	 * @return \Exedra\Routing\Route
 	 */
-	public function __invoke($name = null)
+	public function offsetGet($name)
 	{
+		if(isset($this->routeCache[$name]))
+			return $this->routeCache[$name];
+
 		$route = $this->factory->createRoute($this, $name, array());
 
 		$this->addRoute($route);
 
-		return $route;
+		return $this->routeCache[$name] = $route;
 	}
 }
