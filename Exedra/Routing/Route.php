@@ -707,15 +707,6 @@ class Route
 	}
 
 	/**
-	 * Alias to setMethod
-	 * @param string method
-	 */
-	public function method($method)
-	{
-		return $this->setMethod($method);
-	}
-
-	/**
 	 * Set config for this route.
 	 * @param array config
 	 */
@@ -953,6 +944,18 @@ class Route
 	public function isRequestable()
 	{
 		return $this->getPath() !== false;
+	}
+
+	/**
+	 * Alias to setMethod with path settable
+	 * @param string method
+	 */
+	public function method($method, $path = null)
+	{
+		if($path !== null)
+			$this->setPath($path);
+
+		return $this->setMethod($method);
 	}
 
 	/**

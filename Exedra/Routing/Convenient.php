@@ -4,27 +4,19 @@ namespace Exedra\Routing;
 class Convenient extends \Exedra\Routing\Level
 {
 	/**
-	 * Convenient route adding method
+	 * Create a route by given methods
 	 * @param string|array method
 	 * @param string path
-	 * @return \Exedra\Routing\Convenient
+	 * @return \Exedra\Routing\Route
 	 */
-	public function add($method = null, $path = null, $params = null)
+	public function method($method = null, $path = '/')
 	{
 		$parameters = array();
 
-		$parameters['path'] = $path === null ? '' : $path;
+		$parameters['path'] = $path;
 
 		if($method)
 			$parameters['method'] = $method;
-
-		if($params)
-		{
-			if(is_array($params))
-				$parameters = array_merge($parameters, $params);
-			else
-				$parameters['execute'] = $params;
-		}
 
 		$route = $this->factory->createRoute($this, null, $parameters);
 
@@ -33,52 +25,43 @@ class Convenient extends \Exedra\Routing\Level
 		return $route;
 	}
 
-	public function get($path = null, $params = null)
+	public function get($path = null)
 	{
-		return $this->add('get', $path, $params);
+		return $this->method('get', $path);
 	}
 
-	public function post($path = null, $params = null)
+	public function post($path = null)
 	{
-		return $this->add('post', $path, $params);
+		return $this->method('post', $path);
 	}
 
-	public function put($path = null, $params = null)
+	public function put($path = null)
 	{
-		return $this->add('put', $path, $params);
+		return $this->method('put', $path);
 	}
 
-	public function delete($path = null, $params = null)
+	public function delete($path = null)
 	{
-		return $this->add('delete', $path, $params);
+		return $this->method('delete', $path);
 	}
 
-	public function any($path = null, $params = null)
+	public function any($path = null)
 	{
-		return $this->add(null, $path, $params);
+		return $this->method(null, $path);
 	}
 
 	/**
-	 * Create an empty route with the given name|null
+	 * A level invoke to conveniently
+	 * create an empty route with the optional name
 	 * @param string name
 	 * @return \Exedra\Routing\Route
 	 */
-	public function name($name = null)
+	public function __invoke($name = null)
 	{
 		$route = $this->factory->createRoute($this, $name, array());
 
 		$this->addRoute($route);
 
 		return $route;
-	}
-
-	/**
-	 * Alias to name()
-	 * @param string name
-	 * @return \Exedra\Routing\Route
-	 */
-	public function __invoke($name = null)
-	{
-		return $this->name($name);
 	}
 }
