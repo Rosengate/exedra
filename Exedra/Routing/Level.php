@@ -9,10 +9,10 @@ class Level extends \ArrayIterator
 	public $route;
 
 	/**
-	 * Route finding cache
-	 * @var array routeCache
+	 * Cached routes
+	 * @var array routes
 	 */
-	protected $routeCache = array();
+	protected $routes = array();
 
 	/**
 	 * Level based middlewares
@@ -122,7 +122,7 @@ class Level extends \ArrayIterator
 	 */
 	public function addRoutes(array $routes)
 	{
-		foreach($routes as $name=>$routeData)
+		foreach($routes as $name => $routeData)
 			$this->addRoute($this->factory->createRoute($this, $name, $routeData));
 
 		return $this;
@@ -238,10 +238,10 @@ class Level extends \ArrayIterator
 	 */
 	public function findRoute($name)
 	{
-		if(isset($this->routeCache[$name]))
-			return $this->routeCache[$name];
+		if(isset($this->routes[$name]))
+			return $this->routes[$name];
 		else
-			return $this->routeCache[$name] = $this->findRouteRecursively($name);
+			return $this->routes[$name] = $this->findRouteRecursively($name);
 	}
 
 	/**
