@@ -1,6 +1,6 @@
 <?php return function($group)
 {
-	$group->get('/')->name('bad')->execute(function()
+	$group['bad']->get('/')->execute(function()
 	{
 		return 'baz';
 	});

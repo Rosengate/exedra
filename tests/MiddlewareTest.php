@@ -26,7 +26,7 @@ class MiddlewareTest extends PHPUnit_Framework_TestCase
 	{
 		$this->map->middleware('global');
 
-		$this->map->any('/')->name('foo')->middleware('limiter')->execute(function(){});
+		$this->map['foo']->any('/')->middleware('limiter')->execute(function(){});
 
 		$this->map->addRoutes(array(
 			'bar' => array(

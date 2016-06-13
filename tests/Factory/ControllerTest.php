@@ -12,14 +12,14 @@ class FactoryControllerTest extends PHPUnit_Framework_TestCase
 	{
 		$context = $this;
 
-		$this->app->map->any('/[:controller?]')->name('fooRoute')->execute(function($exe)
+		$this->app->map['fooRoute']->any('/[:controller?]')->execute(function($exe)
 		{
 			return $exe->controller->execute(array($exe->param('controller', 'Foo'), array($exe)), 'bar');
 		});
 
-		$this->app->map->any('/[:controller?]')->name('barRoute')->execute('controller=Foo@bar');
+		$this->app->map['barRoute']->any('/[:controller?]')->execute('controller=Foo@bar');
 
-		$this->app->map->any('/[:controller?]')->name('bazRoute')->execute(function($exe)
+		$this->app->map['bazRoute']->any('/[:controller?]')->execute(function($exe)
 		{
 			return $exe->controller->create('Foo', array($exe));
 		});

@@ -12,7 +12,7 @@ class ImmutabilityTest extends PHPUnit_Framework_TestCase
 
 		$this->app->config->set('qux', 'tux');
 
-		$this->app->map->get(false)->name('fooRoute')->execute(function($exe)
+		$this->app->map['fooRoute']->get(false)->execute(function($exe)
 		{
 			$exe->config->set('foo', 'baz');
 		});

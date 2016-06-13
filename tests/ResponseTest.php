@@ -21,7 +21,7 @@ class ResponseTest extends PHPUnit_Framework_TestCase
 	{
 		$test = $this;
 
-		$this->app->map->any('/')->name('foo')->execute(function($exe) use($test)
+		$this->app->map['foo']->any('/')->execute(function($exe) use($test)
 		{
 			$exe->redirect->url('http://example.com');
 
@@ -36,7 +36,7 @@ class ResponseTest extends PHPUnit_Framework_TestCase
 			$test->assertEquals('/foo', $exe->response->getHeaderLine('location'));
 		});
 
-		$this->app->map->any('/foo')->name('bar')->execute(function()
+		$this->app->map['bar']->any('/foo')->execute(function()
 		{
 			
 		});

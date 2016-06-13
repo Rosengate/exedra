@@ -610,7 +610,7 @@ class Route
 	 * Refresh absolute name, everytime name changed.
 	 * @param string name
 	 */
-	public function setName($name)
+	protected function setName($name)
 	{
 		$this->name = $name;
 
@@ -629,19 +629,6 @@ class Route
 		$name = $this->name;
 
 		$this->absoluteName = $level->getUpperRoute() ? $level->getUpperRoute()->getAbsoluteName().'.'.$name : $name;
-	}
-
-	/**
-	 * Alias to setName
-	 * @param string name
-	 */
-	public function name($name)
-	{
-		$this->name = $name;
-
-		$this->refreshAbsoluteName();
-
-		return $this;
 	}
 
 	/**

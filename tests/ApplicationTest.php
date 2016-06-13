@@ -5,7 +5,7 @@ class ApplicationTest extends PHPUnit_Framework_TestCase
 	{
 		$this->app = new \Exedra\Application(__DIR__.'/Factory');
 
-		$this->app->map->any('/')->name('foo')->execute(function($exe)
+		$this->app->map['foo']->any('/')->execute(function($exe)
 		{
 			return 'bar';
 		});
