@@ -954,5 +954,74 @@ class Route
 	{
 		return $this->getPath() !== false;
 	}
-}
 
+	/**
+	 * Set method to GET and path
+	 * @param string
+	 * @return self
+	 */
+	public function get($path = '/')
+	{
+		$this->setMethod('GET');
+
+		$this->setPath($path);
+
+		return $this;
+	}
+
+	/**
+	 * Set method to POST and path
+	 * @param string path
+	 * @return self
+	 */
+	public function post($path = '/')
+	{
+		$this->setMethod('POST');
+
+		$this->setPath($path);
+
+		return $this;
+	}
+
+	/**
+	 * Set method to PUT and path
+	 * @param string path
+	 * @return self
+	 */
+	public function put($path = '/')
+	{
+		$this->setMethod('PUT');
+
+		$this->setPath($path);
+
+		return $this;
+	}
+
+	/**
+	 * Set method to DELETE and path
+	 * @param string path
+	 * @return self
+	 */
+	public function delete($path = '/')
+	{
+		$this->setMethod('DELETE');
+
+		$this->setPath($path);
+
+		return $this;
+	}
+
+	/**
+	 * Set method to any method and path
+	 * @param string path
+	 * @return self
+	 */
+	public function any($path = '/')
+	{
+		$this->setMethod('ANY');
+
+		$this->setPath($path);
+
+		return $this;
+	}
+}

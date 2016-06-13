@@ -57,4 +57,28 @@ class Convenient extends \Exedra\Routing\Level
 	{
 		return $this->add(null, $path, $params);
 	}
+
+	/**
+	 * Create an empty route with the given name|null
+	 * @param string name
+	 * @return \Exedra\Routing\Route
+	 */
+	public function name($name = null)
+	{
+		$route = $this->factory->createRoute($this, $name, array());
+
+		$this->addRoute($route);
+
+		return $route;
+	}
+
+	/**
+	 * Alias to name()
+	 * @param string name
+	 * @return \Exedra\Routing\Route
+	 */
+	public function __invoke($name = null)
+	{
+		return $this->name($name);
+	}
 }
