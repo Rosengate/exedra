@@ -33,9 +33,11 @@ class Route
 	 * - module
 	 * - config
 	 * - base
+	 * - requestable
 	 */
 	protected $properties = array(
 		'path' => '',
+		'requestable' => true,
 		'middleware' => array()
 		);
 
@@ -308,16 +310,16 @@ class Route
 				$value = $request->getMethod();
 				// return false because method doesn't exist.
 				if(!in_array(strtolower($value), $this->getProperty('method')))
-					return array('route'=> false, 'parameter'=> false, 'continue'=> false);
+					return array('route' => false, 'parameter' => false, 'continue' => false);
 
 				break;
 				case 'path':
 				$result = $this->validatePath($path);
 
 				if(!$result['matched'])
-					return array('route'=>false, 'parameter'=> $result['parameter'], 'continue'=> $result['continue']);
+					return array('route' =>false, 'parameter' => $result['parameter'], 'continue' => $result['continue']);
 
-				return array('route'=> $this, 'parameter'=> $result['parameter'], 'continue'=> $result['continue']);
+				return array('route' => $this, 'parameter' => $result['parameter'], 'continue' => $result['continue']);
 				break;
 				case 'ajax':
 				if($request->isAjax() != $this->getProperty('ajax'))
@@ -340,6 +342,9 @@ class Route
 		$continue = true;
 
 		$routePath = $this->getProperty('path');
+
+		if($this->getProperty('requestable') === false)
+			return false;
 
 		if($routePath === false)
 			return false;
@@ -682,13 +687,12 @@ class Route
 	 */
 	public function setMethod($method)
 	{
-		if(!is_array($method))
+		if($method == 'any')
+			$method = array('get', 'post', 'put', 'delete');
+		else if(!is_array($method))
 			$method = explode(',', $method);
 
 		$method = array_map(function($value){return trim(strtolower($value));}, $method);
-	
-		if($method == 'any')
-			$method = array('get', 'post', 'put', 'delete');
 	
 		$this->setProperty('method', $method);
 	}
@@ -930,7 +934,29 @@ class Route
 	 */
 	public function isRequestable()
 	{
-		return $this->getPath() !== false;
+		return $this->getPath !== false && $this->getProperty('requestable') === true;
+	}
+
+	/**
+	 * Alias to setRequestable
+	 * @param bool bool
+	 * @return self
+	 */
+	public function requestable($flag = true)
+	{
+		return $this->setRequestable($flag);
+	}
+
+	/**
+	 * Set whether route is requestable / dispatchable
+	 * @param bool flag
+	 * @return self
+	 */
+	public function setRequestable($flag)
+	{
+		$this->setProperty('requestable', $flag);
+
+		return $this;
 	}
 
 	/**
@@ -1008,7 +1034,7 @@ class Route
 	 */
 	public function any($path = '/')
 	{
-		$this->setMethod('ANY');
+		$this->setMethod('any');
 
 		$this->setPath($path);
 
