@@ -140,9 +140,20 @@ class Registry implements \ArrayAccess
 	/**
 	 * Clear registry
 	 */
-	public function clear()
+	public function clear($name = null)
 	{
-		$this->data = array();
+		if($name)
+		{
+			unset($this->data[$name]);
+
+			unset($this->filters[$name]);
+		}
+		else
+		{
+			$this->data = array();
+
+			$this->filters = array();
+		}
 	}
 }
 

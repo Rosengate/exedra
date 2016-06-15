@@ -88,6 +88,7 @@ class Application extends \Exedra\Container\Container
 			'module' => '\Exedra\Module\Module',
 		));
 
+		// Application module as a default Module registered
 		$this->services['service']->on('module', function(\Exedra\Module\Registry $registry)
 		{
 			$registry->register('Application', '\Exedra\Module\Application');
