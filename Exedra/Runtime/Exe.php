@@ -85,8 +85,8 @@ class Exe extends \Exedra\Container\Container
 	protected function setUp()
 	{
 		$this->services['service']->register(array(
-			'view' => function(){ return new \Exedra\View\Factory($this->path['app']->create('View'));},
-			'controller' => function(){ return new \Exedra\Factory\Controller($this->app->getNamespace());},
+			'view' => function(){ return $this->module['Application']->view;},
+			'controller' => function(){ return $this->module['Application']->controller;},
 			'url' => function(){ return new \Exedra\Runtime\Factory\Url($this->app->map, $this->request, $this->config->get('app.url', null), $this->config->get('asset.url', null), $this);},
 			'redirect' => array("\Exedra\Runtime\Redirect", array('self')),
 			'form' => array("\Exedra\Runtime\Factory\Form", array('self')),
@@ -570,6 +570,6 @@ class Exe extends \Exedra\Container\Container
 			$registry = $this->services[$type]->get($name);
 		}
 
-		return $this->resolve($name, $registry, $args);
+		return $this->filter($type, $name, $this->resolve($name, $registry, $args));
 	}
 }

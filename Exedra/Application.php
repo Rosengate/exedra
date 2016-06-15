@@ -77,14 +77,21 @@ class Application extends \Exedra\Container\Container
 			'@session' => '\Exedra\Session\Session',
 			'@flash' => array('\Exedra\Session\Flash', array('self.session')),
 			'wizard' => array('\Exedra\Wizard\Manager', array('self')),
-			'@module' => function(){ return new \Exedra\Module\Registry($this, $this->path['app'], $this->getNamespace());}
+			'@module' => function(){
+				return new \Exedra\Module\Registry($this, $this->path['app'], $this->getNamespace());
+			}
 		));
 
 		$this->services['factory']->register(array(
 			'runtime.exe' => '\Exedra\Runtime\Exe',
 			'runtime.handlers' => '\Exedra\Runtime\Handlers',
-			'module' => '\Exedra\Module\Module'
+			'module' => '\Exedra\Module\Module',
 		));
+
+		$this->services['service']->on('module', function(\Exedra\Module\Registry $registry)
+		{
+			$registry->register('Application', '\Exedra\Module\Application');
+		});
 	}
 
 	/**
@@ -306,6 +313,6 @@ class Application extends \Exedra\Container\Container
 			$registry = $this->services[$type]->get($name);
 		}
 
-		return $this->resolve($name, $registry, $args);
+		return $this->filter($type, $name, $this->resolve($name, $registry, $args));
 	}
 }

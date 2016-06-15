@@ -36,10 +36,10 @@ class Registry implements \ArrayAccess
 	protected $registry = array();
 
 	/**
-	 * List of module configures
-	 * @var array configures
+	 * List of module filters
+	 * @var array filters
 	 */
-	protected $configures = array();
+	protected $filters = array();
 
 	public function __construct(\Exedra\Application $app, \Exedra\Path $path, $baseNamespace = null)
 	{
@@ -102,9 +102,9 @@ class Registry implements \ArrayAccess
 			$namespace = $this->baseNamespace.'\\'.$namespace;
 
 		if($class)
-			return new $class($this->app, $path, $namespace);
+			return new $class($this->app, $namespace, $path);
 		else
-			return $this->app->create('module', array($this->app, $path, $namespace));
+			return $this->app->create('module', array($this->app, $namespace, $path));
 	}
 
 	/**
@@ -114,33 +114,34 @@ class Registry implements \ArrayAccess
 	 * @param string name
 	 * @param \Closure configure
 	 */
-	public function configure($name, \Closure $callback)
+	public function configure($name, \Closure $filter)
 	{
 		if(!isset($this->modules[$name]))
 		{
-			$this->configures[$name][] = $callback;
+			$this->filters[$name][] = $filter;
 
 			return;
 		}
 
-		$callback($this->modules[$name]);
+		$filter($this->modules[$name]);
 	}
 
 	/**
 	 * Register a module
-	 * @param string name
+	 * @param string name assumed as the namespace
 	 * @param mixed
 	 */
 	public function register($name, $resolve)
 	{
-		if($resolve instanceof \Exedra\Module\Module)
-			return $this->modules[$name] = $resolve;
-
 		$this->registry[$name] = $resolve;
 	}
 
 	/**
-	 * Get/resolve module
+	 * Get or resolve and configure module
+	 * - If there's no registry for the module, it'll do a default instantiation
+	 * - Else, if it's an object, and an instanceof \Exedra\Module\Module. It's good.
+	 * - Else, if the registry is a string. It'll be expected as class name of a type of \Exedra\Module\Module
+	 * - Else, if it's closure, it'll expect the returned one a type of \Exedra\Module\Module
 	 * @param string name
 	 * @return \Exedra\Module\Module
 	 */
@@ -158,6 +159,10 @@ class Registry implements \ArrayAccess
 			// resolve
 			$registry = $this->registry[$name];
 
+			if(is_object($registry) && $registry instanceof \Exedra\Module\Module)
+			{
+				$module = $registry;
+			}
 			// expect a class name
 			if(is_string($registry))
 			{
@@ -169,17 +174,17 @@ class Registry implements \ArrayAccess
 			}
 			else
 			{
-				throw new \Exedra\Exception\Exception('Module registry must be either String or \Closure');
+				throw new \Exedra\Exception\Exception('Module registry must be either String, \Closure, or type of \Exedra\Module\Module');
 			}
 
 			if(!$module instanceof \Exedra\Module\Module)
 				throw new \Exedra\Exception\InvalidArgumentException('Resolve of module ['.$name.'] must be type of \Exedra\Module\Module');
 		}
 
-		// resolves with the configures.
-		if(isset($this->configures[$name]))
+		// resolves with the filters.
+		if(isset($this->filters[$name]))
 		{
-			foreach($this->configures[$name] as $callback)
+			foreach($this->filters[$name] as $callback)
 				$callback($module);
 		}
 

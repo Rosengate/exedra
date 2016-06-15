@@ -5,9 +5,25 @@ class Registry implements \ArrayAccess
 {
 	protected $data = array();
 
+	/**
+	 * List of configures on dependency resolve
+	 * @param array configures
+	 */
+	protected $filters = array();
+
 	public function __construct(array $registry = array())
 	{
 		$this->data = $registry;
+	}
+
+	public function on($name, \Closure $callable)
+	{
+		$this->filters[$name][] = $callable;
+	}
+
+	public function getFilters($name)
+	{
+		return isset($this->filters[$name]) ? $this->filters[$name] : array();
 	}
 
 	/**

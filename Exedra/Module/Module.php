@@ -9,22 +9,15 @@ class Module extends \Exedra\Container\Container
 	 */
 	protected $namespace;
 
-	public function __construct(\Exedra\Application $app, \Exedra\Path $path, $namespace = null)
+	public function __construct(\Exedra\Application $app, $namespace, \Exedra\Path $path)
 	{
 		parent::__construct();
 
 		$this->services['app'] = $app;
 
-		$this->services['path'] = $path;
-
 		$this->namespace = str_replace('/', '\\', $namespace);
 
-		$this->setUp();
-	}
-
-	public function getPath()
-	{
-		return $this->path;
+		$this->setUp($path);
 	}
 
 	public function getNamespace()
@@ -35,11 +28,14 @@ class Module extends \Exedra\Container\Container
 	/**
 	 * Setup dependency registry
 	 */
-	protected function setUp()
+	protected function setUp(\Exedra\Path $path)
 	{
 		$this->services['service']->register(array(
+			'path' => function() use($path) {
+				return $path;
+			},
 			'view' => function() {
-				return new \Exedra\View\Factory($this->getPath()->create('View'));
+				return new \Exedra\View\Factory($this->path->create('View'));
 			},
 			'controller' => function() {
 				return new \Exedra\Factory\Controller($this->getNamespace());

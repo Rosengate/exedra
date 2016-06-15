@@ -42,21 +42,6 @@ class Container implements \ArrayAccess
 	}
 
 	/**
-	 * Get service
-	 * If has none, find in services registry.
-	 * Alias to get()
-	 * @param string key
-	 * @return \Exedra\Container\Registry
-	 */
-	public function offsetGet($name)
-	{
-		if(array_key_exists($name, $this->services))
-			return $this->services[$name];
-
-		return $this->services[$name] = $this->solve('service', $name);
-	}
-
-	/**
 	 * Set service
 	 * alias to __set
 	 * @param string 
@@ -121,6 +106,20 @@ class Container implements \ArrayAccess
 
 	/**
 	 * Get service
+	 * If has none, resolve
+	 * @param string name
+	 * @return mixed
+	 */
+	public function get($name)
+	{
+		if(array_key_exists($name, $this->services))
+			return $this->services[$name];
+
+		return $this->services[$name] = $this->solve('service', $name);
+	}
+
+	/**
+	 * Get service
 	 * If has none, find in services registry.
 	 * Alias to get()
 	 * @param string name
@@ -128,10 +127,19 @@ class Container implements \ArrayAccess
 	 */
 	public function __get($name)
 	{
-		if(array_key_exists($name, $this->services))
-			return $this->services[$name];
+		return $this->get($name);
+	}
 
-		return $this->services[$name] = $this->solve('service', $name);
+	/**
+	 * Get service
+	 * If has none, find in services registry.
+	 * Alias to get()
+	 * @param string key
+	 * @return \Exedra\Container\Registry
+	 */
+	public function offsetGet($name)
+	{
+		return $this->get($name);
 	}
 
 	/**
@@ -162,20 +170,6 @@ class Container implements \ArrayAccess
 	public function create($name, array $args = array())
 	{
 		return $this->solve('factory', $name, $args);
-	}
-
-	/**
-	 * Get service
-	 * If has none, find in services registry
-	 * @param string name
-	 * @return mixed
-	 */
-	public function get($name)
-	{
-		if(array_key_exists($name, $this->services))
-			return $this->services[$name];
-
-		return $this->services[$name] = $this->solve('service', $name);
 	}
 
 	/**
@@ -232,7 +226,15 @@ class Container implements \ArrayAccess
 
 		$registry = $this->services[$type]->get($name);
 
-		return $this->resolve($name, $registry, $args);
+		return $this->filter($type, $name, $this->resolve($name, $registry, $args));
+	}
+
+	protected function filter($type, $name, $resolve)
+	{
+		foreach($this->services[$type]->getFilters($name) as $filter)
+			$filter($resolve);
+
+		return $resolve;
 	}
 
 	/**

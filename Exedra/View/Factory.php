@@ -14,10 +14,16 @@ class Factory
 	protected $path;
 
 	/**
-	 * Default datas for this view.
-	 * @var array
+	 * Default datas for created views
+	 * @var array defaultData
 	 */
 	protected $defaultData = array();
+
+	/**
+	 * Cached views
+	 * @var array views
+	 */
+	protected $views = array();
 
 	public function __construct(\Exedra\Path $path)
 	{
@@ -103,5 +109,13 @@ class Factory
 		}
 
 		return $this;
+	}
+
+	public function offsetGet($path)
+	{
+		if(isset($this->views[$path]))
+			return $this->views[$path];
+
+		return $this->views[$path] = $this->create($path);
 	}
 }
