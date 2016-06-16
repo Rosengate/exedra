@@ -38,7 +38,8 @@ class Route
 	protected $properties = array(
 		'path' => '',
 		'requestable' => true,
-		'middleware' => array()
+		'middleware' => array(),
+		'execute' => null
 		);
 
 	/**
