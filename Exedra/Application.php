@@ -46,6 +46,8 @@ class Application extends \Exedra\Container\Container
 
 		$path->register('routes', isset($params['path.routes']) ? $params['path.routes'] : $path['app']->to('Routes'), true);
 
+		$path->register('module', isset($params['path.module']) ? $params['path.module'] : $path['app']);
+
 		// autoload the current app folder.
 		$path['app']->autoloadPsr4($this->namespace, '');
 
@@ -78,7 +80,7 @@ class Application extends \Exedra\Container\Container
 			'@flash' => array('\Exedra\Session\Flash', array('self.session')),
 			'wizard' => array('\Exedra\Wizard\Manager', array('self')),
 			'@module' => function(){
-				return new \Exedra\Module\Registry($this, $this->path['app'], $this->getNamespace());
+				return new \Exedra\Module\Registry($this, $this->path['module'], $this->getNamespace());
 			}
 		));
 
