@@ -5,7 +5,7 @@ class Controller extends HandlerAbstract
 {
 	public function validate($pattern)
 	{
-		if(strpos($pattern, "controller=") === 0)
+		if(is_string($pattern) && strpos($pattern, "controller=") === 0)
 			return true;
 
 		return false;

@@ -1,59 +1,16 @@
 <?php
-namespace Exedra\Runtime;
+namespace Exedra\Runtime\Handler;
 
 /**
  * Handle list of registered execution handler
  */
-class Handlers
+class Resolver
 {
-	/**
-	 * Application instance
-	 * @var \Exedra\Application
-	 */
-	protected $app;
-
-	/**
-	 * Registry of execution bindable in application layer.
-	 * @var array registry
-	 */
-	protected $registry = array();
-
 	/**
 	 * List of instantiated handlers
 	 * @var array handlers
 	 */
 	protected $handlers = array();
-
-	public function __construct()
-	{
-		$this->registerDefaultHandlers();
-	}
-
-	protected function registerDefaultHandlers()
-	{
-		$this->register('closure', '\Exedra\Runtime\Handler\Closure');
-	}
-
-	/**
-	 * Register execution handler
-	 * @param string name
-	 * @param string class
-	 * @return self
-	 */
-	public function register($name, $class)
-	{
-		$this->registry[$name] = $class;
-
-		return $this;
-	}
-
-	/**
-	 * Alias for register()
-	 */
-	public function add($name, $class)
-	{
-		return $this->register($name, $class);
-	}
 
 	/**
 	 * Resolve a handler
@@ -66,7 +23,7 @@ class Handlers
 	 */
 	public function resolve(\Exedra\Runtime\Exe $exe, $pattern, array $handlers = array())
 	{
-		foreach(array_merge($this->registry, $handlers) as $name => $className)
+		foreach($handlers as $name => $className)
 		{
 			if(isset($this->handlers[$name]))
 			{

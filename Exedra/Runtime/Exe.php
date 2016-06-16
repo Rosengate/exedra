@@ -107,8 +107,10 @@ class Exe extends \Exedra\Container\Container
 		// resolve registry
 		$this->middlewareRegistry->resolve($this, $this->callStack);
 
+		$resolver = $this->app->create('handler.resolver');
+
 		// add final handle
-		$this->callStack[] = $this->app->getRuntimeRegistry()->resolve($this, $this->route->getProperty('execute'), $this->finding->getHandlers());
+		$this->callStack[] = $resolver->resolve($this, $this->route->getProperty('execute'), $this->finding->getHandlers());
 
 		// first handle.
 		$handle = reset($this->callStack);

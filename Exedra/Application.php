@@ -4,6 +4,8 @@ class Application extends \Exedra\Container\Container
 {
 	protected $namespace = 'App';
 
+	protected $failRoute = null;
+
 	/**
 	 * Create a new application
 	 * @param string|array params [if string, expect root directory, else array of directories, and configuration]
@@ -22,6 +24,8 @@ class Application extends \Exedra\Container\Container
 		$this->setUpPath(is_array($params) ? $params : array('path.root' => $params));
 		
 		$this->setUp();
+
+		$this->setUpHandlers();
 	}
 
 	/**
@@ -60,7 +64,7 @@ class Application extends \Exedra\Container\Container
 	 */
 	public function setFailRoute($routename)
 	{
-		$this->runtime->setFailRoute($routename);
+		$this->failRoute = $routename;
 	}
 
 	/**
@@ -72,7 +76,6 @@ class Application extends \Exedra\Container\Container
 			'config' => '\Exedra\Config',
 			'routing.factory' => function(){ return new \Exedra\Routing\Factory((string) $this->path['routes']);},
 			'map' => function() { return $this['routing.factory']->createLevel();},
-			'runtime' => array('\Exedra\Runtime\Registry', array('factory.runtime.handlers')),
 			'middleware' => array('\Exedra\Middleware\Registry', array('self.map')),
 			'request' => function(){ return \Exedra\Http\ServerRequest::createFromGlobals();},
 			'url' => function() { return new \Exedra\Factory\Url($this->map, $this->request, $this->config->get('app.url', null), $this->config->get('asset.url', null));},
@@ -86,14 +89,25 @@ class Application extends \Exedra\Container\Container
 
 		$this->services['factory']->register(array(
 			'runtime.exe' => '\Exedra\Runtime\Exe',
-			'runtime.handlers' => '\Exedra\Runtime\Handlers',
-			'module' => '\Exedra\Module\Module',
+			'handler.resolver' => '\Exedra\Runtime\Handler\Resolver',
+			'module' => '\Exedra\Module\Module'
 		));
 
 		// Application module as a default Module registered
 		$this->services['service']->on('module', function(\Exedra\Module\Registry $registry)
 		{
 			$registry->register('Application', '\Exedra\Module\Application');
+		});
+	}
+
+	protected function setUpHandlers()
+	{
+		// register default handler
+		$this['service']->on('map', function($map)
+		{
+			$map->addHandler('closure', '\Exedra\Runtime\Handler\Closure');
+
+			$map->addHandler('controller', '\Exedra\Runtime\Handler\Controller');
 		});
 	}
 
@@ -230,7 +244,7 @@ class Application extends \Exedra\Container\Container
 		}
 		catch(\Exedra\Exception\Exception $e)
 		{
-			if($failRoute = $this->runtime->getFailRoute())
+			if($failRoute = $this->failRoute)
 			{
 				$response = $this->execute($failRoute, array('exception' => $e), $request)
 								->finalize()
