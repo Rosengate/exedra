@@ -39,9 +39,9 @@ class Registry
 	 * @param mixed pattern
 	 * @return \Closure 
 	 */
-	public function resolve(\Exedra\Runtime\Exe $exe, $pattern)
+	public function resolve(\Exedra\Runtime\Exe $exe, $pattern, array $handlers = array())
 	{
-		return $this->handlers->resolve($exe, $pattern);
+		return $this->handlers->resolve($exe, $pattern, $handlers);
 	}
 
 	/**

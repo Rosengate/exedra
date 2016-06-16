@@ -22,6 +22,12 @@ class Level extends \ArrayIterator
 	protected $middlewares = array();
 
 	/**
+	 * Routing based handlers
+	 * @var array handlers
+	 */
+	protected $handlers = array();
+
+	/**
 	 * Factory injected to this level.
 	 * @var \Exedra\Routing\Factory
 	 */
@@ -79,6 +85,42 @@ class Level extends \ArrayIterator
 			$this->middlewares = array($middleware);
 
 		return $this;
+	}
+
+	/**
+	 * Add a routing based handler
+	 * To be stacked on runtime
+	 * @param string name
+	 * @param string|\Closure class
+	 * @return self
+	 */
+	public function addHandler($name,  $handler)
+	{
+		$this->handlers[$name] = $handler;
+
+		 return $this;
+	}
+
+	/**
+	 * Alias to addHandler()
+	 * @param string name
+	 * @param string|\Closure class
+	 * @return self
+	 */
+	public function handler($name, $handler)
+	{
+		$this->handlers[$name] = $handler;
+
+		return $this;
+	}
+
+	/**
+	 * Get all handlers
+	 * @return array
+	 */
+	public function getHandlers()
+	{
+		return $this->handlers;
 	}
 
 	/**

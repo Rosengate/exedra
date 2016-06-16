@@ -32,8 +32,6 @@ class Handlers
 	protected function registerDefaultHandlers()
 	{
 		$this->register('closure', '\Exedra\Runtime\Handler\Closure');
-		
-		$this->register('controller', '\Exedra\Runtime\Handler\Controller');
 	}
 
 	/**
@@ -66,9 +64,9 @@ class Handlers
 	 * @throws \Exedra\Exception\InvalidArgumentException
 	 * @throws \Exedra\Exception\NotFoundException
 	 */
-	public function resolve(\Exedra\Runtime\Exe $exe, $pattern)
+	public function resolve(\Exedra\Runtime\Exe $exe, $pattern, array $handlers = array())
 	{
-		foreach($this->registry as $name => $className)
+		foreach(array_merge($this->registry, $handlers) as $name => $className)
 		{
 			if(isset($this->handlers[$name]))
 			{

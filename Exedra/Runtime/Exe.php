@@ -108,7 +108,7 @@ class Exe extends \Exedra\Container\Container
 		$this->middlewareRegistry->resolve($this, $this->callStack);
 
 		// add final handle
-		$this->callStack[] = $this->app->getRuntimeRegistry()->resolve($this, $this->route->getProperty('execute'));
+		$this->callStack[] = $this->app->getRuntimeRegistry()->resolve($this, $this->route->getProperty('execute'), $this->finding->getHandlers());
 
 		// first handle.
 		$handle = reset($this->callStack);

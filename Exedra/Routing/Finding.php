@@ -53,6 +53,12 @@ class Finding
 	protected $config = array();
 
 	/**
+	 * Stacked handlers
+	 * @var array handlers
+	 */
+	protected $handlers = array();
+
+	/**
 	 * @param \Exedra\Routing\Route or null
 	 * @param array parameters
 	 */
@@ -123,6 +129,10 @@ class Finding
 
 		foreach($this->route->getFullRoutes() as $route)
 		{
+			// stack all the handlers
+			foreach($route->getLevel()->getHandlers() as $name => $handler)
+				$this->handlers[$name] = $handler;
+
 			// get the latest module and route base
 			if($route->hasProperty('module'))
 				$this->module = $route->getProperty('module');
@@ -168,6 +178,15 @@ class Finding
 	public function getMiddlewares()
 	{
 		return $this->middlewares;
+	}
+
+	/**
+	 * Get stacked handlers
+	 * @return array
+	 */
+	public function getHandlers()
+	{
+		return $this->handlers;
 	}
 
 	/**
