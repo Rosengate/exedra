@@ -88,7 +88,7 @@ class Response extends Message
 		return $this;
 	}
 
-	public function withStatus()
+	public function withStatus($status, $reason = null)
 	{
 		$response = clone $this;
 
