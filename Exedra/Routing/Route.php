@@ -597,7 +597,7 @@ class Route
 	public function getMethod()
 	{
 		if(!$this->hasProperty('method'))
-			return array('get', 'post', 'put', 'delete');
+			return array('get', 'post', 'put', 'delete', 'patch');
 
 		return $this->getProperty('method');
 	}
@@ -689,7 +689,7 @@ class Route
 	public function setMethod($method)
 	{
 		if($method == 'any')
-			$method = array('get', 'post', 'put', 'delete');
+			$method = array('get', 'post', 'put', 'delete', 'patch');
 		else if(!is_array($method))
 			$method = explode(',', $method);
 
@@ -1022,6 +1022,20 @@ class Route
 	public function delete($path = '/')
 	{
 		$this->setMethod('DELETE');
+
+		$this->setPath($path);
+
+		return $this;
+	}
+
+	/**
+	 * Set method to PATCH and path
+	 * @param string path
+	 * @return self
+	 */
+	public function patch($path = '/')
+	{
+		$this->setMethod('PATCH');
 
 		$this->setPath($path);
 

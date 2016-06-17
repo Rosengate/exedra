@@ -25,27 +25,32 @@ class Convenient extends \Exedra\Routing\Level
 		return $route;
 	}
 
-	public function get($path = null)
+	public function get($path = '/')
 	{
 		return $this->method('get', $path);
 	}
 
-	public function post($path = null)
+	public function post($path = '/')
 	{
 		return $this->method('post', $path);
 	}
 
-	public function put($path = null)
+	public function put($path = '/')
 	{
 		return $this->method('put', $path);
 	}
 
-	public function delete($path = null)
+	public function delete($path = '/')
 	{
 		return $this->method('delete', $path);
 	}
 
-	public function any($path = null)
+	public function patch($path = '/')
+	{
+		return $this->method('patch', $path);
+	}
+
+	public function any($path = '/')
 	{
 		return $this->method(null, $path);
 	}
