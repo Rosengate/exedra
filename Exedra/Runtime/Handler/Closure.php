@@ -16,6 +16,3 @@ class Closure extends HandlerAbstract
 		return $pattern;
 	}
 }
-
-
-?>

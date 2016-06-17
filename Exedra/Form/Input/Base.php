@@ -162,6 +162,3 @@ class Base
 		return $this->toString();
 	}
 }
-
-
-?>

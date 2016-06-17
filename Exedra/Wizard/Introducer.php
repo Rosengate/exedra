@@ -79,5 +79,3 @@ class Introducer extends Wizardry
 			return $this->executeIndex($args);
 	}
 }
-
-?>

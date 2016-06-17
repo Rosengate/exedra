@@ -200,5 +200,3 @@ class Stream
 		return $this->toString();
 	}
 }
-
-?>

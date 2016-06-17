@@ -132,6 +132,3 @@ class DotArray
 		unset($storage[array_shift($keys)]);
 	}
 }
-
-
-?>

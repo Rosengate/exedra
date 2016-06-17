@@ -102,6 +102,3 @@ class Registry
 		return $this;
 	}
 }
-
-
-?>

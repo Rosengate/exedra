@@ -267,6 +267,3 @@ class Uri
 		return $this->toString();
 	}
 }
-
-
-?>

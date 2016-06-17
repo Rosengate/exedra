@@ -102,5 +102,3 @@ class Request extends Message
 		return $this->uri;
 	}
 }
-
-?>

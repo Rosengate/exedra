@@ -156,6 +156,3 @@ class Registry implements \ArrayAccess
 		}
 	}
 }
-
-
-?>

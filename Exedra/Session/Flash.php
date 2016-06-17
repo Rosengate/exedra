@@ -101,6 +101,3 @@ class Flash
 		return $this;
 	}
 }
-
-
-?>

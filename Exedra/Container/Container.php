@@ -347,6 +347,3 @@ class Container implements \ArrayAccess
 		}
 	}
 }
-
-
-?>

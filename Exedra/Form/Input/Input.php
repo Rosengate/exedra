@@ -40,6 +40,3 @@ class Input extends Base
 		return '<input type="'.$type.'" '.$attributes.' />';
 	}
 }
-
-
-?>

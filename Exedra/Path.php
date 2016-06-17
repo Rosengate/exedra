@@ -376,5 +376,3 @@ class Path implements \ArrayAccess
 		return $this->basePath;
 	}
 }
-
-?>

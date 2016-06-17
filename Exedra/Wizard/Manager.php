@@ -606,6 +606,3 @@ class Manager
 		}
 	}
 }
-
-
-?>

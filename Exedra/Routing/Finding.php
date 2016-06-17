@@ -243,6 +243,3 @@ class Finding
 		return $this->request;
 	}
 }
-
-
-?>

@@ -104,5 +104,3 @@ class File extends \SplFileInfo
 		file_put_contents($this->filename, $data, $flag, $context);
 	}
 }
-
-?>

@@ -58,5 +58,3 @@ class Resolver
 		throw new \Exedra\Exception\NotFoundException('No executional pattern handler matched. '.(is_string($pattern) ? ' ['.$pattern.']' : ''));
 	}
 }
-
-?>
