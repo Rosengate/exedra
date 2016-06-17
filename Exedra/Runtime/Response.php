@@ -25,11 +25,11 @@ class Response extends \Exedra\Http\Response
 
 	/**
 	 * Close and response
+	 * http://stackoverflow.com/questions/138374/close-a-connection-early
 	 */
 	public function close()
 	{
-		$contents = ob_get_contents();
-		ob_end_clean();
+		$contents = ob_get_clean();
 		header("Content-Encoding: none\r\n");
 		ignore_user_abort(true);
 		ob_start();
