@@ -155,5 +155,3 @@ class Session
 		return $this;
 	}
 }
-
-?>

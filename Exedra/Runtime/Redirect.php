@@ -3,9 +3,11 @@ namespace Exedra\Runtime;
 
 class Redirect
 {
-	public function __construct(\Exedra\Runtime\Exe $exe)
+	public function __construct(\Exedra\Http\Response $response, \Exedra\Factory\Url $urlFactory)
 	{
-		$this->exe = $exe;
+		$this->response = $response;
+
+		$this->urlFactory = $urlFactory;
 	}
 
 	/**
@@ -16,7 +18,7 @@ class Redirect
 	 */
 	public function toUrl($url)
 	{
-		return $this->exe->response->redirect($url);
+		return $this->response->redirect($url);
 	}
 
 	/**
@@ -29,26 +31,13 @@ class Redirect
 	}
 
 	/**
-	 * Do a session flash
-	 * @param mixed key
-	 * @param mixed val
-	 * @return this
-	 */
-	public function flash($key, $val = null)
-	{
-		$this->exe->flash->set($key, $val);
-		
-		return $this;
-	}
-
-	/**
 	 * Refresh the page.
 	 * alias to \Exedra\Http\Response::refresh()
 	 * @return refresh
 	 */
 	public function refresh($time = 0)
 	{
-		return $this->exe->response->refresh($time);
+		return $this->response->refresh($time);
 	}
 
 	/**
@@ -84,7 +73,7 @@ class Redirect
 		if(!$route)
 			return $this->refresh();
 
-		$url = $this->exe->url->create($route, $params, $query);
+		$url = $this->urlFactory->create($route, $params, $query);
 
 		return $this->toUrl($url);
 	}

@@ -133,6 +133,17 @@ class Response extends Message
 	}
 
 	/**
+	 * Send header and print response
+	 * @return
+	 */
+	public function send()
+	{
+		$this->sendHeader();
+
+		echo $this->getBody()->rewind()->getContents();
+	}
+
+	/**
 	 * Set location header (redirect)
 	 * @param string url
 	 */
@@ -151,14 +162,21 @@ class Response extends Message
 	}
 
 	/**
-	 * Send header and print response
-	 * @return
+	 * Close and response
+	 * http://stackoverflow.com/questions/138374/close-a-connection-early
 	 */
-	public function send()
+	public function close()
 	{
-		$this->sendHeader();
-
-		echo $this->getBody()->rewind()->getContents();
+		$contents = ob_get_clean();
+		header("Content-Encoding: none\r\n");
+		ignore_user_abort(true);
+		ob_start();
+		echo $contents;
+		$size = ob_get_length();
+		header("Content-Length: $size");
+		ob_end_flush();
+		flush();
+		ob_end_clean();
 	}
 
 	public function __toString()
@@ -166,5 +184,3 @@ class Response extends Message
 		return $this->getBody();
 	}
 }
-
-?>

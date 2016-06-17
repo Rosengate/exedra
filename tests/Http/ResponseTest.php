@@ -3,7 +3,12 @@ class HttpResponseTest extends PHPUnit_Framework_TestCase
 {
 	public function setUp()
 	{
-		$this->response = \Exedra\Http\Response::createEmptyResponse();
+		$this->response = \Exedra\Runtime\Response::createEmptyResponse();
+	}
+
+	public function testType()
+	{
+		$this->assertTrue($this->response instanceof \Exedra\Http\Response);
 	}
 
 	public function testStatus()

@@ -88,7 +88,7 @@ class Exe extends \Exedra\Container\Container
 			'view' => function(){ return $this->module['Application']->view;},
 			'controller' => function(){ return $this->module['Application']->controller;},
 			'url' => function(){ return new \Exedra\Runtime\Factory\Url($this->app->map, $this->request, $this->config->get('app.url', null), $this->config->get('asset.url', null), $this);},
-			'redirect' => array("\Exedra\Runtime\Redirect", array('self')),
+			'redirect' => array("\Exedra\Runtime\Redirect", array('self.response', 'self.url')),
 			'form' => array("\Exedra\Runtime\Factory\Form", array('self')),
 			// thinking of deprecating the asset as service
 			'asset' => function(){ return new \Exedra\Factory\Asset($this->url, $this->app->path['public'], $this->config->get('asset', array()));}
