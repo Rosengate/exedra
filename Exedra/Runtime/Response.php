@@ -22,4 +22,22 @@ class Response extends \Exedra\Http\Response
 
 		echo $this->body;
 	}
+
+	/**
+	 * Close and response
+	 */
+	public function close()
+	{
+		$contents = ob_get_contents();
+		ob_end_clean();
+		header("Content-Encoding: none\r\n");
+		ignore_user_abort(true);
+		ob_start();
+		echo $contents;
+		$size = ob_get_length();
+		header("Content-Length: $size");
+		ob_end_flush();
+		flush();
+		ob_end_clean();
+	}
 }
