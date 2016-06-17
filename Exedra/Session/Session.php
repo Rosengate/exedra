@@ -126,6 +126,15 @@ class Session
 	}
 
 	/**
+	 * Regenerate session id
+	 * @return boolean
+	 */
+	public function regenerate()
+	{
+		return session_regenerate_id();
+	}
+
+	/**
 	 * PHP session_write_close
 	 * @return void
 	 */
