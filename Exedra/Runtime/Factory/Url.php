@@ -18,6 +18,24 @@ class Url extends \Exedra\Factory\Url
 	}
 
 	/**
+	 * Call a callable. If does not exist, call on app level
+	 * @param string name
+	 * @param array args
+	 * @return mixed
+	 */
+	public function __call($name, array $args = array())
+	{
+		try
+		{
+			return parent::__call($name, $args);
+		}
+		catch(\Exception $e)
+		{
+			return $this->exe->app->url->__call($name, $args);
+		}
+	}
+
+	/**
 	 * Get url of parent route
 	 * @param array data
 	 * @param array query

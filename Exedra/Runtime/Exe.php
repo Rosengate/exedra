@@ -87,12 +87,14 @@ class Exe extends \Exedra\Container\Container
 		$this->services['service']->register(array(
 			'view' => function(){ return $this->module['Application']->view;},
 			'controller' => function(){ return $this->module['Application']->controller;},
-			'url' => function(){ return new \Exedra\Runtime\Factory\Url($this->app->map, $this->request, $this->config->get('app.url', null), $this->config->get('asset.url', null), $this);},
-			'redirect' => array("\Exedra\Runtime\Redirect", array('self.response', 'self.url')),
-			'form' => array("\Exedra\Runtime\Factory\Form", array('self')),
+			'url' => function(){ return $this->create('factory.url', array($this->app->map, $this->request, $this->config->get('app.url', null), $this->config->get('asset.url', null), $this));},
+			'redirect' => array('\Exedra\Runtime\Redirect', array('self.response', 'self.url')),
+			'form' => array('\Exedra\Runtime\Factory\Form', array('self')),
 			// thinking of deprecating the asset as service
 			'asset' => function(){ return new \Exedra\Factory\Asset($this->url, $this->app->path['public'], $this->config->get('asset', array()));}
 			));
+
+		$this->services['factory']->add('factory.url', '\Exedra\Runtime\Factory\Url');
 	}
 
 	/**

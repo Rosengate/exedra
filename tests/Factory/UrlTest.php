@@ -74,6 +74,32 @@ class FactoryUrlTest extends PHPUnit_Framework_TestCase
 
 		$this->assertEquals('http://example.com/foo/assets/bazt', $this->app->url->asset('bazt'));
 	}
+
+	public function testAddCallable()
+	{
+		$this->app->config->set(array(
+			'app.url' => 'http://example.com/foo',
+			'asset.url' => 'http://example.com/foo/assets'
+			));
+
+		$this->app['service']['request'] = function()
+		{
+			return null;
+		};
+
+		$this->app->url->addCallable('foo', function($var)
+		{
+			return $this->base('bar/'.$var);
+		});
+
+		$this->assertEquals('http://example.com/foo/bar/baz', $this->app->url->foo('baz'));
+
+		$this->app->map['foo']->any('/')->execute(function(){ });
+
+		$exe = $this->app->execute('foo');
+
+		$this->assertEquals('http://example.com/foo/bar/baz/qux', $exe->url->foo('baz/qux'));
+	}
 }
 
 

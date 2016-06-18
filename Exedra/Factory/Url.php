@@ -25,6 +25,8 @@ class Url
 	 */
 	protected $request;
 
+	protected $callables = array();
+
 	/**
 	 * Application map
 	 * @param \Exedra\Routing\Level
@@ -58,6 +60,41 @@ class Url
 		$referer = $this->request->getHeaderLine('referer');
 
 		return $referer ? : false;
+	}
+
+	public function __call($name, array $args = array())
+	{
+		if(!isset($this->callables[$name]))
+			throw new \Exedra\Exception\NotFoundException('Method / callable ['.$name.'] does not exists');
+
+		if(isset($this->callables[$name.'_bound']))
+			$callable = $this->callables[$name.'_bound'];
+		else
+			$callable = $this->callables[$name.'_bound'] = $this->callables[$name]->bindTo($this);
+
+		return call_user_func_array($callable, $args);
+	}
+
+	/**
+	 * Register a callables
+	 * @param string name
+	 * @param \Closure callable
+	 */
+	public function addCallable($name, \Closure $callable)
+	{
+		$this->callables[$name] = $callable;
+
+		return $this;
+	}
+
+	/**
+	 * Alias to addCallable()
+	 * @param string name
+	 * @param \Closure callable
+	 */
+	public function register($name, \Closure $callable)
+	{
+		$this->callables[$name] = $callable;
 	}
 
 	/**
@@ -122,9 +159,6 @@ class Url
 	 */
 	public function create($routeName, array $data = array(), array $query = array())
 	{
-		// build query
-		$query = http_build_query($query);
-
 		// get \Exedra\Routing\Route by name.
 		$route = $this->map->findRoute($routeName);
 
@@ -133,7 +167,7 @@ class Url
 
 		$path = $route->getAbsolutePath($data);
 
-		return $this->base($path).($query ? '?'.$query : null);
+		return $this->base($path).($query ? '?'. http_build_query($query) : null);
 	}
 
 	/**

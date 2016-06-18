@@ -54,8 +54,6 @@ class Application extends \Exedra\Container\Container
 
 		// autoload the current app folder.
 		$path['app']->autoloadPsr4($this->namespace, '');
-
-		$this->services['loader'] = $path;
 	}
 
 	/**
@@ -78,7 +76,7 @@ class Application extends \Exedra\Container\Container
 			'map' => function() { return $this['routing.factory']->createLevel();},
 			'middleware' => array('\Exedra\Middleware\Registry', array('self.map')),
 			'request' => function(){ return \Exedra\Http\ServerRequest::createFromGlobals();},
-			'url' => function() { return new \Exedra\Factory\Url($this->map, $this->request, $this->config->get('app.url', null), $this->config->get('asset.url', null));},
+			'url' => function() { return $this->create('factory.url', array($this->map, $this->request, $this->config->get('app.url', null), $this->config->get('asset.url', null)));},
 			'@session' => '\Exedra\Session\Session',
 			'@flash' => array('\Exedra\Session\Flash', array('self.session')),
 			'wizard' => array('\Exedra\Wizard\Manager', array('self')),
@@ -90,7 +88,8 @@ class Application extends \Exedra\Container\Container
 		$this->services['factory']->register(array(
 			'runtime.exe' => '\Exedra\Runtime\Exe',
 			'handler.resolver' => '\Exedra\Runtime\Handler\Resolver',
-			'module' => '\Exedra\Module\Module'
+			'module' => '\Exedra\Module\Module',
+			'factory.url' => '\Exedra\Factory\Url'
 		));
 
 		// Application module as a default Module registered
@@ -159,15 +158,6 @@ class Application extends \Exedra\Container\Container
 	public function getPublicDir($path = null)
 	{
 		return (string) $this->path['public'] . ($path ? '/' . $path : '');
-	}
-
-	/**
-	 * Get application runtime registry
-	 * @return \Exedra\Runtime\Registry
-	 */
-	public function getRuntimeRegistry()
-	{
-		return $this->runtime;
 	}
 
 	/**
