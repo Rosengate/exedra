@@ -28,12 +28,6 @@ class Finding
 	public $parameters = array();
 
 	/**
-	 * string of module name.
-	 * @var string|null
-	 */
-	protected $module = null;
-
-	/**
 	 * string of route base
 	 * @var string|null
 	 */
@@ -119,12 +113,10 @@ class Finding
 
 	/**
 	 * Resolve finding informations
-	 * resolve module, baseRoute, middlewares, meta, config
+	 * resolve, baseRoute, middlewares, meta, config
 	 */
 	public function resolve()
 	{
-		$this->module = null;
-
 		$this->baseRoute = null;
 
 		foreach($this->route->getFullRoutes() as $route)
@@ -132,10 +124,6 @@ class Finding
 			// stack all the handlers
 			foreach($route->getLevel()->getHandlers() as $name => $handler)
 				$this->handlers[$name] = $handler;
-
-			// get the latest module and route base
-			if($route->hasProperty('module'))
-				$this->module = $route->getProperty('module');
 
 			// if has parameter base, and it's true, set base route to the current route.
 			if($route->hasProperty('base') && $route->getProperty('base') === true)
@@ -214,15 +202,6 @@ class Finding
 	public function hasMeta($key)
 	{
 		return isset($this->meta[$key]);
-	}
-
-	/**
-	 * Module on this finding.
-	 * @return string referenced module name
-	 */
-	public function getModule()
-	{
-		return $this->module;
 	}
 
 	/**

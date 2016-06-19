@@ -122,27 +122,12 @@ class Exe extends \Exedra\Container\Container
 	}
 
 	/**
-	 * Get module path
-	 * @param string path
-	 * @return \Exedra\Path
-	 */
-	public function getModulePath($path = null)
-	{
-		$path = $path ? ltrim($path, '/\\') : '';
-
-		$base = $this->path['app'];
-
-		return ($module = $this->getModule()) ? $base->create($module.'/'.$path) : $base->create($path);
-	}
-
-	/**
 	 * Get execution namespace
-	 * Module appended namespace
 	 * @return string
 	 */
 	public function getNamespace($namespace = null)
 	{
-		return $this->app->getNamespace($module = $this->getModule() ? '\\' . $module : '') . ($namespace ? '\\'.$namespace : '');
+		return $this->app->getNamespace() . ($namespace ? '\\'.$namespace : '');
 	}
 
 	/**
@@ -164,12 +149,12 @@ class Exe extends \Exedra\Container\Container
 	}
 
 	/**
-	 * Get base dir for this execution instance. A concenated app base directory and this module.
+	 * Get base dir for this execution instance. A concenated app base directory
 	 * @return string.
 	 */
 	public function getBaseDir()
 	{
-		return rtrim($this->app->getBaseDir(), '/'). '/' . $this->getModule();
+		return rtrim($this->app->getBaseDir(), '/');
 	}
 
 	/**
@@ -457,24 +442,6 @@ class Exe extends \Exedra\Container\Container
 		}
 
 		return $route;
-	}
-
-	/**
-	 * Get module name.
-	 * @return string
-	 */
-	public function getModule()
-	{
-		return $this->finding->getModule();
-	}
-
-	/**
-	 * check whether this exec has module
-	 * @return boolean flag
-	 */
-	public function hasModule()
-	{
-		return $this->getModule() === null ? false : true;
 	}
 
 	/**

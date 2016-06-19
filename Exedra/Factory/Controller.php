@@ -9,17 +9,9 @@ class Controller
 	 */
 	protected $baseNamespace;
 
-	/**
-	 * Module bound on this factory
-	 * @var string|null module
-	 */
-	protected $module;
-
-	public function __construct($baseNamespace, $module = null)
+	public function __construct($baseNamespace)
 	{
 		$this->baseNamespace = $baseNamespace;
-
-		$this->module = $module;
 	}
 
 	/**
@@ -27,12 +19,9 @@ class Controller
 	 * @param string class
 	 * @return string
 	 */
-	protected function buildClassName($class, $module = null)
+	protected function buildClassName($class)
 	{
 		$className = $this->baseNamespace;
-
-		if($module)
-			$className .= '\\'.$module;
 
 		$className .= '\\Controller';
 
@@ -55,19 +44,15 @@ class Controller
 		{
 			$className = $definition['class'];
 
-			$module = isset($definition['module']) ? $definition['module'] : $this->module;
-
 			if(isset($definition['arguments']))
 				$args = array_merge($args, $definition['arguments']);
 		}
 		else
 		{
 			$className = $definition;
-
-			$module = $this->module;
 		}
 
-		$className = $this->buildClassName($className, $module);
+		$className = $this->buildClassName($className);
 		
 		// class name does not exists in the given path.
 		if(!class_exists($className))

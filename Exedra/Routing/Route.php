@@ -30,7 +30,6 @@ class Route
 	 * - execute
 	 * - middleware
 	 * - subroutes
-	 * - module
 	 * - config
 	 * - base
 	 * - requestable
@@ -823,24 +822,6 @@ class Route
 		$this->properties['middleware'][] = $middleware;
 
 		return $this;
-	}
-
-	/**
-	 * Set module under this route.
-	 * @param string module
-	 */
-	public function setModule($module)
-	{
-		return $this->setProperty('module', $module);
-	}
-
-	/**
-	 * Alias to setModule
-	 * @param string module
-	 */
-	public function module($module)
-	{
-		return $this->setProperty('module', $module);
 	}
 
 	/**
