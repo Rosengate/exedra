@@ -25,6 +25,8 @@ class ServerRequest extends Message
 
 	protected $attributes = array();
 
+	protected $params = array();
+
 	public function __construct(
 		$method, 
 		Uri $uri, 
