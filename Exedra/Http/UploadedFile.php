@@ -19,17 +19,17 @@ class UploadedFile
 
 	protected $size;
 
-	public function __construct(array $file)
+	public function __construct($name, $type, $tmp_name, $error, $size)
 	{
-		$this->name = $file['name'];
+		$this->name = $name;
 
-		$this->type = $file['type'];
+		$this->type = $type;
 
-		$this->path = $file['tmp_name'];
+		$this->path = $tmp_name;
 
-		$this->error = $file['error'];
+		$this->error = $error;
 
-		$this->size = $file['size'];
+		$this->size = $size;
 	}
 
 	/**
@@ -39,14 +39,62 @@ class UploadedFile
 	 */
 	public static function createFromGlobals(array $files = array())
 	{
-		$uploadedFiles = array();
-
-		foreach($_FILES as $key => $file)
-			$uploadedFiles[$key] - new static($file);
-
-		return $uploadedFiles;
+		return static::parseFiles($files);
 	}
 
+	/**
+	 * Normalize global $_FILES
+	 * @param array files
+	 */
+	protected static function parseFiles(array $files)
+	{
+		$normalizedFiles = array();
+
+		foreach($files as $name => $file)
+		{
+			if(is_array($file) && !isset($file['tmp_name']))
+				$normalizedFiles[$name] = static::parseFiles($file);
+			else if(isset($file['tmp_name']) && is_array($file['tmp_name']))
+				$normalizedFiles[$name] = static::normalizeFilesTree($file);
+			else if(isset($file['tmp_name']))
+				$normalizedFiles[$name] = new static(
+					$file['name'], $file['type'], $file['tmp_name'], $file['error'], $file['size']
+					);
+		}
+
+		return $normalizedFiles;
+	}
+
+	/**
+	 * Normalize the tree recursively
+	 * thanks and credit to https://github.com/guzzle/psr7/blob/master/src/ServerRequest.php
+	 * @param array file
+	 */
+	protected static function normalizeFilesTree(array $file)
+	{
+		if(!is_array($file['tmp_name']))
+			return new static(
+				$file['name'], $file['type'], $file['tmp_name'], $file['error'], $file['size']
+				);
+
+		$normalizedFiles = array();
+
+		foreach(array_keys($file['tmp_name']) as $key)
+			$normalizedFiles[$key] = static::normalizeFile(array(
+				'tmp_name' => $file['tmp_name'][$key],
+				'name' => $file['name'][$key],
+				'type' => $file['type'][$key],
+				'error' => $file['error'][$key],
+				'size' => $file['size'][$key]
+				));
+
+		return $normalizedFiles;
+	}
+
+	/**
+	 * Get stream of the uploaded file
+	 * @return \Exedra\Http\Stream
+	 */
 	public function getStream()
 	{
 		if(!$this->stream)
@@ -88,10 +136,31 @@ class UploadedFile
 	public function getClientFileName()
 	{
 		return $this->name;
-
 	}
 
+	/**
+	 * Alias to getClientFileName()
+	 * @return string
+	 */
+	public function getName()
+	{
+		return $this->name;
+	}
+
+	/**
+	 * Get file media type
+	 * @return string
+	 */
 	public function getClientMediaType()
+	{
+		return $this->type;
+	}
+
+	/**
+	 * Alias to getClientMediaType()
+	 * @return string
+	 */
+	public function getType()
 	{
 		return $this->type;
 	}

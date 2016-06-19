@@ -192,7 +192,14 @@ class Stream
 		if(!$this->resource)
 			return '';
 
-		return $this->rewind()->getContents();
+		try
+		{
+			return $this->rewind()->getContents();
+		}
+		catch(\Exception $e)
+		{
+			return '';
+		}
 	}
 
 	public function __toString()

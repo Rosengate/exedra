@@ -32,9 +32,7 @@ class ServerRequest extends Message
 		Stream $body, 
 		array $server = array(), 
 		array $cookies = array(), 
-		array $uploadedFiles = array(),
-		array $queryParams = array(),
-		array $parsedBody= array())
+		array $uploadedFiles = array())
 	{
 		$this->method = strtoupper($method);
 
@@ -50,18 +48,18 @@ class ServerRequest extends Message
 
 		$this->uploadedFiles = $uploadedFiles;
 
-		if($parsedBody)
-			$this->parsedBody = $parsedBody;
-		else
-			if($body->isSeekable())
-				parse_str($body->rewind()->getContents(), $this->parsedBody);
-			else
-				parse_str($body->getContents(), $this->parsedBody);
+		// register common content-type parser
+		$this->registerMediaTypeParser('application/json', function($body)
+		{
+			return json_decode($body, true);
+		});
 
-		if($queryParams)
-			$this->queryParams = $queryParams;
-		else
-			parse_str($this->uri->getQuery(), $this->queryParams);
+		$this->registerMediaTypeParser('application/x-www-form-urlencoded', function($body)
+		{
+			parse_str($body, $data);
+
+			return $data;
+		});
 	}
 
 	protected function setHeaderLines(array $headerLines)
@@ -73,9 +71,9 @@ class ServerRequest extends Message
 	 * Instantiate request from php _SERVER variable
 	 * @param array server
 	 */
-	public static function createFromGlobals(array $server = array())
+	public static function createFromGlobals()
 	{
-		$server = !$server ? $_SERVER : $server;
+		$server = $_SERVER;
 
 		$uriParts = parse_url($server['REQUEST_URI']);
 
@@ -107,17 +105,20 @@ class ServerRequest extends Message
 			}
 		}
 
-		return new static(
+		$request = new static(
 			$server['REQUEST_METHOD'],
 			new Uri($uriParts),
 			$headers,
 			Stream::createFromContents(file_get_contents('php://input')),
 			$server,
 			$_COOKIE,
-			UploadedFile::createFromGlobals($_FILES),
-			$_GET,
-			$_POST
+			UploadedFile::createFromGlobals($_FILES)
 		);
+
+		if($server['REQUEST_METHOD'] == 'POST' && in_array($request->getMediaType(), array('application/x-www-form-urlencoded', 'multipart/form-data')))
+			$request->setParsedBody($_POST);
+
+		return $request;
 	}
 
 	/**
@@ -132,9 +133,7 @@ class ServerRequest extends Message
 			isset($params['headers']) ? $params['headers'] : array(),
 			isset($params['body']) ? (is_resource($params['body']) ? new Stream($params['body']) : Stream::createFromContents($params['body'])) : Stream::createFromContents(''),
 			isset($params['server']) ? $params['server'] : array(),
-			isset($params['cookies']) ? $params['cookies'] : array(),
-			isset($params['queryParams']) ? $params['queryParams'] : array(),
-			isset($params['parsedBody']) ? $params['parsedBody'] : array()
+			isset($params['cookies']) ? $params['cookies'] : array()
 		);
 	}
 
@@ -212,17 +211,50 @@ class ServerRequest extends Message
 	}
 
 	/**
-	 * Below this is the implementation for /Psr/Http/ServerRequest
+	 * Get server params
+	 * @return array
 	 */
-
 	public function getServerParams()
 	{
 		return $this->server;
 	}
 
+	/**
+	 * Get server value
+	 * @param string name
+	 * @param null|string default
+	 * @return string|null
+	 */
+	public function server($name, $default = null)
+	{
+		return array_key_exists($name, $this->server) ? $this->server[$name] : $default;
+	}
+
+	/**
+	 * Get cookie params
+	 * @return array
+	 */
 	public function getCookieParams()
 	{
 		return $this->cookies;
+	}
+
+	/**
+	 * Get cookie
+	 * @param string name
+	 * @param null|string default
+	 * @return null|string
+	 */
+	public function cookie($name, $default = null)
+	{
+		return array_key_exists($name, $this->cookies) ? $this->cookies[$name] : $default;
+	}
+
+	public function setCookieParams(array $params)
+	{
+		$this->cookies = $params;
+
+		return $this;
 	}
 
 	public function withCookieParams(array $params)
@@ -236,10 +268,22 @@ class ServerRequest extends Message
 
 	public function getQueryParams()
 	{
+		if($this->queryParams)
+			return $this->queryParams;
+
+		parse_str($this->uri->getQuery(), $this->queryParams);
+
 		return $this->queryParams;
 	}
 
-	public function withQueryParams($queryParams)
+	public function setQueryParams(array $queryParams)
+	{
+		$this->queryParams = $queryParams;
+
+		return $this;
+	}
+
+	public function withQueryParams(array $queryParams)
 	{
 		$request = clone $this;
 
@@ -253,6 +297,13 @@ class ServerRequest extends Message
 		return $this->uploadedFiles;
 	}
 
+	public function setUploadedFiles(array $uploadedFiles)
+	{
+		$this->uploadedFiles = $uploadedFiles;
+
+		return $this;
+	}
+
 	public function withUploadedFiles(array $uploadedFiles)
 	{
 		$request = clone $this;
@@ -264,7 +315,38 @@ class ServerRequest extends Message
 
 	public function getParsedBody()
 	{
+		if($this->parsedBody)
+			return $this->parsedBody;
+
+		$mediaType = $this->getMediaType();
+
+		if(!isset($this->bodyParsers[$mediaType]))
+			return $this->parsedBody;
+
+		$this->parsedBody = $this->bodyParsers[$mediaType]((string) $this->body);
+
+		if(!in_array(gettype($this->parsedBody), array('NULL', 'array', 'object')))
+			throw new \Exedra\Exception\Exception('Registered media type parser return type must be a null, array, or object');
+
 		return $this->parsedBody;
+	}
+
+	public function getMediaType()
+	{
+		$contentType = $this->getHeaderLine('Content-Type');
+
+		if(!$contentType)
+			return null;
+
+		// credit to https://github.com/slimphp/Slim-Http/blob/master/src/Request.php
+		$contentTypeParts = preg_split('/\s*[;,]\s*/', $contentType);
+
+		return $contentTypeParts[0];
+	}
+
+	public function registerMediaTypeParser($type, \Closure $callable)
+	{
+		$this->bodyParsers[$type] = $callable->bindTo($this);
 	}
 
 	public function setParsedBody(array $parsedBody)
@@ -334,11 +416,44 @@ class ServerRequest extends Message
 		return strtolower($method) == strtolower($this->method);
 	}
 
+	/**
+	 * Get a merged query params and parsed body
+	 * @param string name
+	 * @param null|string default
+	 */
+	public function param($name, $default = null)
+	{
+		if(!$this->params)
+			$this->params = $this->getMethod() == 'GET' ? $this->getQueryParams() : array_merge($this->getQueryParams(), $this->getParsedBody());
+
+		return array_key_exists($name, $this->params) ? $this->params[$name] : $default;
+	}
+
+	/**
+	 * Get merged query params and parsed body
+	 * @return array
+	 */
+	public function getParams()
+	{
+		if(!$this->params)
+			$this->params = $this->getMethod() == 'GET' ? $this->getQueryParams() : array_merge($this->getQueryParams(), $this->getParsedBody());
+
+		return $this->params;
+	}
+
+	/**
+	 * Alias to resolveUriPath()
+	 * @return null
+	 */
 	public function resolveUri()
 	{
 		return $this->resolveUriPath();
 	}
 
+	/**
+	 * Apache only functionality, to resolve uri to current folder the apps is located
+	 * @return null
+	 */
 	public function resolveUriPath()
 	{
 		if(!$this->server)
@@ -364,7 +479,3 @@ class ServerRequest extends Message
 		$this->uri->setPath($requestUri);
 	}
 }
-
-
-
-?>
