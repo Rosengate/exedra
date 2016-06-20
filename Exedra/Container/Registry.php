@@ -71,7 +71,8 @@ class Registry implements \ArrayAccess
 	 */
 	public function register(array $registry)
 	{
-		$this->data = $registry;
+		foreach($registry as $key => $reg)
+			$this->data[$key] = $reg;
 	}
 
 	/**

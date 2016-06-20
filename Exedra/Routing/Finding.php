@@ -28,6 +28,12 @@ class Finding
 	public $parameters = array();
 
 	/**
+	 * string of module name.
+	 * @var string|null
+	 */
+	protected $module = null;
+	
+	/**
 	 * string of route base
 	 * @var string|null
 	 */
@@ -121,6 +127,10 @@ class Finding
 
 		foreach($this->route->getFullRoutes() as $route)
 		{
+			// get the latest module and route base
+			if($route->hasProperty('module'))
+				$this->module = $route->getProperty('module');
+
 			// stack all the handlers
 			foreach($route->getLevel()->getHandlers() as $name => $handler)
 				$this->handlers[$name] = $handler;
@@ -202,6 +212,15 @@ class Finding
 	public function hasMeta($key)
 	{
 		return isset($this->meta[$key]);
+	}
+
+	/**
+	 * Module on this finding.
+	 * @return string referenced module name
+	 */
+	public function getModule()
+	{
+		return $this->module;
 	}
 
 	/**

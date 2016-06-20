@@ -25,6 +25,8 @@ class Application extends \Exedra\Container\Container
 		
 		$this->setUp();
 
+		$this->setUpModule();
+
 		$this->setUpHandlers();
 	}
 
@@ -91,7 +93,10 @@ class Application extends \Exedra\Container\Container
 			'module' => '\Exedra\Module\Module',
 			'factory.url' => '\Exedra\Factory\Url'
 		));
+	}
 
+	protected function setUpModule()
+	{
 		// Application module as a default Module registered
 		$this->services['service']->on('module', function(\Exedra\Module\Registry $registry)
 		{

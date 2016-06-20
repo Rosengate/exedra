@@ -27,6 +27,8 @@ class Exe extends \Exedra\Container\Container
 	 */
 	protected $middlewareRegistry;
 
+	protected $currentModule;
+
 	/**
 	 * Route for handling exception
 	 * @var string
@@ -51,6 +53,8 @@ class Exe extends \Exedra\Container\Container
 
 		// initiate service registry
 		$this->setUp();
+
+		$this->setUpModule();
 
 		// Initiate execution handles/middlewares
 		$this->handle();
@@ -85,8 +89,6 @@ class Exe extends \Exedra\Container\Container
 	protected function setUp()
 	{
 		$this->services['service']->register(array(
-			'view' => function(){ return $this->module['Application']->view;},
-			'controller' => function(){ return $this->module['Application']->controller;},
 			'url' => function(){ return $this->create('factory.url', array($this->app->map, $this->request, $this->config->get('app.url', null), $this->config->get('asset.url', null), $this));},
 			'redirect' => array('\Exedra\Runtime\Redirect', array('self.response', 'self.url')),
 			'form' => array('\Exedra\Runtime\Factory\Form', array('self')),
@@ -95,6 +97,17 @@ class Exe extends \Exedra\Container\Container
 			));
 
 		$this->services['factory']->add('factory.url', '\Exedra\Runtime\Factory\Url');
+	}
+
+	/**
+	 * Modularity set up
+	 */
+	protected function setUpModule()
+	{
+		$this['service']->register(array(
+			'view' => function(){ return $this->getModule()->view; },
+			'controller' => function(){ return $this->getModule()->controller; }
+			));
 	}
 
 	/**
@@ -137,6 +150,18 @@ class Exe extends \Exedra\Container\Container
 	public function getApp()
 	{
 		return $this->app;
+	}
+
+	/**
+	 * Get current module based on finding
+	 * @return \Exedra\Module\Module
+	 */
+	public function getModule()
+	{
+		if($this->currentModule)
+			return $this->currentModule;
+
+		return $this->module[$this->finding->getModule() ? : 'Application'];
 	}
 
 	/**
