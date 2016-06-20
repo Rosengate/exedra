@@ -865,15 +865,23 @@ class Route
 	 * @param string key
 	 * @param mixed value
 	 */
-	public function setMeta($key, $value)
+	public function setMeta($key, $value = null)
 	{
+		if(is_array($key))
+		{
+			foreach($key as $k => $v)
+				$this->meta[$k] = $value;
+
+			return $this;
+		}
+
 		$this->meta[$key] = $value;
 
 		return $this;
 	}
 
 	/**
-	 * Alias to meta information
+	 * Alias to setMeta(), but without first arg checked as if its array.
 	 * @param string key
 	 * @param mixed value
 	 */
