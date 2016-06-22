@@ -29,19 +29,18 @@ Booting up \Exedra\Application
 ======
 At the end of this file, this is how your sample project directory may look like :
 ```
-| app
-| ─ app.php
-| public
+| /public
 | ─ index.php
-| vendor
+| /vendor
+| app.php
 | wizard
 | composer.json
 | composer.lock
 ```
-#### /app/app.php
+#### /app.php
 You can write up the boot file (**app.php**) anywhere. But there're several important directory paths required to be configured.
 
-First, create the boot file named on **/app/app.php**
+First, create the boot file named  **/app.php**
 
 ##### Returns the \Exedra\Application
 And load the composer autoload accordingly. The **app.php** file should return the same \Exedra\Application instance, so it's usable for the front controller public/index.php, or wizard (console) later.
@@ -49,25 +48,23 @@ And load the composer autoload accordingly. The **app.php** file should return t
 Construct the application with your root directory (**path.root**) as the first argument.
 ```
 <?php
-// assuming that this app.php is located under /app/
-require_once __DIR__.'/../vendor/autoload.php';
+require_once __DIR__.'/vendor/autoload.php';
 
-$app = new \Exedra\Application(__DIR__.'/../');
+$app = new \Exedra\Application(__DIR__);
 
 return $app;
 ```
 Or you may pass an array of paths and namespace like below :
 ```
 <?php
-// assuming that this app.php is located under /app/
-require_once __DIR__.'/../vendor/autoload.php';
+require_once __DIR__.'/vendor/autoload.php';
 
 $app = new \Exedra\Application(array(
     'namespace' => 'App',
-    'path.root' => __DIR__.'/../',
-    'path.app' => __DIR__',
-    'path.public' => __DIR__.'/../public/',
-    'path.routes' => __DIR__
+    'path.root' => __DIR__',
+    'path.app' => __DIR__./app',
+    'path.public' => __DIR__.'/public/',
+    'path.routes' => __DIR__.'/app/Routes
     ));
 
 return $app;
@@ -80,9 +77,9 @@ These are optional and internally configured if not passed, only path.root is re
 | public   //path.public
 ```
 
-On the instantiation of the instance, it will autoload the configured **path.app** with the given namespace.
+On the instantiation of the instance, it will autoload the configured **path.app** (/app) with the given namespace.
 
-#### /app/app.php sample routing
+#### /app.php sample routing
 Now, in the same **app.php** let's write some nestful chatting api codes :
 ```
 // global middleware
@@ -154,7 +151,7 @@ return $app;
 Create your front controller file (**index.php**) under your public folder (**path.public**). And require the **app.php** file;
 ```
 <?php 
-$app = require_once __DIR__.'/../App/app.php';
+$app = require_once __DIR__.'/../app.php';
 
 $app->dispatch();
 ```
@@ -163,7 +160,7 @@ $app->dispatch();
 Create a file named **wizard**, in your project root directory, or anywhere convenient to you. And require the **app.php** again.
 ```
 <?php
-$app = require_once __DIR__.'/App/app.php';
+$app = require_once __DIR__.'/app.php';
 
 $app->wizard($argv);
 ```
@@ -221,12 +218,12 @@ Roadmap to 0.3.0
 - proper jargon renames
   - 'uri' to 'path' [DONE]
   - builder to factory [DONE]
-- Internal Routing Improvements [PARTIAL]
-- More type of Exceptions [PARTIAL]
+- Internal Routing Improvements [NEARLY?]
+- More type of Exceptions [DONE]
 - More clarity on application structure [Structure Class removed]
 - Container based \Exedra\Application\Application and \Exedra\Application\Execution\Exec ? [DONE]
 - Move \Exedra\Application\Execution\ and all the related namespaces outsides ? [DONE]
-- Do more tests [PARTIAL]
+- Do more tests [NEEDMORE?]
 
 Thank you!
 ======
