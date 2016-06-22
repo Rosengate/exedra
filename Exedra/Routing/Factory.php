@@ -56,7 +56,7 @@ class Factory
 		$this->register(array(
 			'finding' => '\Exedra\Routing\Finding',
 			'route' => '\Exedra\Routing\Route',
-			'level' => '\Exedra\Routing\Convenient'
+			'level' => '\Exedra\Routing\Router'
 			));
 
 		return $this;
