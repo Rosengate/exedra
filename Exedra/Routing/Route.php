@@ -690,7 +690,7 @@ class Route
 		if($method == 'any')
 			$method = array('get', 'post', 'put', 'delete', 'patch');
 		else if(!is_array($method))
-			$method = explode(',', $method);
+			$method = explode('|', $method);
 
 		$method = array_map(function($value){return trim(strtolower($value));}, $method);
 	
