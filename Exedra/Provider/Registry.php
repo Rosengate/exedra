@@ -58,7 +58,7 @@ class Registry
 				}
 				else
 				{
-					if(!in_array($type, 'service', 'callable', 'factory'))
+					if(!in_array($type, array('service', 'callable', 'factory')))
 					{
 						$type = 'service';
 
@@ -78,6 +78,9 @@ class Registry
 
 				return;
 			}
+
+			if(method_exists($provider, 'provides') && is_array($dependencies = $provider::provides()) && count($dependencies) > 0)
+				return $this->add($provider, $dependencies);
 
 			$this->providers[$provider] = true;
 
