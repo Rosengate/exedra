@@ -63,9 +63,7 @@ class Exe extends \Exedra\Container\Container
 	 */
 	protected function initializeServices()
 	{
-		// Initiate loader, registry, route, params, and set base route based on finding.
-		$this->services['path'] = $this->app->path;
-
+		// Initiate registry, route, params, and set base route based on finding.
 		$this->services['route'] = $this->finding->getRoute();
 		
 		$this->setBaseRoute($this->finding->getBaseRoute());
@@ -83,6 +81,7 @@ class Exe extends \Exedra\Container\Container
 	protected function setUp()
 	{
 		$this->services['service']->register(array(
+			'path' => function(){ return $this->app->path; },
 			'config' => function() { return clone $this->app->config; },
 			'url' => function(){ return $this->create('factory.url', array($this->app->map, $this->request, $this->config->get('app.url', null), $this->config->get('asset.url', null), $this));},
 			'redirect' => array('\Exedra\Runtime\Redirect', array('self.response', 'self.url')),
