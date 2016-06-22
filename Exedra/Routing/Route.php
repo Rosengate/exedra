@@ -1,6 +1,6 @@
 <?php namespace Exedra\Routing;
 
-class Route
+class Route implements RoutableInterface
 {
 	/**
 	 * Route name

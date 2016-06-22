@@ -1,7 +1,7 @@
 <?php
 namespace Exedra\Routing;
 
-class Convenient extends \Exedra\Routing\Level
+class Convenient extends \Exedra\Routing\Level implements \Exedra\Routing\RoutableInterface
 {
 	/**
 	 * Create a route by given methods
@@ -51,6 +51,11 @@ class Convenient extends \Exedra\Routing\Level
 	}
 
 	public function any($path = '/')
+	{
+		return $this->method(null, $path);
+	}
+
+	public function path($path = '/')
 	{
 		return $this->method(null, $path);
 	}
