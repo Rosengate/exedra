@@ -18,4 +18,6 @@ interface RoutableInterface
 	public function path($path);
 
 	public function method($methods);
+
+	public function tag($tag);
 }

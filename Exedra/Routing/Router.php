@@ -61,6 +61,19 @@ class Router extends \Exedra\Routing\Level implements \Exedra\Routing\RoutableIn
 	}
 
 	/**
+	 * Create an empty route with the given tag
+	 * @param string tag
+	 */
+	public function tag($tag)
+	{
+		$route = $this->factory->createRoute($this, $name, array());
+
+		$this->addRoute($route);
+
+		return $route->tag($tag);
+	}
+
+	/**
 	 * A level invoke to conveniently
 	 * create an empty route with the optional name
 	 * @param string name
