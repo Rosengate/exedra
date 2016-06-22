@@ -85,6 +85,7 @@ class Application extends \Exedra\Container\Container
 
 		$this->services['factory']->register(array(
 			'runtime.exe' => '\Exedra\Runtime\Exe',
+			'runtime.response' => function(){ return \Exedra\Runtime\Response::createEmptyResponse(); },
 			'handler.resolver' => '\Exedra\Runtime\Handler\Resolver',
 			'module' => '\Exedra\Module\Module',
 			'factory.url' => '\Exedra\Factory\Url'
@@ -230,7 +231,7 @@ class Application extends \Exedra\Container\Container
 		if(!$finding->isSuccess())
 			throw new \Exedra\Exception\RouteNotFoundException('Route is not found');
 
-		return $this->create('runtime.exe', array($this, $this->middleware, $finding));
+		return $this->create('runtime.exe', array($this, $this->middleware, $finding, $this->create('runtime.response')));
 	}
 
 	/**

@@ -38,15 +38,18 @@ class Exe extends \Exedra\Container\Container
 	public function __construct(
 		\Exedra\Application $app,
 		\Exedra\Middleware\Registry $middlewareRegistry,
-		\Exedra\Routing\Finding $finding)
+		\Exedra\Routing\Finding $finding,
+		\Exedra\Runtime\Response $response)
 	{
 		parent::__construct();
-
-		$this->finding = $finding;
 
 		$this->app = $app;
 
 		$this->middlewareRegistry = $middlewareRegistry;
+
+		$this->services['finding'] = $finding;
+
+		$this->services['response'] = $response;
 
 		// initiate services
 		$this->initializeServices();
@@ -71,8 +74,6 @@ class Exe extends \Exedra\Container\Container
 		\Exedra\Support\DotArray::initialize($this->params, $this->finding->param());
 		
 		$this->services['request'] = $this->finding->getRequest();
-		
-		$this->services['response'] = \Exedra\Runtime\Response::createEmptyResponse();
 	}
 
 	/**
