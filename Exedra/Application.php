@@ -24,10 +24,6 @@ class Application extends \Exedra\Container\Container
 		$this->setUpPath(is_array($params) ? $params : array('path.root' => $params));
 		
 		$this->setUp();
-
-		$this->setUpModule();
-
-		$this->setUpHandlers();
 	}
 
 	/**
@@ -93,6 +89,12 @@ class Application extends \Exedra\Container\Container
 			'module' => '\Exedra\Module\Module',
 			'factory.url' => '\Exedra\Factory\Url'
 		));
+
+		$this->setUpModule();
+
+		$this->setUpHandlers();
+
+		$this->setUpWizard();
 	}
 
 	protected function setUpModule()
@@ -112,6 +114,14 @@ class Application extends \Exedra\Container\Container
 			$map->addHandler('closure', '\Exedra\Runtime\Handler\Closure');
 
 			$map->addHandler('controller', '\Exedra\Runtime\Handler\Controller');
+		});
+	}
+
+	protected function setUpWizard()
+	{
+		$this->services['service']->on('wizard', function($wizard)
+		{
+			$wizard->add('Exedra\Wizard\Application');
 		});
 	}
 

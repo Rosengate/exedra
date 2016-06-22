@@ -75,9 +75,6 @@ class Manager
 	public function __construct(\Exedra\Application $app)
 	{
 		$this->app = $app;
-
-		// register application wizard
-		$this->add('Exedra\Wizard\Application');
 	}
 
 	/**
