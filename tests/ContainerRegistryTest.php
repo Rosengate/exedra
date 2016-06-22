@@ -64,4 +64,64 @@ class ContainerRegistryTest extends PHPUnit_Framework_TestCase
 
 		$this->assertTrue($exe->controller instanceof \Exedra\Factory\Controller && $exe->controller === $exe->module['Application']->controller);
 	}
+
+	public function testConfigPriority()
+	{
+		$app = $this->app;
+
+		$app->config->set('foo-bar', 'app level');
+
+		$getConfig = function($route) use($app)
+		{
+			return $app->execute($route)->config->get('foo-bar');
+		};
+
+		$app->map['foo']->execute(function(){ });
+
+		$this->assertEquals('app level', $getConfig('foo'));
+
+		// route level config
+		$app->map['fooo']->config(array('foo-bar' => 'route level'))->execute(function(){ });
+
+		$this->assertEquals('route level', $getConfig('fooo'));
+
+		// runtime level
+		$app->map->middleware(function($exe)
+		{
+			$exe->service->on('config', function($config)
+			{
+				$config->set('foo-bar', 'runtime level');
+			});
+
+			return $exe->next($exe);
+		});
+
+		$this->assertEquals('runtime level', $getConfig('fooo'));
+
+		// module level
+		$app->module->onAll(function($module)
+		{
+			$module['service']->set('config', function()
+			{
+				$config = new \Exedra\Config;
+
+				$config->set('foo-bar', 'module level');
+
+				return $config;
+			});
+		});
+
+		// merge config on module level with runtime.
+		$app->map->middleware(function($exe)
+		{
+			$exe['service']->on('config', function($config) use($exe)
+			{
+				$config->set($exe->getModule()->config->getAll());
+			});
+
+			return $exe->next($exe);
+		});
+
+		$this->assertEquals('module level', $getConfig('fooo'));
+	}
 }

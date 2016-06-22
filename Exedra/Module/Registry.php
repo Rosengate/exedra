@@ -41,6 +41,12 @@ class Registry implements \ArrayAccess
 	 */
 	protected $filters = array();
 
+	/**
+	 * General filters to be applied to every module.
+	 * @var array filters
+	 */
+	protected $generalFilters = array();
+
 	public function __construct(\Exedra\Application $app, \Exedra\Path $path, $baseNamespace = null)
 	{
 		$this->app = $app;
@@ -114,7 +120,7 @@ class Registry implements \ArrayAccess
 	 * @param string name
 	 * @param \Closure configure
 	 */
-	public function configure($name, \Closure $filter)
+	public function on($name, \Closure $filter)
 	{
 		if(!isset($this->modules[$name]))
 		{
@@ -124,6 +130,19 @@ class Registry implements \ArrayAccess
 		}
 
 		$filter($this->modules[$name]);
+	}
+
+	/**
+	 * Applied on every module instantiated
+	 * @param \Closure
+	 */
+	public function onAll(\Closure $filter)
+	{
+		// apply to existing.
+		foreach($this->modules as $name => $module)
+			$filter($module);
+
+		$this->generalFilters[] = $filter;
 	}
 
 	/**
@@ -180,6 +199,10 @@ class Registry implements \ArrayAccess
 			if(!$module instanceof \Exedra\Module\Module)
 				throw new \Exedra\Exception\InvalidArgumentException('Resolve of module ['.$name.'] must be type of \Exedra\Module\Module');
 		}
+
+		// apply general filter.
+		foreach($this->generalFilters as $callback)
+			$callback($module);
 
 		// resolves with the filters.
 		if(isset($this->filters[$name]))

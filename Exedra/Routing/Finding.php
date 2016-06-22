@@ -188,8 +188,8 @@ class Finding
 	}
 
 	/**
-	 * Config bag of this finding
-	 * @return \Exedra\Config
+	 * An array of config of the finding
+	 * @return array
 	 */
 	public function getConfig()
 	{

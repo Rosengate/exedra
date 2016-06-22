@@ -17,9 +17,9 @@ class ModuleTest extends PHPUnit_Framework_TestCase
 		$this->assertTrue($controller instanceof \Exedra\Factory\Controller);
 	}
 
-	public function testConfigure()
+	public function testFilter()
 	{
-		$this->app['module']->configure('Backend', function($module)
+		$this->app['module']->on('Backend', function($module)
 		{
 			$module['service']->add('foo', function()
 			{
@@ -27,7 +27,17 @@ class ModuleTest extends PHPUnit_Framework_TestCase
 			});
 		});
 
+		$this->app['module']->onAll(function($module)
+		{
+			$module['service']->add('bar', function()
+			{
+				return 'baz';
+			});
+		});
+
 		$this->assertEquals('bar', $this->app['module']->get('Backend')->foo);
+
+		$this->assertEquals('baz', $this->app['module']->get('Frontend')->bar);
 	}
 
 	public function testRegister()

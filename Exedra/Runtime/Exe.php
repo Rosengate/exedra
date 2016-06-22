@@ -54,8 +54,6 @@ class Exe extends \Exedra\Container\Container
 		// initiate service registry
 		$this->setUp();
 
-		$this->setUpModule();
-
 		// Initiate execution handles/middlewares
 		$this->handle();
 	}	
@@ -65,14 +63,10 @@ class Exe extends \Exedra\Container\Container
 	 */
 	protected function initializeServices()
 	{
-		// Initiate loader, registry, route, config, params, and set base route based on finding.
+		// Initiate loader, registry, route, params, and set base route based on finding.
 		$this->services['path'] = $this->app->path;
 
 		$this->services['route'] = $this->finding->getRoute();
-		
-		$this->services['config'] = clone $this->app->config;
-
-		$this->services['config']->set($this->finding->getConfig());
 		
 		$this->setBaseRoute($this->finding->getBaseRoute());
 		
@@ -89,6 +83,7 @@ class Exe extends \Exedra\Container\Container
 	protected function setUp()
 	{
 		$this->services['service']->register(array(
+			'config' => function() { return clone $this->app->config; },
 			'url' => function(){ return $this->create('factory.url', array($this->app->map, $this->request, $this->config->get('app.url', null), $this->config->get('asset.url', null), $this));},
 			'redirect' => array('\Exedra\Runtime\Redirect', array('self.response', 'self.url')),
 			'form' => array('\Exedra\Runtime\Factory\Form', array('self')),
@@ -97,6 +92,20 @@ class Exe extends \Exedra\Container\Container
 			));
 
 		$this->services['factory']->add('factory.url', '\Exedra\Runtime\Factory\Url');
+
+		$this->setUpModule();
+
+		$this->setUpConfig();
+	}
+
+	protected function setUpConfig()
+	{
+		$finding = $this->finding;
+
+		$this->services['service']->on('config', function($config) use($finding)
+		{
+			$config->set($this->finding->getConfig());
+		});
 	}
 
 	/**
