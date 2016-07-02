@@ -17,6 +17,8 @@ class FormTest extends PHPUnit_Framework_TestCase
 
 	public function testInputTextarea()
 	{
+		$this->assertEquals('<textarea name="foo" id="foo"></textarea>', (string) $this->form->textarea('foo'));
+		
 		$this->assertEquals('<textarea name="foo" id="foo">bar</textarea>', (string) $this->form->textarea('foo')->value('bar'));
 	}
 

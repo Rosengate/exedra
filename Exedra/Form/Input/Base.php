@@ -152,7 +152,7 @@ class Base
 	 */
 	public function getValue()
 	{
-		$value = $this->override ? : ($this->attributes['value'] ? : null);
+		$value = $this->override ? : (isset($this->attributes['value']) ? $this->attributes['value'] : null);
 
 		return $value;
 	}
