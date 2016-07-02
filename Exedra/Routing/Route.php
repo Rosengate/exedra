@@ -695,6 +695,8 @@ class Route implements RoutableInterface
 		$method = array_map(function($value){return trim(strtolower($value));}, $method);
 	
 		$this->setProperty('method', $method);
+
+		return $this;
 	}
 
 	/**
