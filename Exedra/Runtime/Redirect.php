@@ -1,7 +1,7 @@
 <?php
 namespace Exedra\Runtime;
 
-class Redirect
+class Redirect implements \Exedra\Factory\UrlInterface
 {
 	public function __construct(\Exedra\Http\Response $response, \Exedra\Factory\Url $urlFactory)
 	{
@@ -11,23 +11,36 @@ class Redirect
 	}
 
 	/**
-	 * Redirect to url
-	 * Set header redirect to the url
-	 * @param string url
-	 * @return redirection
+	 * Dynamically redirect to urlFactory callables
+	 * @param string name
+	 * @param array args
+	 * @return \Exedra\Http\Response
 	 */
-	public function toUrl($url)
+	public function __call($name, array $args = array())
 	{
-		return $this->response->redirect($url);
+		$url = $this->urlFactory->__call($name, $args);
+
+		return $this->to($url);
 	}
 
 	/**
-	 * Alias to toUrl(url)
+	 * Redirect to referer
+	 * @return \Exedra\Http\Response
+	 */
+	public function previous()
+	{
+		$url = $this->urlFactory->previous();
+
+		return $this->to($url);
+	}
+
+	/**
+	 * Alias to to(url)
 	 * @param string url
 	 */
 	public function url($url)
 	{
-		return $this->toUrl($url);
+		return $this->to($url);
 	}
 
 	/**
@@ -41,14 +54,24 @@ class Redirect
 	}
 
 	/**
-	 * Alias to toRoute
-	 * @param string route
-	 * @param array route named params
-	 * @param mixed query string
+	 * Alias to to
+	 * @param string url
+	 * @return \Exedra\Http\Response
 	 */
-	public function to($route = null, array $params = array(), array $query = array())
+	public function to($url)
 	{
-		return $this->toRoute($route, $params, $query);
+		return $this->response->redirect($url);
+	}
+
+	/**
+	 * Redirect to current url.
+	 * @return \Exedra\Http\Response
+	 */
+	public function current()
+	{
+		$url = $this->urlFactory->current();
+
+		return $this->to($url);
 	}
 
 	/**
@@ -75,6 +98,6 @@ class Redirect
 
 		$url = $this->urlFactory->create($route, $params, $query);
 
-		return $this->toUrl($url);
+		return $this->to($url);
 	}
 }

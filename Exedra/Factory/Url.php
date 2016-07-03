@@ -4,7 +4,7 @@ namespace Exedra\Factory;
 /**
  * A route oriented url generator
  */
-class Url
+class Url implements UrlInterface
 {
 	/**
 	 * Absolute Base url
@@ -46,6 +46,12 @@ class Url
 		$this->setBase($appUrl ? : ($request ? $request->getUri()->getScheme().'://'.$request->getUri()->getAuthority() : null ));
 
 		$this->setAsset($assetUrl ? : $this->baseUrl);
+
+		// add a dynamic alias to addCallable()
+		$this->addCallable('callable', function($name, \Closure $closure)
+		{
+			return $this->addCallable($name, $closure);
+		});
 	}
 
 	/**
@@ -85,16 +91,6 @@ class Url
 		$this->callables[$name] = $callable;
 
 		return $this;
-	}
-
-	/**
-	 * Alias to addCallable()
-	 * @param string name
-	 * @param \Closure callable
-	 */
-	public function register($name, \Closure $callable)
-	{
-		$this->callables[$name] = $callable;
 	}
 
 	/**
