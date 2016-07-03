@@ -289,7 +289,7 @@ class Manager
 
 		$method = 'execute'.ucfirst($command);
 
-		return $wizard->$method($arguments);
+		return $wizard->{$method}($arguments);
 	}
 
 	/**

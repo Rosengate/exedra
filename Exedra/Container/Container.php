@@ -283,7 +283,7 @@ class Container implements \ArrayAccess
 								switch($split[0])
 								{
 									case 'self':
-										$arguments[] = $this->$split[1];
+										$arguments[] = $this->{$split[1]};
 									break;
 									case 'service':
 										$arguments[] = $this->get($split[1]);
@@ -295,7 +295,7 @@ class Container implements \ArrayAccess
 										$arguments[] = $this->__call($split[1]);
 									break;
 									default:
-										$arguments[] = $this->$arg;
+										$arguments[] = $this->{$arg};
 									break;
 								}
 							}

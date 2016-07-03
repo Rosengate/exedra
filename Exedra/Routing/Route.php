@@ -108,7 +108,7 @@ class Route implements RoutableInterface
 
 		$method = 'set'.ucwords($key);
 
-		$this->$method($value);
+		$this->{$method}($value);
 	}
 
 	/**

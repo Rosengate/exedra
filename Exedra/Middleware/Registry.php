@@ -49,7 +49,7 @@ class Registry
 
 			$method = 'resolveByType'.ucfirst(strtolower(gettype($middleware)));
 
-			$middlewares[$no] = $this->$method($exe, $middleware);
+			$middlewares[$no] = $this->{$method}($exe, $middleware);
 		}
 	}
 

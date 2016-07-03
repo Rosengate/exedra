@@ -45,7 +45,7 @@ class Uri
 	public function applyParts($parts)
 	{
 		foreach($parts as $part => $value)
-			$this->$part = $value;
+			$this->{$part} = $value;
 	}
 
 	/**
