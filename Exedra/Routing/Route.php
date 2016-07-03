@@ -584,7 +584,7 @@ class Route implements RoutableInterface
 				return $level;
 			break;
 			default:
-				throw new \Exedra\Exception\InvalidArgumentException('Unable to resolve route level. It must be type of \Closure, string, or array');
+				throw new \Exedra\Exception\InvalidArgumentException('Unable to resolve route level ['.$type.']. It must be type of \Closure, string, or array');
 			break;
 		}
 	}
