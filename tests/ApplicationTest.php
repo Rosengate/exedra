@@ -1,4 +1,6 @@
 <?php
+require_once __DIR__.'/autoload.php';
+
 class ApplicationTest extends PHPUnit_Framework_TestCase
 {
 	public function setUp()
