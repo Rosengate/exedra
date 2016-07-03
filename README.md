@@ -1,5 +1,8 @@
 Exédra
 ======
+[![Semver](https://travis-ci.org/Rosengate/exedra.svg?branch=master)](https://travis-ci.org/Rosengate/exedra.svg?branch=master)
+[![MIT Licence](https://badges.frapsoft.com/os/mit/mit.png?v=103)](https://opensource.org/licenses/mit-license.php)
+
 A multi-tier nestful routing oriented PHP Microframework.
 
 p/s : About to be released on stable version
