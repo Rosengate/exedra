@@ -177,7 +177,14 @@ class Route implements RoutableInterface
 		$paths = array();
 
 		foreach($routes as $route)
-			$paths[] = $route->getProperty('path');
+		{
+			$path = $route->getProperty('path');
+
+			if($path == '')
+				continue;
+
+			$paths[] = $path;
+		}
 
 		return trim(implode('/', $paths), '/');
 	}
