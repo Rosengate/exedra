@@ -87,4 +87,34 @@ class DotArrayTest extends PHPUnit_Framework_TestCase
 
 		$this->assertTrue(!DotArray::has($this->storage, 'foo.tuq.nux'));
 	}
+
+	public function testEach()
+	{
+		$dump = array(
+			'foo' => array(
+				'bar' => 'baz',
+				'quz' => array(
+					'tux' => 'nux'
+					)
+				),
+			'juz' => 'tuq',
+			'dax' => array(
+				'nut' => 'jar'
+				)
+			);
+
+		$new = array();
+
+		DotArray::each($dump, function($key, $value) use(&$new)
+		{
+			$new[] = $key;
+		});
+
+		$this->assertEquals(array(
+			'foo.bar',
+			'foo.quz.tux',
+			'juz',
+			'dax.nut'
+			), $new);
+	}
 }

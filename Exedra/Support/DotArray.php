@@ -85,6 +85,24 @@ class DotArray
 	}
 
 	/**
+	 * Recursively loop through multidimensional array
+	 * With every loop receive a dotted key
+	 * @param &array storage
+	 * @param \Closure callback
+	 * @param array prefix
+	 */
+	public static function each(&$storage, \Closure $callback, array $prefix = array())
+	{
+		foreach($storage as $key => &$value)
+		{
+			if(is_array($value))
+				static::each($value, $callback, array_merge($prefix, array($key)));
+			else
+				$callback(implode('.', array_merge($prefix, array($key))), $value, $storage[$key]);
+		}
+	}
+
+	/**
 	 * Check key existence
 	 * @param array storage
 	 * @param string key
