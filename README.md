@@ -55,6 +55,8 @@ require_once __DIR__.'/vendor/autoload.php';
 
 $app = new \Exedra\Application(__DIR__);
 
+$app->autoloadSrc();
+
 return $app;
 ```
 Or you may pass an array of paths and namespace like below :
@@ -66,9 +68,12 @@ $app = new \Exedra\Application(array(
     'namespace' => 'App',
     'path.root' => __DIR__',
     'path.app' => __DIR__./app',
-    'path.public' => __DIR__.'/public/',
-    'path.routes' => __DIR__.'/app/Routes
+    'path.src' => __DIR__.'/app/src',
+    'path.routes' => __DIR__.'/app/routes,
+    'path.public' => __DIR__.'/public'
     ));
+    
+$app->autoloadSrc();
 
 return $app;
 ```
@@ -76,11 +81,10 @@ These are optional and internally configured if not passed, only path.root is re
 ```
 | .        //path.root
 | app      //path.app
-| ─ Routes //path.routes
+| ─ src    //path.src
+| ─ routes //path.routes
 | public   //path.public
 ```
-
-On the instantiation of the instance, it will autoload the configured **path.app** (/app) with the given namespace.
 
 #### /app.php sample routing
 Now, in the same **app.php** let's write some nestful chatting api codes :
