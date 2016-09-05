@@ -6,15 +6,17 @@ class PathTest extends PHPUnit_Framework_TestCase
 		$this->path = new \Exedra\Path(__DIR__.'/Factory');
 
 		$this->path['app'] = 'app';
+
+
 	}
 
 	public function testLoad()
 	{
-		$this->assertTrue($this->path['app']->has('View/TestView.php'));
+		$this->assertTrue($this->path['app']->has('views/TestView.php'));
 
 		ob_start();
 
-		$this->path['app']->load('View/TestView.php');
+		$this->path['app']->load('views/TestView.php');
 
 		$content = ob_get_clean();
 
@@ -36,7 +38,7 @@ class PathTest extends PHPUnit_Framework_TestCase
 	{
 		ob_start();
 
-		$this->path['app']->load('View/TestView.php', array(
+		$this->path['app']->load('views/TestView.php', array(
 			'testData' => 'foo-bar'
 			));
 
@@ -52,11 +54,11 @@ class PathTest extends PHPUnit_Framework_TestCase
 
 	public function testAutoload()
 	{
-		$this->path['app']->autoload('AutoloadedDir');
+		$this->path['app']->autoload('autoloaded_dir');
 
 		$this->assertEquals(FooBarClass::CLASS, get_class(new FooBarClass));
 
-		$this->path['app']->autoload('AutoloadedDir', 'FooSpace');
+		$this->path['app']->autoload('autoloaded_dir', 'FooSpace');
 
 		$this->assertEquals(\FooSpace\FooBazClass::CLASS, get_class(new \FooSpace\FooBazClass));
 	}

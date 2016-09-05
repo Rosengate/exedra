@@ -5,12 +5,12 @@ class FactoryViewTest extends PHPUnit_Framework_TestCase
 	{
 		$app = new \Exedra\Application(__DIR__);
 
-		$this->factoryView = new \Exedra\View\Factory($app->path['app']->create('View'));
+		$this->viewFactory = new \Exedra\View\Factory($app->path['app']->create('views'));
 	}
 
 	public function viewCreate()
 	{
-		return $this->factoryView->create('TestView');
+		return $this->viewFactory->create('TestView');
 	}
 
 	public function testCreate()
@@ -36,7 +36,7 @@ class FactoryViewTest extends PHPUnit_Framework_TestCase
 
 	public function testRenderWithDefaultData()
 	{
-		$this->factoryView->setDefaultData('testDefaultData', 'testDefaultDataValue');
+		$this->viewFactory->setDefaultData('testDefaultData', 'testDefaultDataValue');
 
 		$view = $this->viewCreate();
 

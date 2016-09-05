@@ -34,7 +34,7 @@ class ContainerRegistryTest extends PHPUnit_Framework_TestCase
 
 		$this->assertTrue($app->wizard instanceof \Exedra\Wizard\Manager);
 
-		$this->assertTrue($app->module instanceof \Exedra\Module\Registry);
+		// $this->assertTrue($app->module instanceof \Exedra\Module\Registry);
 
 		$this->assertTrue($app->path instanceof \Exedra\Path);
 
@@ -58,11 +58,11 @@ class ContainerRegistryTest extends PHPUnit_Framework_TestCase
 
 		$this->assertTrue($exe->redirect instanceof \Exedra\Runtime\Redirect);
 
-		$this->assertTrue($exe->module instanceof \Exedra\Module\Registry && $exe->module === $exe->app->module);
+		// $this->assertTrue($exe->module instanceof \Exedra\Module\Registry && $exe->module === $exe->app->module);
 
-		$this->assertTrue($exe->view instanceof \Exedra\View\Factory && $exe->view === $exe->module['Application']->view);
+		// $this->assertTrue($exe->view instanceof \Exedra\View\Factory && $exe->view === $exe->module['Application']->view);
 
-		$this->assertTrue($exe->controller instanceof \Exedra\Factory\Controller && $exe->controller === $exe->module['Application']->controller);
+		// $this->assertTrue($exe->controller instanceof \Exedra\Factory\Controller && $exe->controller === $exe->module['Application']->controller);
 	}
 
 	public function testConfigPriority()
@@ -98,30 +98,17 @@ class ContainerRegistryTest extends PHPUnit_Framework_TestCase
 
 		$this->assertEquals('runtime level', $getConfig('fooo'));
 
-		// module level
-		$app->module->onAll(function($module)
-		{
-			$module['service']->set('config', function()
-			{
-				$config = new \Exedra\Config;
-
-				$config->set('foo-bar', 'module level');
-
-				return $config;
-			});
-		});
-
 		// merge config on module level with runtime.
-		$app->map->middleware(function($exe)
-		{
-			$exe['service']->on('config', function($config) use($exe)
-			{
-				$config->set($exe->getModule()->config->getAll());
-			});
+		// $app->map->middleware(function($exe)
+		// {
+		// 	$exe['service']->on('config', function($config) use($exe)
+		// 	{
+		// 		$config->set($exe->getModule()->config->getAll());
+		// 	});
 
-			return $exe->next($exe);
-		});
+		// 	return $exe->next($exe);
+		// });
 
-		$this->assertEquals('module level', $getConfig('fooo'));
+		// $this->assertEquals('module level', $getConfig('fooo'));
 	}
 }

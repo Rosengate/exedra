@@ -211,6 +211,6 @@ class ApplicationTest extends PHPUnit_Framework_TestCase
 
 		$this->assertEquals(404, $response->getStatusCode());
 
-		$this->assertEquals('Route is not found', $response->getBody());
+		$this->assertEquals('Route does not exist', $response->getBody());
 	}
 }

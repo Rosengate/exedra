@@ -15,6 +15,16 @@ class Controller
 	}
 
 	/**
+	 * Set factory base namespace
+	 * @param string namespace
+	 * @return void
+	 */
+	public function setBaseNamespace($namespace)
+	{
+		$this->baseNamespace = $namespace;
+	}
+
+	/**
 	 * Build class name
 	 * @param string class
 	 * @return string

@@ -38,20 +38,26 @@ class Application extends \Exedra\Container\Container
 
 		$params['path.root'] = rtrim($params['path.root'], '/\\');
 
-		$this->services['path'] = $path = new \Exedra\Path($params['path.root']);
+		$this->services['path'] = $pathRoot = new \Exedra\Path($params['path.root']);
 
-		$path->register('root', $path); // recursive reference.
+		$pathRoot->register('root', $pathRoot); // recursive reference.
 
-		$path->register('app', isset($params['path.app']) ? $params['path.app'] : $path->to('app'), true);
+		$pathRoot->register('public', isset($params['path.public']) ? $params['path.public'] : $pathRoot->to('public'), true);
+		
+		$pathApp = $pathRoot->register('app', isset($params['path.app']) ? $params['path.app'] : $pathRoot->to('app'), true);
 
-		$path->register('public', isset($params['path.public']) ? $params['path.public'] : $path->to('public'), true);
+		$pathRoot->register('src', isset($params['path.src']) ? $params['path.src'] : $pathApp->to('src'), true);
 
-		$path->register('routes', isset($params['path.routes']) ? $params['path.routes'] : $path['app']->to('Routes'), true);
+		$pathRoot->register('routes', isset($params['path.routes']) ? $params['path.routes'] : $pathApp->to('routes'), true);
+	}
 
-		$path->register('module', isset($params['path.module']) ? $params['path.module'] : $path['app']);
-
-		// autoload the current app folder.
-		$path['app']->autoloadPsr4($this->namespace, '');
+	/**
+	 * Autoload src folder with the app namespace.
+	 * @return void
+	 */
+	public function autoloadSrc()
+	{
+		$this->path['src']->autoloadPsr4($this->namespace, '');
 	}
 
 	/**
@@ -78,17 +84,25 @@ class Application extends \Exedra\Container\Container
 			'@session' => '\Exedra\Session\Session',
 			'@flash' => array('\Exedra\Session\Flash', array('self.session')),
 			'wizard' => array('\Exedra\Wizard\Manager', array('self')),
-			'@module' => function(){
-				return new \Exedra\Module\Registry($this, $this->path['module'], $this->getNamespace());
+			'@controller' => function(){
+				return new \Exedra\Factory\Controller($this->namespace);
+			},
+			'@view' => function(){
+				return new \Exedra\View\Factory($this->path['app']->create('views'));
 			}
+			// '@module' => function(){
+			// 	return new \Exedra\Module\Registry($this, $this->path['module'], $this->getNamespace());
+			// }
 		));
 
 		$this->services['factory']->register(array(
 			'runtime.exe' => '\Exedra\Runtime\Exe',
 			'runtime.response' => function(){ return \Exedra\Runtime\Response::createEmptyResponse(); },
 			'handler.resolver' => '\Exedra\Runtime\Handler\Resolver',
-			'module' => '\Exedra\Module\Module',
-			'factory.url' => '\Exedra\Factory\Url'
+			// 'module' => '\Exedra\Module\Module',
+			'factory.url' => '\Exedra\Factory\Url',
+			'@factory.controller' => '\Exedra\Factory\Controller',
+			'@factory.view' => '\Exedra\View\Factory'
 		));
 
 		$this->setUpModule();
@@ -101,10 +115,10 @@ class Application extends \Exedra\Container\Container
 	protected function setUpModule()
 	{
 		// Application module as a default Module registered
-		$this->services['service']->on('module', function(\Exedra\Module\Registry $registry)
-		{
-			$registry->register('Application', '\Exedra\Module\Application');
-		});
+		// $this->services['service']->on('module', function(\Exedra\Module\Registry $registry)
+		// {
+		// 	$registry->register('Application', '\Exedra\Module\Application');
+		// });
 	}
 
 	protected function setUpHandlers()
@@ -229,7 +243,7 @@ class Application extends \Exedra\Container\Container
 	public function exec(\Exedra\Routing\Finding $finding)
 	{
 		if(!$finding->isSuccess())
-			throw new \Exedra\Exception\RouteNotFoundException('Route is not found');
+			throw new \Exedra\Exception\RouteNotFoundException('Route does not exist');
 
 		return $this->create('runtime.exe', array($this, $this->middleware, $finding, $this->create('runtime.response')));
 	}
