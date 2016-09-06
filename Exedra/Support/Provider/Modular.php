@@ -5,7 +5,7 @@ class Modular implements \Exedra\Provider\ProviderInterface
 {
 	public function register(\Exedra\Application $app)
 	{
-		$app->path->register('modules', 'modules');
+		$app->path->register('modules', $app->path['app']->create('modules'));
 
 		$app->map->middleware(function($exe)
 		{
