@@ -22,6 +22,12 @@ class Finding
 	protected $meta = array();
 
 	/**
+	 * Finding attributes
+	 * @var array meta
+	 */
+	protected $attributes = array();
+
+	/**
 	 * Route parameters
 	 * @var array parameters
 	 */
@@ -146,14 +152,11 @@ class Finding
 			foreach($route->getProperty('middleware') as $middleware)
 				$this->middlewares[] = $middleware;
 
-			$meta = $route->getMeta();
+			foreach($route->getMeta() as $key => $value)
+				$this->meta[$key] = $value;
 
-			// if route has meta information
-			if(count($meta) > 0)
-			{
-				foreach($meta as $key => $value)
-					$this->meta[$key] = $value;
-			}
+			foreach($route->getAttributes() as $key => $value)
+				$this->attributes[$key] = $value;
 
 			// pass conig.
 			if($route->hasProperty('config'))
@@ -212,6 +215,27 @@ class Finding
 	public function hasMeta($key)
 	{
 		return isset($this->meta[$key]);
+	}
+
+	/**
+	 * Get route found attribute
+	 * @param string key
+	 * @param mixed default value
+	 * @return mixed
+	 */
+	public function getAttribute($key, $default = null)
+	{
+		return array_key_exists($key, $this->attributes) ? $this->attributes[$key] : $default;
+	}
+
+	/**
+	 * Check whether attribute exists
+	 * @param string key
+	 * @return boolean
+	 */
+	public function hasAttribute($key)
+	{
+		return array_key_exists($key, $this->attributes);
 	}
 
 	/**

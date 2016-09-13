@@ -297,6 +297,48 @@ class Exe extends \Exedra\Container\Container
 	}
 
 	/**
+	 * Check whether given attribute exists
+	 * @param string key
+	 * @return boolean
+	 */
+	public function hasAttribute($key)
+	{
+		return $this->finding->hasAttribute($key);
+	}
+
+	/**
+	 * Alias to hasAttribute(key)
+	 * @param string key
+	 * @return boolean
+	 */
+	public function hasAttr($key)
+	{
+		return $this->finding->hasAttribute($key);
+	}
+
+	/**
+	 * Alias to getAttribute
+	 * @param string key
+	 * @param string|null default value
+	 * @return mixed
+	 */
+	public function attr($key, $default = null)
+	{
+		return $this->finding->getAttribute($key, $default);
+	}
+
+	/**
+	 * Get attribute
+	 * @param string key
+	 * @param string|null default value
+	 * @return mixed
+	 */
+	public function getAttribute($key, $default = null)
+	{
+		return $this->finding->getAttribute($key, $default);
+	}
+
+	/**
 	 * Get route meta information
 	 * @param string key
 	 */

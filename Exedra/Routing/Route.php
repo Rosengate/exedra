@@ -70,6 +70,12 @@ class Route implements RoutableInterface
 	 */
 	protected $meta = array();
 
+	/**
+	 * Route meta attributes
+	 * @param array attributes
+	 */
+	protected $attributes = array();
+
 	public function __construct(Level $level, $name, array $properties = array())
 	{
 		$this->name = $name;
@@ -867,6 +873,49 @@ class Route implements RoutableInterface
 	public function tag($tag)
 	{
 		return $this->setProperty('tag', $tag);
+	}
+
+	/**
+	 * Set attribute
+	 * @param string key
+	 * @param mixed value
+	 */
+	public function setAttribute($key, $value)
+	{
+		$this->attributes[$key] = $value;
+
+		return $this;
+	}
+
+	/**
+	 * Get attribute
+	 * @param string key
+	 * @return mixed
+	 */
+	public function getAttribute($key)
+	{
+		return $this->attributes[$key];
+	}
+
+	/**
+	 * Get all attributes
+	 * @return array
+	 */
+	public function getAttributes()
+	{
+		return $this->attributes;
+	}
+
+	/**
+	 * Alias to setAttribute(key, value)
+	 * @param string key
+	 * @param string value
+	 */
+	public function attr($key, $value)
+	{
+		$this->attributes[$key] = $value;
+
+		return $this;
 	}
 
 	/**

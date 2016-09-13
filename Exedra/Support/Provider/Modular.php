@@ -9,9 +9,9 @@ class Modular implements \Exedra\Provider\ProviderInterface
 
 		$app->map->middleware(function($exe)
 		{
-			if($exe->hasMeta('module'))
+			if($exe->hasAttribute('module'))
 			{
-				$module = $exe->meta('module');
+				$module = $exe->attr('module');
 
 				$pathModule = $exe->path['modules']->create(strtolower($module));
 
