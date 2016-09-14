@@ -339,22 +339,25 @@ class Exe extends \Exedra\Container\Container
 	}
 
 	/**
-	 * Get route meta information
+	 * Alias to get attribute
+	 * For backward compatibility
 	 * @param string key
 	 */
-	public function meta($key)
+	public function meta($key, $default = null)
 	{
-		return $this->finding->getMeta($key);
+		return $this->finding->getAttribute($key, $default);
 	}
 
 	/**
+	 * Alias to hasAttr
+	 * For backward compatibility
 	 * Check whether given meta key exists
 	 * @param string key
 	 * @return bool
 	 */
 	public function hasMeta($key)
 	{
-		return $this->finding->hasMeta($key);
+		return $this->finding->hasAttribute($key);
 	}
 
 	/**

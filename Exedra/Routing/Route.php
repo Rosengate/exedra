@@ -65,12 +65,6 @@ class Route implements RoutableInterface
 								'verb' => 'method');
 
 	/**
-	 * Route meta information
-	 * @var array meta
-	 */
-	protected $meta = array();
-
-	/**
 	 * Route meta attributes
 	 * @param array attributes
 	 */
@@ -928,38 +922,26 @@ class Route implements RoutableInterface
 		if(is_array($key))
 		{
 			foreach($key as $k => $v)
-				$this->meta[$k] = $value;
+				$this->attributes[$k] = $value;
 
 			return $this;
 		}
 
-		$this->meta[$key] = $value;
+		$this->attributes[$key] = $value;
 
 		return $this;
 	}
 
 	/**
-	 * Alias to setMeta(), but without first arg checked as if its array.
+	 * Alias to setAttribute(), but without first arg checked as if its array.
 	 * @param string key
 	 * @param mixed value
 	 */
 	public function meta($key, $value)
 	{
-		$this->meta[$key] = $value;
+		$this->attributes[$key] = $value;
 
 		return $this;
-	}
-
-	/**
-	 * Get meta information
-	 * @param string key
-	 */
-	public function getMeta($key = null)
-	{
-		if(!$key)
-			return $this->meta;
-
-		return $this->meta[$key];
 	}
 
 	/**

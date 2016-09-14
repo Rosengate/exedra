@@ -16,14 +16,8 @@ class Finding
 	public $middlewares = array();
 
 	/**
-	 * Route meta information
-	 * @var array meta
-	 */
-	protected $meta = array();
-
-	/**
 	 * Finding attributes
-	 * @var array meta
+	 * @var array attributes
 	 */
 	protected $attributes = array();
 
@@ -125,7 +119,7 @@ class Finding
 
 	/**
 	 * Resolve finding informations
-	 * resolve, baseRoute, middlewares, meta, config
+	 * resolve, baseRoute, middlewares, config, attributes
 	 */
 	public function resolve()
 	{
@@ -151,9 +145,6 @@ class Finding
 			// append all route middlewares
 			foreach($route->getProperty('middleware') as $middleware)
 				$this->middlewares[] = $middleware;
-
-			foreach($route->getMeta() as $key => $value)
-				$this->meta[$key] = $value;
 
 			foreach($route->getAttributes() as $key => $value)
 				$this->attributes[$key] = $value;
@@ -197,24 +188,6 @@ class Finding
 	public function getConfig()
 	{
 		return $this->config;
-	}
-
-	/**
-	 * Get meta information
-	 * @param string key
-	 */
-	public function getMeta($key)
-	{
-		return $this->meta[$key];
-	}
-
-	/**
-	 * Check whether the meta information exists
-	 * @param string key
-	 */
-	public function hasMeta($key)
-	{
-		return isset($this->meta[$key]);
 	}
 
 	/**
