@@ -8,6 +8,7 @@ use Exedra\Http\ServerRequest;
 use Exedra\Middleware\Registry as MiddlewareRegistry;
 use Exedra\Path;
 use Exedra\Provider\Registry as ProviderRegistry;
+use Exedra\Routing\Route;
 use Exedra\Routing\Router;
 use Exedra\Session\Flash;
 use Exedra\Session\Session;
@@ -19,7 +20,7 @@ use Exedra\Wizard\Manager;
  * @package Exedra\Support\Definitions
  *
  * @property Path $path
- * @property Router $map
+ * @property Router|Route[] $map
  * @property ProviderRegistry $provider
  * @property Config $config
  * @property MiddlewareRegistry $middleware
