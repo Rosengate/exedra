@@ -1,6 +1,8 @@
 <?php namespace Exedra;
 
-class Application extends \Exedra\Container\Container
+use Exedra\Support\Definitions\Application as Definition;
+
+class Application extends \Exedra\Container\Container implements Definition
 {
 	protected $namespace = 'App';
 
@@ -30,11 +32,13 @@ class Application extends \Exedra\Container\Container
 	 * Configure default paths.
 	 * root, app, public, routes
 	 * @param array params
+     *
+     * @throws Exception\InvalidArgumentException
 	 */
 	protected function setUpPath(array $params)
 	{
 		if(!isset($params['path.root']))
-			throw new \Exedra\Exception\InvalidArgumentException('[path.root] parameter is required, at least.');
+			throw new Exception\InvalidArgumentException('[path.root] parameter is required, at least.');
 
 		$params['path.root'] = rtrim($params['path.root'], '/\\');
 
@@ -197,13 +201,13 @@ class Application extends \Exedra\Container\Container
 	 * @param array parameter
 	 * @return \Exedra\Runtime\Exe
 	 *
-	 * @throws \Exedra\Exception\InvalidArgumentException
+	 * @throws Exception\InvalidArgumentException
 	 */
 	public function execute($routeName, array $parameters = array(), \Exedra\Http\ServerRequest $request = null)
 	{
 		// expect it as route name
 		if(!is_string($routeName))
-			throw new \Exedra\Exception\InvalidArgumentException('Argument 1 must be [string]');
+			throw new Exception\InvalidArgumentException('Argument 1 must be [string]');
 			
 		return $this->exec($this->map->findByName($routeName, $parameters, $request));
 	}
@@ -300,7 +304,7 @@ class Application extends \Exedra\Container\Container
 	 * @param array args
 	 * @return mixed
 	 *
-	 * @throws \Exedra\Exception\InvalidArgumentException
+	 * @throws Exception\InvalidArgumentException
 	 */
 	protected function solve($type, $name, array $args = array())
 	{
@@ -327,7 +331,7 @@ class Application extends \Exedra\Container\Container
 						return call_user_func_array($service, $args);
 				}
 
-				throw new \Exedra\Exception\InvalidArgumentException('['.get_class($this).'] Unable to find ['.$name.'] in the registered '.$type);
+				throw new Exception\InvalidArgumentException('['.get_class($this).'] Unable to find ['.$name.'] in the registered '.$type);
 			}
 		}
 		else

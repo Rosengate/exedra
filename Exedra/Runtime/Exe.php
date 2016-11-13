@@ -1,7 +1,10 @@
 <?php
 namespace Exedra\Runtime;
 
-class Exe extends \Exedra\Container\Container
+use Exedra\Config;
+use Exedra\Support\Definitions\Exe as Definition;
+
+class Exe extends \Exedra\Container\Container implements Definition
 {
 	/**
 	 * Array of (referenced) parameters for this execution.
@@ -23,7 +26,7 @@ class Exe extends \Exedra\Container\Container
 
 	/**
 	 * Middleware registry of application instance
-	 * @var \Exedra\Application\Middleware\Registry
+	 * @var \Exedra\Middleware\Registry
 	 */
 	protected $middlewareRegistry;
 
@@ -100,7 +103,7 @@ class Exe extends \Exedra\Container\Container
 	{
 		$finding = $this->finding;
 
-		$this->services['service']->on('config', function($config) use($finding)
+		$this->services['service']->on('config', function(Config $config) use($finding)
 		{
 			$config->set($this->finding->getConfig());
 		});

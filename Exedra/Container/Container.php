@@ -5,7 +5,7 @@ class Container implements \ArrayAccess
 	/**
 	 * Container resolved services
 	 * resolved services, and publicly accessible service
-	 * @var array services
+	 * @var Registry[] services
 	 */
 	protected $services = array();
 
