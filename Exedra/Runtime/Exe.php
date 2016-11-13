@@ -93,8 +93,6 @@ class Exe extends \Exedra\Container\Container
 
 		$this->services['factory']->add('factory.url', '\Exedra\Runtime\Factory\Url');
 
-		// $this->setUpModule();
-
 		$this->setUpConfig();
 	}
 
@@ -106,17 +104,6 @@ class Exe extends \Exedra\Container\Container
 		{
 			$config->set($this->finding->getConfig());
 		});
-	}
-
-	/**
-	 * Modularity set up
-	 */
-	protected function setUpModule()
-	{
-		// $this['service']->register(array(
-		// 	'view' => function(){ return $this->getModule()->view; },
-		// 	'controller' => function(){ return $this->getModule()->controller; }
-		// 	));
 	}
 
 	/**

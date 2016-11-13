@@ -90,35 +90,20 @@ class Application extends \Exedra\Container\Container
 			'@view' => function(){
 				return new \Exedra\View\Factory($this->path['app']->create('views'));
 			}
-			// '@module' => function(){
-			// 	return new \Exedra\Module\Registry($this, $this->path['module'], $this->getNamespace());
-			// }
 		));
 
 		$this->services['factory']->register(array(
 			'runtime.exe' => '\Exedra\Runtime\Exe',
 			'runtime.response' => function(){ return \Exedra\Runtime\Response::createEmptyResponse(); },
 			'handler.resolver' => '\Exedra\Runtime\Handler\Resolver',
-			// 'module' => '\Exedra\Module\Module',
 			'factory.url' => '\Exedra\Factory\Url',
 			'@factory.controller' => '\Exedra\Factory\Controller',
 			'@factory.view' => '\Exedra\View\Factory'
 		));
 
-		$this->setUpModule();
-
 		$this->setUpHandlers();
 
 		$this->setUpWizard();
-	}
-
-	protected function setUpModule()
-	{
-		// Application module as a default Module registered
-		// $this->services['service']->on('module', function(\Exedra\Module\Registry $registry)
-		// {
-		// 	$registry->register('Application', '\Exedra\Module\Application');
-		// });
 	}
 
 	protected function setUpHandlers()
