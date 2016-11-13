@@ -33,9 +33,9 @@ class Path implements \ArrayAccess
 
 	/**
 	 * Required the file.
-	 * @param string file
-	 * @param array data
-	 * @return required file
+	 * @param string $file
+	 * @param array $data
+	 * @return mixed
 	 */
 	public function load($file, array $data = array())
 	{
@@ -44,9 +44,9 @@ class Path implements \ArrayAccess
 
 	/**
 	 * Similar with load, but only require the file once.
-	 * @param mixed file
-	 * @param array data
-	 * @return required file
+	 * @param mixed $file
+	 * @param array $data
+	 * @return mixed
 	 */
 	public function loadOnce($file, array $data = array())
 	{
@@ -55,8 +55,8 @@ class Path implements \ArrayAccess
 
 	/**
 	 * Do a buffered file inclusion
-	 * @param string file
-	 * @param array data
+	 * @param string $file
+	 * @param array $data
 	 * @return string
 	 */
 	public function loadBuffered($file, array $data = array())
@@ -71,9 +71,11 @@ class Path implements \ArrayAccess
 	/**
 	 * Abstract function for load and loadOnce
 	 * @param mixed file
-	 * @param array data
-	 * @param boolean once
-	 * @return required file
+	 * @param array $data
+	 * @param boolean $once
+	 * @return mixed
+     *
+     * @throws \Exedra\Exception\NotFoundException
 	 */
 	protected function loadFile($file, $data, $once = false)
 	{
@@ -115,9 +117,9 @@ class Path implements \ArrayAccess
 
 	/**
 	 * PSR-4 autoloader path register
-	 * @param string basePath
-	 * @param string prefix (optional), a namespace prefix
-	 * @param boolean relative (optional, default : true), if false, will consider the basePath given as absolute.
+	 * @param string $basePath
+	 * @param string $prefix (optional), a namespace prefix
+	 * @param boolean $relative (optional, default : true), if false, will consider the basePath given as absolute.
 	 */
 	public function registerAutoload($basePath, $prefix = '', $relative = true)
 	{
@@ -126,9 +128,9 @@ class Path implements \ArrayAccess
 
 	/**
 	 * Alias to registerAutoload
-	 * @param string paths
-	 * @param string|null namespace
-	 * @param boolean|true relative, if false, will consider the path given as absolute.
+	 * @param string $path
+	 * @param string|null $namespace
+	 * @param boolean|true $relative, if false, will consider the path given as absolute.
 	 */
 	public function autoload($path, $namespace = '', $relative = true)
 	{
@@ -137,8 +139,9 @@ class Path implements \ArrayAccess
 
 	/**
 	 * Psr autoload
-	 * @param string namespace
-	 * @param string path
+	 * @param string $namespace
+	 * @param string $path
+     * @param bool $relative
 	 */
 	public function autoloadPsr4($namespace, $path, $relative = true)
 	{
@@ -193,6 +196,7 @@ class Path implements \ArrayAccess
 
 	/**
 	 * Create File instance
+     * @param string $filename
 	 * @return \Exedra\File
 	 */
 	public function file($filename)
@@ -202,7 +206,7 @@ class Path implements \ArrayAccess
 
 	/**
 	 * Alias to create()
-	 * @param string path
+	 * @param string $path
 	 * @return \Exedra\Path
 	 */
 	public function path($path)
@@ -212,7 +216,7 @@ class Path implements \ArrayAccess
 
 	/**
 	 * Create \Exedra\Path based on given path
-	 * @param string path
+	 * @param string $path
 	 * @return \Exedra\Path
 	 */
 	public function create($path)
@@ -223,7 +227,8 @@ class Path implements \ArrayAccess
 	/**
 	 * Get string based path
 	 * Except that the argument is required
-	 * @param string
+	 * @param string $path
+     * @return string
 	 */
 	public function to($path)
 	{
@@ -250,8 +255,9 @@ class Path implements \ArrayAccess
 	/**
 	 * Put the content of file of the path
 	 * @param string file name
-	 * @param string contents
-	 * @param int flag
+	 * @param string $contents
+	 * @param int $flag
+     * @param resource $context
 	 * @return mixed file contents
 	 */
 	public function putContents($file, $contents, $flag = null, $context = null)
@@ -263,8 +269,8 @@ class Path implements \ArrayAccess
 
 	/**
 	 * Alias to register() except without absolute flag
-	 * @param string name
-	 * @param string path
+	 * @param string $name
+	 * @param string $path
 	 */
 	public function offsetSet($name, $path)
 	{
@@ -282,7 +288,7 @@ class Path implements \ArrayAccess
 
 	/**
 	 * Alias to get()
-	 * @param string name
+	 * @param string $name
 	 * @return \Exedra\Path
 	 *
 	 * @throws \Exedra\Exception\NotFoundException
@@ -298,7 +304,7 @@ class Path implements \ArrayAccess
 
 	/**
 	 * If loader name exists.
-	 * @param string name
+	 * @param string $name
 	 * @return boolean
 	 */
 	public function offsetExists($name)
@@ -308,7 +314,7 @@ class Path implements \ArrayAccess
 
 	/**
 	 * Unset loader
-	 * @param string name
+	 * @param string $name
 	 */
 	public function offsetUnset($name)
 	{
@@ -317,8 +323,10 @@ class Path implements \ArrayAccess
 
 	/**
 	 * Register a new path for the given name and path
-	 * @param string name
-	 * @param string path
+	 * @param string $name
+	 * @param string $path
+     * @param bool $absolute
+     * @return \Exedra\Path
 	 */
 	public function register($name, $path, $absolute = false)
 	{
@@ -337,7 +345,7 @@ class Path implements \ArrayAccess
 	 * @param string name
 	 * @return \Exedra\Path
 	 *
-	 * @throws \Exedra\Excepton\NotFoundException
+	 * @throws \Exedra\Exception\NotFoundException
 	 */
 	public function get($name)
 	{
@@ -350,7 +358,7 @@ class Path implements \ArrayAccess
 
 	/**
 	 * Has given name registered.
-	 * @param string name
+	 * @param string $name
 	 * @return boolean
 	 */
 	public function hasRegistry($name)

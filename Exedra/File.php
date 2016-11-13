@@ -27,7 +27,7 @@ class File extends \SplFileInfo
 
 	/**
 	 * Require this instance's file path extracted with the given data (optional)
-	 * @param array data
+	 * @param array $data
 	 * @return mixed
 	 */
 	public function load(array $data = array())
@@ -39,7 +39,7 @@ class File extends \SplFileInfo
 
 	/**
 	 * Require the file once
-	 * @param array data
+	 * @param array $data
 	 * @return mixed
 	 */
 	public function loadOnce(array $data = array())
@@ -51,7 +51,7 @@ class File extends \SplFileInfo
 
 	/**
 	 * Load this file buffered.
-	 * @param array data
+	 * @param array $data
 	 * @return mixed
 	 */
 	public function loadBuffered(array $data = array())
@@ -76,6 +76,7 @@ class File extends \SplFileInfo
 
 	/**
 	 * Open the file
+     * @param string $mode
 	 * @return \SplFileObject
 	 *
 	 * @throws \RuntimeException
@@ -90,13 +91,14 @@ class File extends \SplFileInfo
 	 */
 	public function delete()
 	{
-		unlink($this->toString());
+		unlink($this->filename);
 	}
 
 	/**
 	 * Put contents to the given path if it's file
-	 * @param string data
-	 * @param int flag file_put_contents flag
+	 * @param string $data
+	 * @param int $flag file_put_contents flag
+     * @param resource $context
 	 * @return mixed
 	 */
 	public function putContents($data = null, $flag = null, $context = null)

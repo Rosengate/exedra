@@ -11,15 +11,15 @@ class Config implements \ArrayAccess
 
 	/**
 	 * Set config value
-	 * @param mixed key or array
-	 * @param mixed value
-	 * @return this
+	 * @param string|array $key
+	 * @param mixed $value
+	 * @return $this
 	 */
-	public function set($key,$value = null)
+	public function set($key, $value = null)
 	{
 		if(is_array($key))
 		{
-			foreach($key as $k=>$v)
+			foreach($key as $k => $v)
 				$this->set($k, $v);
 
 			return $this;
@@ -32,8 +32,8 @@ class Config implements \ArrayAccess
 
 	/**
 	 * Get config value
-	 * @param key
-	 * @return value
+	 * @param string key
+	 * @return $value
 	 */
 	public function get($key, $default = null)
 	{
@@ -54,7 +54,8 @@ class Config implements \ArrayAccess
 
 	/**
 	 * Check key existence.
-	 * @param string key.
+	 * @param string $key
+     * @return bool
 	 */
 	public function has($key)
 	{
@@ -63,8 +64,8 @@ class Config implements \ArrayAccess
 
 	/**
 	 * Set config through array offset
-	 * @param string key
-	 * @param mixed value
+	 * @param string $key
+	 * @param mixed $value
 	 */
 	public function offsetSet($key, $value)
 	{
@@ -73,7 +74,7 @@ class Config implements \ArrayAccess
 
 	/**
 	 * Get config through array offset
-	 * @param string key
+	 * @param string $key
 	 * @return mixed
 	 */
 	public function &offsetGet($key)
@@ -86,7 +87,7 @@ class Config implements \ArrayAccess
 
 	/**
 	 * Check config existence through array offset
-	 * @param string key
+	 * @param string $key
 	 * @return bool
 	 */
 	public function offsetExists($key)
@@ -96,7 +97,7 @@ class Config implements \ArrayAccess
 
 	/**
 	 * Unset config through array offset
-	 * @param string key
+	 * @param string $key
 	 */
 	public function offsetUnset($key)
 	{

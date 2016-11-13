@@ -31,7 +31,7 @@ class Application extends \Exedra\Container\Container implements Definition
 	/**
 	 * Configure default paths.
 	 * root, app, public, routes
-	 * @param array params
+	 * @param array $params
      *
      * @throws Exception\InvalidArgumentException
 	 */
@@ -66,7 +66,7 @@ class Application extends \Exedra\Container\Container implements Definition
 
 	/**
 	 * Alias for above method.
-	 * @param string routename
+	 * @param string $routename
 	 */
 	public function setFailRoute($routename)
 	{
@@ -151,7 +151,7 @@ class Application extends \Exedra\Container\Container implements Definition
 
 	/**
 	 * Get root directory
-	 * @param string|null path
+	 * @param string|null $path
 	 * @return string
 	 */
 	public function getRootDir($path = null)
@@ -161,7 +161,7 @@ class Application extends \Exedra\Container\Container implements Definition
 
 	/**
 	 * Get application namespace
-	 * @param string|null namespace
+	 * @param string|null $namespace
 	 * @return string
 	 */
 	public function getNamespace($namespace = null)
@@ -171,7 +171,7 @@ class Application extends \Exedra\Container\Container implements Definition
 
 	/**
 	 * Get public directory
-	 * @param string|null
+	 * @param string|null $path
 	 * @return string
 	 */
 	public function getPublicDir($path = null)
@@ -197,8 +197,9 @@ class Application extends \Exedra\Container\Container implements Definition
 
 	/**
 	 * Execute application with route name
-	 * @param string|\Exedra\Http\ServerRequest query
-	 * @param array parameter
+	 * @param string|\Exedra\Http\ServerRequest $routeName
+	 * @param array $parameters
+     * @param \Exedra\Http\ServerRequest $request
 	 * @return \Exedra\Runtime\Exe
 	 *
 	 * @throws Exception\InvalidArgumentException
@@ -214,7 +215,7 @@ class Application extends \Exedra\Container\Container implements Definition
 
 	/**
 	 * Execute using http request
-	 * @param \Exedra\Http\ServerRequest|null
+	 * @param \Exedra\Http\ServerRequest|null $request
 	 * @return \Exedra\Runtime\Exe
 	 */
 	public function request(\Exedra\Http\ServerRequest $request = null)
@@ -224,7 +225,7 @@ class Application extends \Exedra\Container\Container implements Definition
 
 	/**
 	 * Create the exec instance by given finding.
-	 * @param \Exedra\Routing\Finding finding
+	 * @param \Exedra\Routing\Finding $finding
 	 * @return \Exedra\Runtime\Exe
 	 *
 	 * @throws \Exedra\Exception\RouteNotFoundException
@@ -240,7 +241,7 @@ class Application extends \Exedra\Container\Container implements Definition
 	/**
 	 * Dispatch and return the response
 	 * Handle uncaught \Exedra\Exception\Exception
-	 * @param \Exedra\Http\ServerRequest|null
+	 * @param \Exedra\Http\ServerRequest|null $request
 	 * @return \Exedra\Runtime\Response
 	 */
 	public function respond(\Exedra\Http\ServerRequest $request)
@@ -275,7 +276,7 @@ class Application extends \Exedra\Container\Container implements Definition
 	/**
 	 * Dispatch and send the response
 	 * Clear any flash
-	 * @param \Exedra\Http\ServerRequest|null
+	 * @param \Exedra\Http\ServerRequest|null $request
 	 */
 	public function dispatch(\Exedra\Http\ServerRequest $request = null)
 	{
@@ -286,7 +287,8 @@ class Application extends \Exedra\Container\Container implements Definition
 
 	/**
 	 * Listen to the console arguments.
-	 * @param string
+	 * @param array $arguments
+     * @return mixed
 	 */
 	public function wizard(array $arguments)
 	{
@@ -299,9 +301,9 @@ class Application extends \Exedra\Container\Container implements Definition
 	/**
 	 * Extended container solve method
 	 * Search for shared symbol for sharable dependency
-	 * @param string type
-	 * @param string name
-	 * @param array args
+	 * @param string $type
+	 * @param string $name
+	 * @param array $args
 	 * @return mixed
 	 *
 	 * @throws Exception\InvalidArgumentException
