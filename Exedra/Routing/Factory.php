@@ -9,26 +9,26 @@ class Factory
 {
 	/**
 	 * Application instance
-	 * @var \Exedra\Application app
+	 * @var \Exedra\Application $app
 	 */
 	protected $app;
 
 	/**
 	 * Classes registry
-	 * @var array registry
+	 * @var array $registry
 	 */
 	protected $registry = array();
 
 	/**
 	 * Reflection of classes on creating
-	 * @var array reflections
+	 * @var array $reflections
 	 */
 	protected $reflections = array();
 
 	/**
 	 * Routes lookup path
 	 * Used when a string based subroutes is passed
-	 * @param string path
+	 * @param string $path
 	 */
 	protected $lookupPath;
 
@@ -62,11 +62,11 @@ class Factory
 		return $this;
 	}
 
-	/**
-	 * Register classname
-	 * @param string name
-	 * @param string classname
-	 */
+    /**
+     * Register classname
+     * @param array $registry
+     * @return $this
+     */
 	public function register(array $registry)
 	{
 		foreach($registry as $name => $classname)
@@ -79,11 +79,12 @@ class Factory
 		return $this;
 	}
 
-	/**
-	 * General method to create classes from the registered list.
-	 * @param string name
-	 * @param array arguments
-	 */
+    /**
+     * General method to create classes from the registered list.
+     * @param string $name
+     * @param array $arguments
+     * @return mixed
+     */
 	public function create($name, array $arguments = array())
 	{
 		if(!isset($this->reflections[$name]))
@@ -94,11 +95,11 @@ class Factory
 		return $reflection->newInstanceArgs($arguments);
 	}
 
-	/**
+    /**
 	 * Create route object
-	 * @param \Exedra\Routing\Level level of where the route is based on
-	 * @param string route name
-	 * @param array parameters route parameter
+	 * @param \Exedra\Routing\Level $level of where the route is based on
+	 * @param string $name
+	 * @param array $parameters route parameter
 	 * @return \Exedra\Routing\Route
 	 */
 	public function createRoute(Level $level, $name, array $parameters)
@@ -106,22 +107,22 @@ class Factory
 		return $this->create('route', array($level, $name, $parameters));
 	}
 
-	/**
-	 * Create level object
-	 * @param \Exedra\Routing\Route route of where the level is based on
-	 * @param array of routes
-	 * @return \Exedra\Routing\Level
-	 */
-	public function createLevel(array $routes = array(), Route $route = null)
-	{
-		return $this->create('level', array($this, $route, $routes));
-	}
+    /**
+     * Create level object
+     * @param array $routes
+     * @param \Exedra\Routing\Route $route of where the level is based on
+     * @return \Exedra\Routing\Level
+     */
+    public function createLevel(array $routes = array(), Route $route = null)
+    {
+        return $this->create('level', array($this, $route, $routes));
+    }
 
-	/**
+    /**
 	 * Create level by given path
 	 * For now, assume the passed pattern as path
-	 * @param \Exedra\Routing\Route
-	 * @param string pattern
+	 * @param string $path
+	 * @param Route|null $route
 	 * @return \Exedra\Routing\Level
 	 *
 	 * @throws \Exedra\Exception\InvalidArgumentException
@@ -132,7 +133,7 @@ class Factory
 
 		if(!file_exists($path))
 			throw new \Exedra\Exception\NotFoundException('File ['.$path.'] does not exists.');
-		
+
 		$closure = require $path;
 
 		// expecting a \Closure from this loaded file.
@@ -148,9 +149,9 @@ class Factory
 
 	/**
 	 * Create route finding
-	 * @param \Exedra\Routing\Route result's route.
-	 * @param array parameters
-	 * @param \Exedra\Http\ServerRequest
+	 * @param \Exedra\Routing\Route|null
+	 * @param array $parameters
+	 * @param \Exedra\Http\ServerRequest $request
 	 * @return \Exedra\Routing\Finding
 	 */
 	public function createFinding(Route $route = null, array $parameters = null, \Exedra\Http\ServerRequest $request = null)

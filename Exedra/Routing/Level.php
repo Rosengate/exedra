@@ -17,7 +17,7 @@ class Level extends \ArrayIterator
 	/**
 	 * Level based middlewares
 	 * Addable on level not bound to any route
-	 * @var array middlewares
+	 * @var array $middlewares
 	 */
 	protected $middlewares = array();
 
@@ -47,7 +47,7 @@ class Level extends \ArrayIterator
 	 * Change level factory.
 	 * Subroutes behaviour are expected to change
 	 * Accept fully qualied class name or an instance of Factory.
-	 * @param \Exedra\Routing\Factory|string factory instance, or string of the class name.
+	 * @param \Exedra\Routing\Factory|string $factory instance, or string of the class name.
 	 *
 	 * @throws \Exedra\Exception\InvalidArgumentException
 	 */
@@ -74,8 +74,8 @@ class Level extends \ArrayIterator
 	/**
 	 * Inversely set middleware on upper route
 	 * If there's this level is on the top (not route dependant), register middleware on app
-	 * @param mixed middleware
-	 * @return this
+	 * @param mixed $middleware
+	 * @return $this
 	 */
 	public function setMiddleware($middleware)
 	{
@@ -90,8 +90,8 @@ class Level extends \ArrayIterator
 	/**
 	 * Add a routing based handler
 	 * To be stacked on runtime
-	 * @param string name
-	 * @param string|\Closure class
+	 * @param string $name
+	 * @param string|\Closure $handler
 	 * @return self
 	 */
 	public function addHandler($name,  $handler)
@@ -103,8 +103,8 @@ class Level extends \ArrayIterator
 
 	/**
 	 * Alias to addHandler()
-	 * @param string name
-	 * @param string|\Closure class
+	 * @param string $name
+	 * @param string|\Closure $handler
 	 * @return self
 	 */
 	public function handler($name, $handler)
@@ -125,8 +125,8 @@ class Level extends \ArrayIterator
 
 	/**
 	 * Alias to addMiddleware
-	 * @param mixed middleware
-	 * @return this
+	 * @param mixed $middleware
+	 * @return $this
 	 */
 	public function middleware($middleware)
 	{
@@ -136,8 +136,8 @@ class Level extends \ArrayIterator
 	/**
 	 * Inversely add middleware on upper route
 	 * If there's this level is on the top (not route dependant), register middleware on app
-	 * @param mixed middleware
-	 * @return this
+	 * @param mixed $middleware
+	 * @return $this
 	 */
 	public function addMiddleware($middleware)
 	{
@@ -158,10 +158,11 @@ class Level extends \ArrayIterator
 		return $this->middlewares;
 	}
 
-	/**
-	 * Add routes by the given array.
-	 * @param array routes
-	 */
+    /**
+     * Add routes by the given array.
+     * @param array $routes
+     * @return $this
+     */
 	public function addRoutes(array $routes)
 	{
 		foreach($routes as $name => $routeData)
@@ -172,9 +173,9 @@ class Level extends \ArrayIterator
 
 	/**
 	 * Add subroutes on other route.
-	 * @param string name of the route.
-	 * @param array routes
-	 * @return this
+	 * @param string $name of the route.
+	 * @param array $routes
+	 * @return $this
 	 */
 	public function addOnRoute($name, array $routes)
 	{
@@ -191,8 +192,8 @@ class Level extends \ArrayIterator
 
 	/**
 	 * Add route to this level.
-	 * @param \Exedra\Routing\Route
-	 * @return this
+	 * @param \Exedra\Routing\Route $route
+	 * @return $this
 	 */
 	public function addRoute(Route $route)
 	{
@@ -212,7 +213,7 @@ class Level extends \ArrayIterator
 
 	/**
 	 * Make a finding by \Exedra\Http\Request
-	 * @param \Exedra\Http\Request
+	 * @param \Exedra\Http\ServerRequest $request
 	 * @return \Exedra\Routing\Finding
 	 */
 	public function findByRequest(\Exedra\Http\ServerRequest $request)
@@ -224,9 +225,9 @@ class Level extends \ArrayIterator
 
 	/**
 	 * Make a finding by given absolute name
-	 * @param string name.
-	 * @param array parameters
-	 * @param \Exedra\Http\ServerRequest request forwarded request, for this Finding
+	 * @param string $name.
+	 * @param array $parameters
+	 * @param \Exedra\Http\ServerRequest $request forwarded request, for this Finding
 	 * @return \Exedra\Routing\Finding
 	 */
 	public function findByName($name, array $parameters = array(), \Exedra\Http\ServerRequest $request = null)
@@ -239,7 +240,7 @@ class Level extends \ArrayIterator
 	/**
 	 * Loop the routes within this level and it's sublevel
 	 * Break on other closure result not equal to null
-	 * @param \Closure closure
+	 * @param \Closure $closure
 	 * @return null|mixed
 	 */
 	public function each(\Closure $closure)
@@ -275,7 +276,7 @@ class Level extends \ArrayIterator
 	 * Example :
 	 * - general.books.detail
 	 * - general.#bookDetail.comments
-	 * @param mixed routeName by dot notation or array.
+	 * @param mixed $name by dot notation or array.
 	 * @return \Exedra\Routing\Route|false
 	 */
 	public function findRoute($name)
@@ -288,7 +289,7 @@ class Level extends \ArrayIterator
 
 	/**
 	 * A recursive search of route given by an absolute search string relative to this level
-	 * @param string routeName
+	 * @param string $routeName
 	 * @return \Exedra\Routing\Route|false
 	 */
 	protected function findRouteRecursively($routeName)
@@ -334,12 +335,12 @@ class Level extends \ArrayIterator
 	}
 
 	/**
-	 * @param string tag
+	 * @param string $tag
 	 * @return \Exedra\Routing\Route|null
 	 */
 	public function findRouteByTag($tag)
 	{
-		$route = $this->each(function($route) use($tag)
+		$route = $this->each(function(Route $route) use($tag)
 		{
 			if($route->hasProperty('tag') && $route->getProperty('tag') == $tag)
 				return $route;
@@ -350,9 +351,11 @@ class Level extends \ArrayIterator
 
 	/**
 	 * A recursivable functionality to find route under this level, by the given request instance.
-	 * @param array of result containing parameter 
-	 * @param array passedParameters - highly otional.
-	 * @return array {route: \Exedra\Routing\Route|false, parameter: array}
+	 * @param \Exedra\Http\ServerRequest $request
+     * @param string $levelUriPath
+	 * @param array $passedParameters - highly otional.
+	 * @return array
+     * {route: boolean|Route, parameter: array, continue: boolean}
 	 */
 	public function findRouteByRequest(\Exedra\Http\ServerRequest $request, $levelUriPath, array $passedParameters = array())
 	{

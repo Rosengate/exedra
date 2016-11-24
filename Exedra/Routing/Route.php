@@ -66,7 +66,7 @@ class Route implements RoutableInterface
 
 	/**
 	 * Route meta attributes
-	 * @param array attributes
+	 * @var array $attributes
 	 */
 	protected $attributes = array();
 
@@ -84,7 +84,7 @@ class Route implements RoutableInterface
 
 	/**
 	 * Set multiple properties for this route
-	 * @param array properties
+	 * @param array $properties
 	 * @return self
 	 */
 	public function setProperties(array $properties)
@@ -97,9 +97,9 @@ class Route implements RoutableInterface
 
 	/**
 	 * Manual setter based on string.
-	 * @param string key
-	 * @param mixed value
-	 * @return this->set'Key'
+	 * @param string $key
+	 * @param mixed $value
+	 * @return $this;
 	 */
 	public function parseProperty($key, $value)
 	{
@@ -109,11 +109,13 @@ class Route implements RoutableInterface
 		$method = 'set'.ucwords($key);
 
 		$this->{$method}($value);
+
+        return $this;
 	}
 
 	/**
 	 * Get name of this route, relative to the current level
-	 * @return string of route name.
+	 * @return string
 	 */
 	public function getName()
 	{
@@ -139,9 +141,10 @@ class Route implements RoutableInterface
 	}
 
 	/**
-	 * Get an absolutely resolved uri path
-	 * @param params param for named parameter.
-	 * @return uri path of all of the related routes to this, with replaced named parameter.
+	 * Get an absolutely resolved uri path all of the related routes to this,
+     * with replaced named parameter.
+	 * @param array $params
+	 * @return string uri path of
 	 *
 	 * @throws \Exedra\Exception\InvalidArgumentException
 	 */
@@ -164,7 +167,7 @@ class Route implements RoutableInterface
 
 	/**
 	 * Get uri path property for this route.
-	 * @param boolean absolute
+	 * @param boolean $absolute
 	 * @return string
 	 */
 	public function getPath($absolute = false)
@@ -191,7 +194,7 @@ class Route implements RoutableInterface
 
 	/**
 	 * Return all of the related routes.
-	 * @return array
+	 * @return array|Route[]
 	 */
 	public function getFullRoutes()
 	{
@@ -205,6 +208,7 @@ class Route implements RoutableInterface
 		
 		$level = $this->level;
 
+        /** @var Route $route */
 		while($route = $level->getUpperRoute())
 		{
 			$routes[] = $route;
@@ -220,7 +224,7 @@ class Route implements RoutableInterface
 
 	/**
 	 * Get parent route name after substracted the current route name.
-	 * @return string | null
+	 * @return string|null
 	 */
 	public function getParentRoute()
 	{
@@ -240,7 +244,7 @@ class Route implements RoutableInterface
 
 	/**
 	 * Get a replaced uri path parameter.
-	 * @param array data;
+	 * @param array $data
 	 * @return string of a replaced path
 	 *
 	 * @throws \Exedra\Exception\InvalidArgumentException
@@ -260,20 +264,20 @@ class Route implements RoutableInterface
 				continue;
 			}
 
-			## strip.
+			// strip.
 			$segment	= trim($segment, '[]');
 			list($key,$segment)	= explode(':', $segment);
 
 			$isOptional	= $segment[strlen($segment)-1] == '?'? true : false;
 			$segment	= $isOptional?substr($segment, 0,strlen($segment)-1):$segment;
 
-			## is mandatory, but no parameter passed.
+			// is mandatory, but no parameter passed.
 			if(!$isOptional && !isset($data[$segment]))
 			{
 				throw new \Exedra\Exception\InvalidArgumentException("Url.Create : Required parameter not passed [$segment].");
 			}
 
-			## trailing capture.
+			// trailing capture.
 			if($key == '**')
 			{
 				if(is_array($data[$segment]))
@@ -296,9 +300,9 @@ class Route implements RoutableInterface
 
 	/**
 	 * Validate uri path against the request
-	 * @param \Exedra\Http\Request request
-	 * @param string path
-	 * @return array struct of {route, parameter, continue}
+	 * @param \Exedra\Http\ServerRequest $request
+	 * @param string $path
+	 * @return array
 	 */
 	public function validate(\Exedra\Http\ServerRequest $request, $path)
 	{
@@ -308,8 +312,6 @@ class Route implements RoutableInterface
 			// if this parameter wasn't set, skip validation.
 			if(!$this->hasProperty($key))
 				continue;
-
-			// $value = $query[$key];
 
 			switch($key)
 			{
@@ -341,8 +343,9 @@ class Route implements RoutableInterface
 
 	/**
 	 * Validate given uri path
-	 * @param string path
-	 * @return array of matched flag, and parameter.
+     * Return array of matched flag, and parameter.
+	 * @param string $path
+	 * @return array|boolean
 	 */
 	protected function validatePath($path)
 	{
@@ -371,7 +374,6 @@ class Route implements RoutableInterface
 
 		// initialize states
 		$matched = true;
-		$isTrailing = false;
 		$pathParams	= array();
 
 		// route segment loop.
@@ -382,7 +384,8 @@ class Route implements RoutableInterface
 		foreach($segments as $no => $segment)
 		{
 			// non-pattern based validation
-			if($segment == '' || ($segment[0] != '[' || $segment[strlen($segment) - 1] != ']'))
+//			if($segment == '' || ($segment[0] != '[' || $segment[strlen($segment) - 1] != ']'))
+            if(strpos($segment, ':') === false)
 			{
 				$equal	= false;
 
@@ -466,7 +469,6 @@ class Route implements RoutableInterface
 					$path = explode('/', $path, $no+1);
 					$pathParams[$segmentParamName] = array_pop($path);
 					$matched = true;
-					$isTrailing = true;
 					break 2;
 				break;
 				// segments remainder into array.
@@ -476,7 +478,6 @@ class Route implements RoutableInterface
 					$explodes = explode('/', $path, $no+1);
 					$pathParams[$segmentParamName]	= explode('/', array_pop($explodes));
 					$matched		= true;
-					$isTrailing		= true;
 					break 2; // break the param loop, and set matched directly to true.
 				break;
 				default:
@@ -516,7 +517,7 @@ class Route implements RoutableInterface
 
 	/**
 	 * Get remaining uri path extracted from the passed one.
-	 * @param string path
+	 * @param string $path
 	 * @return string path
 	 */
 	public function getRemainingPath($path)
@@ -617,11 +618,12 @@ class Route implements RoutableInterface
 		return isset($this->properties['execute']);
 	}
 
-	/**
-	 * Set route name
-	 * Refresh absolute name, everytime name changed.
-	 * @param string name
-	 */
+    /**
+     * Set route name
+     * Refresh absolute name, everytime name changed.
+     * @param string $name
+     * @return $this
+     */
 	protected function setName($name)
 	{
 		$this->name = $name;
@@ -653,10 +655,11 @@ class Route implements RoutableInterface
 		return $this;
 	}
 
-	/**
-	 * Alias to setBase
-	 * @param string baseRoute
-	 */
+    /**
+     * Alias to setBase
+     * @param string $baseRoute
+     * @return $this
+     */
 	public function base($baseRoute)
 	{
 		$this->setProperty('base', $baseRoute);
@@ -666,8 +669,8 @@ class Route implements RoutableInterface
 
 	/**
 	 * Set uri path pattern for this route.
-	 * @param string path
-	 * @return this
+	 * @param string $path
+	 * @return $this
 	 */
 	public function setPath($path)
 	{
@@ -681,17 +684,19 @@ class Route implements RoutableInterface
 
 	/**
 	 * Alias to setPath
-	 * @param string path
+	 * @param string $path
+     * @return $this
 	 */
 	public function path($path)
 	{
 		return $this->setPath($path);
 	}
 
-	/**
-	 * Set method for this route.
-	 * @param mixed method (array of method, or /)
-	 */
+    /**
+     * Set method for this route.
+     * @param mixed $method (array of method, or /)
+     * @return $this
+     */
 	public function setMethod($method)
 	{
 		if($method == 'any')
@@ -706,28 +711,31 @@ class Route implements RoutableInterface
 		return $this;
 	}
 
-	/**
-	 * Set config for this route.
-	 * @param array config
-	 */
+    /**
+     * Set config for this route.
+     * @param array $config
+     * @return Route
+     */
 	public function setConfig(array $config)
 	{
 		return $this->setProperty('config', $config);
 	}
 
-	/**
-	 * Alias to setConfig
-	 * @param array config
-	 */
+    /**
+     * Alias to setConfig
+     * @param array $config
+     * @return Route
+     */
 	public function config(array $config)
 	{
 		return $this->setProperty('config', $config);
 	}
 
-	/**
-	 * Set execution property
-	 * @param mixed execute
-	 */
+    /**
+     * Set execution property
+     * @param mixed $execute
+     * @return $this
+     */
 	public function setExecute($execute)
 	{
 		$this->setProperty('execute', $execute);
@@ -735,10 +743,11 @@ class Route implements RoutableInterface
 		return $this;
 	}
 
-	/**
-	 * Alias to setExecute
-	 * @param mixed execute
-	 */
+    /**
+     * Alias to setExecute
+     * @param mixed $execute
+     * @return $this
+     */
 	public function execute($execute)
 	{
 		$this->setProperty('execute', $execute);
@@ -746,10 +755,11 @@ class Route implements RoutableInterface
 		return $this;
 	}
 
-	/**
-	 * Alias to setExecute
-	 * @param mixed handle
-	 */
+    /**
+     * Alias to setExecute
+     * @param mixed $handle
+     * @return $this
+     */
 	public function handle($handle)
 	{
 		$this->setProperty('execute', $handle);
@@ -757,32 +767,35 @@ class Route implements RoutableInterface
 		return $this;
 	}
 
-	/**
-	 * Add new level on for this route.
-	 * @param array|string|callback
-	 */
+    /**
+     * Add new level on for this route.
+     * @param array|string|\Callback $subroutes
+     * @return Route
+     */
 	public function setSubroutes($subroutes)
 	{
 		// only create Level if the argument is array. else, just save the pattern.
 		return $this->setProperty('subroutes', $subroutes);
 	}
 
-	/**
-	 * Alias to setSubroutes
-	 * @param array|string|callback
-	 */
+    /**
+     * Alias to setSubroutes
+     * @param array|string|callback $subroutes
+     * @return Route
+     */
 	public function group($subroutes)
 	{
 		return $this->setProperty('subroutes', $subroutes);
 	}
 
-	/**
-	 * Set middleware(s) on this route.
-	 * Will reset previously added middleware
-	 * If given argument is an array, add the list
-	 * Else, will be pushed as one middleware
-	 * @param mixed middleware
-	 */
+    /**
+     * Set middleware(s) on this route.
+     * Will reset previously added middleware
+     * If given argument is an array, add the list
+     * Else, will be pushed as one middleware
+     * @param mixed $middleware
+     * @return $this
+     */
 	public function setMiddleware($middleware)
 	{
 		// reset on each call
@@ -801,20 +814,24 @@ class Route implements RoutableInterface
 		return $this;
 	}
 
-	/**
-	 * Add an array of middlewares
-	 * @param string
-	 */
+    /**
+     * Add an array of middlewares
+     * @param array $middlewares
+     * @return $this
+     */
 	public function addMiddlewares(array $middlewares)
 	{
 		foreach($middlewares as $middleware)
 			$this->properties['middleware'][] = $middleware;
+
+        return $this;
 	}
 
-	/**
-	 * Add middleware to existing
-	 * @param mixed middleware
-	 */
+    /**
+     * Add middleware to existing
+     * @param mixed $middleware
+     * @return $this
+     */
 	public function addMiddleware($middleware)
 	{
 		$this->properties['middleware'][] = $middleware;
@@ -822,10 +839,11 @@ class Route implements RoutableInterface
 		return $this;
 	}
 
-	/**
-	 * Alias to addMiddleware
-	 * @param mixed middleware handler
-	 */
+    /**
+     * Alias to addMiddleware
+     * @param mixed $middleware handler
+     * @return $this
+     */
 	public function middleware($middleware)
 	{
 		$this->properties['middleware'][] = $middleware;
@@ -833,47 +851,52 @@ class Route implements RoutableInterface
 		return $this;
 	}
 
-	/**
-	 * Set module under this route.
-	 * @param string module
-	 */
+    /**
+     * Set module under this route.
+     * @param string $module
+     * @return Route
+     */
 	public function setModule($module)
 	{
 		return $this->setProperty('module', $module);
 	}
 
-	/**
-	 * Alias to setModule()
-	 * @param string module
-	 */
+    /**
+     * Alias to setModule()
+     * @param string $module
+     * @return Route
+     */
 	public function module($module)
 	{
 		return $this->setProperty('module', $module);
 	}
 
-	/**
-	 * Tag this route
-	 * @param string tag
-	 */
+    /**
+     * Tag this route
+     * @param string $tag
+     * @return Route
+     */
 	public function setTag($tag)
 	{
 		return $this->setProperty('tag', $tag);
 	}
 
-	/**
-	 * Alias to setTag
-	 * @param string tag
-	 */
+    /**
+     * Alias to setTag
+     * @param string $tag
+     * @return Route
+     */
 	public function tag($tag)
 	{
 		return $this->setProperty('tag', $tag);
 	}
 
-	/**
-	 * Set attribute
-	 * @param string key
-	 * @param mixed value
-	 */
+    /**
+     * Set attribute
+     * @param string $key
+     * @param mixed $value
+     * @return $this
+     */
 	public function setAttribute($key, $value)
 	{
 		$this->attributes[$key] = $value;
@@ -883,7 +906,7 @@ class Route implements RoutableInterface
 
 	/**
 	 * Get attribute
-	 * @param string key
+	 * @param string $key
 	 * @return mixed
 	 */
 	public function getAttribute($key)
@@ -912,11 +935,12 @@ class Route implements RoutableInterface
 		return $this;
 	}
 
-	/**
-	 * Set meta information
-	 * @param string key
-	 * @param mixed value
-	 */
+    /**
+     * Set meta information
+     * @param string $key
+     * @param mixed $value
+     * @return $this
+     */
 	public function setMeta($key, $value = null)
 	{
 		if(is_array($key))
@@ -932,11 +956,12 @@ class Route implements RoutableInterface
 		return $this;
 	}
 
-	/**
-	 * Alias to setAttribute(), but without first arg checked as if its array.
-	 * @param string key
-	 * @param mixed value
-	 */
+    /**
+     * Alias to setAttribute(), but without first arg checked as if its array.
+     * @param string $key
+     * @param mixed $value
+     * @return $this
+     */
 	public function meta($key, $value)
 	{
 		$this->attributes[$key] = $value;
@@ -946,7 +971,7 @@ class Route implements RoutableInterface
 
 	/**
 	 * Get route property
-	 * @param string key
+	 * @param string $key
 	 * @return mixed
 	 */
 	public function getProperty($key)
@@ -956,19 +981,20 @@ class Route implements RoutableInterface
 
 	/**
 	 * Check whether route property exist or not.
-	 * @param string key
-	 * @return boolean of existence
+	 * @param string $key
+	 * @return boolean
 	 */
 	public function hasProperty($key)
 	{
 		return isset($this->properties[$key]);
 	}
 
-	/**
-	 * Set property for this route.
-	 * @param string key
-	 * @param mixed value
-	 */
+    /**
+     * Set property for this route.
+     * @param string $key
+     * @param mixed $value
+     * @return $this
+     */
 	protected function setProperty($key, $value)
 	{
 		$this->properties[$key] = $value;
@@ -987,7 +1013,7 @@ class Route implements RoutableInterface
 
 	/**
 	 * Alias to setRequestable
-	 * @param bool bool
+	 * @param bool $flag
 	 * @return self
 	 */
 	public function requestable($flag = true)
@@ -997,7 +1023,7 @@ class Route implements RoutableInterface
 
 	/**
 	 * Set whether route is requestable / dispatchable
-	 * @param bool flag
+	 * @param bool $flag
 	 * @return self
 	 */
 	public function setRequestable($flag)
@@ -1007,10 +1033,11 @@ class Route implements RoutableInterface
 		return $this;
 	}
 
-	/**
-	 * Alias to setMethod with path settable
-	 * @param string method
-	 */
+    /**
+     * Alias to setMethod with path settable
+     * @param string $method
+     * @return Route
+     */
 	public function method($method, $path = null)
 	{
 		if($path !== null)
@@ -1021,7 +1048,7 @@ class Route implements RoutableInterface
 
 	/**
 	 * Set method to GET and path
-	 * @param string
+	 * @param string $path
 	 * @return self
 	 */
 	public function get($path = '/')
@@ -1035,7 +1062,7 @@ class Route implements RoutableInterface
 
 	/**
 	 * Set method to POST and path
-	 * @param string path
+	 * @param string $path
 	 * @return self
 	 */
 	public function post($path = '/')
@@ -1049,7 +1076,7 @@ class Route implements RoutableInterface
 
 	/**
 	 * Set method to PUT and path
-	 * @param string path
+	 * @param string $path
 	 * @return self
 	 */
 	public function put($path = '/')
@@ -1063,7 +1090,7 @@ class Route implements RoutableInterface
 
 	/**
 	 * Set method to DELETE and path
-	 * @param string path
+	 * @param string $path
 	 * @return self
 	 */
 	public function delete($path = '/')
@@ -1077,7 +1104,7 @@ class Route implements RoutableInterface
 
 	/**
 	 * Set method to PATCH and path
-	 * @param string path
+	 * @param string $path
 	 * @return self
 	 */
 	public function patch($path = '/')
@@ -1091,7 +1118,7 @@ class Route implements RoutableInterface
 
 	/**
 	 * Set method to any method and path
-	 * @param string path
+	 * @param string $path
 	 * @return self
 	 */
 	public function any($path = '/')

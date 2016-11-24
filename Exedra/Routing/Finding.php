@@ -5,25 +5,25 @@ class Finding
 {
 	/**
 	 * Found route
-	 * @var \Exedra\Routing\Route route
+	 * @var \Exedra\Routing\Route $route
 	 */
 	public $route;
 
 	/**
 	 * List of found middlewares
-	 * @var array middlewares
+	 * @var array $middlewares
 	 */
 	public $middlewares = array();
 
 	/**
 	 * Finding attributes
-	 * @var array attributes
+	 * @var array $attributes
 	 */
 	protected $attributes = array();
 
 	/**
 	 * Route parameters
-	 * @var array parameters
+	 * @var array $parameters
 	 */
 	public $parameters = array();
 
@@ -35,7 +35,7 @@ class Finding
 	
 	/**
 	 * string of route base
-	 * @var string|null
+	 * @var string|null $baseRoute
 	 */
 	protected $baseRoute = null;
 
@@ -43,7 +43,7 @@ class Finding
 	 * Request instance
 	 * Since exedra didn't implement it
 	 * It'll not be typehinted
-	 * @var \Psr\Http\Message\RequestInterface|null
+	 * @var \Psr\Http\Message\RequestInterface|null $request
 	 */
 	protected $request = null;
 
@@ -59,8 +59,9 @@ class Finding
 	protected $handlers = array();
 
 	/**
-	 * @param \Exedra\Routing\Route or null
-	 * @param array parameters
+	 * @param \Exedra\Routing\Route|null
+	 * @param array $parameters
+     * @param mixed $request
 	 */
 	public function __construct(\Exedra\Routing\Route $route = null, array $parameters = array(), $request = null)
 	{
@@ -87,7 +88,7 @@ class Finding
 
 	/**
 	 * Append given parameters
-	 * @param array parameters
+	 * @param array $parameters
 	 */
 	public function addParameters(array $parameters)
 	{
@@ -95,11 +96,12 @@ class Finding
 			$this->parameters[$key] = $param;
 	}
 
-	/**
-	 * Get findings parameter
-	 * Return all if no argument passed
-	 * @return array|mixed
-	 */
+    /**
+     * Get findings parameter
+     * Return all if no argument passed
+     * @param string|null $name
+     * @return array|mixed
+     */
 	public function param($name = null)
 	{
 		if($name === null)
@@ -165,7 +167,7 @@ class Finding
 	}
 
 	/**
-	 * @return array middlewares
+	 * @return array
 	 */
 	public function getMiddlewares()
 	{
@@ -192,8 +194,8 @@ class Finding
 
 	/**
 	 * Get route found attribute
-	 * @param string key
-	 * @param mixed default value
+	 * @param string $key
+	 * @param mixed $default value
 	 * @return mixed
 	 */
 	public function getAttribute($key, $default = null)
@@ -203,7 +205,7 @@ class Finding
 
 	/**
 	 * Check whether attribute exists
-	 * @param string key
+	 * @param string $key
 	 * @return boolean
 	 */
 	public function hasAttribute($key)

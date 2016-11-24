@@ -6,7 +6,7 @@ class Router extends \Exedra\Routing\Level implements \Exedra\Routing\RoutableIn
 	/**
 	 * Create a route by given methods
 	 * @param string|array method
-	 * @param string path
+	 * @param string $path
 	 * @return \Exedra\Routing\Route
 	 */
 	public function method($method = null, $path = '/')
@@ -60,10 +60,11 @@ class Router extends \Exedra\Routing\Level implements \Exedra\Routing\RoutableIn
 		return $this->method(null, $path);
 	}
 
-	/**
-	 * Create an empty route with the given tag
-	 * @param string tag
-	 */
+    /**
+     * Create an empty route with the given tag
+     * @param string $tag
+     * @return Route
+     */
 	public function tag($tag)
 	{
 		$route = $this->factory->createRoute($this, $name, array());
@@ -76,7 +77,7 @@ class Router extends \Exedra\Routing\Level implements \Exedra\Routing\RoutableIn
 	/**
 	 * A level invoke to conveniently
 	 * create an empty route with the optional name
-	 * @param string name
+	 * @param string $name
 	 * @return \Exedra\Routing\Route
 	 */
 	public function offsetGet($name)
