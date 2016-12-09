@@ -6,9 +6,9 @@ class DotArray
 	/**
 	 * Initialize array
 	 * @param array &storage
-	 * @param array data
+	 * @param array $data
 	 */
-	public static function initialize(&$storage, array $data)
+	public static function initialize(array &$storage, array $data)
 	{
 		foreach($data as $key => $value)
 		{
@@ -25,8 +25,9 @@ class DotArray
 	/**
 	 * Set value
 	 * @param array &storage
-	 * @param string key
-	 * @param mxied value
+	 * @param string $key
+	 * @param mixed $value
+     * @return mixed
 	 */
 	public static function &set(&$storage, $key, $value)
 	{
@@ -54,8 +55,8 @@ class DotArray
 
 	/**
 	 * Get value
-	 * @param array storage
-	 * @param string key
+	 * @param array $storage
+	 * @param string $key
 	 * @return mixed
 	 */
 	public static function get($storage, $key)
@@ -70,9 +71,9 @@ class DotArray
 
 	/**
 	 * Get referenced value
-	 * @param array storage
-	 * @param string key
-	 * @return &mixed
+	 * @param array &$storage
+	 * @param string $key
+	 * @return mixed
 	 */
 	public static function &getReference(&$storage, $key)
 	{
@@ -87,11 +88,11 @@ class DotArray
 	/**
 	 * Recursively loop through multidimensional array
 	 * With every loop receive a dotted key
-	 * @param &array storage
-	 * @param \Closure callback
-	 * @param array prefix
+	 * @param array &$storage
+	 * @param \Closure $callback
+	 * @param array $prefix
 	 */
-	public static function each(&$storage, \Closure $callback, array $prefix = array())
+	public static function each(array &$storage, \Closure $callback, array $prefix = array())
 	{
 		foreach($storage as $key => &$value)
 		{
@@ -104,11 +105,11 @@ class DotArray
 
 	/**
 	 * Check key existence
-	 * @param array storage
-	 * @param string key
+	 * @param array $storage
+	 * @param string $key
 	 * @return bool
 	 */
-	public static function has($storage, $key)
+	public static function has(array $storage, $key)
 	{
 		$keys	= explode('.', $key);
 
@@ -126,7 +127,7 @@ class DotArray
 	/**
 	 * Delete key
 	 * @param array &storage
-	 * @param string key
+	 * @param string $key
 	 */
 	public static function delete(&$storage, $key)
 	{

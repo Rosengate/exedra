@@ -107,7 +107,7 @@ class Path implements \ArrayAccess
 	 * Alias to has()
 	 * But with optional argument
 	 * Which can also be used to check the base path existence
-	 * @param string|null path
+	 * @param string|null $path
 	 * @return boolean
 	 */
 	public function isExists($path = null)

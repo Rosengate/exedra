@@ -1,6 +1,8 @@
 <?php
 namespace Exedra\View;
 
+use Exedra\Exception\InvalidArgumentException;
+
 /**
  * Blueprint for View
  */
@@ -36,7 +38,12 @@ class View implements \ArrayAccess
 	 */
 	protected $callbacks	= array();
 
-	public function __construct($path = null, $data = null)
+    /**
+     * @var string $contents
+     */
+    protected $contents;
+
+    public function __construct($path = null, $data = null)
 	{
 		if($path) $this->setPath($path);
 	
@@ -47,8 +54,8 @@ class View implements \ArrayAccess
 
 	/**
 	 * Set data through array offset
-	 * @param string key
-	 * @param mixed value
+	 * @param string $key
+	 * @param mixed $value
 	 */
 	public function offsetSet($key, $value)
 	{
@@ -57,7 +64,7 @@ class View implements \ArrayAccess
 
 	/**
 	 * Get data through array offset
-	 * @param string key
+	 * @param string $key
 	 * @return mixed
 	 */
 	public function offsetGet($key)
@@ -67,7 +74,7 @@ class View implements \ArrayAccess
 
 	/**
 	 * Check data existence through array offset
-	 * @param string key
+	 * @param string $key
 	 * @return bool
 	 */
 	public function offsetExists($key)
@@ -77,7 +84,7 @@ class View implements \ArrayAccess
 
 	/**
 	 * Unset data through array offset
-	 * @param string key
+	 * @param string $key
 	 */
 	public function offsetUnset($key)
 	{
@@ -86,8 +93,8 @@ class View implements \ArrayAccess
 
 	/**
 	 * Set required data for rendering.
-	 * @param array @keys
-	 * @return this
+	 * @param array $keys
+	 * @return $this
 	 */
 	public function setRequired($keys)
 	{
@@ -109,8 +116,8 @@ class View implements \ArrayAccess
 
 	/**
 	 * Alias to setRequired
-	 * @param mixed key
-	 * @return this
+	 * @param mixed $keys
+	 * @return $this
 	 */
 	public function setRequiredData($keys)
 	{
@@ -119,9 +126,9 @@ class View implements \ArrayAccess
 
 	/**
 	 * Set callback for the given data key
-	 * @param string key
-	 * @param callback callback
-	 * @return this
+	 * @param string $key
+	 * @param callback $callback
+	 * @return $this
 	 */
 	public function setCallback($key, $callback)
 	{
@@ -131,7 +138,7 @@ class View implements \ArrayAccess
 
 	/**
 	 * Resolve callback in rendering
-	 * @return null
+	 * @return mixed
 	 */
 	protected function callbackResolve($data)
 	{
@@ -155,8 +162,8 @@ class View implements \ArrayAccess
 
 	/**
 	 * Set view path
-	 * @param string path
-	 * @return this
+	 * @param string $path
+	 * @return $this
 	 */
 	public function setPath($path)
 	{
@@ -166,7 +173,7 @@ class View implements \ArrayAccess
 
 	/**
 	 * Check whether view has this data or not
-	 * @param string key
+	 * @param string $key
 	 * @return boolean
 	 */
 	public function has($key)
@@ -176,9 +183,9 @@ class View implements \ArrayAccess
 
 	/**
 	 * Set view data
-	 * @param mixed key
-	 * @param mixed value
-	 * @return this
+	 * @param mixed $key
+	 * @param mixed $value
+	 * @return $this
 	 */
 	public function set($key, $value = null)
 	{
@@ -196,11 +203,12 @@ class View implements \ArrayAccess
 		return $this;
 	}
 
-	/**
-	 * Get view data
-	 * @param string key
-	 * @return mixed
-	 */
+    /**
+     * Get view data
+     * @param string $key
+     * @param null|mixed $default
+     * @return mixed
+     */
 	public function get($key = null, $default = null)
 	{
 		if($key === null)
@@ -219,7 +227,7 @@ class View implements \ArrayAccess
 
 	/**
 	 * Get view content
-	 * @throws \Exedra\Application\Exception\Exception
+     * @return string
 	 */
 	public function getContents()
 	{
@@ -237,14 +245,15 @@ class View implements \ArrayAccess
 
 	/**
 	 * Check required data for rendering use.
-	 * @return array
+	 * @return array|boolean
 	 */
 	protected function requirementCheck()
 	{
 		if(count($this->required) > 0)
 		{
 			// non-exists list
-			$nonExist	= Array();
+			$nonExist	= array();
+
 			foreach($this->required as $k)
 			{
 				if(!isset($this->data[$k]))
@@ -263,7 +272,7 @@ class View implements \ArrayAccess
 	/**
 	 * Prepare the contents to be rendered
 	 * Or execute any required variable
-	 * @return null
+	 * @return $this
 	 */
 	public function prepare()
 	{
@@ -279,15 +288,15 @@ class View implements \ArrayAccess
 	 * Check if view is ready
 	 * @return boolean
 	 * 
-	 * @throws \Exedra\Exception\InvalidArgumentException
+	 * @throws InvalidArgumentException
 	 */
 	protected function isReady()
 	{
 		if($requiredArgs = $this->requirementCheck())
-			throw new \Exedra\Exception\InvalidArgumentException('View.render : Missing required argument(s) for view ['. $this->path .'] : '. implode(', ', $requiredArgs) .'');
+			throw new InvalidArgumentException('View.render : Missing required argument(s) for view ['. $this->path .'] : '. implode(', ', $requiredArgs) .'');
 
 		if($this->path == null)
-			throw new \Exedra\Exception\InvalidArgumentException('Path was not set');
+			throw new InvalidArgumentException('Path was not set');
 
 		return true;
 	}
@@ -296,7 +305,8 @@ class View implements \ArrayAccess
 	 * Main rendering function, load the with loader function.
 	 * Print the 
 	 * @return mixed
-	 * @throws \Exedra\Application\Exception\Exception
+     *
+     * @throws InvalidArgumentException
 	 */
 	public function render()
 	{
