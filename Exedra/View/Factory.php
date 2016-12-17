@@ -1,5 +1,6 @@
 <?php
 namespace Exedra\View;
+use Exedra\Exception\NotFoundException;
 
 /**
  * Exedra View Factory
@@ -9,19 +10,19 @@ class Factory
 {
 	/**
 	 * Path to View directory
-	 * @var \Exedra\Path
+	 * @var \Exedra\Path $path
 	 */
 	protected $path;
 
 	/**
 	 * Default datas for created views
-	 * @var array defaultData
+	 * @var array $defaultData
 	 */
 	protected $defaultData = array();
 
 	/**
 	 * Cached views
-	 * @var array views
+	 * @var array $views
 	 */
 	protected $views = array();
 
@@ -30,18 +31,19 @@ class Factory
 		$this->path = $path;
 	}
 
-	/**
-	 * Create view instance based on given relative path.
-	 * @param string path
-	 * @param string|array data (array to be deprecated)
-	 * @return \Exedra\Application\Response\View view
-	 */
+    /**
+     * Create view instance based on given relative path.
+     * @param string $path
+     * @param string|array $data (array to be deprecated)
+     * @return View
+     * @throws NotFoundException
+     */
 	public function create($path, $data = array())
 	{
 		$path = $this->buildPath($path);
 
 		if(!file_exists($path))
-			throw new \Exedra\Exception\NotFoundException('Unable to find view ['.$path.']');
+			throw new NotFoundException('Unable to find view ['.$path.']');
 		
 		// merge with default data.
 		$class = '\Exedra\View\View';
@@ -59,7 +61,7 @@ class Factory
 		else
 		{
 			if(!is_array($data))
-				throw new \Exedra\Exception\NotFoundException('Argument 2 must be either string or array ['.gettype($data).'] given.');
+				throw new NotFoundException('Argument 2 must be either string or array ['.gettype($data).'] given.');
 		}
 
 		$data = array_merge($data, $this->defaultData);
@@ -69,7 +71,7 @@ class Factory
 
 	/**
 	 * Absolutely build path based on the relative one
-	 * @param string path
+	 * @param string $path
 	 * @return string
 	 */
 	protected function buildPath($path)
@@ -79,8 +81,7 @@ class Factory
 
 	/**
 	 * Check file's path existence.
-	 * @param string path
-	 * @param boolean build
+	 * @param string $path
 	 * @return boolean
 	 */
 	public function has($path)
@@ -90,9 +91,9 @@ class Factory
 
 	/**
 	 * Set default data for every view created through this factory.
-	 * @param mixed name
-	 * @param data string
-	 * @return this
+	 * @param array|string $key
+	 * @param mixed $val
+	 * @return $this
 	 */
 	public function setDefaultData($key, $val = null)
 	{
