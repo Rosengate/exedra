@@ -4,10 +4,12 @@ namespace Exedra\Support\Definitions;
 use Exedra\Config;
 use Exedra\Container\Registry;
 use Exedra\Factory\Controller;
+use Exedra\Http\ServerRequest;
 use Exedra\Path;
 use Exedra\Runtime\Factory\Form;
 use Exedra\Runtime\Factory\Url;
 use Exedra\Runtime\Redirect;
+use Exedra\Runtime\Response;
 use Exedra\Session\Flash;
 use Exedra\Session\Session;
 use Exedra\View\Factory;
@@ -28,6 +30,8 @@ use Exedra\View\Factory;
  * @property Session $session
  * @property Flash $flash
  * @property Controller $controller
+ * @property ServerRequest $request
+ * @property Response
  */
 interface Exe
 {
