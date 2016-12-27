@@ -80,7 +80,7 @@ class UploadedFile
 		$normalizedFiles = array();
 
 		foreach(array_keys($file['tmp_name']) as $key)
-			$normalizedFiles[$key] = static::normalizeFile(array(
+			$normalizedFiles[$key] = static::normalizeFilesTree(array(
 				'tmp_name' => $file['tmp_name'][$key],
 				'name' => $file['name'][$key],
 				'type' => $file['type'][$key],
