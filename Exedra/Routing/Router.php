@@ -73,22 +73,4 @@ class Router extends \Exedra\Routing\Level implements \Exedra\Routing\RoutableIn
 
 		return $route->tag($tag);
 	}
-
-	/**
-	 * A level invoke to conveniently
-	 * create an empty route with the optional name
-	 * @param string $name
-	 * @return \Exedra\Routing\Route
-	 */
-	public function offsetGet($name)
-	{
-		if(isset($this->routeCache[$name]))
-			return $this->routeCache[$name];
-
-		$route = $this->factory->createRoute($this, $name, array());
-
-		$this->addRoute($route);
-
-		return $this->routeCache[$name] = $route;
-	}
 }

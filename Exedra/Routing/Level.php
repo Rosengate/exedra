@@ -1,10 +1,16 @@
 <?php namespace Exedra\Routing;
 
-class Level extends \ArrayIterator
+use Exedra\Exception\InvalidArgumentException;
+use Exedra\Http\ServerRequest;
+use Exedra\Routing\Factory;
+use Exedra\Routing\Finding;
+use Exedra\Routing\Route;
+
+class Level implements \ArrayAccess
 {
 	/**
 	 * Reference to the route this level was bound to.
-	 * @var \Exedra\Routing\Route
+	 * @var Route
 	 */
 	public $route;
 
@@ -29,9 +35,14 @@ class Level extends \ArrayIterator
 
 	/**
 	 * Factory injected to this level.
-	 * @var \Exedra\Routing\Factory
+	 * @var Factory
 	 */
 	public $factory;
+
+    /**
+     * @var array|Route[]
+     */
+    protected $storage = array();
 
 	public function __construct(Factory $factory, Route $route = null, array $routes = array())
 	{
@@ -47,24 +58,24 @@ class Level extends \ArrayIterator
 	 * Change level factory.
 	 * Subroutes behaviour are expected to change
 	 * Accept fully qualied class name or an instance of Factory.
-	 * @param \Exedra\Routing\Factory|string $factory instance, or string of the class name.
+	 * @param Factory|string $factory instance, or string of the class name.
 	 *
-	 * @throws \Exedra\Exception\InvalidArgumentException
+	 * @throws InvalidArgumentException
 	 */
 	public function setFactory($factory)
 	{
 		if(is_string($factory))
 			$factory = new $factory($this->factory->getLookupPath());
 
-		if(!($factory instanceof \Exedra\Routing\Factory))
-			throw new \Exedra\Exception\InvalidArgumentException('The map factory must be the the type of [\Exedra\Routing\Factory].');
+		if(!($factory instanceof Factory))
+			throw new InvalidArgumentException('The map factory must be the the type of [\Exedra\Routing\Factory].');
 
 		$this->factory = $factory;
 	}
 
 	/**
 	 * Get factory instance this Level is based on
-	 * @return \Exedra\Routing\Factory
+	 * @return Factory
 	 */
 	public function getFactory()
 	{
@@ -192,19 +203,19 @@ class Level extends \ArrayIterator
 
 	/**
 	 * Add route to this level.
-	 * @param \Exedra\Routing\Route $route
+	 * @param Route $route
 	 * @return $this
 	 */
 	public function addRoute(Route $route)
 	{
-		$this->append($route);
+	    $this->storage[] = $route;
 
 		return $this;
 	}
 
 	/**
 	 * Get the route this level was bound to.
-	 * @return \Exedra\Routing\Route
+	 * @return Route
 	 */
 	public function getUpperRoute()
 	{
@@ -213,10 +224,10 @@ class Level extends \ArrayIterator
 
 	/**
 	 * Make a finding by \Exedra\Http\Request
-	 * @param \Exedra\Http\ServerRequest $request
-	 * @return \Exedra\Routing\Finding
+	 * @param ServerRequest $request
+	 * @return Finding
 	 */
-	public function findByRequest(\Exedra\Http\ServerRequest $request)
+	public function findByRequest(ServerRequest $request)
 	{
 		$result = $this->findRouteByRequest($request, trim($request->getUri()->getPath(), '/'));
 
@@ -227,44 +238,39 @@ class Level extends \ArrayIterator
 	 * Make a finding by given absolute name
 	 * @param string $name.
 	 * @param array $parameters
-	 * @param \Exedra\Http\ServerRequest $request forwarded request, for this Finding
-	 * @return \Exedra\Routing\Finding
+	 * @param ServerRequest $request forwarded request, for this Finding
+	 * @return Finding
 	 */
-	public function findByName($name, array $parameters = array(), \Exedra\Http\ServerRequest $request = null)
+	public function findByName($name, array $parameters = array(), ServerRequest $request = null)
 	{
 		$route = $this->findRoute($name);
 
 		return $this->factory->createFinding($route ? : null, $parameters, $request);
 	}
 
-	/**
-	 * Loop the routes within this level and it's sublevel
-	 * Break on other closure result not equal to null
-	 * @param \Closure $closure
-	 * @return null|mixed
-	 */
-	public function each(\Closure $closure)
+    /**
+     * Loop the routes within this level and it's sublevel
+     * Break on other closure result not equal to null
+     * @param \Closure $closure
+     * @param bool $recursive
+     * @return mixed|null
+     */
+	public function each(\Closure $closure, $recursive = true)
 	{
-		$this->rewind();
-
-		while($this->valid())
+        foreach($this->storage as $route)
 		{
-			$route = $this->current();
-
 			$result = $closure($route);
 
 			if($result !== null)
 				return $result;
 			
-			if($route->hasSubroutes())
+			if($route->hasSubroutes() && $recursive)
 			{
 				$result = $route->getSubroutes()->each($closure);
 
 				if($result !== null)
 					return $result;
 			}
-
-			$this->next();
 		}
 
 		return null;
@@ -277,7 +283,7 @@ class Level extends \ArrayIterator
 	 * - general.books.detail
 	 * - general.#bookDetail.comments
 	 * @param mixed $name by dot notation or array.
-	 * @return \Exedra\Routing\Route|false
+	 * @return Route|false
 	 */
 	public function findRoute($name)
 	{
@@ -290,7 +296,7 @@ class Level extends \ArrayIterator
 	/**
 	 * A recursive search of route given by an absolute search string relative to this level
 	 * @param string $routeName
-	 * @return \Exedra\Routing\Route|false
+	 * @return Route|false
 	 */
 	protected function findRouteRecursively($routeName)
 	{
@@ -298,24 +304,19 @@ class Level extends \ArrayIterator
 		$routeName = array_shift($routeNames);
 		$isTag = strpos($routeName, '#') === 0;
 
-		$this->rewind();
-
 		// search by route name
 		if(!$isTag)
 		{
 			// loop this level, and find the route.
-			while($this->valid())
-			{
-				$route = $this->current();
 
-				if($route->getName() === $routeName)
-					if(count($routeNames) > 0 && $route->hasSubroutes())
-						return $route->getSubroutes()->findRouteRecursively($routeNames);
-					else
-						return $route;
-
-				$this->next();
-			}
+            foreach($this->storage as $route)
+            {
+                if($route->getName() === $routeName)
+                    if(count($routeNames) > 0 && $route->hasSubroutes())
+                        return $route->getSubroutes()->findRouteRecursively($routeNames);
+                    else
+                        return $route;
+            }
 		}
 		// search by route tag under this level.
 		else
@@ -336,7 +337,7 @@ class Level extends \ArrayIterator
 
 	/**
 	 * @param string $tag
-	 * @return \Exedra\Routing\Route|null
+	 * @return Route|null
 	 */
 	public function findRouteByTag($tag)
 	{
@@ -351,21 +352,17 @@ class Level extends \ArrayIterator
 
 	/**
 	 * A recursivable functionality to find route under this level, by the given request instance.
-	 * @param \Exedra\Http\ServerRequest $request
+	 * @param ServerRequest $request
      * @param string $levelUriPath
 	 * @param array $passedParameters - highly otional.
 	 * @return array
      * {route: boolean|Route, parameter: array, continue: boolean}
 	 */
-	public function findRouteByRequest(\Exedra\Http\ServerRequest $request, $levelUriPath, array $passedParameters = array())
+	public function findRouteByRequest(ServerRequest $request, $levelUriPath, array $passedParameters = array())
 	{
-		$this->rewind();
-
 		// loop the level and find.
-		while($this->valid())
+        foreach($this->storage as $route)
 		{
-			$route = $this->current();
-
 			$result = $route->validate($request, $levelUriPath);
 
 			$remainingPath = $route->getRemainingPath($levelUriPath);
@@ -394,7 +391,6 @@ class Level extends \ArrayIterator
 					// if has passed parameter.
 					$passedParameters = array_merge(count($result['parameter']) > 0 ? $result['parameter'] : array(), $passedParameters);
 
-					// $subrouteResult = $route->getSubroutes()->query($queryUpdated, $passedParameters);
 					$subrouteResult = $route->getSubroutes()->findRouteByRequest($request, $remainingPath, $passedParameters);
 
 					// if found. else. continue on this level.
@@ -402,11 +398,44 @@ class Level extends \ArrayIterator
 						return $subrouteResult;
 				}
 			}
-
-			$this->next();
 		}
 
 		// false default.
 		return array('route'=> false, 'parameter'=> array(), 'continue' => false);
 	}
+
+    /**
+     * @param mixed $name
+     * @return bool
+     */
+    public function offsetExists($name)
+    {
+        return isset($this->routes[$name]);
+    }
+
+    /**
+     * A level invoke to conveniently
+     * create an empty route with the optional name
+     * @param string $name
+     * @return Route
+     */
+    public function offsetGet($name)
+    {
+        if(isset($this->routes[$name]))
+            return $this->routes[$name];
+
+        $route = $this->factory->createRoute($this, $name, array());
+
+        $this->addRoute($route);
+
+        return $this->routes[$name] = $route;
+    }
+
+    public function offsetSet($offset, $value)
+    {
+    }
+
+    public function offsetUnset($offset)
+    {
+    }
 }
