@@ -124,28 +124,39 @@ class Factory
 	 * @param string $path
 	 * @param Route|null $route
 	 * @return \Exedra\Routing\Level
-	 *
 	 * @throws \Exedra\Exception\InvalidArgumentException
 	 */
 	public function createLevelFromString($path, $route = null)
 	{
-		$path = $this->lookupPath.'/'.ltrim($path, '/\\');
-
-		if(!file_exists($path))
-			throw new \Exedra\Exception\NotFoundException('File ['.$path.'] does not exists.');
-
-		$closure = require $path;
-
-		// expecting a \Closure from this loaded file.
-		if(!($closure instanceof \Closure))
-			throw new \Exedra\Exception\InvalidArgumentException('Failed to create routing level. The path ['.$path.'] must return a \Closure.');
-
-		$level = $this->create('level', array($this, $route));
-
-		$closure($level);
-
-		return $level;
+		return $this->createLevelFromPath($path, $route);
 	}
+
+    /**
+     * @param $path
+     * @param null $route
+     * @return mixed
+     * @throws \Exedra\Exception\InvalidArgumentException
+     * @throws \Exedra\Exception\NotFoundException
+     */
+    public function createLevelFromPath($path, $route = null)
+    {
+        $path = $this->lookupPath.'/'.ltrim($path, '/\\');
+
+        if(!file_exists($path))
+            throw new \Exedra\Exception\NotFoundException('File ['.$path.'] does not exists.');
+
+        $closure = require $path;
+
+        // expecting a \Closure from this loaded file.
+        if(!($closure instanceof \Closure))
+            throw new \Exedra\Exception\InvalidArgumentException('Failed to create routing level. The path ['.$path.'] must return a \Closure.');
+
+        $level = $this->create('level', array($this, $route));
+
+        $closure($level);
+
+        return $level;
+    }
 
 	/**
 	 * Create route finding
