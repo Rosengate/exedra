@@ -568,33 +568,14 @@ class Route implements RoutableInterface
 	{
 		$type = @get_class($pattern) ? : gettype($pattern);
 
-		switch($type)
-		{
-			case 'Closure':
-				$closure = $pattern;
+        $router = $this->level->factory->resolveLevel($pattern, $this);
 
-				$level = $this->level->factory->createLevel(array(), $this);
-				
-				$closure($level);
-				
-				$this->properties['subroutes'] = $level;
-				
-				return $level;
-			break;
-			case 'string':
-				$this->properties['subroutes'] = $level = $this->level->factory->createLevelFromString($pattern, $this);
-				
-				return $level;
-			break;
-			case 'array':
-				$this->properties['subroutes'] = $level = $this->level->factory->createLevel($pattern, $this);
-				
-				return $level;
-			break;
-			default:
-				throw new \Exedra\Exception\InvalidArgumentException('Unable to resolve route level ['.$type.']. It must be type of \Closure, string, or array');
-			break;
-		}
+        if(!$router)
+            throw new \Exedra\Exception\InvalidArgumentException('Unable to resolve route level ['.$type.']. It must be type of \Closure, string, or array');
+
+        $this->properties['subroutes'] = $router;
+
+        return $router;
 	}
 
 	/**

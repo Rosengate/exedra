@@ -1,5 +1,9 @@
 <?php
 namespace Exedra\Routing;
+use Exedra\Exception\InvalidArgumentException;
+use Exedra\Routing\Handler\ArrayHandler;
+use Exedra\Routing\Handler\ClosureHandler;
+use Exedra\Routing\Handler\PathHandler;
 
 /**
  * A factory that handle the route/level/finding creation
@@ -28,11 +32,21 @@ class Factory
 	/**
 	 * Routes lookup path
 	 * Used when a string based subroutes is passed
-	 * @param string $path
+	 * @var string $path
 	 */
 	protected $lookupPath;
 
-	public function __construct($lookupPath)
+    /**
+     * @var LevelHandler[] $levelHandlers
+     */
+    protected $levelHandlers = array();
+
+    /**
+     * @var LevelHandler[] $defaultHandlers
+     */
+    protected $defaultHandlers;
+
+    public function __construct($lookupPath)
 	{
 		$this->lookupPath = rtrim($lookupPath, '/\\');
 
@@ -54,10 +68,14 @@ class Factory
 	protected function setUp()
 	{
 		$this->register(array(
-			'finding' => '\Exedra\Routing\Finding',
-			'route' => '\Exedra\Routing\Route',
-			'level' => '\Exedra\Routing\Router'
+			'finding' => Finding::class,
+			'route' => Route::class,
+			'level' => Router::class
 			));
+
+        $this->addDefaultHandler(new ClosureHandler());
+        $this->addDefaultHandler(new ArrayHandler());
+        $this->addDefaultHandler(new PathHandler());
 
 		return $this;
 	}
@@ -119,43 +137,46 @@ class Factory
     }
 
     /**
-	 * Create level by given path
-	 * For now, assume the passed pattern as path
-	 * @param string $path
-	 * @param Route|null $route
-	 * @return \Exedra\Routing\Level
-	 * @throws \Exedra\Exception\InvalidArgumentException
-	 */
-	public function createLevelFromString($path, $route = null)
-	{
-		return $this->createLevelFromPath($path, $route);
-	}
-
-    /**
-     * @param $path
-     * @param null $route
-     * @return mixed
+     * Create level by given path
+     * For now, assume the passed pattern as path
+     * @param string $path
+     * @param Route|null $route
+     * @return \Exedra\Routing\Level
      * @throws \Exedra\Exception\InvalidArgumentException
-     * @throws \Exedra\Exception\NotFoundException
      */
-    public function createLevelFromPath($path, $route = null)
+    public function resolveLevel($pattern, $route = null)
     {
-        $path = $this->lookupPath.'/'.ltrim($path, '/\\');
+        foreach($this->levelHandlers as $handler)
+        {
+            if(!$handler->validate($pattern, $route))
+                continue;
 
-        if(!file_exists($path))
-            throw new \Exedra\Exception\NotFoundException('File ['.$path.'] does not exists.');
+            return $handler->resolve($this, $pattern, $route);
+        }
 
-        $closure = require $path;
+        foreach($this->defaultHandlers as $handler)
+        {
+            if(!$handler->validate($pattern, $route))
+                continue;
 
-        // expecting a \Closure from this loaded file.
-        if(!($closure instanceof \Closure))
-            throw new \Exedra\Exception\InvalidArgumentException('Failed to create routing level. The path ['.$path.'] must return a \Closure.');
+            return $handler->resolve($this, $pattern, $route);
+        }
 
-        $level = $this->create('level', array($this, $route));
+        throw new InvalidArgumentException('Unable to resolve the routing group pattern');
+    }
 
-        $closure($level);
+	public function addLevelHandler(LevelHandler $handler)
+    {
+        $this->levelHandlers[] = $handler;
 
-        return $level;
+        return $this;
+    }
+
+    protected function addDefaultHandler(LevelHandler $handler)
+    {
+        $this->levelHandlers[] = $handler;
+
+        return $this;
     }
 
 	/**
