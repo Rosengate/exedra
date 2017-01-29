@@ -15,7 +15,7 @@ interface Routable
 
     public function delete($path);
 
-    public function option($path);
+    public function options($path);
 
     public function path($path);
 

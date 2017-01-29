@@ -485,7 +485,7 @@ class Group implements \ArrayAccess, Routable
         return $this->method('patch', $path);
     }
 
-    public function option($path = '/')
+    public function options($path = '/')
     {
         return $this->method('option', $path);
     }

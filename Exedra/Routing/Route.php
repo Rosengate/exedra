@@ -1102,7 +1102,7 @@ class Route implements Routable
      * @param $path
      * @return $this
      */
-    public function option($path = '/')
+    public function options($path = '/')
     {
         $this->setMethod('OPTION');
 
