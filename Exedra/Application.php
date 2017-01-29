@@ -79,15 +79,15 @@ class Application extends \Exedra\Container\Container implements Definition
 	protected function setUp()
 	{
 		$this->services['service']->register(array(
-			'config' => '\Exedra\Config',
+			'config' => \Exedra\Config::class,
 			'routing.factory' => function(){ return new \Exedra\Routing\Factory((string) $this->path['routes']);},
 			'map' => function() { return $this['routing.factory']->createGroup();},
-			'middleware' => array('\Exedra\Middleware\Registry', array('self.map')),
+			'middleware' => array(\Exedra\Middleware\Registry::class, array('self.map')),
 			'request' => function(){ return \Exedra\Http\ServerRequest::createFromGlobals();},
 			'url' => function() { return $this->create('factory.url', array($this->map, $this->request, $this->config->get('app.url', null), $this->config->get('asset.url', null)));},
-			'@session' => '\Exedra\Session\Session',
-			'@flash' => array('\Exedra\Session\Flash', array('self.session')),
-			'wizard' => array('\Exedra\Wizard\Manager', array('self')),
+			'@session' => \Exedra\Session\Session::class,
+			'@flash' => array(\Exedra\Session\Flash::class, array('self.session')),
+			'wizard' => array(\Exedra\Wizard\Manager::class, array('self')),
 			'@controller' => function(){
 				return new \Exedra\Factory\Controller($this->namespace);
 			},
@@ -97,12 +97,12 @@ class Application extends \Exedra\Container\Container implements Definition
 		));
 
 		$this->services['factory']->register(array(
-			'runtime.exe' => '\Exedra\Runtime\Exe',
+			'runtime.exe' => \Exedra\Runtime\Exe::class,
 			'runtime.response' => function(){ return \Exedra\Runtime\Response::createEmptyResponse(); },
-			'handler.resolver' => '\Exedra\Runtime\Handler\Resolver',
-			'factory.url' => '\Exedra\Factory\Url',
-			'@factory.controller' => '\Exedra\Factory\Controller',
-			'@factory.view' => '\Exedra\View\Factory'
+			'handler.resolver' => \Exedra\Runtime\Handler\Resolver::class,
+			'factory.url' => \Exedra\Factory\Url::class,
+			'@factory.controller' => \Exedra\Factory\Controller::class,
+			'@factory.view' => \Exedra\View\Factory::class
 		));
 
 		$this->setUpHandlers();
@@ -115,9 +115,9 @@ class Application extends \Exedra\Container\Container implements Definition
 		// register default handler
 		$this['service']->on('map', function($map)
 		{
-			$map->addHandler('closure', '\Exedra\Runtime\Handler\Closure');
+			$map->addHandler('closure', \Exedra\Runtime\Handler\Closure::class);
 
-			$map->addHandler('controller', '\Exedra\Runtime\Handler\Controller');
+			$map->addHandler('controller', \Exedra\Runtime\Handler\Controller::class);
 		});
 	}
 
@@ -125,7 +125,7 @@ class Application extends \Exedra\Container\Container implements Definition
 	{
 		$this->services['service']->on('wizard', function($wizard)
 		{
-			$wizard->add('Exedra\Wizard\Application');
+			$wizard->add(\Exedra\Wizard\Application::class);
 		});
 	}
 
