@@ -395,6 +395,15 @@ class Exe extends \Exedra\Container\Container implements Definition
 		return $this;
 	}
 
+    /**
+     * @param array $params
+     */
+    public function addParams(array $params)
+    {
+        foreach($params as $key => $value)
+            $this->setParam($key, $value);
+    }
+
 	/**
 	 * Get parameters by the given list of key
 	 * @param array keys (optional)

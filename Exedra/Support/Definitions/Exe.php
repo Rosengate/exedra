@@ -31,7 +31,7 @@ use Exedra\View\Factory;
  * @property Flash $flash
  * @property Controller $controller
  * @property ServerRequest $request
- * @property Response
+ * @property Response $response
  */
 interface Exe
 {
