@@ -1,8 +1,8 @@
 <?php namespace Exedra\Routing;
 
-use Exedra\Routing\Group;
+use Exedra\Contracts\Routing\Routable;
 
-class Route implements RoutableInterface
+class Route implements Routable
 {
 	/**
 	 * Route name

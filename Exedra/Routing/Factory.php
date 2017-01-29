@@ -71,7 +71,7 @@ class Factory
 		$this->register(array(
 			'finding' => Finding::class,
 			'route' => Route::class,
-			'group' => Router::class
+			'group' => Group::class
 			));
 
         $this->addDefaultGroupHandler(new ClosureHandler());
