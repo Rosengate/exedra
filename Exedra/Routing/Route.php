@@ -586,7 +586,7 @@ class Route implements Routable
 	public function getMethod()
 	{
 		if(!$this->hasProperty('method'))
-			return array('get', 'post', 'put', 'delete', 'patch');
+			return array('get', 'post', 'put', 'delete', 'patch', 'options');
 
 		return $this->getProperty('method');
 	}
@@ -682,7 +682,7 @@ class Route implements Routable
 	public function setMethod($method)
 	{
 		if($method == 'any')
-			$method = array('get', 'post', 'put', 'delete', 'patch');
+			$method = array('get', 'post', 'put', 'delete', 'patch', 'options');
 		else if(!is_array($method))
 			$method = explode('|', $method);
 
