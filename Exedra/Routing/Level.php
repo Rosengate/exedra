@@ -177,7 +177,7 @@ class Level implements \ArrayAccess
 	public function addRoutes(array $routes)
 	{
 		foreach($routes as $name => $routeData)
-			$this->addRoute($this->routes[$name] = $this->factory->createRoute($this, $name, $routeData));
+			$this->addRoute($this->factory->createRoute($this, $name, $routeData));
 
 		return $this;
 	}
@@ -208,6 +208,8 @@ class Level implements \ArrayAccess
 	 */
 	public function addRoute(Route $route)
 	{
+	    $this->routes[$route->getName()] = $route;
+
 	    $this->storage[] = $route;
 
 		return $this;

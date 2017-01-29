@@ -174,7 +174,7 @@ class Factory
 
     protected function addDefaultHandler(LevelHandler $handler)
     {
-        $this->levelHandlers[] = $handler;
+        $this->defaultHandlers[] = $handler;
 
         return $this;
     }
