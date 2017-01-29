@@ -100,7 +100,7 @@ $app->map->middleware(\App\Middleware\All::CLASS);
 
 $app->map->any('/api')->middleware(\App\Middleware\Api::CLASS)->group(function($api)
 {
-    // or inversely, you can register the middleware into the current route, through this level.
+    // or inversely, you can register the middleware into the current route, through this group.
     $api->middleware(\App\Middleware\ApiAuth::CLASS);
     
     $api->any('/users')->group(function($users)

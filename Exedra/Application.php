@@ -81,7 +81,7 @@ class Application extends \Exedra\Container\Container implements Definition
 		$this->services['service']->register(array(
 			'config' => '\Exedra\Config',
 			'routing.factory' => function(){ return new \Exedra\Routing\Factory((string) $this->path['routes']);},
-			'map' => function() { return $this['routing.factory']->createLevel();},
+			'map' => function() { return $this['routing.factory']->createGroup();},
 			'middleware' => array('\Exedra\Middleware\Registry', array('self.map')),
 			'request' => function(){ return \Exedra\Http\ServerRequest::createFromGlobals();},
 			'url' => function() { return $this->create('factory.url', array($this->map, $this->request, $this->config->get('app.url', null), $this->config->get('asset.url', null)));},

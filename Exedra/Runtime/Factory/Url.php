@@ -6,7 +6,7 @@ class Url extends \Exedra\Factory\Url
 	protected $exe;
 
 	public function __construct(
-		\Exedra\Routing\Level $router,
+		\Exedra\Routing\Group $router,
 		\Exedra\Http\ServerRequest $request = null,
 		$appUrl = null,
 		$assetUrl = null,
@@ -18,7 +18,7 @@ class Url extends \Exedra\Factory\Url
 	}
 
 	/**
-	 * Call a callable. If does not exist, call on app level
+	 * Call a callable. If does not exist, call on app group
 	 * @param string name
 	 * @param array args
 	 * @return mixed

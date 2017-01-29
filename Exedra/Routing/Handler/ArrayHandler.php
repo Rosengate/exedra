@@ -1,11 +1,11 @@
 <?php
 namespace Exedra\Routing\Handler;
 
+use Exedra\Contracts\Routing\GroupHandler;
 use Exedra\Routing\Factory;
-use Exedra\Routing\LevelHandler;
 use Exedra\Routing\Route;
 
-class ArrayHandler implements LevelHandler
+class ArrayHandler implements GroupHandler
 {
     public function validate($pattern, Route $route = null)
     {
@@ -14,6 +14,6 @@ class ArrayHandler implements LevelHandler
 
     public function resolve(Factory $factory, $routes, Route $route = null)
     {
-        return $factory->createLevel($routes, $route);
+        return $factory->createGroup($routes, $route);
     }
 }

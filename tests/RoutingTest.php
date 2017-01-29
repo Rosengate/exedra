@@ -73,11 +73,11 @@ class RoutingTest extends PHPUnit_Framework_TestCase
 
 	public function testNestedRoute()
 	{
-		// 2 level
+		// 2 group
 		$finding = $this->map->findByRequest($this->createRequest(['uri' => ['path' => 'path-two/sub-one']]));
 		$this->assertEquals('two.one', $finding->route->getAbsoluteName());
 
-		// 3 level
+		// 3 group
 		$finding = $this->map->findByRequest($this->createRequest(['uri' => ['path' => 'path-two/sub-two/deep-one']]));
 		$this->assertEquals('two.two.one', $finding->route->getAbsoluteName());
 	}

@@ -1,5 +1,7 @@
 <?php namespace Exedra\Routing;
 
+use Exedra\Routing\Group;
+
 class Route implements RoutableInterface
 {
 	/**
@@ -42,10 +44,10 @@ class Route implements RoutableInterface
 		);
 
 	/**
-	 * Level this route is bound to
-	 * @var \Exedra\Routing\Level
+	 * The Group this route is bound to
+	 * @var Group $group
 	 */
-	protected $level;
+	protected $group;
 
 	/**
 	 * Route notation stored in static form
@@ -70,11 +72,11 @@ class Route implements RoutableInterface
 	 */
 	protected $attributes = array();
 
-	public function __construct(Level $level, $name, array $properties = array())
+	public function __construct(Group $group, $name, array $properties = array())
 	{
 		$this->name = $name;
 		
-		$this->level = $level;
+		$this->group = $group;
 		
 		$this->refreshAbsoluteName();
 
@@ -114,7 +116,7 @@ class Route implements RoutableInterface
 	}
 
 	/**
-	 * Get name of this route, relative to the current level
+	 * Get name of this route, relative to the current group
 	 * @return string
 	 */
 	public function getName()
@@ -122,14 +124,13 @@ class Route implements RoutableInterface
 		return $this->name;
 	}
 
-	/**
-	 * Get current level this route was bound to.
-	 * @return \Exedra\Routing\Level
-	 */
-	public function getLevel()
-	{
-		return $this->level;
-	}
+    /**
+     * @return Group
+     */
+    public function getGroup()
+    {
+        return $this->group;
+    }
 
 	/**
 	 * Get route fullname.
@@ -206,15 +207,15 @@ class Route implements RoutableInterface
 
 		$routes[] = $this;
 		
-		$level = $this->level;
+		$group = $this->group;
 
         /** @var Route $route */
-		while($route = $level->getUpperRoute())
+		while($route = $group->getUpperRoute())
 		{
 			$routes[] = $route;
 
-			// recursively refer to upperRoute's level
-			$level = $route->getLevel();
+			// recursively refer to upperRoute's group
+			$group = $route->getGroup();
 		}
 
 		$this->fullRoutes = array_reverse($routes);
@@ -542,36 +543,36 @@ class Route implements RoutableInterface
 	}
 
 	/**
-	 * Get sublevel of this route
-	 * Resolve the level in case of Closure, string and array
-	 * @return \Exedra\Routing\Level
+	 * Get subgroup of this route
+	 * Resolve the group in case of Closure, string and array
+	 * @return Group
 	 *
 	 * @throws \Exedra\Exception\InvalidArgumentException
 	 */
 	public function getSubroutes()
 	{
-		$level = $this->properties['subroutes'];
+		$group = $this->properties['subroutes'];
 
-		if($level instanceof \Exedra\Routing\Level)
-			return $level;
+		if($group instanceof Group)
+			return $group;
 
-		return $this->resolveLevel($level);
+		return $this->resolveGroup($group);
 	}
 
 	/**
-	 * Resolve level in case of Closure, string and array
-	 * @return \Exedra\Routing\Level
+	 * Resolve group in case of Closure, string and array
+	 * @return \Exedra\Routing\Group
 	 *
 	 * @throws \Exedra\Exception\InvalidArgumentException
 	 */
-	public function resolveLevel($pattern)
+	public function resolveGroup($pattern)
 	{
 		$type = @get_class($pattern) ? : gettype($pattern);
 
-        $router = $this->level->factory->resolveLevel($pattern, $this);
+        $router = $this->group->factory->resolveGroup($pattern, $this);
 
         if(!$router)
-            throw new \Exedra\Exception\InvalidArgumentException('Unable to resolve route level ['.$type.']. It must be type of \Closure, string, or array');
+            throw new \Exedra\Exception\InvalidArgumentException('Unable to resolve route group ['.$type.']. It must be type of \Closure, string, or array');
 
         $this->properties['subroutes'] = $router;
 
@@ -619,11 +620,11 @@ class Route implements RoutableInterface
 	 */
 	protected function refreshAbsoluteName()
 	{
-		$level = $this->level;
+		$group = $this->group;
 
 		$name = $this->name;
 
-		$this->absoluteName = $level->getUpperRoute() ? $level->getUpperRoute()->getAbsoluteName().'.'.$name : $name;
+		$this->absoluteName = $group->getUpperRoute() ? $group->getUpperRoute()->getAbsoluteName().'.'.$name : $name;
 	}
 
 	/**
@@ -749,13 +750,12 @@ class Route implements RoutableInterface
 	}
 
     /**
-     * Add new level on for this route.
+     * Add new group on for this route.
      * @param array|string|\Callback $subroutes
      * @return Route
      */
 	public function setSubroutes($subroutes)
 	{
-		// only create Level if the argument is array. else, just save the pattern.
 		return $this->setProperty('subroutes', $subroutes);
 	}
 

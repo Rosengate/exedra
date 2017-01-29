@@ -1,13 +1,14 @@
 <?php
 namespace Exedra\Routing;
+use Exedra\Contracts\Routing\GroupHandler;
 use Exedra\Exception\InvalidArgumentException;
 use Exedra\Routing\Handler\ArrayHandler;
 use Exedra\Routing\Handler\ClosureHandler;
 use Exedra\Routing\Handler\PathHandler;
 
 /**
- * A factory that handle the route/level/finding creation
- * This instance is injected into each created level
+ * A factory that handle the route/group/finding creation
+ * This instance is injected into each created group
  */
 class Factory
 {
@@ -37,14 +38,14 @@ class Factory
 	protected $lookupPath;
 
     /**
-     * @var LevelHandler[] $levelHandlers
+     * @var GroupHandler[] $groupHandlers
      */
-    protected $levelHandlers = array();
+    protected $groupHandlers = array();
 
     /**
-     * @var LevelHandler[] $defaultHandlers
+     * @var GroupHandler[] $defaultGroupHandlers
      */
-    protected $defaultHandlers;
+    protected $defaultGroupHandlers;
 
     public function __construct($lookupPath)
 	{
@@ -63,19 +64,19 @@ class Factory
 	}
 
 	/**
-	 * Register basic components [finding, route, level]
+	 * Register basic components [finding, route, group]
 	 */
 	protected function setUp()
 	{
 		$this->register(array(
 			'finding' => Finding::class,
 			'route' => Route::class,
-			'level' => Router::class
+			'group' => Router::class
 			));
 
-        $this->addDefaultHandler(new ClosureHandler());
-        $this->addDefaultHandler(new ArrayHandler());
-        $this->addDefaultHandler(new PathHandler());
+        $this->addDefaultGroupHandler(new ClosureHandler());
+        $this->addDefaultGroupHandler(new ArrayHandler());
+        $this->addDefaultGroupHandler(new PathHandler());
 
 		return $this;
 	}
@@ -115,38 +116,38 @@ class Factory
 
     /**
 	 * Create route object
-	 * @param \Exedra\Routing\Level $level of where the route is based on
+	 * @param \Exedra\Routing\Group $group of where the route is based on
 	 * @param string $name
 	 * @param array $parameters route parameter
 	 * @return \Exedra\Routing\Route
 	 */
-	public function createRoute(Level $level, $name, array $parameters)
+	public function createRoute(Group $group, $name, array $parameters)
 	{
-		return $this->create('route', array($level, $name, $parameters));
+		return $this->create('route', array($group, $name, $parameters));
 	}
 
     /**
-     * Create level object
+     * Create routing group object
      * @param array $routes
-     * @param \Exedra\Routing\Route $route of where the level is based on
-     * @return \Exedra\Routing\Level
+     * @param \Exedra\Routing\Route $route of where the group is based on
+     * @return \Exedra\Routing\Group
      */
-    public function createLevel(array $routes = array(), Route $route = null)
+    public function createGroup(array $routes = array(), Route $route = null)
     {
-        return $this->create('level', array($this, $route, $routes));
+        return $this->create('group', array($this, $route, $routes));
     }
 
     /**
-     * Create level by given path
+     * Create routing group by given path
      * For now, assume the passed pattern as path
      * @param string $path
      * @param Route|null $route
-     * @return \Exedra\Routing\Level
+     * @return \Exedra\Routing\Group
      * @throws \Exedra\Exception\InvalidArgumentException
      */
-    public function resolveLevel($pattern, $route = null)
+    public function resolveGroup($pattern, $route = null)
     {
-        foreach($this->levelHandlers as $handler)
+        foreach($this->groupHandlers as $handler)
         {
             if(!$handler->validate($pattern, $route))
                 continue;
@@ -154,7 +155,7 @@ class Factory
             return $handler->resolve($this, $pattern, $route);
         }
 
-        foreach($this->defaultHandlers as $handler)
+        foreach($this->defaultGroupHandlers as $handler)
         {
             if(!$handler->validate($pattern, $route))
                 continue;
@@ -165,16 +166,16 @@ class Factory
         throw new InvalidArgumentException('Unable to resolve the routing group pattern');
     }
 
-	public function addLevelHandler(LevelHandler $handler)
+	public function addGroupHandler(GroupHandler $handler)
     {
-        $this->levelHandlers[] = $handler;
+        $this->groupHandlers[] = $handler;
 
         return $this;
     }
 
-    protected function addDefaultHandler(LevelHandler $handler)
+    protected function addDefaultGroupHandler(GroupHandler $handler)
     {
-        $this->defaultHandlers[] = $handler;
+        $this->defaultGroupHandlers[] = $handler;
 
         return $this;
     }

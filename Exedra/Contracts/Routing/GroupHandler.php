@@ -1,7 +1,10 @@
 <?php
-namespace Exedra\Routing;
+namespace Exedra\Contracts\Routing;
 
-interface LevelHandler
+use Exedra\Routing\Factory;
+use Exedra\Routing\Route;
+
+interface GroupHandler
 {
     public function validate($pattern, Route $route = null);
 

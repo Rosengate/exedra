@@ -11,11 +11,11 @@ class Registry
 
 	/**
 	 * Routing full map
-	 * @var \Exedra\Routing\Level
+	 * @var \Exedra\Routing\Group
 	 */
 	protected $map;
 
-	public function __construct(\Exedra\Routing\Level $map)
+	public function __construct(\Exedra\Routing\Group $map)
 	{
 		$this->map = $map;
 	}

@@ -22,7 +22,7 @@ class ContainerRegistryTest extends PHPUnit_Framework_TestCase
 
 		$this->assertTrue($app->get('routing.factory') instanceof \Exedra\Routing\Factory);
 
-		$this->assertTrue($app->map instanceof \Exedra\Routing\Level);
+		$this->assertTrue($app->map instanceof \Exedra\Routing\Group);
 
 		// $this->assertTrue($app->runtime instanceof \Exedra\Runtime\Registry);
 
@@ -69,7 +69,7 @@ class ContainerRegistryTest extends PHPUnit_Framework_TestCase
 	{
 		$app = $this->app;
 
-		$app->config->set('foo-bar', 'app level');
+		$app->config->set('foo-bar', 'app group');
 
 		$getConfig = function($route) use($app)
 		{
@@ -78,27 +78,27 @@ class ContainerRegistryTest extends PHPUnit_Framework_TestCase
 
 		$app->map['foo']->execute(function(){ });
 
-		$this->assertEquals('app level', $getConfig('foo'));
+		$this->assertEquals('app group', $getConfig('foo'));
 
-		// route level config
-		$app->map['fooo']->config(array('foo-bar' => 'route level'))->execute(function(){ });
+		// route group config
+		$app->map['fooo']->config(array('foo-bar' => 'route group'))->execute(function(){ });
 
-		$this->assertEquals('route level', $getConfig('fooo'));
+		$this->assertEquals('route group', $getConfig('fooo'));
 
-		// runtime level
+		// runtime group
 		$app->map->middleware(function($exe)
 		{
 			$exe->service->on('config', function($config)
 			{
-				$config->set('foo-bar', 'runtime level');
+				$config->set('foo-bar', 'runtime group');
 			});
 
 			return $exe->next($exe);
 		});
 
-		$this->assertEquals('runtime level', $getConfig('fooo'));
+		$this->assertEquals('runtime group', $getConfig('fooo'));
 
-		// merge config on module level with runtime.
+		// merge config on module group with runtime.
 		// $app->map->middleware(function($exe)
 		// {
 		// 	$exe['service']->on('config', function($config) use($exe)
@@ -109,6 +109,6 @@ class ContainerRegistryTest extends PHPUnit_Framework_TestCase
 		// 	return $exe->next($exe);
 		// });
 
-		// $this->assertEquals('module level', $getConfig('fooo'));
+		// $this->assertEquals('module group', $getConfig('fooo'));
 	}
 }

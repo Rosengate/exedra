@@ -29,12 +29,12 @@ class Url implements UrlInterface
 
 	/**
 	 * Application map
-	 * @param \Exedra\Routing\Level
+	 * @param \Exedra\Routing\Group
 	 */
 	protected $map;
 
 	public function __construct(
-		\Exedra\Routing\Level $router,
+		\Exedra\Routing\Group $router,
 		\Exedra\Http\ServerRequest $request = null,
 		$appUrl = null,
 		$assetUrl = null)

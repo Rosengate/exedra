@@ -1,7 +1,7 @@
 <?php
 namespace Exedra\Routing;
 
-class Router extends \Exedra\Routing\Level implements \Exedra\Routing\RoutableInterface
+class Router extends Group implements \Exedra\Routing\RoutableInterface
 {
 	/**
 	 * Create a route by given methods

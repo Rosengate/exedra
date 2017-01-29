@@ -1,13 +1,13 @@
 <?php
 namespace Exedra\Routing\Handler;
 
+use Exedra\Contracts\Routing\GroupHandler;
 use Exedra\Exception\InvalidArgumentException;
 use Exedra\Exception\NotFoundException;
 use Exedra\Routing\Factory;
-use Exedra\Routing\LevelHandler;
 use Exedra\Routing\Route;
 
-class PathHandler implements LevelHandler
+class PathHandler implements GroupHandler
 {
     /**
      * @param $pattern
@@ -41,12 +41,12 @@ class PathHandler implements LevelHandler
 
         // expecting a \Closure from this loaded file.
         if(!($closure instanceof \Closure))
-            throw new InvalidArgumentException('Failed to create routing level. The path ['.$path.'] must return a \Closure.');
+            throw new InvalidArgumentException('Failed to create routing group. The path ['.$path.'] must return a \Closure.');
 
-        $level = $factory->create('level', array($factory, $route));
+        $group = $factory->createGroup(array(), $route);
 
-        $closure($level);
+        $closure($group);
 
-        return $level;
+        return $group;
     }
 }

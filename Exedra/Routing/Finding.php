@@ -134,14 +134,14 @@ class Finding
 				$this->module = $route->getProperty('module');
 
 			// stack all the handlers
-			foreach($route->getLevel()->getHandlers() as $name => $handler)
+			foreach($route->getGroup()->getHandlers() as $name => $handler)
 				$this->handlers[$name] = $handler;
 
 			// if has parameter base, and it's true, set base route to the current route.
 			if($route->hasProperty('base') && $route->getProperty('base') === true)
 				$this->baseRoute = $route->getAbsoluteName();
 
-			foreach($route->getLevel()->getMiddlewares() as $middleware)
+			foreach($route->getGroup()->getMiddlewares() as $middleware)
 				$this->middlewares[] = $middleware;
 
 			// append all route middlewares

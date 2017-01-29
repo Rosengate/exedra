@@ -37,7 +37,7 @@ class Session
 
 	/**
 	 * Point the current storage to the prefixing point.
-	 * This session manager will later point every session operation (has, get, set, getAll, destroy) on this key level
+	 * This session manager will later point every session operation (has, get, set, getAll, destroy) on this key group
 	 * Another prefix will not to a new prefix, except append to the current reference.
 	 * @return \Exedra\Session\Session
 	 */
