@@ -1,5 +1,6 @@
 <?php
 namespace Exedra\Provider;
+use Exedra\Contracts\Provider\Provider;
 
 /**
  * List of registered providers
@@ -38,9 +39,9 @@ class Registry
 	/**
 	 * Register the provider.
 	 * If any types is passed, it will be assumed as deferred provider
-	 * @param string provider fully qualified class name
-	 * @param array types
-	 * @return string
+	 * @param string $provider fully qualified class name
+	 * @param array $dependencies
+	 * @return void
 	 */
 	public function add($provider, array $dependencies = array())
 	{
@@ -86,13 +87,15 @@ class Registry
 
 			$this->register(new $provider);
 		}
+
+		return;
 	}
 
-	/**
-	 * Register the given provider.
-	 * @param \Exedra\Provider\ProviderInterface
-	 */
-	public function register(\Exedra\Provider\ProviderInterface $provider)
+    /**
+     * Register the given provider.
+     * @param Provider $provider
+     */
+	public function register(Provider $provider)
 	{
 		$provider->register($this->app);
 	}

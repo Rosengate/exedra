@@ -1,7 +1,8 @@
 <?php
 namespace Exedra\Provider;
 
-interface ProviderInterface
+use Exedra\Contracts\Provider\Provider;
+
+interface ProviderInterface extends Provider
 {
-	public function register(\Exedra\Application $app);
 }
