@@ -1,6 +1,11 @@
 <?php
 class MiddlewareTest extends PHPUnit_Framework_TestCase
 {
+    /**
+     * @var \Exedra\Application $app
+     */
+    protected $app;
+
 	public function setUp()
 	{
 		$this->app = new \Exedra\Application(__DIR__.'/Factory');
@@ -39,4 +44,25 @@ class MiddlewareTest extends PHPUnit_Framework_TestCase
 
 		$this->assertEquals('global-bar-baz!', $this->app->execute('bar')->response->getBody());
 	}
+
+	public function testMiddlewareRemoval()
+    {
+        $this->map->middleware(function()
+        {
+            return 'with-middleware';
+        }, 'foo-middleware');
+
+        $this->map['foo']->get('/')->execute(function()
+        {
+            return 'without-middleware';
+        });
+
+        $finding = $this->app->map->findByName('foo');
+
+        $this->assertEquals('with-middleware', $this->app->exec($finding)->response->getBody());
+
+        $finding->removeMiddleware('foo-middleware');
+
+        $this->assertEquals('without-middleware', $this->app->exec($finding)->response->getBody());
+    }
 }
