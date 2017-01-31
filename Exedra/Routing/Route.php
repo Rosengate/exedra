@@ -256,10 +256,14 @@ class Route implements Routable
 
 		$segments	= explode('/', $path);
 
-		$newSegments	= Array();
+		$newSegments	= array();
+
+        $missingParameters = array();
+
 		foreach($segments as $segment)
 		{
-			if(strpos($segment, '[') === false && strpos($segment, ']') === false)
+//			if(strpos($segment, '[') === false && strpos($segment, ']') === false)
+            if(strpos($segment, ':') === false)
 			{
 				$newSegments[]	= $segment;
 				continue;
@@ -275,7 +279,8 @@ class Route implements Routable
 			// is mandatory, but no parameter passed.
 			if(!$isOptional && !isset($data[$segment]))
 			{
-				throw new \Exedra\Exception\InvalidArgumentException("Url.Create : Required parameter not passed [$segment].");
+			    $missingParameters[] = $segment;
+                continue;
 			}
 
 			// trailing capture.
@@ -296,8 +301,21 @@ class Route implements Routable
 					$newSegments[]	= '';
 		}
 
-		return implode('/', $newSegments);
+		if(count($missingParameters) > 0)
+            throw new \Exedra\Exception\InvalidArgumentException("Url.Create : Route parameter(s) is missing [".implode(', ', $missingParameters)."].");
+
+        return implode('/', $newSegments);
 	}
+
+    /**
+     * An alias
+     * @param array $data
+     * @return string
+     */
+    public function getParameterizedPath(array $data)
+    {
+        return $this->pathParameterReplace($data);
+    }
 
 	/**
 	 * Validate uri path against the request

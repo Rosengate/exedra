@@ -226,7 +226,7 @@ class RoutingTest extends PHPUnit_Framework_TestCase
 
 	public function testMultioptional()
 	{
-		$this->map['foo']->get('mult/[:foo?]/[:bar?]/[:baz?]')->execute(function($exe)
+		$this->map['foo']->get('mult/:foo?/:bar?/:baz?')->execute(function($exe)
 		{
 			return 'qux'.$exe->param('foo', 'hug').$exe->param('bar', 'tiz').$exe->param('baz', 'rel');
 		})->group(function($mult)
