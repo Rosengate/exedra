@@ -135,25 +135,34 @@ class Group implements \ArrayAccess, Routable
     /**
      * Alias to addMiddleware
      * @param mixed $middleware
+     * @param null|string $name
      * @return $this
      */
-    public function middleware($middleware)
+    public function middleware($middleware, $name = null)
     {
-        return $this->addMiddleware($middleware);
+        return $this->addMiddleware($middleware, $name);
     }
 
     /**
      * Inversely add middleware on upper route
      * If there's this group is on the top (not route dependant), register middleware on app
      * @param mixed $middleware
+     * @param null|string $name
      * @return $this
      */
-    public function addMiddleware($middleware)
+    public function addMiddleware($middleware, $name = null)
     {
         if($this->route)
-            $this->route->addMiddleware($middleware);
+        {
+            $this->route->addMiddleware($middleware, $name);
+        }
         else
-            $this->middlewares[] = $middleware;
+        {
+            if($name)
+                $this->middlewares[$name] = $middleware;
+            else
+                $this->middlewares[] = $middleware;
+        }
 
         return $this;
     }

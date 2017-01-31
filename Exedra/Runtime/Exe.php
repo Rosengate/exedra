@@ -2,6 +2,7 @@
 namespace Exedra\Runtime;
 
 use Exedra\Config;
+use Exedra\Routing\Finding;
 use Exedra\Support\Definitions\Exe as Definition;
 
 class Exe extends \Exedra\Container\Container implements Definition
@@ -201,7 +202,7 @@ class Exe extends \Exedra\Container\Container implements Definition
 
 	/**
 	 * Get execution finding
-	 * @return string
+	 * @return Finding
 	 */
 	public function getFinding()
 	{

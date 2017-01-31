@@ -811,11 +811,15 @@ class Route implements Routable
     /**
      * Add middleware to existing
      * @param mixed $middleware
+     * @param null $name
      * @return $this
      */
-	public function addMiddleware($middleware)
+	public function addMiddleware($middleware, $name = null)
 	{
-		$this->properties['middleware'][] = $middleware;
+	    if($name)
+	        $this->properties['middleware'][$name] = $middleware;
+        else
+            $this->properties['middleware'][] = $middleware;
 
 		return $this;
 	}
@@ -823,11 +827,15 @@ class Route implements Routable
     /**
      * Alias to addMiddleware
      * @param mixed $middleware handler
+     * @param null $name
      * @return $this
      */
-	public function middleware($middleware)
+	public function middleware($middleware, $name = null)
 	{
-		$this->properties['middleware'][] = $middleware;
+        if($name)
+            $this->properties['middleware'][$name] = $middleware;
+        else
+            $this->properties['middleware'][] = $middleware;
 
 		return $this;
 	}

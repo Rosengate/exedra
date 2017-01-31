@@ -141,12 +141,22 @@ class Finding
 			if($route->hasProperty('base') && $route->getProperty('base') === true)
 				$this->baseRoute = $route->getAbsoluteName();
 
-			foreach($route->getGroup()->getMiddlewares() as $middleware)
-				$this->middlewares[] = $middleware;
+			foreach($route->getGroup()->getMiddlewares() as $key => $middleware)
+            {
+                if(is_string($key))
+                    $this->middlewares[$key] = $middleware;
+                else
+                    $this->middlewares[] = $middleware;
+            }
 
 			// append all route middlewares
-			foreach($route->getProperty('middleware') as $middleware)
-				$this->middlewares[] = $middleware;
+			foreach($route->getProperty('middleware') as $key => $middleware)
+            {
+                if(is_string($key))
+                    $this->middlewares[$key] = $middleware;
+                else
+                    $this->middlewares[] = $middleware;
+            }
 
 			foreach($route->getAttributes() as $key => $value)
 				$this->attributes[$key] = $value;
@@ -173,6 +183,17 @@ class Finding
 	{
 		return $this->middlewares;
 	}
+
+    /**
+     * @param $key
+     * @return $this
+     */
+    public function removeMiddleware($key)
+    {
+        unset($this->middlewares[$key]);
+
+        return $this;
+    }
 
 	/**
 	 * Get stacked handlers
