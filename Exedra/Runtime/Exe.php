@@ -477,7 +477,7 @@ class Exe extends \Exedra\Container\Container implements Definition
 	 */
 	public function getParentRoute()
 	{
-		return $this->route->getParentRoute();
+		return $this->route->getParentRouteName();
 	}
 
 	/**

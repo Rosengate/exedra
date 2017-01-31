@@ -157,7 +157,7 @@ class Route implements Routable
 
 		foreach($routes as $route)
 		{
-			$path = $route->pathParameterReplace($params);
+			$path = $route->getParameterizedPath($params);
 			
 			if($path)
 				$paths[] = $path; 
@@ -227,7 +227,7 @@ class Route implements Routable
 	 * Get parent route name after substracted the current route name.
 	 * @return string|null
 	 */
-	public function getParentRoute()
+	public function getParentRouteName()
 	{
 		$absoluteRoute	= $this->getAbsoluteName();
 
@@ -250,7 +250,7 @@ class Route implements Routable
 	 *
 	 * @throws \Exedra\Exception\InvalidArgumentException
 	 */
-	public function pathParameterReplace(array $data)
+	public function getParameterizedPath(array $data)
 	{
 		$path = $this->getProperty('path');
 
@@ -306,16 +306,6 @@ class Route implements Routable
 
         return implode('/', $newSegments);
 	}
-
-    /**
-     * An alias
-     * @param array $data
-     * @return string
-     */
-    public function getParameterizedPath(array $data)
-    {
-        return $this->pathParameterReplace($data);
-    }
 
 	/**
 	 * Validate uri path against the request
