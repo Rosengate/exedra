@@ -6,6 +6,8 @@ use Exedra\Container\Registry;
 use Exedra\Factory\Controller;
 use Exedra\Http\ServerRequest;
 use Exedra\Path;
+use Exedra\Routing\Finding;
+use Exedra\Routing\Route;
 use Exedra\Runtime\Factory\Form;
 use Exedra\Runtime\Factory\Url;
 use Exedra\Runtime\Redirect;
@@ -32,6 +34,8 @@ use Exedra\View\Factory;
  * @property Controller $controller
  * @property ServerRequest $request
  * @property Response $response
+ * @property Finding $finding
+ * @property Route $route
  */
 interface Exe
 {

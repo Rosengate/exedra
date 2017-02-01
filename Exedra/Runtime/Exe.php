@@ -2,10 +2,13 @@
 namespace Exedra\Runtime;
 
 use Exedra\Config;
+use Exedra\Container\Container;
+use Exedra\Factory\Asset;
 use Exedra\Routing\Finding;
+use Exedra\Runtime\Factory\Form;
 use Exedra\Support\Definitions\Exe as Definition;
 
-class Exe extends \Exedra\Container\Container implements Definition
+class Exe extends Container implements Definition
 {
 	/**
 	 * Array of (referenced) parameters for this execution.
@@ -89,10 +92,10 @@ class Exe extends \Exedra\Container\Container implements Definition
 			'path' => function(){ return $this->app->path; },
 			'config' => function() { return clone $this->app->config; },
 			'url' => function(){ return $this->create('factory.url', array($this->app->map, $this->request, $this->config->get('app.url', null), $this->config->get('asset.url', null), $this));},
-			'redirect' => array('\Exedra\Runtime\Redirect', array('self.response', 'self.url')),
-			'form' => array('\Exedra\Runtime\Factory\Form', array('self')),
+			'redirect' => array(Redirect::class, array('self.response', 'self.url')),
+			'form' => array(Form::class, array('self')),
 			// thinking of deprecating the asset as service
-			'asset' => function(){ return new \Exedra\Factory\Asset($this->url, $this->app->path['public'], $this->config->get('asset', array()));}
+			'asset' => function(){ return new Asset($this->url, $this->app->path['public'], $this->config->get('asset', array()));}
 			));
 
 		$this->services['factory']->add('factory.url', '\Exedra\Runtime\Factory\Url');
@@ -154,7 +157,7 @@ class Exe extends \Exedra\Container\Container implements Definition
 
 	/**
 	 * Get current module based on finding
-	 * @return \Exedra\Module\Module
+	 * @return string
 	 */
 	public function getModule()
 	{
@@ -234,8 +237,8 @@ class Exe extends \Exedra\Container\Container implements Definition
 
 	/**
 	 * Check if the given route exists within the current route.
-	 * @param string route
-	 * @param array params (optional)
+	 * @param string $route
+	 * @param array $params
 	 * @return boolean
 	 */
 	public function hasRoute($route, array $params = array())
@@ -256,8 +259,8 @@ class Exe extends \Exedra\Container\Container implements Definition
 
 	/**
 	 * Check if the given route is equal
-	 * @param string route
-	 * @param array params (optional)
+	 * @param string $route
+	 * @param array $params
 	 * @return boolean
 	 */
 	public function isRoute($route, array $params = array())
@@ -278,8 +281,8 @@ class Exe extends \Exedra\Container\Container implements Definition
 
 	/**
 	 * Get execution parameter
-	 * @param string name
-	 * @param mixed default value (optional)
+	 * @param string $name
+	 * @param mixed $default
 	 * @return mixed or default if not found.
 	 */
 	public function param($name, $default = null)
@@ -289,7 +292,7 @@ class Exe extends \Exedra\Container\Container implements Definition
 
 	/**
 	 * Check whether given attribute exists
-	 * @param string key
+	 * @param string $key
 	 * @return boolean
 	 */
 	public function hasAttribute($key)
@@ -299,7 +302,7 @@ class Exe extends \Exedra\Container\Container implements Definition
 
 	/**
 	 * Alias to hasAttribute(key)
-	 * @param string key
+	 * @param string $key
 	 * @return boolean
 	 */
 	public function hasAttr($key)
@@ -309,7 +312,7 @@ class Exe extends \Exedra\Container\Container implements Definition
 
 	/**
 	 * Alias to getAttribute
-	 * @param string key
+	 * @param string $key
 	 * @param string|null default value
 	 * @return mixed
 	 */
@@ -320,7 +323,7 @@ class Exe extends \Exedra\Container\Container implements Definition
 
 	/**
 	 * Get attribute
-	 * @param string key
+	 * @param string $key
 	 * @param string|null default value
 	 * @return mixed
 	 */
@@ -332,7 +335,7 @@ class Exe extends \Exedra\Container\Container implements Definition
 	/**
 	 * Alias to get attribute
 	 * For backward compatibility
-	 * @param string key
+	 * @param string $key
 	 */
 	public function meta($key, $default = null)
 	{
@@ -343,7 +346,7 @@ class Exe extends \Exedra\Container\Container implements Definition
 	 * Alias to hasAttr
 	 * For backward compatibility
 	 * Check whether given meta key exists
-	 * @param string key
+	 * @param string $key
 	 * @return bool
 	 */
 	public function hasMeta($key)
@@ -353,7 +356,7 @@ class Exe extends \Exedra\Container\Container implements Definition
 
 	/**
 	 * Check whether given param key exists
-	 * @param string name
+	 * @param string $name
 	 * @return boolean
 	 */
 	public function hasParam($name)
@@ -363,9 +366,9 @@ class Exe extends \Exedra\Container\Container implements Definition
 
 	/**
 	 * Update the given param
-	 * @param string key
-	 * @param mixed value
-	 * @return this
+	 * @param string $key
+	 * @param mixed $value
+	 * @return $this
 	 */
 	public function setParam($key, $value = null)
 	{
@@ -374,9 +377,9 @@ class Exe extends \Exedra\Container\Container implements Definition
 
 	/**
 	 * A public functionality to add parameter(s) to $exe.
-	 * @param string name
-	 * @param mixed value
-	 * @return this;
+	 * @param string $key
+	 * @param mixed $value
+	 * @return $this;
 	 */
 	public function addParam($key, $value = null)
 	{
@@ -407,7 +410,7 @@ class Exe extends \Exedra\Container\Container implements Definition
 
 	/**
 	 * Get parameters by the given list of key
-	 * @param array keys (optional)
+	 * @param array $keys
 	 * @return array
 	 */
 	public function params(array $keys = array())
@@ -429,7 +432,7 @@ class Exe extends \Exedra\Container\Container implements Definition
 
 	/**
 	 * Route name relative to the current base route, return absolute route if true boolean is given as argument.
-	 * @param boolean absolute, if true. will directly return absolute route. The same use of getAbsoluteRoute
+	 * @param boolean $absolute, if true. will directly return absolute route. The same use of getAbsoluteRoute
 	 * @return string
 	 */
 	public function getRouteName($absolute = false)
@@ -453,7 +456,7 @@ class Exe extends \Exedra\Container\Container implements Definition
 
 	/**
 	 * Alias to getRouteName()
-	 * @param bool absolute
+	 * @param bool $absolute
 	 * @return string
 	 */
 	public function getRoute($absolute = false)
@@ -463,7 +466,7 @@ class Exe extends \Exedra\Container\Container implements Definition
 
 	/** 
 	* get absolute route. 
-	* @return current route absolute name.
+	* @return string current route absolute name.
 	*/
 	public function getAbsoluteRoute()
 	{
@@ -482,7 +485,7 @@ class Exe extends \Exedra\Container\Container implements Definition
 
 	/**
 	 * Set a base route for this execution
-	 * @param string route
+	 * @param string $route
 	 */
 	public function setBaseRoute($route)
 	{
@@ -503,11 +506,12 @@ class Exe extends \Exedra\Container\Container implements Definition
 		return $baseRoute ? $baseRoute : null;
 	}
 
-	/**
-	 * Base the given route.
-	 * Or return an absolute route, if absolute character was given at the beginning of the given string.
-	 * @param string route
-	 */
+    /**
+     * Base the given route.
+     * Or return an absolute route, if absolute character was given at the beginning of the given string.
+     * @param string $route
+     * @return string
+     */
 	public function baseRoute($route)
 	{
 		if(strpos($route, '@') === 0)
@@ -523,11 +527,12 @@ class Exe extends \Exedra\Container\Container implements Definition
 		return $route;
 	}
 
-	/**
-	 * Forward current request to the given route
-	 * @param string route
-	 * @param array args
-	 */
+    /**
+     * Forward current request to the given route
+     * @param string $route
+     * @param array $args
+     * @return Exe
+     */
 	public function forward($route, array $args = array())
 	{
 		$route = $this->baseRoute($route);
@@ -535,11 +540,13 @@ class Exe extends \Exedra\Container\Container implements Definition
 		return $this->app->execute($route, $args, $this->request);
 	}
 
-	/**
-	 * Execute a scope based route
-	 * @param string route
-	 * @param array parameter.
-	 */
+    /**
+     * Execute a scope based route
+     * @param string $route
+     * @param array $parameters
+     * @param \Exedra\Http\ServerRequest|null $request
+     * @return Exe
+     */
 	public function execute($route, array $parameters = array(), \Exedra\Http\ServerRequest $request = null)
 	{
 		$route = $this->baseRoute($route);
@@ -583,9 +590,9 @@ class Exe extends \Exedra\Container\Container implements Definition
 	/**
 	 * Extended container::solve method
 	 * for shared service/factory/callable check
-	 * @param string type
-	 * @param string name
-	 * @param array args
+	 * @param string $type
+	 * @param string $name
+	 * @param array $args
 	 * @return mixed
 	 *
 	 * @throws \Exedra\Exception\InvalidArgumentException
