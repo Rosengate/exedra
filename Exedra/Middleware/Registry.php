@@ -5,7 +5,7 @@ class Registry
 {
 	/**
 	 * List of key-pair middleware registry
-	 * @var array registry
+	 * @var array $registry
 	 */
 	protected $registry = array();
 
@@ -20,10 +20,11 @@ class Registry
 		$this->map = $map;
 	}
 
-	/**
-	 * Append middleware into middlewares
-	 * @param mixed middleware
-	 */
+    /**
+     * Append middleware into $middlewares
+     * @param mixed $middleware
+     * @return $this
+     */
 	public function add($middleware)
 	{
 		$this->map->addMiddleware($middleware);
@@ -34,9 +35,7 @@ class Registry
 	/**
 	 * Resolve given collection of middleware
 	 * @param \Exedra\Runtime\Exe exe
-	 * @param Collection middlewares
-	 * @param \Closure handle
-	 * @return \Closure
+	 * @param array $middlewares
 	 */
 	public function resolve(\Exedra\Runtime\Exe $exe, array &$middlewares)
 	{
@@ -56,7 +55,7 @@ class Registry
 	/**
 	 * Resolve given pattern of string
 	 * @param \Exedra\Runtime\Exe exe
-	 * @param string middleware
+	 * @param string $middleware
 	 * @return \Closure
 	 */
 	protected function resolveByTypeString($exe, $middleware)
@@ -73,7 +72,7 @@ class Registry
 	/**
 	 * Resolve given object
 	 * @param \Exedra\Runtime\Exe exe
-	 * @param object middleware
+	 * @param object $middleware
 	 *
 	 * @throws \Exedra\Exception\InvalidArgumentException
 	 */
@@ -87,8 +86,8 @@ class Registry
 
 	/**
 	 * Key based middleware register
-	 * @param string key
-	 * @param mixed pattern|null
+	 * @param string $key
+	 * @param mixed $pattern|null
 	 * @return self
 	 */
 	public function register($key, $pattern = null)

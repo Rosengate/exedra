@@ -95,9 +95,9 @@ class Base
 
 	/**
 	 * Set input attribute
-	 * @param mixed key
-	 * @param string value
-	 * @return this
+	 * @param array|string|null $key
+	 * @param string $value
+	 * @return $this
 	 */
 	public function attr($key, $value = null)
 	{

@@ -24,7 +24,7 @@ class Form
 
 	/**
 	 * Initialize given data
-	 * @param array data
+	 * @param array $data
 	 */
 	public function initialize(array $data = array())
 	{
@@ -35,8 +35,8 @@ class Form
 	 * Set form data
 	 * @param string|array key
 	 * @param string|boolean value
-	 * @param boolean override
-	 * @return this
+	 * @param boolean $override
+	 * @return $this
 	 */
 	public function set($key, $value = null, $override = false)
 	{
@@ -69,9 +69,9 @@ class Form
 
 	/**
 	 * Set overriding data
-	 * @param string key
-	 * @param string value
-	 * @return this
+	 * @param string $key
+	 * @param string $value
+	 * @return $this
 	 */
 	public function setOverride($key, $value = null)
 	{
@@ -86,9 +86,9 @@ class Form
 
 	/**
 	 * Set options
-	 * @param string key
-	 * @param array options
-	 * @return this
+	 * @param string $key
+	 * @param array $options
+	 * @return $this
 	 */
 	public function setOptions($key, array $options)
 	{
@@ -123,7 +123,7 @@ class Form
 
 	/**
 	 * Check data existence
-	 * @param string key
+	 * @param string $key
 	 * @return boolean
 	 */
 	public function has($key)
@@ -131,24 +131,25 @@ class Form
 		return isset($this->override[$key]) ? true : (isset($this->data[$key]) ? true : false);
 	}
 
-	/**
-	 * Get form data
-	 * @param string key
-	 * @return string
-	 */
+    /**
+     * Get form data
+     * @param string $key
+     * @param string|null $default
+     * @return string
+     */
 	public function get($key, $default = null)
 	{
 		return isset($this->override[$key]) ? $this->override[$key] : (isset($this->data[$key]) ? $this->data[$key] : $default);
 	}
 
-	/**
-	 * Create html input
-	 * @param string type
-	 * @param string name
-	 * @param mixed attr
-	 * @param string value
-	 * @return \Exedra\Form\Input\Input
-	 */
+    /**
+     * Create html input
+     * @param string $type
+     * @param string $name
+     * @param string|null $value
+     * @param array|string|null $attr
+     * @return Input\Input
+     */
 	protected function createInput($type, $name = null, $value = null, $attr = null)
 	{
 		if($type == 'textarea')
@@ -173,15 +174,15 @@ class Form
 		return $input;
 	}
 
-	/**
-	 * Create html select
-	 * @param string name
-	 * @param array options (optional)
-	 * @param mixed attr (optional)
-	 * @param string value (optional)
-	 * @param string first (optional)
-	 * @return \Exedra\Form\Input\Select
-	 */
+    /**
+     * Create select input
+     * @param string|null $name
+     * @param array $options
+     * @param string|null $value
+     * @param array|string|null $attr
+     * @param mixed|null $first
+     * @return Input\Select
+     */
 	public function select($name = null, array $options = array(), $value = null, $attr = null, $first = null)
 	{
 		$select = new Input\Select($name);
@@ -211,73 +212,98 @@ class Form
 		return $select;
 	}
 
-	/**
-	 * Create html text input
-	 * @return Input\Input
-	 */
+    /**
+     * Create html text input
+     * @param string|null $name
+     * @param string|null $value
+     * @param array|string|null $attr
+     * @return Input\Input
+     */
 	public function text($name = null, $value = null, $attr = null)
 	{
 		return $this->createInput('text', $name, $value, $attr);
 	}
 
-	/**
-	 * Create html password input
-	 * @return Input\Input
-	 */
+    /**
+     * Create html password input
+     * @param string|null $name
+     * @param string|null $value
+     * @param array|string|null $attr
+     * @return Input\Input
+     */
 	public function password($name = null, $value = null, $attr = null)
 	{
 		return $this->createInput('password', $name, $value, $attr);
 	}
 
-	/**
-	 * Create html textarea input
-	 * @return Input\Input
-	 */
+    /**
+     * Create html textarea input
+     * @param string|null $name
+     * @param string|null $value
+     * @param array|string|null $attr
+     * @return Input\Input
+     */
 	public function textarea($name = null, $value = null, $attr = null)
 	{
 		return $this->createInput('textarea', $name, $value, $attr);
 	}
 
-	/**
-	 * Create html 5 date input
-	 * @return Input\Input
-	 */
+    /**
+     * Create html 5 date input
+     * @param string|null $name
+     * @param string|null $value
+     * @param array|string|null $attr
+     * @return Input\Input
+     */
 	public function date($name = null, $value = null, $attr = null)
 	{
 		return $this->createInput('date', $name, $value, $attr);
 	}
 
-	/**
-	 * Create html 5 time input
-	 * @return Input\Input
-	 */
+    /**
+     * Create html 5 time input
+     * @param string|null $name
+     * @param string|null $value
+     * @param array|string|null $attr
+     * @return Input\Input
+     */
 	public function time($name = null, $value = null, $attr = null)
 	{
 		return $this->createInput('time', $name, $value, $attr);
 	}
 
-	/**
-	 * Create html file input
-	 * @return Input\Input
-	 */
+    /**
+     * Create html file input
+     * @param string|null $name
+     * @param string|null $value
+     * @param array|string|null $attr
+     * @return Input\Input
+     */
 	public function file($name = null, $value = null, $attr = null)
 	{
 		return $this->createInput('file', $name, $value, $attr);
 	}
 
-	/** 
-	* Create html hidden input
-	* @return Input\Input
-	*/
+    /**
+     * Create html hidden input
+     * @param string|null $name
+     * @param string|null $value
+     * @param array|string|null $attr
+     * @return Input\Input
+     */
 	public function hidden($name = null, $value = null, $attr = null)
 	{
 		return $this->createInput('hidden', $name, $value, $attr);
 	}
 
-	/**
-	 * Create html checkbox input
-	 * @return Input\Input
-	 */
+    /**
+     * Create html checkbox input
+     * @param string|null $name
+     * @param string|null $value
+     * @param bool $status
+     * @param array|string|null $attr
+     * @return Input\Input
+     */
 	public function checkbox($name = null, $value = null, $status = false, $attr = null)
 	{
 		$input = $this->createInput('checkbox', $name, $value, $attr);
@@ -288,10 +314,13 @@ class Form
 		return $input;
 	}
 
-	/**
-	 * Create html submit input
-	 * @return Input\Input
-	 */
+    /**
+     * Create html submit input
+     * @param string|null $name
+     * @param string|null $value
+     * @param array|string|null $attr
+     * @return Input\Input
+     */
 	public function submit($name = null, $value = null, $attr = null)
 	{
 		return $this->createInput('submit', $name, $value, $attr);
