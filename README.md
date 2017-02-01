@@ -28,15 +28,17 @@ Documentation
 ===
 Documentation and the homebase for exedra is currently hosted here : http://exedra.rosengate.com
 
-Booting up \Exedra\Application
+Quick Boot
 ======
+Let's get it running through some quick usages.
+
 At the end of this file, this is how your sample project directory may look like :
 ```
 | /public
 | ─ index.php
 | /vendor
 | app.php
-| wizard
+| console
 | composer.json
 | composer.lock
 ```
@@ -85,6 +87,8 @@ These are optional and internally configured if not passed, only path.root is re
 | ─ routes //path.routes
 | public   //path.public
 ```
+
+The *autoloadSrc()* method basically just autoload the src folder, with the default namespace (App\) or the given through the constructor.
 
 #### /app.php sample routing
 Now, in the same **app.php** let's write some nestful chatting api codes :
@@ -155,7 +159,7 @@ return $app;
 ```
 
 #### /public/index.php
-Create your front controller file (**index.php**) under your public folder (**path.public**). And require the **app.php** file;
+This file act as a public facing front controller of your application, which is usually located under /public/ folder, or **path.public** per configured above.
 ```
 <?php 
 $app = require_once __DIR__.'/../app.php';
@@ -163,31 +167,31 @@ $app = require_once __DIR__.'/../app.php';
 $app->dispatch();
 ```
 
-#### /wizard
-Create a file named **wizard**, in your project root directory, or anywhere convenient to you. And require the **app.php** again.
+#### /console
+Create a file named **console**, in your project root directory, or anywhere convenient to you. And require the **app.php** again.
 ```
 <?php
 $app = require_once __DIR__.'/app.php';
 
-$app->wizard($argv);
+$app->console($argv);
 ```
-##### Run the wizard intro on cli
+##### Run the console wizard on your cli
 ```
-php wizard
+php console
 ```
 ##### Start Basic PHP Server
 ```
-php wizard serve -p 9000
+php console serve -p 9000
 ```
 and it'll serve based on the **path.public** path configured, with port 9000.
 
-##### wizard help
+##### console help
 ```
-php wizard /?
+php console /?
 ```
 ##### command specific help
 ```
-php wizard routes /?
+php console routes /?
 ```
 
 Another Examples
@@ -215,6 +219,13 @@ $app->map->addRoutes(array(
 Some of the projects built on top of exedra :
 
 http://github.com/rosengate/exedra-web (hosted at exedra.rosengate.com)
+
+Exedron\Routeller
+======
+Look out for an amazing annotation based routing-controller component
+
+http://github.com/exedron/routeller
+
 
 Roadmap to 0.3.0
 ======

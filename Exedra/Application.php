@@ -285,18 +285,28 @@ class Application extends \Exedra\Container\Container implements Definition
 		$response->send();
 	}
 
-	/**
-	 * Listen to the console arguments.
-	 * @param array $arguments
+    /**
+     * An alias to console($arguments)
+     * @param array $arguments
      * @return mixed
-	 */
+     */
 	public function wizard(array $arguments)
 	{
-		// shift out file name
-		array_shift($arguments);
-		
-		return $this->wizard->listen($arguments);
+		return $this->console($arguments);
 	}
+
+    /**
+     * Listen to the console arguments.
+     * @param array $arguments
+     * @return mixed
+     */
+	public function console(array $arguments)
+    {
+        // shift out file name
+        array_shift($arguments);
+
+        return $this->wizard->listen($arguments);
+    }
 
 	/**
 	 * Extended container solve method
