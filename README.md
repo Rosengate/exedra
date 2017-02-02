@@ -32,7 +32,7 @@ Quick Boot
 ======
 Let's get it running through some quick usages.
 
-At the end of this file, this is how your sample project directory may look like :
+Assuming that you've done that installation through composer, at the end of this file, this is how your sample project directory may look like :
 ```
 | /public
 | ─ index.php
