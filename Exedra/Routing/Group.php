@@ -2,7 +2,7 @@
 
 use Exedra\Contracts\Routing\Registrar;
 use Exedra\Exception\InvalidArgumentException;
-use Exedra\Http\ServerRequest;
+use Psr\Http\Message\ServerRequestInterface;
 
 class Group implements \ArrayAccess, Registrar
 {
@@ -103,7 +103,7 @@ class Group implements \ArrayAccess, Registrar
      * @param string|\Closure $handler
      * @return self
      */
-    public function addHandler($name,  $handler)
+    public function addHandler($name, $handler)
     {
         $this->handlers[$name] = $handler;
 
@@ -233,10 +233,10 @@ class Group implements \ArrayAccess, Registrar
 
     /**
      * Make a finding by \Exedra\Http\Request
-     * @param ServerRequest $request
+     * @param ServerRequestInterface $request
      * @return Finding
      */
-    public function findByRequest(ServerRequest $request)
+    public function findByRequest(ServerRequestInterface $request)
     {
         $result = $this->findRouteByRequest($request, trim($request->getUri()->getPath(), '/'));
 
@@ -247,10 +247,10 @@ class Group implements \ArrayAccess, Registrar
      * Make a finding by given absolute name
      * @param string $name.
      * @param array $parameters
-     * @param ServerRequest $request forwarded request, for this Finding
+     * @param ServerRequestInterface $request forwarded request, for this Finding
      * @return Finding
      */
-    public function findByName($name, array $parameters = array(), ServerRequest $request = null)
+    public function findByName($name, array $parameters = array(), ServerRequestInterface $request = null)
     {
         $route = $this->findRoute($name);
 
@@ -360,13 +360,13 @@ class Group implements \ArrayAccess, Registrar
 
     /**
      * A recursivable functionality to find route under this routing group, by the given request instance.
-     * @param ServerRequest $request
+     * @param ServerRequestInterface $request
      * @param string $groupUriPath
      * @param array $passedParameters - highly otional.
      * @return array
      * {route: boolean|Route, parameter: array, continue: boolean}
      */
-    public function findRouteByRequest(ServerRequest $request, $groupUriPath, array $passedParameters = array())
+    public function findRouteByRequest(ServerRequestInterface $request, $groupUriPath, array $passedParameters = array())
     {
         // loop the group and find.
         foreach($this->storage as $route)
@@ -516,7 +516,7 @@ class Group implements \ArrayAccess, Registrar
      */
     public function tag($tag)
     {
-        $route = $this->factory->createRoute($this, $name, array());
+        $route = $this->factory->createRoute($this, null, array());
 
         $this->addRoute($route);
 

@@ -1,6 +1,7 @@
 <?php namespace Exedra\Routing;
 
 use Exedra\Contracts\Routing\Registrar;
+use Psr\Http\Message\ServerRequestInterface;
 
 class Route implements Registrar
 {
@@ -307,13 +308,13 @@ class Route implements Registrar
         return implode('/', $newSegments);
 	}
 
-	/**
-	 * Validate uri path against the request
-	 * @param \Exedra\Http\ServerRequest $request
-	 * @param string $path
-	 * @return array
-	 */
-	public function validate(\Exedra\Http\ServerRequest $request, $path)
+    /**
+     * Validate uri path against the request
+     * @param ServerRequestInterface $request
+     * @param string $path
+     * @return array
+     */
+	public function validate(ServerRequestInterface $request, $path)
 	{
 		// print_r($query);die;
 		foreach(array('method', 'path', 'ajax') as $key)

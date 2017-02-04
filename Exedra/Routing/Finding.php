@@ -1,6 +1,8 @@
 <?php
 namespace Exedra\Routing;
 
+use Psr\Http\Message\ServerRequestInterface;
+
 class Finding
 {
 	/**
@@ -63,7 +65,7 @@ class Finding
 	 * @param array $parameters
      * @param mixed $request
 	 */
-	public function __construct(\Exedra\Routing\Route $route = null, array $parameters = array(), $request = null)
+	public function __construct(\Exedra\Routing\Route $route = null, array $parameters = array(), ServerRequestInterface $request = null)
 	{
 		$this->route = $route;
 
@@ -254,7 +256,7 @@ class Finding
 
 	/**
 	 * Get Http request found along with the finding
-	 * @return \Exedra\Http\ServerRequest
+	 * @return ServerRequestInterface
 	 */
 	public function getRequest()
 	{

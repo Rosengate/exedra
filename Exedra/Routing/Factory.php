@@ -5,6 +5,7 @@ use Exedra\Exception\InvalidArgumentException;
 use Exedra\Routing\Handler\ArrayHandler;
 use Exedra\Routing\Handler\ClosureHandler;
 use Exedra\Routing\Handler\PathHandler;
+use Psr\Http\Message\ServerRequestInterface;
 
 /**
  * A factory that handle the route/group/finding creation
@@ -134,7 +135,7 @@ class Factory
     /**
      * Create routing group by given path
      * For now, assume the passed pattern as path
-     * @param string $path
+     * @param string $pattern
      * @param Route|null $route
      * @return \Exedra\Routing\Group
      * @throws \Exedra\Exception\InvalidArgumentException
@@ -176,12 +177,12 @@ class Factory
 
 	/**
 	 * Create route finding
-	 * @param \Exedra\Routing\Route|null
+	 * @param Route|null $route
 	 * @param array $parameters
-	 * @param \Exedra\Http\ServerRequest $request
+	 * @param ServerRequestInterface $request
 	 * @return \Exedra\Routing\Finding
 	 */
-	public function createFinding(Route $route = null, array $parameters = null, \Exedra\Http\ServerRequest $request = null)
+	public function createFinding(Route $route = null, array $parameters = null, ServerRequestInterface $request = null)
 	{
 		return $this->create('finding', array($route, $parameters, $request));
 	}
