@@ -24,7 +24,36 @@ class UrlTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals((string) $factory->to('hello')->setHost('192.168.1.100'), 'http://192.168.1.100/hello');
 
-        $this->assertEquals($factory->route('foo')->addParam('baz', 'bat')->addParams(array('baft' => 'jazt', 'taz' => 'tux')), 'http://localhost/bar?baz=bat&baft=jazt&taz=tux');
+        $this->assertEquals($factory->route('foo')->addQueryParam('baz', 'bat')->addQueryParams(array('baft' => 'jazt', 'taz' => 'tux')), 'http://localhost/bar?baz=bat&baft=jazt&taz=tux');
+
+        $url = $factory->to('foo-bar');
+
+        $url->setQueryParams(array(
+            'foo' => 'bar',
+            'baz' => array('bad')
+        ));
+
+        $url->addQueryParam('qux', array(
+            'tux' => 'new',
+            'eqa' => array(
+                'opa' => array(
+                    'gan' => 'nam'
+                )
+            )
+        ));
+
+        $this->assertEquals(array(
+            'foo' => 'bar',
+            'baz' => array('bad'),
+            'qux' => array(
+                'tux' => 'new',
+                'eqa' => array(
+                    'opa' => array(
+                        'gan' => 'nam'
+                    )
+                )
+            )
+        ), $url->getQueryParams());
     }
 
     public function testGenerator()
