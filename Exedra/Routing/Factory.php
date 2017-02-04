@@ -13,12 +13,6 @@ use Exedra\Routing\Handler\PathHandler;
 class Factory
 {
 	/**
-	 * Application instance
-	 * @var \Exedra\Application $app
-	 */
-	protected $app;
-
-	/**
 	 * Classes registry
 	 * @var array $registry
 	 */
