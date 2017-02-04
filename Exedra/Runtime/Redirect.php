@@ -18,8 +18,8 @@ class Redirect implements UrlGenerator
 
 	/**
 	 * Dynamically redirect to urlFactory callables
-	 * @param string name
-	 * @param array args
+	 * @param string $name
+	 * @param array $args
 	 * @return \Exedra\Http\Response
 	 */
 	public function __call($name, array $args = array())
@@ -40,10 +40,11 @@ class Redirect implements UrlGenerator
 		return $this->to($url);
 	}
 
-	/**
-	 * Alias to to(url)
-	 * @param string url
-	 */
+    /**
+     * Alias to to(url)
+     * @param string $url
+     * @return \Exedra\Http\Response
+     */
 	public function url($url)
 	{
 		return $this->to($url);

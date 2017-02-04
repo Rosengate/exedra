@@ -7,7 +7,9 @@ class Response extends Message
 
 	protected $reasonPhrase = null;
 
-	public function __construct($status = 200, array $headers = array(), Stream $body, $protocol = '1.1', $reason = null)
+    protected $statuses;
+
+    public function __construct($status = 200, array $headers = array(), Stream $body, $protocol = '1.1', $reason = null)
 	{
 		parent::__construct($headers, $body, $protocol);
 
@@ -110,8 +112,8 @@ class Response extends Message
 
 	/**
 	 * Old method
-	 * @param string name
-	 * @param string value
+	 * @param string $name
+	 * @param string $value
 	 */
 	public function header($name, $value)
 	{
@@ -134,7 +136,7 @@ class Response extends Message
 
 	/**
 	 * Send header and print response
-	 * @return
+	 * @return void
 	 */
 	public function send()
 	{
@@ -181,6 +183,6 @@ class Response extends Message
 
 	public function __toString()
 	{
-		return $this->getBody();
+		return $this->getBody()->toString();
 	}
 }

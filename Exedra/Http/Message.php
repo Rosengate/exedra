@@ -43,7 +43,7 @@ class Message
 	}
 
 	/**
-	 * @param string name
+	 * @param string $name
 	 * @return string
 	 */
 	public static function headerCase($name)
@@ -81,7 +81,7 @@ class Message
 
 	/**
 	 * Get header values
-	 * @param string name
+	 * @param string $header
 	 * @return array
 	 */
 	public function getHeader($header)
@@ -91,8 +91,8 @@ class Message
 
 	/**
 	 * Get header value
-	 * @param name of header
-	 * @return string of header value
+	 * @param string $name
+	 * @return string
 	 */
 	public function getHeaderLine($name)
 	{
@@ -106,14 +106,19 @@ class Message
 		return $message->setHeader($name, $value);
 	}
 
-	public function withAddedHeader($name)
+    /**
+     * @param $name
+     * @param $value
+     * @return Message
+     */
+    public function withAddedHeader($name, $value)
 	{
 		if(!$this->hasHeader($name))
 			return $this->withHeader($name, $value);
 
 		$message = clone $this;
 
-		return $message->addHeader($name);
+		return $message->addHeader($name, $value);
 	}
 
 	public function withoutHeader($name)
@@ -127,6 +132,7 @@ class Message
 	}
 
 	/**
+     * Get messange body Stream
 	 * @return \Exedra\Http\Stream
 	 */
 	public function getBody()
@@ -161,12 +167,12 @@ class Message
 
 	public function hasHeader($header)
 	{
-		return isset($this->header[strtolower($header)]);
+		return isset($this->headers[strtolower($header)]);
 	}
 
 	public function headerHas($name, $value)
 	{
-		$name = strtolower($header);
+		$name = strtolower($name);
 
 		if(!isset($this->headers[$name]))
 			return false;
@@ -188,12 +194,12 @@ class Message
 		$this->headerLines = $headerLines;
 	}
 
-	/**
-	 * Set header as if it's new
-	 * @param string header
-	 * @param array|string value
-	 * @return void
-	 */
+    /**
+     * Set header as if it's new
+     * @param string $header
+     * @param array|string $value
+     * @return $this
+     */
 	public function setHeader($header, $value)
 	{
 		$value = !is_array($value) ? array($value) : array_map('trim', $value);
@@ -207,13 +213,15 @@ class Message
 				unset($this->headerLines[$key]);
 
 		$this->headerLines[$header] = $value;
+
+        return $this;
 	}
 
 	/**
 	 * Add header value(s)
-	 * @param string header
+	 * @param string $header
 	 * @param string|array value
-	 * @return this
+	 * @return $this
 	 */
 	public function addHeader($header, $value)
 	{
@@ -244,10 +252,11 @@ class Message
 		return $this;
 	}
 
-	/**
-	 * Remove header
-	 * @param string header
-	 */
+    /**
+     * Remove header
+     * @param string $header
+     * @return $this
+     */
 	public function removeHeader($header)
 	{
 		$name = strtolower($header);

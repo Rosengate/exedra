@@ -27,7 +27,9 @@ class ServerRequest extends Message
 
 	protected $params = array();
 
-	public function __construct(
+    protected $requestTarget;
+
+    public function __construct(
 		$method, 
 		Uri $uri, 
 		array $headers, 
@@ -69,10 +71,10 @@ class ServerRequest extends Message
 		$this->headerLines = $headerLines;
 	}
 
-	/**
-	 * Instantiate request from php _SERVER variable
-	 * @param array server
-	 */
+    /**
+     * Instantiate request from php _SERVER variable
+     * @return static
+     */
 	public static function createFromGlobals()
 	{
 		$server = $_SERVER;
@@ -83,7 +85,9 @@ class ServerRequest extends Message
 		$uriParts['port'] = $server['SERVER_PORT'];
 		$uriParts['scheme'] = isset($server['REQUEST_SCHEME']) ? $server['REQUEST_SCHEME'] : ( isset($server['HTTPS']) && $server['HTTPS'] == 'on' ? 'https' : 'http' );
 
-		if(function_exists('getallheaders'))
+        $headers = array();
+
+        if(function_exists('getallheaders'))
 		{
 			// a correct case already
 			$apacheHeaders = getallheaders();
@@ -93,7 +97,6 @@ class ServerRequest extends Message
 		}
 		else
 		{
-			$headers = array();
 
 			// normalize the header key
 			foreach($server as $key => $value)
@@ -123,10 +126,11 @@ class ServerRequest extends Message
 		return $request;
 	}
 
-	/**
-	 * Create request from given array
-	 * @param array params
-	 */
+    /**
+     * Create request from given array
+     * @param array $params
+     * @return static
+     */
 	public static function createFromArray(array $params)
 	{
 		return new static(
@@ -162,7 +166,7 @@ class ServerRequest extends Message
 		return $this->requestTarget;
 	}
 
-	public function withRequestTarget()
+	public function withRequestTarget($target)
 	{
 		$request = clone $this;
 
@@ -207,9 +211,9 @@ class ServerRequest extends Message
 	{
 		$request = clone $this;
 
-		$this->uri = $uri;
+		$request->uri = $uri;
 
-		return $this->uri;
+		return $request;
 	}
 
 	/**
@@ -223,8 +227,8 @@ class ServerRequest extends Message
 
 	/**
 	 * Get server value
-	 * @param string name
-	 * @param null|string default
+	 * @param string $name
+	 * @param null|string $default
 	 * @return string|null
 	 */
 	public function server($name, $default = null)
@@ -243,7 +247,7 @@ class ServerRequest extends Message
 
 	/**
 	 * Get cookie
-	 * @param string name
+	 * @param string $name
 	 * @param null|string default
 	 * @return null|string
 	 */
@@ -418,11 +422,12 @@ class ServerRequest extends Message
 		return strtolower($method) == strtolower($this->method);
 	}
 
-	/**
-	 * Get a merged query params and parsed body
-	 * @param string name
-	 * @param null|string default
-	 */
+    /**
+     * Get a merged query params and parsed body
+     * @param string $name
+     * @param null|string $default
+     * @return mixed|string
+     */
 	public function param($name, $default = null)
 	{
 		if(!$this->params)

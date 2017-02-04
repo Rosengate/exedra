@@ -13,7 +13,11 @@ class Request extends Message
 	 */
 	protected $uri;
 
-	public function __construct($method, Uri $uri, array $headers, Stream $body)
+    protected $requestTarget;
+
+    protected $method;
+
+    public function __construct($method, Uri $uri, array $headers, Stream $body)
 	{
 		parent::__construct($headers, $body);
 
@@ -24,9 +28,11 @@ class Request extends Message
 
 	public function __clone()
 	{
-		parent::__clone();
-		
-		$this->uri = clone $uri;
+	    $request = clone $this;
+
+        $request->uri = clone $this->uri;
+
+        return $request;
 	}
 
 	public function getRequestTarget()
@@ -52,7 +58,7 @@ class Request extends Message
 		return $this->requestTarget;
 	}
 
-	public function withRequestTarget()
+	public function withRequestTarget($target)
 	{
 		$request = clone $this;
 
@@ -97,8 +103,8 @@ class Request extends Message
 	{
 		$request = clone $this;
 
-		$this->uri = $uri;
+        $request->uri = $uri;
 
-		return $this->uri;
+        return $request;
 	}
 }

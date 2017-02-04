@@ -145,7 +145,7 @@ class Stream
 		if(!$this->isRewritable())
 			throw new \RuntimeException('Resource is not writeable');
 
-		if(fwrite($contents) === false)
+		if(fwrite($this->resource, $contents) === false)
 			throw new \RuntimeException('Failed to write the resource');
 	}
 

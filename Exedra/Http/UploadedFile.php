@@ -34,7 +34,7 @@ class UploadedFile
 
 	/**
 	 * Create an array of \Exedra\Http\UploadedFile
-	 * @param array files
+	 * @param array $files
 	 * @return array
 	 */
 	public static function createFromGlobals(array $files = array())
@@ -42,10 +42,11 @@ class UploadedFile
 		return static::parseFiles($files);
 	}
 
-	/**
-	 * Normalize global $_FILES
-	 * @param array files
-	 */
+    /**
+     * Normalize global $_FILES
+     * @param array $files
+     * @return array
+     */
 	protected static function parseFiles(array $files)
 	{
 		$normalizedFiles = array();
@@ -65,11 +66,12 @@ class UploadedFile
 		return $normalizedFiles;
 	}
 
-	/**
-	 * Normalize the tree recursively
-	 * thanks and credit to https://github.com/guzzle/psr7/blob/master/src/ServerRequest.php
-	 * @param array file
-	 */
+    /**
+     * Normalize the tree recursively
+     * thanks and credit to https://github.com/guzzle/psr7/blob/master/src/ServerRequest.php
+     * @param array $file
+     * @return array|static
+     */
 	protected static function normalizeFilesTree(array $file)
 	{
 		if(!is_array($file['tmp_name']))
@@ -105,7 +107,7 @@ class UploadedFile
 
 	/**
 	 * Move this file to the target path
-	 * @param string targetPath
+	 * @param string $targetPath
 	 */
 	public function moveTo($targetPath)
 	{
