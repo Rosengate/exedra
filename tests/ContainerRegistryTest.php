@@ -30,7 +30,7 @@ class ContainerRegistryTest extends PHPUnit_Framework_TestCase
 
 		$this->assertTrue($app->request instanceof \Exedra\Http\ServerRequest);
 
-		$this->assertTrue($app->url instanceof \Exedra\Factory\Url);
+		$this->assertTrue($app->url instanceof \Exedra\Url\UrlFactory);
 
 		$this->assertTrue($app->wizard instanceof \Exedra\Wizard\Manager);
 
@@ -54,15 +54,15 @@ class ContainerRegistryTest extends PHPUnit_Framework_TestCase
 				'uri' => '/'
 				)));
 
-		$this->assertTrue($exe->url instanceof \Exedra\Factory\Url);
+		$this->assertTrue($exe->url instanceof \Exedra\Url\UrlFactory);
 
 		$this->assertTrue($exe->redirect instanceof \Exedra\Runtime\Redirect);
 
 		// $this->assertTrue($exe->module instanceof \Exedra\Module\Registry && $exe->module === $exe->app->module);
 
-		// $this->assertTrue($exe->view instanceof \Exedra\View\Factory && $exe->view === $exe->module['Application']->view);
+		// $this->assertTrue($exe->view instanceof \Exedra\View\UrlFactory && $exe->view === $exe->module['Application']->view);
 
-		// $this->assertTrue($exe->controller instanceof \Exedra\Factory\Controller && $exe->controller === $exe->module['Application']->controller);
+		// $this->assertTrue($exe->controller instanceof \Exedra\UrlFactory\Controller && $exe->controller === $exe->module['Application']->controller);
 	}
 
 	public function testConfigPriority()

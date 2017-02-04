@@ -100,7 +100,7 @@ class Application extends \Exedra\Container\Container implements Definition
 			'runtime.exe' => \Exedra\Runtime\Exe::class,
 			'runtime.response' => function(){ return \Exedra\Runtime\Response::createEmptyResponse(); },
 			'handler.resolver' => \Exedra\Runtime\Handler\Resolver::class,
-			'factory.url' => \Exedra\Factory\Url::class,
+			'factory.url' => \Exedra\Url\UrlFactory::class,
 			'@factory.controller' => \Exedra\Factory\Controller::class,
 			'@factory.view' => \Exedra\View\Factory::class
 		));

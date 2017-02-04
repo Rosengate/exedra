@@ -1,9 +1,15 @@
 <?php
 namespace Exedra\Runtime;
 
-class Redirect implements \Exedra\Factory\UrlInterface
+use Exedra\Contracts\Url\UrlGenerator;
+
+class Redirect implements UrlGenerator
 {
-	public function __construct(\Exedra\Http\Response $response, \Exedra\Factory\Url $urlFactory)
+    protected $response;
+
+    protected $urlFactory;
+
+    public function __construct(\Exedra\Http\Response $response, \Exedra\Url\UrlFactory $urlFactory)
 	{
 		$this->response = $response;
 

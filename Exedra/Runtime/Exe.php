@@ -5,8 +5,9 @@ use Exedra\Config;
 use Exedra\Container\Container;
 use Exedra\Factory\Asset;
 use Exedra\Routing\Finding;
-use Exedra\Runtime\Factory\Form;
 use Exedra\Support\Definitions\Exe as Definition;
+use Exedra\Support\Runtime\Form\Form;
+use Exedra\Support\Runtime\Url\UrlFactory;
 
 class Exe extends Container implements Definition
 {
@@ -98,7 +99,7 @@ class Exe extends Container implements Definition
 			'asset' => function(){ return new Asset($this->url, $this->app->path['public'], $this->config->get('asset', array()));}
 			));
 
-		$this->services['factory']->add('factory.url', '\Exedra\Runtime\Factory\Url');
+		$this->services['factory']->add('factory.url', UrlFactory::class);
 
 		$this->setUpConfig();
 	}
