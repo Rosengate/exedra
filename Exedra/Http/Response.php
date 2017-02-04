@@ -1,7 +1,9 @@
 <?php
 namespace Exedra\Http;
 
-class Response extends Message
+use Psr\Http\Message\ResponseInterface;
+
+class Response extends Message implements ResponseInterface
 {
 	protected $status;
 

@@ -1,11 +1,12 @@
 <?php
 namespace Exedra\Http;
+use Psr\Http\Message\UriInterface;
 
 /**
  * A placeholder for upcoming PSR-7 impementation
  * implements Psr\Http\Message\UriInterface
  */
-class Uri
+class Uri implements UriInterface
 {
 	protected $uri;
 

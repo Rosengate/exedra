@@ -1,11 +1,12 @@
 <?php
 namespace Exedra\Http;
+use Psr\Http\Message\UploadedFileInterface;
 
 /**
  * A placeholder for upcoming PSR-7 impementation
  * implements Psr\Http\Message\UploadedFileInterface
  */
-class UploadedFile
+class UploadedFile implements UploadedFileInterface
 {
 	protected $name;
 

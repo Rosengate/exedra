@@ -1,11 +1,12 @@
 <?php
 namespace Exedra\Http;
+use Psr\Http\Message\StreamInterface;
 
 /**
  * A placeholder for upcoming PSR-7 impementation
  * implements Psr\Http\Message\UploadedFileInterface
  */
-class Stream
+class Stream implements StreamInterface
 {
 	protected static $modes = array(
 		'readable' => array('r', 'r+', 'w+', 'a+', 'x+', 'c+'),
@@ -129,7 +130,7 @@ class Stream
 		return $this->seek(0);
 	}
 
-	public function isRewritable()
+	public function isWritable()
 	{
 		if(!$this->resource)
 			return false;
@@ -142,7 +143,7 @@ class Stream
 		if(!$this->resource)
 			throw new \RuntimeException('No resource is available');
 
-		if(!$this->isRewritable())
+		if(!$this->isWritable())
 			throw new \RuntimeException('Resource is not writeable');
 
 		if(fwrite($this->resource, $contents) === false)

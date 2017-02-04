@@ -1,11 +1,13 @@
 <?php
 namespace Exedra\Http;
+use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Message\UriInterface;
 
 /**
  * Implementation of both Psr\Http\Message\RequestInterface and Psr\Http\Message\ServerRequestInterface
  * Along with number of application methods
  */
-class ServerRequest extends Message
+class ServerRequest extends Message implements ServerRequestInterface
 {
 	protected $method;
 
@@ -207,7 +209,7 @@ class ServerRequest extends Message
 			throw new \InvalidArgumentException('Invalid uri. Must be string, array, or Uri');
 	}
 
-	public function withUri(Uri $uri, $preserveHost = false)
+	public function withUri(UriInterface $uri, $preserveHost = false)
 	{
 		$request = clone $this;
 
@@ -355,14 +357,14 @@ class ServerRequest extends Message
 		$this->bodyParsers[$type] = $callable->bindTo($this);
 	}
 
-	public function setParsedBody(array $parsedBody)
+	public function setParsedBody($parsedBody)
 	{
 		$this->parsedBody = $parsedBody;
 
 		return $this;
 	}
 
-	public function withParsedBody(array $parsedBody)
+	public function withParsedBody($parsedBody)
 	{
 		$request = clone $this;
 

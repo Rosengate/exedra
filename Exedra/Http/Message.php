@@ -1,11 +1,13 @@
 <?php
 namespace Exedra\Http;
+use Psr\Http\Message\MessageInterface;
+use Psr\Http\Message\StreamInterface;
 
 /**
  * A placeholder for upcoming PSR-7 impementation
  * implements Psr\Http\Message\MessageInterface
  */
-class Message
+class Message implements MessageInterface
 {
 	protected $protocol = '1.1';
 
@@ -158,7 +160,7 @@ class Message
 		return $this;
 	}
 
-	public function withBody(Stream $body)
+	public function withBody(StreamInterface $body)
 	{
 		$message = clone $this;
 

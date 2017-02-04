@@ -1,11 +1,12 @@
 <?php
 namespace Exedra\Http;
+use Psr\Http\Message\RequestInterface;
 
 /**
  * HTTP Request interface
  * Covers ServerRequestInterface with a number of added method
  */
-class Request extends Message
+class Request extends Message implements RequestInterface
 {
 	/**
 	 * HTTP Request URI instance
