@@ -51,7 +51,7 @@ First, create the boot file named  **/app.php**
 And load the composer autoload accordingly. The **app.php** file should return the same \Exedra\Application instance, so it's usable for the front controller public/index.php, or wizard (console) later.
 
 Construct the application with your root directory (**path.root**) as the first argument.
-```
+```php
 <?php
 require_once __DIR__.'/vendor/autoload.php';
 
@@ -62,16 +62,16 @@ $app->autoloadSrc();
 return $app;
 ```
 Or you may pass an array of paths and namespace like below :
-```
+```php
 <?php
 require_once __DIR__.'/vendor/autoload.php';
 
 $app = new \Exedra\Application(array(
     'namespace' => 'App',
-    'path.root' => __DIR__',
-    'path.app' => __DIR__./app',
+    'path.root' => __DIR__,
+    'path.app' => __DIR__.'/app',
     'path.src' => __DIR__.'/app/src',
-    'path.routes' => __DIR__.'/app/routes,
+    'path.routes' => __DIR__.'/app/routes',
     'path.public' => __DIR__.'/public'
     ));
     
@@ -92,7 +92,7 @@ The *autoloadSrc()* method basically just autoload the src folder, with the defa
 
 #### /app.php sample routing
 Now, in the same **app.php** let's write some nestful chatting api codes :
-```
+```php
 // global middleware
 $app->map->middleware(function($exe)
 {
@@ -160,7 +160,7 @@ return $app;
 
 #### /public/index.php
 This file act as a public facing front controller of your application, which is usually located under /public/ folder, or **path.public** per configured above.
-```
+```php
 <?php 
 $app = require_once __DIR__.'/../app.php';
 
@@ -169,7 +169,7 @@ $app->dispatch();
 
 #### /console
 Create a file named **console**, in your project root directory, or anywhere convenient to you. And require the **app.php** again.
-```
+```php
 <?php
 $app = require_once __DIR__.'/app.php';
 
@@ -197,7 +197,7 @@ php console routes /?
 Another Examples
 ======
 ##### Default routing
-```
+```php
 $app->map->addRoutes(array(
     'book' => array(
         'path' => '/books',
