@@ -1,10 +1,10 @@
 <?php namespace Exedra\Routing;
 
-use Exedra\Contracts\Routing\Routable;
+use Exedra\Contracts\Routing\Registrar;
 use Exedra\Exception\InvalidArgumentException;
 use Exedra\Http\ServerRequest;
 
-class Group implements \ArrayAccess, Routable
+class Group implements \ArrayAccess, Registrar
 {
     /**
      * Reference to the route this group was bound to.

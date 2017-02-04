@@ -1,7 +1,7 @@
 <?php
 namespace Exedra\Contracts\Routing;
 
-interface Routable
+interface Registrar
 {
     public function any($path);
 

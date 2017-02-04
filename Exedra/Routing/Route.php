@@ -1,8 +1,8 @@
 <?php namespace Exedra\Routing;
 
-use Exedra\Contracts\Routing\Routable;
+use Exedra\Contracts\Routing\Registrar;
 
-class Route implements Routable
+class Route implements Registrar
 {
 	/**
 	 * Route name
