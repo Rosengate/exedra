@@ -1,6 +1,8 @@
 <?php namespace Exedra\Routing;
 
 use Exedra\Contracts\Routing\Registrar;
+use Exedra\Contracts\Routing\Validator;
+use Exedra\Exception\InvalidArgumentException;
 use Psr\Http\Message\ServerRequestInterface;
 
 class Route implements Registrar
@@ -41,7 +43,8 @@ class Route implements Registrar
 		'path' => '',
 		'requestable' => true,
 		'middleware' => array(),
-		'execute' => null
+		'execute' => null,
+        'validators' => array()
 		);
 
 	/**
@@ -314,9 +317,8 @@ class Route implements Registrar
      * @param string $path
      * @return array
      */
-	public function validate(ServerRequestInterface $request, $path)
+	public function match(ServerRequestInterface $request, $path)
 	{
-		// print_r($query);die;
 		foreach(array('method', 'path', 'ajax') as $key)
 		{
 			// if this parameter wasn't set, skip validation.
@@ -326,24 +328,31 @@ class Route implements Registrar
 			switch($key)
 			{
 				case 'method':
-				$value = $request->getMethod();
-				// return false because method doesn't exist.
-				if(!in_array(strtolower($value), $this->getProperty('method')))
-					return array('route' => false, 'parameter' => false, 'continue' => false);
+                    $value = $request->getMethod();
+                    // return false because method doesn't exist.
+                    if(!in_array(strtolower($value), $this->getProperty('method')))
+                        return array('route' => false, 'parameter' => false, 'continue' => false);
 
 				break;
 				case 'path':
-				$result = $this->validatePath($path);
+                    $result = $this->matchPath($path);
 
-				if(!$result['matched'])
-					return array('route' =>false, 'parameter' => $result['parameter'], 'continue' => $result['continue']);
+                    if(!$result['matched'])
+                        return array('route' =>false, 'parameter' => $result['parameter'], 'continue' => $result['continue']);
 
-				return array('route' => $this, 'parameter' => $result['parameter'], 'continue' => $result['continue']);
+                    if($this->properties['validators'])
+                    {
+                        $flag = $this->matchValidators($request, $path, $result['parameter']);
+
+                        if($flag === false)
+                            return array('route' => false, 'parameter' => false, 'continue' => false);
+                    }
+
+                    return array('route' => $this, 'parameter' => $result['parameter'], 'continue' => $result['continue']);
 				break;
 				case 'ajax':
-				if($request->isAjax() != $this->getProperty('ajax'))
-					return array('route' => false, 'parameter' => false, 'continue' => false);
-				
+                    if((strtolower($request->getHeaderLine('x-requested-with')) == 'xmlhttprequest') != $this->getProperty('ajax'))
+                        return array('route' => false, 'parameter' => false, 'continue' => false);
 				break;
 			}
 		}
@@ -351,13 +360,51 @@ class Route implements Registrar
 		return array('route'=>false, 'parameter'=> array(), 'continue'=> false);
 	}
 
+    /**
+     * Do a custom validation matching
+     * @param ServerRequestInterface $request
+     * @param $path
+     * @param array $parameters
+     * @return int
+     * @throws InvalidArgumentException
+     */
+    protected function matchValidators(ServerRequestInterface $request, $path, array $parameters = array())
+    {
+        foreach($this->getProperty('validators') as $validation)
+        {
+            if(is_string($validation))
+            {
+                /** @var Validator $validationObj */
+                $validationObj = new $validation;
+
+                if(!($validationObj instanceof Validator))
+                    throw new InvalidArgumentException('The [' . $validation . '] validator must be type of [' . Validator::class . '].');
+
+                $flag = $validationObj->validate($parameters, $this, $request, $path);
+            }
+            else if(is_object($validation) && ($validation instanceof \Closure))
+            {
+                $flag = $validation($parameters, $this, $request, $path);
+            }
+            else
+            {
+                throw new InvalidArgumentException('The validator must be type of [' . Validator::class . ']');
+            }
+
+            if(!$flag || $flag === false)
+                return false;
+        }
+
+        return true;
+    }
+
 	/**
 	 * Validate given uri path
      * Return array of matched flag, and parameter.
 	 * @param string $path
 	 * @return array|boolean
 	 */
-	protected function validatePath($path)
+	protected function matchPath($path)
 	{
 		$continue = true;
 
@@ -921,17 +968,41 @@ class Route implements Registrar
 		return $this->attributes;
 	}
 
-	/**
-	 * Alias to setAttribute(key, value)
-	 * @param string key
-	 * @param string value
-	 */
+    /**
+     * Alias to setAttribute(key, value)
+     * @param string $key
+     * @param string $value
+     * @return $this
+     */
 	public function attr($key, $value)
 	{
 		$this->attributes[$key] = $value;
 
 		return $this;
 	}
+
+    /**
+     *
+     * @param mixed $validator
+     * @return $this
+     */
+    public function validate($validator)
+    {
+        $this->properties['validators'][] = $validator;
+
+        return $this;
+    }
+
+    /**
+     * @param mixed $validator
+     * @return $this
+     */
+    public function addValidator($validator)
+    {
+        $this->properties['validators'][] = $validator;
+
+        return $this;
+    }
 
     /**
      * Set meta information
@@ -1006,7 +1077,7 @@ class Route implements Registrar
 	 */
 	public function isRequestable()
 	{
-		return $this->getPath !== false && $this->getProperty('requestable') === true;
+		return $this->getPath() !== false && $this->getProperty('requestable') === true;
 	}
 
 	/**

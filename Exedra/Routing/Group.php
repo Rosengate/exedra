@@ -371,7 +371,7 @@ class Group implements \ArrayAccess, Registrar
         // loop the group and find.
         foreach($this->storage as $route)
         {
-            $result = $route->validate($request, $groupUriPath);
+            $result = $route->match($request, $groupUriPath);
 
             $remainingPath = $route->getRemainingPath($groupUriPath);
 
