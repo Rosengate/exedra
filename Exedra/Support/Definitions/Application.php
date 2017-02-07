@@ -12,6 +12,8 @@ use Exedra\Routing\Route;
 use Exedra\Routing\Group;
 use Exedra\Session\Flash;
 use Exedra\Session\Session;
+use Exedra\Support\Runtime\ControllerFactory;
+use Exedra\Support\Runtime\Url\UrlFactory;
 use Exedra\View\Factory;
 use Exedra\Wizard\Manager;
 
@@ -25,11 +27,11 @@ use Exedra\Wizard\Manager;
  * @property Config $config
  * @property MiddlewareRegistry $middleware
  * @property ServerRequest $request
- * @property Url $url
+ * @property UrlFactory $url
  * @property Session $session
  * @property Flash $flash
  * @property Manager $wizard
- * @property Controller $controller
+ * @property ControllerFactory $controller
  * @property Factory $view
  */
 

@@ -12,6 +12,7 @@ use Exedra\Runtime\Redirect;
 use Exedra\Runtime\Response;
 use Exedra\Session\Flash;
 use Exedra\Session\Session;
+use Exedra\Support\Runtime\ControllerFactory;
 use Exedra\Support\Runtime\Form\Form;
 use Exedra\Support\Runtime\Url\UrlFactory;
 use Exedra\View\Factory;
@@ -31,7 +32,7 @@ use Exedra\View\Factory;
  * @property Registry[] $services
  * @property Session $session
  * @property Flash $flash
- * @property Controller $controller
+ * @property ControllerFactory $controller
  * @property ServerRequest $request
  * @property Response $response
  * @property Finding $finding

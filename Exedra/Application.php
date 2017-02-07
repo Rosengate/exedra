@@ -1,6 +1,7 @@
 <?php namespace Exedra;
 
 use Exedra\Support\Definitions\Application as Definition;
+use Exedra\Support\Runtime\ControllerFactory;
 
 class Application extends \Exedra\Container\Container implements Definition
 {
@@ -89,7 +90,7 @@ class Application extends \Exedra\Container\Container implements Definition
 			'@flash' => array(\Exedra\Session\Flash::class, array('self.session')),
 			'wizard' => array(\Exedra\Wizard\Manager::class, array('self')),
 			'@controller' => function(){
-				return new \Exedra\Factory\Controller($this->namespace);
+				return new ControllerFactory($this->namespace);
 			},
 			'@view' => function(){
 				return new \Exedra\View\Factory($this->path['app']->create('views'));
@@ -101,7 +102,7 @@ class Application extends \Exedra\Container\Container implements Definition
 			'runtime.response' => function(){ return \Exedra\Runtime\Response::createEmptyResponse(); },
 			'handler.resolver' => \Exedra\Runtime\Handler\Resolver::class,
 			'factory.url' => \Exedra\Url\UrlFactory::class,
-			'@factory.controller' => \Exedra\Factory\Controller::class,
+			'@factory.controller' => ControllerFactory::class,
 			'@factory.view' => \Exedra\View\Factory::class
 		));
 

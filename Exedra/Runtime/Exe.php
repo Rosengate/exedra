@@ -3,8 +3,8 @@ namespace Exedra\Runtime;
 
 use Exedra\Config;
 use Exedra\Container\Container;
-use Exedra\Factory\Asset;
 use Exedra\Routing\Finding;
+use Exedra\Support\Asset\AssetFactory;
 use Exedra\Support\Definitions\Exe as Definition;
 use Exedra\Support\Runtime\Form\Form;
 use Exedra\Support\Runtime\Url\UrlFactory;
@@ -96,7 +96,7 @@ class Exe extends Container implements Definition
 			'redirect' => array(Redirect::class, array('self.response', 'self.url')),
 			'form' => array(Form::class, array('self')),
 			// thinking of deprecating the asset as service
-			'asset' => function(){ return new Asset($this->url, $this->app->path['public'], $this->config->get('asset', array()));}
+			'asset' => function(){ return new AssetFactory($this->url, $this->app->path['public'], $this->config->get('asset', array()));}
 			));
 
 		$this->services['factory']->add('factory.url', UrlFactory::class);
