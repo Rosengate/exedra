@@ -227,6 +227,29 @@ class Route implements Registrar
 		return $this->fullRoutes;
 	}
 
+    /**
+     * Recursively find all the fail route reversely
+     * @return string|null
+     */
+    public function getFailRouteName()
+    {
+        if($this->group->hasFailRoute())
+            return $this->group->getFailRoute();
+
+        $group = $this->group;
+
+        while($route = $group->getUpperRoute())
+        {
+            /** @var Group $group */
+            $group = $route->getGroup();
+
+            if($group->hasFailRoute())
+                return $group->getFailRoute();
+        }
+
+        return null;
+    }
+
 	/**
 	 * Get parent route name after substracted the current route name.
 	 * @return string|null

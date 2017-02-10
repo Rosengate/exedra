@@ -1,7 +1,9 @@
 <?php namespace Exedra;
 
+use Exedra\Routing\Group;
 use Exedra\Support\Definitions\Application as Definition;
 use Exedra\Support\Runtime\ControllerFactory;
+use Exedra\Wizard\Manager;
 
 class Application extends \Exedra\Container\Container implements Definition
 {
@@ -12,7 +14,6 @@ class Application extends \Exedra\Container\Container implements Definition
 	/**
 	 * Create a new application
 	 * @param string|array params [if string, expect root directory, else array of directories, and configuration]
-	 * @param \Exedra\Exedra exedra instance
 	 */
 	public function __construct($params)
 	{
@@ -114,7 +115,7 @@ class Application extends \Exedra\Container\Container implements Definition
 	protected function setUpHandlers()
 	{
 		// register default handler
-		$this['service']->on('map', function($map)
+		$this['service']->on('map', function(Group $map)
 		{
 			$map->addHandler('closure', \Exedra\Runtime\Handler\Closure::class);
 
@@ -124,7 +125,7 @@ class Application extends \Exedra\Container\Container implements Definition
 
 	protected function setUpWizard()
 	{
-		$this->services['service']->on('wizard', function($wizard)
+		$this->services['service']->on('wizard', function(Manager $wizard)
 		{
 			$wizard->add(\Exedra\Wizard\Application::class);
 		});
@@ -253,16 +254,22 @@ class Application extends \Exedra\Container\Container implements Definition
 							->finalize()
 							->getResponse();
 		}
-		catch(\Exedra\Exception\Exception $e)
+		catch(\Exception $e)
 		{
 			if($failRoute = $this->failRoute)
 			{
-				$response = $this->execute($failRoute, array('exception' => $e), $request)
+				$response = $this->execute($failRoute, array('exception' => $e, 'request' => $request), $request)
 								->finalize()
 								->getResponse();
 				
 				$this->setFailRoute(null);
 			}
+			else if($this->map->hasFailRoute())
+            {
+                $response = $this->execute($this->map->getFailRoute(), array('exception' => $e, 'request' => $request), $request)
+                                ->finalize()
+                                ->getResponse();
+            }
 			else
 			{
 				$response = \Exedra\Runtime\Response::createEmptyResponse()

@@ -42,6 +42,12 @@ class Group implements \ArrayAccess, Registrar
      */
     protected $storage = array();
 
+    /**
+     * A request dispatch fail handling route name
+     * @var string|null $failRoute
+     */
+    protected $failRoute = null;
+
     public function __construct(Factory $factory, Route $route = null, array $routes = array())
     {
         $this->factory = $factory;
@@ -69,6 +75,31 @@ class Group implements \ArrayAccess, Registrar
             throw new InvalidArgumentException('The map factory must be the the type of [\Exedra\Routing\Factory].');
 
         $this->factory = $factory;
+    }
+
+    /**
+     * @param $name
+     * @return mixed
+     */
+    public function setFailRoute($name)
+    {
+        return $this->failRoute = $name;
+    }
+
+    /**
+     * @return null|string
+     */
+    public function getFailRoute()
+    {
+        return $this->failRoute;
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasFailRoute()
+    {
+        return $this->failRoute ? true : false;
     }
 
     /**
@@ -366,7 +397,7 @@ class Group implements \ArrayAccess, Registrar
      * @return array
      * {route: boolean|Route, parameter: array, continue: boolean}
      */
-    public function findRouteByRequest(ServerRequestInterface $request, $groupUriPath, array $passedParameters = array())
+    protected function findRouteByRequest(ServerRequestInterface $request, $groupUriPath, array $passedParameters = array())
     {
         // loop the group and find.
         foreach($this->storage as $route)
@@ -405,6 +436,10 @@ class Group implements \ArrayAccess, Registrar
                     if($subrouteResult['route'] != false)
                         return $subrouteResult;
                 }
+            }
+            else if($this->failRoute)
+            {
+                return array('route' => $this->findRoute($this->failRoute), 'parameter' => array('request' => $request), 'continue' => false);
             }
         }
 
