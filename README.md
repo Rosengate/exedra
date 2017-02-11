@@ -116,8 +116,8 @@ $app->map->any('/api')->middleware(\App\Middleware\Api::CLASS)->group(function($
             
         });
         
-        // GET /api/users/[:id]
-        $users->get('/[:id]')->execute(function($exe)
+        // GET /api/users/:id
+        $users->get('/:id')->execute(function($exe)
         {
             return $exe->param('id');
         });
@@ -138,7 +138,7 @@ $app->map->any('/api')->middleware(\App\Middleware\Api::CLASS)->group(function($
         
         });
         
-        $channels->any('/[:id]')->group(function($channel)
+        $channels->any('/:id')->group(function($channel)
         {
             // GET /api/channels/:id
             $channel->get('/')->execute(function()
@@ -208,7 +208,7 @@ $app->map->addRoutes(array(
                 'execute' => 'controller=Book@List',
             'view' => array(
                 'method' => 'GET',
-                'path' => '/[:id]',
+                'path' => '/:id',
                 'execute' => ''controller=Book@View'
                 )
             )
