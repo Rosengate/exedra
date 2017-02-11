@@ -437,11 +437,10 @@ class Group implements \ArrayAccess, Registrar
                         return $subrouteResult;
                 }
             }
-            else if($this->failRoute)
-            {
-                return array('route' => $this->findRoute($this->failRoute), 'parameter' => array('request' => $request), 'continue' => false);
-            }
         }
+
+        if($this->failRoute)
+            return array('route' => $this->findRoute($this->failRoute), 'parameter' => array('request' => $request), 'continue' => false);
 
         // false default.
         return array('route'=> false, 'parameter'=> array(), 'continue' => false);
