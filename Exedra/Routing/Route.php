@@ -250,6 +250,38 @@ class Route implements Registrar
         return null;
     }
 
+    /**
+     * set this route as a fail route for the current group.
+     *
+     * @return $this
+     * @throws InvalidArgumentException
+     */
+    public function setAsFailRoute($bool = true)
+    {
+        if(!$bool)
+            return $this;
+
+        $name = $this->getName();
+
+        if(!$name)
+            throw new InvalidArgumentException('This route has to be named first.');
+
+        $this->group->setFailRoute($name);
+
+        return $this;
+    }
+
+    /**
+     * Alias to setAsFailRoute
+     *
+     * @return $this
+     * @throws InvalidArgumentException
+     */
+    public function asFailRoute($bool = true)
+    {
+        return $this->setAsFailRoute($bool);
+    }
+
 	/**
 	 * Get parent route name after substracted the current route name.
 	 * @return string|null
