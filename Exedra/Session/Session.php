@@ -1,6 +1,8 @@
 <?php
 namespace Exedra\Session;
 
+use Exedra\Support\DotArray;
+
 /**
  * A simple session manager based on php native session
  */
@@ -35,15 +37,16 @@ class Session
 		$this->storage = &$_SESSION;
 	}
 
-	/**
-	 * Point the current storage to the prefixing point.
-	 * This session manager will later point every session operation (has, get, set, getAll, destroy) on this key group
-	 * Another prefix will not to a new prefix, except append to the current reference.
-	 * @return \Exedra\Session\Session
-	 */
+    /**
+     * Point the current storage to the prefixing point.
+     * This session manager will later point every session operation (has, get, set, getAll, destroy) on this key group
+     * Another prefix will not to a new prefix, except append to the current reference.
+     * @param $prefix
+     * @return Session
+     */
 	public function setPrefix($prefix)
 	{
-		$storage = &\Exedra\Support\DotArray::getReference($this->getStorage(), $prefix);
+		$storage = &DotArray::getReference($this->getStorage(), $prefix);
 
 		$this->set($prefix, $storage);
 
@@ -78,21 +81,21 @@ class Session
 	 */
 	public function set($key, $value)
 	{
-		\Exedra\Support\DotArray::set($this->getStorage(), $key,$value);
+		DotArray::set($this->getStorage(), $key,$value);
 
 		return $this;
 	}
 
-	/**
-	 * Get the session by the given key.
-	 * Default on null
-	 * @param string key
-	 * @param session value
-	 * @return mixed
-	 */
+    /**
+     * Get the session by the given key.
+     * Default on null
+     * @param string $key
+     * @param mixed|null $default
+     * @return mixed
+     */
 	public function get($key, $default = null)
 	{
-		$data = \Exedra\Support\DotArray::get($this->getStorage(), $key);
+		$data = DotArray::get($this->getStorage(), $key);
 		
 		return $data === null ? $default : $data;
 	}
@@ -108,12 +111,12 @@ class Session
 
 	/**
 	 * Check whether session exist by the given key.
-	 * @param string key
+	 * @param string $key
 	 * @return boolean
 	 */
 	public function has($key)
 	{
-		return \Exedra\Support\DotArray::has($this->storage, $key);
+		return DotArray::has($this->storage, $key);
 	}
 
 	/**
@@ -145,12 +148,12 @@ class Session
 
 	/**
 	 * Destroy session, or only the given key.
-	 * @param string key
+	 * @param string $key
 	 * @return \Exedra\Session\Session
 	 */
 	public function destroy($key = null)
 	{
-		\Exedra\Support\DotArray::delete($this->storage, $key);
+		DotArray::delete($this->storage, $key);
 		
 		return $this;
 	}

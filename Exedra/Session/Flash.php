@@ -20,7 +20,7 @@ class Flash
 	 */
 	protected $data = array();
 
-	public function __construct(\Exedra\Session\Session $session)
+	public function __construct(Session $session)
 	{
 		$this->session = $session;
 
@@ -45,9 +45,9 @@ class Flash
 
 	/**
 	 * Flash the value on the given key.
-	 * @param mixed key
-	 * @param mixed val
-	 * @return this
+	 * @param mixed $key
+	 * @param mixed $value
+	 * @return $this
 	 */
 	public function set($key, $value)
 	{
@@ -67,9 +67,8 @@ class Flash
 
 	/**
 	 * Get flash data
-	 * @return default if array_key isn't exists.
-	 * @param string key
-	 * @param mixed default value
+	 * @param string $key
+	 * @param mixed|null $default value
 	 * @return mixed
 	 */
 	public function get($key, $default = null)
@@ -82,7 +81,7 @@ class Flash
 
 	/**
 	 * Check if has the key
-	 * @param string key
+	 * @param string $key
 	 * @return boolean
 	 */
 	public function has($key)
@@ -92,7 +91,7 @@ class Flash
 
 	/**
 	 * Clear the flash.
-	 * @return this;
+	 * @return $this
 	 */
 	public function clear()
 	{

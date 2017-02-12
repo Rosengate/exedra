@@ -1,16 +1,18 @@
 <?php
 namespace Exedra\View;
+
 use Exedra\Exception\NotFoundException;
+use Exedra\Path;
 
 /**
  * Exedra View Factory
- * @param \Exedra\Path path
+ * @param Path path
  */
 class Factory
 {
 	/**
 	 * Path to View directory
-	 * @var \Exedra\Path $path
+	 * @var Path $path
 	 */
 	protected $path;
 
@@ -26,7 +28,7 @@ class Factory
 	 */
 	protected $views = array();
 
-	public function __construct(\Exedra\Path $path)
+	public function __construct(Path $path)
 	{
 		$this->path = $path;
 	}

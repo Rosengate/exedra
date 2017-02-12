@@ -1,11 +1,13 @@
 <?php
 namespace Exedra;
 
+use Exedra\Support\DotArray;
+
 class Config implements \ArrayAccess
 {
 	/**
 	 * Config storage
-	 * @var array
+	 * @var array $storage
 	 */
 	protected $storage = array();
 
@@ -25,22 +27,23 @@ class Config implements \ArrayAccess
 			return $this;
 		}
 
-		\Exedra\Support\DotArray::set($this->storage, $key, $value);
-		
+		DotArray::set($this->storage, $key, $value);
+
 		return $this;
 	}
 
-	/**
-	 * Get config value
-	 * @param string key
-	 * @return $value
-	 */
+    /**
+     * Get config value
+     * @param string $key
+     * @param string|null $default
+     * @return mixed|null $value
+     */
 	public function get($key, $default = null)
 	{
 		if(!$this->has($key))
 			return $default;
 
-		return \Exedra\Support\DotArray::get($this->storage, $key);
+		return DotArray::get($this->storage, $key);
 	}
 
 	/**
@@ -59,7 +62,7 @@ class Config implements \ArrayAccess
 	 */
 	public function has($key)
 	{
-		return \Exedra\Support\DotArray::has($this->storage, $key);
+		return DotArray::has($this->storage, $key);
 	}
 
 	/**
@@ -82,7 +85,7 @@ class Config implements \ArrayAccess
 		if(!$this->has($key))
 			return null;
 
-		return \Exedra\Support\DotArray::getReference($this->storage, $key);
+		return DotArray::getReference($this->storage, $key);
 	}
 
 	/**
@@ -101,6 +104,6 @@ class Config implements \ArrayAccess
 	 */
 	public function offsetUnset($key)
 	{
-		\Exedra\Support\DotArray::delete($this->storage, $key);
+		DotArray::delete($this->storage, $key);
 	}
 }

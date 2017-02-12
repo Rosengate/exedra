@@ -44,7 +44,7 @@ class Application extends \Exedra\Container\Container implements Definition
 
 		$params['path.root'] = rtrim($params['path.root'], '/\\');
 
-		$this->services['path'] = $pathRoot = new \Exedra\Path($params['path.root']);
+		$this->services['path'] = $pathRoot = new Path($params['path.root']);
 
 		$pathRoot->register('root', $pathRoot); // recursive reference.
 
