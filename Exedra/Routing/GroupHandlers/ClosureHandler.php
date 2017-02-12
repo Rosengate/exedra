@@ -1,5 +1,5 @@
 <?php
-namespace Exedra\Routing\Handler;
+namespace Exedra\Routing\GroupHandlers;
 
 use Exedra\Contracts\Routing\GroupHandler;
 use Exedra\Routing\Factory;

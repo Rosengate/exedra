@@ -10,7 +10,7 @@ class HandlerTest extends PHPUnit_Framework_TestCase
 
 	public function testFunctionalHandler()
 	{
-		$this->app->map->handler('foo', function($handler)
+		$this->app->map->addExecuteHandler('foo', function($handler)
 		{
 			$handler->onValidate(function($pattern)
 			{
@@ -38,7 +38,7 @@ class HandlerTest extends PHPUnit_Framework_TestCase
 
 	public function testClassHandler()
 	{
-		$this->app->map->handler('bar', \App\Handlers\FooHandler::class);
+		$this->app->map->addExecuteHandler('bar', \App\Handlers\FooHandler::class);
 
 		$this->app->map['bar']->any('/')->execute('bar=baz');
 

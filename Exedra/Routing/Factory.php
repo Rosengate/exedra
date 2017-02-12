@@ -2,9 +2,9 @@
 namespace Exedra\Routing;
 use Exedra\Contracts\Routing\GroupHandler;
 use Exedra\Exception\InvalidArgumentException;
-use Exedra\Routing\Handler\ArrayHandler;
-use Exedra\Routing\Handler\ClosureHandler;
-use Exedra\Routing\Handler\PathHandler;
+use Exedra\Routing\GroupHandlers\ArrayHandler;
+use Exedra\Routing\GroupHandlers\ClosureHandler;
+use Exedra\Routing\GroupHandlers\PathHandler;
 use Psr\Http\Message\ServerRequestInterface;
 
 /**

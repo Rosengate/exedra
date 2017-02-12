@@ -136,7 +136,7 @@ class Finding
 				$this->module = $route->getProperty('module');
 
 			// stack all the handlers
-			foreach($route->getGroup()->getHandlers() as $name => $handler)
+			foreach($route->getGroup()->getExecuteHandlers() as $name => $handler)
 				$this->handlers[$name] = $handler;
 
 			// if has parameter base, and it's true, set base route to the current route.

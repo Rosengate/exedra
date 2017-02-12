@@ -26,10 +26,10 @@ class Group implements \ArrayAccess, Registrar
     protected $middlewares = array();
 
     /**
-     * Routing based handlers
+     * Registered execute handlers
      * @var array handlers
      */
-    protected $handlers = array();
+    protected $executeHandlers = array();
 
     /**
      * Factory injected to this group.
@@ -128,28 +128,14 @@ class Group implements \ArrayAccess, Registrar
     }
 
     /**
-     * Add a routing based handler
-     * To be stacked on runtime
+     * Add an execute handler
      * @param string $name
      * @param string|\Closure $handler
      * @return self
      */
-    public function addHandler($name, $handler)
+    public function addExecuteHandler($name, $handler)
     {
-        $this->handlers[$name] = $handler;
-
-        return $this;
-    }
-
-    /**
-     * Alias to addHandler()
-     * @param string $name
-     * @param string|\Closure $handler
-     * @return self
-     */
-    public function handler($name, $handler)
-    {
-        $this->handlers[$name] = $handler;
+        $this->executeHandlers[$name] = $handler;
 
         return $this;
     }
@@ -158,9 +144,9 @@ class Group implements \ArrayAccess, Registrar
      * Get all handlers
      * @return array
      */
-    public function getHandlers()
+    public function getExecuteHandlers()
     {
-        return $this->handlers;
+        return $this->executeHandlers;
     }
 
     /**
