@@ -1,13 +1,15 @@
 <?php
 namespace Exedra\Routing;
 
+use Exedra\Exception\InvalidArgumentException;
+use Exedra\Routing\ExecuteHandlers\DynamicHandler;
 use Psr\Http\Message\ServerRequestInterface;
 
 class Finding
 {
 	/**
 	 * Found route
-	 * @var \Exedra\Routing\Route $route
+	 * @var Route $route
 	 */
 	public $route;
 
@@ -60,12 +62,14 @@ class Finding
 	 */
 	protected $handlers = array();
 
+    protected $execute;
+
 	/**
 	 * @param \Exedra\Routing\Route|null
 	 * @param array $parameters
      * @param mixed $request
 	 */
-	public function __construct(\Exedra\Routing\Route $route = null, array $parameters = array(), ServerRequestInterface $request = null)
+	public function __construct(Route $route = null, array $parameters = array(), ServerRequestInterface $request = null)
 	{
 		$this->route = $route;
 
@@ -81,7 +85,7 @@ class Finding
 
 	/**
 	 * Get route 
-	 * @return \Exedra\Routing\Route|null
+	 * @return Route|null
 	 */
 	public function getRoute()
 	{
@@ -121,6 +125,34 @@ class Finding
 		return $this->route ? true : false;
 	}
 
+    /**
+     * @param $middleware
+     * @return \Closure
+     * @throws InvalidArgumentException
+     */
+    protected function resolveMiddleware($middleware)
+    {
+        if(is_string($middleware))
+        {
+            return function() use($middleware)
+            {
+                $middleware = new $middleware;
+
+                return call_user_func_array(array($middleware, 'handle'), func_get_args());
+            };
+        }
+
+        if(is_object($middleware))
+        {
+            if(is_callable($middleware))
+                return $middleware;
+
+            throw new InvalidArgumentException('Middleware [' . get_class($middleware) . '] needs to be callable/invokeable');
+        }
+
+        throw new InvalidArgumentException('Unable to resolve a middleware.');
+    }
+
 	/**
 	 * Resolve finding informations
 	 * resolve, baseRoute, middlewares, config, attributes
@@ -129,7 +161,9 @@ class Finding
 	{
 		$this->baseRoute = null;
 
-		foreach($this->route->getFullRoutes() as $route)
+        $executePattern = $this->route->getProperty('execute');
+
+        foreach($this->route->getFullRoutes() as $route)
 		{
 			// get the latest module and route base
 			if($route->hasProperty('module'))
@@ -145,6 +179,8 @@ class Finding
 
 			foreach($route->getGroup()->getMiddlewares() as $key => $middleware)
             {
+                $middleware = $this->resolveMiddleware($middleware);
+
                 if(is_string($key))
                     $this->middlewares[$key] = $middleware;
                 else
@@ -154,6 +190,8 @@ class Finding
 			// append all route middlewares
 			foreach($route->getProperty('middleware') as $key => $middleware)
             {
+                $middleware = $this->resolveMiddleware($middleware);
+
                 if(is_string($key))
                     $this->middlewares[$key] = $middleware;
                 else
@@ -167,7 +205,52 @@ class Finding
 			if($route->hasProperty('config'))
 				$this->config = array_merge($this->config, $route->getProperty('config'));
 		}
-	}
+
+		foreach($this->handlers as $name => $class)
+        {
+            if(is_string($class))
+            {
+                $handler = new $class;
+            }
+            else if(is_object($class))
+            {
+                if($class instanceof \Closure)
+                {
+                    $class($handler = new DynamicHandler());
+                }
+            }
+            else
+            {
+                throw new InvalidArgumentException('Handler must be either class name, or \Closure');
+            }
+
+            if($handler->validate($executePattern))
+            {
+                $resolve = $handler->resolve($executePattern);
+
+                if(!is_callable($resolve))
+                    throw new \Exedra\Exception\InvalidArgumentException('The resolve() method for handler ['.get_class($handler).'] must return \Closure or callable');
+
+                $this->execute = $resolve;
+            }
+        }
+    }
+
+    /**
+     * @return array
+     * @throws \Exedra\Exception\NotFoundException
+     */
+    public function getCallStack()
+    {
+        if(!$this->execute)
+        {
+            $executePattern = $this->route->getProperty('execute');
+
+            throw new \Exedra\Exception\NotFoundException('The route execute handle was not properly resolved. '.(is_string($executePattern) ? ' ['.$executePattern.']' : ''));
+        }
+
+        return array_merge($this->middlewares, array($this->execute));
+    }
 
 	/**
 	 * Check has middlewares or not
@@ -262,4 +345,13 @@ class Finding
 	{
 		return $this->request;
 	}
+
+    /**
+     * Whether this finding is dispatched with http request
+     * @return bool
+     */
+    public function hasRequest()
+    {
+        return $this->request ? true : false;
+    }
 }

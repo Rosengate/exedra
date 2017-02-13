@@ -1,10 +1,10 @@
 <?php
 namespace Exedra\Support\Runtime\Handler;
 
+use Exedra\Contracts\Routing\ExecuteHandler;
 use Exedra\Runtime\Exe;
-use Exedra\Runtime\Handler\HandlerAbstract;
 
-class Controller extends HandlerAbstract
+class Controller implements ExecuteHandler
 {
     public function validate($pattern)
     {

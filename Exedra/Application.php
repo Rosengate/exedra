@@ -117,7 +117,7 @@ class Application extends \Exedra\Container\Container implements Definition
 		// register default handler
 		$this['service']->on('map', function(Group $map)
 		{
-			$map->addExecuteHandler('closure', \Exedra\Runtime\Handler\Closure::class);
+			$map->addExecuteHandler('closure', \Exedra\Routing\ExecuteHandlers\ClosureHandler::class);
 
 			$map->addExecuteHandler('controller', \Exedra\Support\Runtime\Handler\Controller::class);
 		});

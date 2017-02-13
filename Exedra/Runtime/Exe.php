@@ -121,15 +121,7 @@ class Exe extends Container implements Definition
 	 */
 	protected function handle()
 	{
-		$this->callStack = $this->finding->getMiddlewares();
-
-		// resolve registry
-		$this->middlewareRegistry->resolve($this, $this->callStack);
-
-		$resolver = $this->app->create('handler.resolver');
-
-		// add final handle
-		$this->callStack[] = $resolver->resolve($this, $this->route->getProperty('execute'), $this->finding->getHandlers());
+        $this->callStack = $this->finding->getCallStack();
 
 		// first handle.
 		$handle = reset($this->callStack);
