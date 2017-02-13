@@ -84,7 +84,6 @@ class Application extends \Exedra\Container\Container implements Definition
 			'config' => \Exedra\Config::class,
 			'routing.factory' => function(){ return new \Exedra\Routing\Factory((string) $this->path['routes']);},
 			'map' => function() { return $this['routing.factory']->createGroup();},
-			'middleware' => array(\Exedra\Middleware\Registry::class, array('self.map')),
 			'request' => function(){ return \Exedra\Http\ServerRequest::createFromGlobals();},
 			'url' => function() { return $this->create('factory.url', array($this->map, $this->request, $this->config->get('app.url', null), $this->config->get('asset.url', null)));},
 			'@session' => \Exedra\Session\Session::class,
@@ -101,7 +100,6 @@ class Application extends \Exedra\Container\Container implements Definition
 		$this->services['factory']->register(array(
 			'runtime.exe' => \Exedra\Runtime\Exe::class,
 			'runtime.response' => function(){ return \Exedra\Runtime\Response::createEmptyResponse(); },
-			'handler.resolver' => \Exedra\Runtime\Handler\Resolver::class,
 			'factory.url' => \Exedra\Url\UrlFactory::class,
 			'@factory.controller' => ControllerFactory::class,
 			'@factory.view' => \Exedra\View\Factory::class
@@ -182,14 +180,6 @@ class Application extends \Exedra\Container\Container implements Definition
 	}
 
 	/**
-	 * @return \Exedra\Middleware\Registry
-	 */
-	public function getMiddlewareRegistry()
-	{
-		return $this->middleware;
-	}
-
-	/**
 	 * @return \Exedra\Http\ServerRequest
 	 */
 	public function getRequest()
@@ -237,7 +227,7 @@ class Application extends \Exedra\Container\Container implements Definition
 		if(!$finding->isSuccess())
 			throw new \Exedra\Exception\RouteNotFoundException('Route does not exist');
 
-		return $this->create('runtime.exe', array($this, $this->middleware, $finding, $this->create('runtime.response')));
+		return $this->create('runtime.exe', array($this, $finding, $this->create('runtime.response')));
 	}
 
 	/**

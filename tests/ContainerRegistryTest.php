@@ -26,8 +26,6 @@ class ContainerRegistryTest extends PHPUnit_Framework_TestCase
 
 		// $this->assertTrue($app->runtime instanceof \Exedra\Runtime\Registry);
 
-		$this->assertTrue($app->middleware instanceof \Exedra\Middleware\Registry);
-
 		$this->assertTrue($app->request instanceof \Exedra\Http\ServerRequest);
 
 		$this->assertTrue($app->url instanceof \Exedra\Url\UrlFactory);

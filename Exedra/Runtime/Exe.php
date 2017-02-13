@@ -29,12 +29,6 @@ class Exe extends Container implements Definition
 	 */
 	protected $callStack;
 
-	/**
-	 * Middleware registry of application instance
-	 * @var \Exedra\Middleware\Registry
-	 */
-	protected $middlewareRegistry;
-
 	protected $currentModule;
 
 	/**
@@ -45,15 +39,12 @@ class Exe extends Container implements Definition
 
 	public function __construct(
 		\Exedra\Application $app,
-		\Exedra\Middleware\Registry $middlewareRegistry,
 		\Exedra\Routing\Finding $finding,
 		\Exedra\Runtime\Response $response)
 	{
 		parent::__construct();
 
 		$this->app = $app;
-
-		$this->middlewareRegistry = $middlewareRegistry;
 
 		$this->services['finding'] = $finding;
 
