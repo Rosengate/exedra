@@ -8,34 +8,34 @@ use Exedra\Support\DotArray;
  */
 class Session
 {
-	/**
-	 * Referenced storage for session data
-	 */
-	protected $storage;
+    /**
+     * Referenced storage for session data
+     */
+    protected $storage;
 
-	/**
-	 * Prefix
-	 */
-	protected $prefix;
+    /**
+     * Prefix
+     */
+    protected $prefix;
 
-	public function __construct(&$storage = null)
-	{
-		if($storage !== null)
-			$this->storage = &$storage;
-		else
-			$this->start();
-	}
+    public function __construct(&$storage = null)
+    {
+        if($storage !== null)
+            $this->storage = &$storage;
+        else
+            $this->start();
+    }
 
-	/**
-	 * Start the session
-	 */
-	public function start()
-	{
-		if(!self::hasStarted())
-			session_start();
+    /**
+     * Start the session
+     */
+    public function start()
+    {
+        if(!self::hasStarted())
+            session_start();
 
-		$this->storage = &$_SESSION;
-	}
+        $this->storage = &$_SESSION;
+    }
 
     /**
      * Point the current storage to the prefixing point.
@@ -44,47 +44,47 @@ class Session
      * @param $prefix
      * @return Session
      */
-	public function setPrefix($prefix)
-	{
-		$storage = &DotArray::getReference($this->getStorage(), $prefix);
+    public function setPrefix($prefix)
+    {
+        $storage = &DotArray::getReference($this->getStorage(), $prefix);
 
-		$this->set($prefix, $storage);
+        $this->set($prefix, $storage);
 
-		$this->storage = &$storage;
+        $this->storage = &$storage;
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * not sure but look's ugly because this is the only use of static :X
-	 * @return bool
-	 */
-	public static function hasStarted()
-	{
-		return session_status() != PHP_SESSION_NONE;
-	}
+    /**
+     * not sure but look's ugly because this is the only use of static :X
+     * @return bool
+     */
+    public static function hasStarted()
+    {
+        return session_status() != PHP_SESSION_NONE;
+    }
 
-	/**
-	 * Get referenced storage variable
-	 * @return &storage
-	 */
-	public function &getStorage()
-	{
-		return $this->storage;
-	}
+    /**
+     * Get referenced storage variable
+     * @return &storage
+     */
+    public function &getStorage()
+    {
+        return $this->storage;
+    }
 
-	/**
-	 * Set a session by the given key.
-	 * @param string key
-	 * @param mixed value
-	 * @return \Exedra\Session\Session
-	 */
-	public function set($key, $value)
-	{
-		DotArray::set($this->getStorage(), $key,$value);
+    /**
+     * Set a session by the given key.
+     * @param string key
+     * @param mixed value
+     * @return \Exedra\Session\Session
+     */
+    public function set($key, $value)
+    {
+        DotArray::set($this->getStorage(), $key,$value);
 
-		return $this;
-	}
+        return $this;
+    }
 
     /**
      * Get the session by the given key.
@@ -93,68 +93,68 @@ class Session
      * @param mixed|null $default
      * @return mixed
      */
-	public function get($key, $default = null)
-	{
-		$data = DotArray::get($this->getStorage(), $key);
-		
-		return $data === null ? $default : $data;
-	}
+    public function get($key, $default = null)
+    {
+        $data = DotArray::get($this->getStorage(), $key);
 
-	/**
-	 * Get everything within storage
-	 * @return mixed
-	 */
-	public function getAll()
-	{
-		return $this->storage;
-	}
+        return $data === null ? $default : $data;
+    }
 
-	/**
-	 * Check whether session exist by the given key.
-	 * @param string $key
-	 * @return boolean
-	 */
-	public function has($key)
-	{
-		return DotArray::has($this->storage, $key);
-	}
+    /**
+     * Get everything within storage
+     * @return mixed
+     */
+    public function getAll()
+    {
+        return $this->storage;
+    }
 
-	/**
-	 * Get PHP native session id
-	 * @return string
-	 */
-	public function id()
-	{
-		return session_id();
-	}
+    /**
+     * Check whether session exist by the given key.
+     * @param string $key
+     * @return boolean
+     */
+    public function has($key)
+    {
+        return DotArray::has($this->storage, $key);
+    }
 
-	/**
-	 * Regenerate session id
-	 * @return boolean
-	 */
-	public function regenerate()
-	{
-		return session_regenerate_id();
-	}
+    /**
+     * Get PHP native session id
+     * @return string
+     */
+    public function id()
+    {
+        return session_id();
+    }
 
-	/**
-	 * PHP session_write_close
-	 * @return void
-	 */
-	public function close()
-	{
-		session_write_close();
-	}
+    /**
+     * Regenerate session id
+     * @return boolean
+     */
+    public function regenerate()
+    {
+        return session_regenerate_id();
+    }
 
-	/**
-	 * Destroy session, or only the given key.
-	 * @param string $key
-	 * @return \Exedra\Session\Session
-	 */
-	public function destroy($key = null)
-	{
-		DotArray::delete($this->storage, $key);
-		
-		return $this;
-	}
+    /**
+     * PHP session_write_close
+     * @return void
+     */
+    public function close()
+    {
+        session_write_close();
+    }
+
+    /**
+     * Destroy session, or only the given key.
+     * @param string $key
+     * @return \Exedra\Session\Session
+     */
+    public function destroy($key = null)
+    {
+        DotArray::delete($this->storage, $key);
+
+        return $this;
+    }
 }

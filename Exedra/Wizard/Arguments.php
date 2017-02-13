@@ -3,94 +3,95 @@ namespace Exedra\Wizard;
 
 class Arguments implements \ArrayAccess
 {
-	protected $data = array();
+    protected $data = array();
 
-	public function __construct(array $arguments = array())
-	{
-		$this->data = $arguments;
-	}
+    public function __construct(array $arguments = array())
+    {
+        $this->data = $arguments;
+    }
 
-	/**
-	 * Clone with a given arguments
-	 * @param array arguments
-	 */
-	public function with(array $arguments)
-	{
-		return new static(array_merge($this->data, $arguments));
-	}
+    /**
+     * Clone with a given arguments
+     * @param array arguments
+     * @return static
+     */
+    public function with(array $arguments)
+    {
+        return new static(array_merge($this->data, $arguments));
+    }
 
-	public function validate(array $commandArguments)
-	{
-		$unfounds = array();
+    public function validate(array $commandArguments)
+    {
+        $unfounds = array();
 
-		// validate against base arguments
-		foreach($this->data as $arg => $value)
-		{
-			$found = false;
+        // validate against base arguments
+        foreach($this->data as $arg => $value)
+        {
+            $found = false;
 
-			foreach($commandArguments as $key => $baseArg)
-			{
-				if(strpos($key, $arg) === 0)
-					$found = true;
-			}
+            foreach($commandArguments as $key => $baseArg)
+            {
+                if(strpos($key, $arg) === 0)
+                    $found = true;
+            }
 
-			if(!$found)
-			{
-				$unfounds[] = $arg;
-			}
-		}
+            if(!$found)
+            {
+                $unfounds[] = $arg;
+            }
+        }
 
-		if(count($unfounds) > 0)
-			throw new \Exedra\Exception\InvalidArgumentException('Unable to find option(s) with name ['.implode(', ', $unfounds).']');
-	}
+        if(count($unfounds) > 0)
+            throw new \Exedra\Exception\InvalidArgumentException('Unable to find option(s) with name ['.implode(', ', $unfounds).']');
+    }
 
-	public function offsetGet($name)
-	{
-		return $this->get($name);
-	}
+    public function offsetGet($name)
+    {
+        return $this->get($name);
+    }
 
-	public function offsetSet($name, $value)
-	{
-		$this->data[$name] = $value;
-	}
+    public function offsetSet($name, $value)
+    {
+        $this->data[$name] = $value;
+    }
 
-	public function offsetExists($name)
-	{
-		foreach($this->data as $key => $value)
-		{
-			if(strpos($name, $key) === 0)
-				return true;
-		}
+    public function offsetExists($name)
+    {
+        foreach($this->data as $key => $value)
+        {
+            if(strpos($name, $key) === 0)
+                return true;
+        }
 
-		return false;
-	}
+        return false;
+    }
 
-	public function offsetUnset($name)
-	{
-		unset($this->data[$name]);
-	}
+    public function offsetUnset($name)
+    {
+        unset($this->data[$name]);
+    }
 
-	public function get($name, $default = null)
-	{
-		$values = array();
+    public function get($name, $default = null)
+    {
+        $values = array();
 
-		foreach($this->data as $key => $value)
-		{
-			if(strpos($name, $key) === 0)
-				return $value;
-		}
+        foreach($this->data as $key => $value)
+        {
+            if(strpos($name, $key) === 0)
+                return $value;
+        }
 
-		return $default;
-	}
+        return $default;
+    }
 
-	public function has($name)
-	{
-		foreach($this->data as $key => $value)
-		{
-			if(strpos($name, $key) === 0)
-				return true;
-		}
+    public function has($name)
+    {
+        foreach($this->data as $key => $value)
+        {
+            if(strpos($name, $key) === 0)
+                return true;
+        }
 
-		return false;
-	}
+        return false;
+    }
 }

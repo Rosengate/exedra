@@ -3,131 +3,131 @@ namespace Exedra\Wizard\Tools;
 
 class Table
 {
-	protected $header = array();
+    protected $header = array();
 
-	protected $rows = array();
+    protected $rows = array();
 
-	protected $oneColRows = array();
+    protected $oneColRows = array();
 
-	protected  $border;
+    protected  $border;
 
-	public function __construct($border = true)
-	{
-		$this->border = $border;
-	}
+    public function __construct($border = true)
+    {
+        $this->border = $border;
+    }
 
-	public function setHeader(array $array)
-	{
-		$this->header = $array;
-	}
+    public function setHeader(array $array)
+    {
+        $this->header = $array;
+    }
 
-	public function addRow($records)
-	{
-		if(!is_array($records))
-			return $this->addOneColumnRow($records);
-		
-		if(count($this->header) !== 0 && count($records) != count($this->header))
-			throw new \Exedra\Exception\InvalidArgumentException("\Exedra\Console\Table : Row records must be same with headers (".count($this->header).")");
+    public function addRow($records)
+    {
+        if(!is_array($records))
+            return $this->addOneColumnRow($records);
 
-		$this->rows[] = $records;
-	}
+        if(count($this->header) !== 0 && count($records) != count($this->header))
+            throw new \Exedra\Exception\InvalidArgumentException("\Exedra\Console\Table : Row records must be same with headers (".count($this->header).")");
 
-	public function addOneColumnRow($value)
-	{
-		$this->oneColRows[] = $value;
-	}
+        $this->rows[] = $records;
+    }
 
-	public function getRowCounts()
-	{
-		return count($this->rows);
-	}
+    public function addOneColumnRow($value)
+    {
+        $this->oneColRows[] = $value;
+    }
 
-	public function printTable()
-	{
-		$lengths = array();
+    public function getRowCounts()
+    {
+        return count($this->rows);
+    }
 
-		$totalLength = 0;
+    public function printTable()
+    {
+        $lengths = array();
 
-		$rows = $this->rows;
+        $totalLength = 0;
 
-		// to calculate length
-		$rows[] = $this->header;
+        $rows = $this->rows;
 
-		foreach($rows as $record)
-		{
-			foreach($record as $no => $value)
-			{
-				if(!isset($lengths[$no]))
-					$lengths[$no] = strlen($value);
+        // to calculate length
+        $rows[] = $this->header;
 
-				if(strlen($value) > $lengths[$no])
-					$lengths[$no] = strlen($value);
-			}
-		}
+        foreach($rows as $record)
+        {
+            foreach($record as $no => $value)
+            {
+                if(!isset($lengths[$no]))
+                    $lengths[$no] = strlen($value);
 
-		// create format
-		$mask = $this->border ? '|' : ' ';
-		$totalLength = 2 * count($lengths) + count($lengths) - 1;
+                if(strlen($value) > $lengths[$no])
+                    $lengths[$no] = strlen($value);
+            }
+        }
 
-		foreach($lengths as $length)
-		{
-			$mask .= ' %-'.$length.'s '.($this->border ? '|' : ' ');
-			$totalLength += $length;
-		}
+        // create format
+        $mask = $this->border ? '|' : ' ';
+        $totalLength = 2 * count($lengths) + count($lengths) - 1;
 
-		$mask .= "\n";
+        foreach($lengths as $length)
+        {
+            $mask .= ' %-'.$length.'s '.($this->border ? '|' : ' ');
+            $totalLength += $length;
+        }
 
-		$header = $this->header;
-		$rows = $this->rows;
+        $mask .= "\n";
 
-		$totalLength = $totalLength < 0 ? 0 : $totalLength;
+        $header = $this->header;
+        $rows = $this->rows;
 
-		$line = '+'.str_repeat('-', $totalLength)."+\n";
+        $totalLength = $totalLength < 0 ? 0 : $totalLength;
 
-		if(count($this->header) > 0)
-		{
-			if($this->border)
-				echo $line;
-			
-			// header
-			$params = array_merge(array($mask), $header);
+        $line = '+'.str_repeat('-', $totalLength)."+\n";
 
-			echo call_user_func_array('sprintf', $params);
-		}
-		else
-		{
-			$params = array($mask);
-		}
+        if(count($this->header) > 0)
+        {
+            if($this->border)
+                echo $line;
 
-		if($this->border)
-			echo $line;
+            // header
+            $params = array_merge(array($mask), $header);
 
-		// rows
-		foreach($rows as $row)
-		{
-			$params = array_merge(array($mask), $row);
-			echo call_user_func_array('sprintf', $params);
-		}
+            echo call_user_func_array('sprintf', $params);
+        }
+        else
+        {
+            $params = array($mask);
+        }
 
-		// one column rows
-		foreach($this->oneColRows as $value)
-		{
-			$length = $totalLength;
+        if($this->border)
+            echo $line;
 
-			$border = $this->border ? '|' : ' ';
+        // rows
+        foreach($rows as $row)
+        {
+            $params = array_merge(array($mask), $row);
+            echo call_user_func_array('sprintf', $params);
+        }
 
-			$lengo = ($length/2) - (strlen($value)/2);
+        // one column rows
+        foreach($this->oneColRows as $value)
+        {
+            $length = $totalLength;
 
-			$lengo = $lengo < 0 ? 0 : $lengo;
+            $border = $this->border ? '|' : ' ';
 
-			$space = str_repeat(' ', $lengo);
+            $lengo = ($length/2) - (strlen($value)/2);
 
-			$mask = $border.$space.'%-'.($length - (strlen($space) * 2)).'s'.$space.$border."\n";
+            $lengo = $lengo < 0 ? 0 : $lengo;
 
-			echo sprintf($mask, $value);
-		}
+            $space = str_repeat(' ', $lengo);
 
-		if($this->border)
-			echo $line;
-	}
+            $mask = $border.$space.'%-'.($length - (strlen($space) * 2)).'s'.$space.$border."\n";
+
+            echo sprintf($mask, $value);
+        }
+
+        if($this->border)
+            echo $line;
+    }
 }

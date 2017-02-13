@@ -9,104 +9,104 @@ use Psr\Http\Message\StreamInterface;
  */
 class Message implements MessageInterface
 {
-	protected $protocol = '1.1';
+    protected $protocol = '1.1';
 
-	/**
-	 * A case lowered key headers.
-	 * A supposed copies for headerLines
-	 * @var array headers
-	 */
-	protected $headers = array();
+    /**
+     * A case lowered key headers.
+     * A supposed copies for headerLines
+     * @var array headers
+     */
+    protected $headers = array();
 
-	/**
-	 * Headers that store original key case
-	 * @var array headerLines
-	 */
-	protected $headerLines = array();
+    /**
+     * Headers that store original key case
+     * @var array headerLines
+     */
+    protected $headerLines = array();
 
-	/**
-	 * Stream
-	 * @param \Exedra\Http\Stream
-	 */
-	protected $body;
+    /**
+     * Stream
+     * @param \Exedra\Http\Stream
+     */
+    protected $body;
 
-	public function __construct(array $headers, Stream $body, $protocol = '1.1')
-	{
-		$this->headers = $headers;
+    public function __construct(array $headers, Stream $body, $protocol = '1.1')
+    {
+        $this->headers = $headers;
 
-		$this->body = $body;
+        $this->body = $body;
 
-		$this->protocol = $protocol;
-	}
+        $this->protocol = $protocol;
+    }
 
-	public function __clone()
-	{
-		$this->body = clone $this->body;
-	}
+    public function __clone()
+    {
+        $this->body = clone $this->body;
+    }
 
-	/**
-	 * @param string $name
-	 * @return string
-	 */
-	public static function headerCase($name)
-	{
-		return str_replace(' ', '-', ucwords(str_replace('-', ' ', strtolower($name))));
-	}
+    /**
+     * @param string $name
+     * @return string
+     */
+    public static function headerCase($name)
+    {
+        return str_replace(' ', '-', ucwords(str_replace('-', ' ', strtolower($name))));
+    }
 
-	public function getProtocolVersion()
-	{
-		return $this->protocol;
-	}
+    public function getProtocolVersion()
+    {
+        return $this->protocol;
+    }
 
-	public function setProtocolVersion($version)
-	{
-		$this->protocol = $version;
+    public function setProtocolVersion($version)
+    {
+        $this->protocol = $version;
 
-		return $this;
-	}
+        return $this;
+    }
 
-	public function withProtocolVersion($version)
-	{
-		$message = clone $this;
+    public function withProtocolVersion($version)
+    {
+        $message = clone $this;
 
-		return $message->setProtocolVersion($version);
-	}
+        return $message->setProtocolVersion($version);
+    }
 
-	/**
-	 * Get all headers
-	 * @return array
-	 */
-	public function getHeaders()
-	{
-		return $this->headerLines;
-	}
+    /**
+     * Get all headers
+     * @return array
+     */
+    public function getHeaders()
+    {
+        return $this->headerLines;
+    }
 
-	/**
-	 * Get header values
-	 * @param string $header
-	 * @return array
-	 */
-	public function getHeader($header)
-	{
-		return isset($this->headers[$name = strtolower($header)]) ? $this->headers[$name] : array();
-	}
+    /**
+     * Get header values
+     * @param string $header
+     * @return array
+     */
+    public function getHeader($header)
+    {
+        return isset($this->headers[$name = strtolower($header)]) ? $this->headers[$name] : array();
+    }
 
-	/**
-	 * Get header value
-	 * @param string $name
-	 * @return string
-	 */
-	public function getHeaderLine($name)
-	{
-		return implode(', ', $this->getHeader($name));
-	}
+    /**
+     * Get header value
+     * @param string $name
+     * @return string
+     */
+    public function getHeaderLine($name)
+    {
+        return implode(', ', $this->getHeader($name));
+    }
 
-	public function withHeader($name, $value)
-	{
-		$message = clone $this;
+    public function withHeader($name, $value)
+    {
+        $message = clone $this;
 
-		return $message->setHeader($name, $value);
-	}
+        return $message->setHeader($name, $value);
+    }
 
     /**
      * @param $name
@@ -114,87 +114,87 @@ class Message implements MessageInterface
      * @return Message
      */
     public function withAddedHeader($name, $value)
-	{
-		if(!$this->hasHeader($name))
-			return $this->withHeader($name, $value);
+    {
+        if(!$this->hasHeader($name))
+            return $this->withHeader($name, $value);
 
-		$message = clone $this;
+        $message = clone $this;
 
-		return $message->addHeader($name, $value);
-	}
+        return $message->addHeader($name, $value);
+    }
 
-	public function withoutHeader($name)
-	{
-		$message = clone $this;
+    public function withoutHeader($name)
+    {
+        $message = clone $this;
 
-		if(!$this->hasHeader($name))
-			return $message;
+        if(!$this->hasHeader($name))
+            return $message;
 
-		return $message->removeHeader($name);
-	}
+        return $message->removeHeader($name);
+    }
 
-	/**
+    /**
      * Get messange body Stream
-	 * @return \Exedra\Http\Stream
-	 */
-	public function getBody()
-	{
-		return $this->body;
-	}
+     * @return \Exedra\Http\Stream
+     */
+    public function getBody()
+    {
+        return $this->body;
+    }
 
-	public function setBody($body, $mode = 'r+')
-	{
-		switch(gettype($body))
-		{
-			case 'string':
-				$this->body = Stream::createFromContents($body);
-			break;
-			case 'object':
-				if($body instanceof Stream)
-					$this->body = $body;
-				else
-					$this->body = new Stream($body, $mode);
-			break;
-		}
+    public function setBody($body, $mode = 'r+')
+    {
+        switch(gettype($body))
+        {
+            case 'string':
+                $this->body = Stream::createFromContents($body);
+            break;
+            case 'object':
+                if($body instanceof Stream)
+                    $this->body = $body;
+                else
+                    $this->body = new Stream($body, $mode);
+            break;
+        }
 
-		return $this;
-	}
+        return $this;
+    }
 
-	public function withBody(StreamInterface $body)
-	{
-		$message = clone $this;
+    public function withBody(StreamInterface $body)
+    {
+        $message = clone $this;
 
-		return $message->setBody($body, 'r+');
-	}
+        return $message->setBody($body, 'r+');
+    }
 
-	public function hasHeader($header)
-	{
-		return isset($this->headers[strtolower($header)]);
-	}
+    public function hasHeader($header)
+    {
+        return isset($this->headers[strtolower($header)]);
+    }
 
-	public function headerHas($name, $value)
-	{
-		$name = strtolower($name);
+    public function headerHas($name, $value)
+    {
+        $name = strtolower($name);
 
-		if(!isset($this->headers[$name]))
-			return false;
+        if(!isset($this->headers[$name]))
+            return false;
 
-		return in_array($value, $this->headers[$name]);
-	}
+        return in_array($value, $this->headers[$name]);
+    }
 
-	public function clearHeaders()
-	{
-		$this->headers = array();
-		$this->headerLines = array();
-	}
+    public function clearHeaders()
+    {
+        $this->headers = array();
+        $this->headerLines = array();
+    }
 
-	public function setHeaders(array $headerLines)
-	{
-		foreach($headerLines as $header => $values)
-			$this->headers[strtolower($header)] = $values;
+    public function setHeaders(array $headerLines)
+    {
+        foreach($headerLines as $header => $values)
+            $this->headers[strtolower($header)] = $values;
 
-		$this->headerLines = $headerLines;
-	}
+        $this->headerLines = $headerLines;
+    }
 
     /**
      * Set header as if it's new
@@ -202,72 +202,72 @@ class Message implements MessageInterface
      * @param array|string $value
      * @return $this
      */
-	public function setHeader($header, $value)
-	{
-		$value = !is_array($value) ? array($value) : array_map('trim', $value);
+    public function setHeader($header, $value)
+    {
+        $value = !is_array($value) ? array($value) : array_map('trim', $value);
 
-		$name = strtolower($header);
+        $name = strtolower($header);
 
-		$this->headers[$name] = $value;
+        $this->headers[$name] = $value;
 
-		foreach(array_keys($this->headerLines) as $key)
-			if(strtolower($key) == $name)
-				unset($this->headerLines[$key]);
+        foreach(array_keys($this->headerLines) as $key)
+            if(strtolower($key) == $name)
+                unset($this->headerLines[$key]);
 
-		$this->headerLines[$header] = $value;
+        $this->headerLines[$header] = $value;
 
         return $this;
-	}
+    }
 
-	/**
-	 * Add header value(s)
-	 * @param string $header
-	 * @param string|array value
-	 * @return $this
-	 */
-	public function addHeader($header, $value)
-	{
-		$name = strtolower($header);
+    /**
+     * Add header value(s)
+     * @param string $header
+     * @param string|array value
+     * @return $this
+     */
+    public function addHeader($header, $value)
+    {
+        $name = strtolower($header);
 
-		if(is_array($value))
-		{
-			foreach($value as $v)
-				$this->headers[$name][] = trim($v);
+        if(is_array($value))
+        {
+            foreach($value as $v)
+                $this->headers[$name][] = trim($v);
 
-			foreach(array_keys($this->headerLines) as $key)
-				if(strtolower($key) == $name)
-					unset($this->headerLines[$key]);
+            foreach(array_keys($this->headerLines) as $key)
+                if(strtolower($key) == $name)
+                    unset($this->headerLines[$key]);
 
-			$this->headerLines[$header] = $this->headers[$name];
-		}
-		else
-		{
-			$this->headers[$name][] = trim($value);
+            $this->headerLines[$header] = $this->headers[$name];
+        }
+        else
+        {
+            $this->headers[$name][] = trim($value);
 
-			foreach(array_keys($this->headerLines) as $key)
-				if(strtolower($key) == $name)
-					unset($this->headerLines[$key]);
+            foreach(array_keys($this->headerLines) as $key)
+                if(strtolower($key) == $name)
+                    unset($this->headerLines[$key]);
 
-			$this->headerLines[$header] = $this->headers[$name];
-		}
+            $this->headerLines[$header] = $this->headers[$name];
+        }
 
-		return $this;
-	}
+        return $this;
+    }
 
     /**
      * Remove header
      * @param string $header
      * @return $this
      */
-	public function removeHeader($header)
-	{
-		$name = strtolower($header);
-		unset($this->headers[$name]);
+    public function removeHeader($header)
+    {
+        $name = strtolower($header);
+        unset($this->headers[$name]);
 
-		foreach($this->headerLines as $key => $value)
-			if(strtolower($key) == $name)
-				unset($this->headerLines[$key]);
+        foreach($this->headerLines as $key => $value)
+            if(strtolower($key) == $name)
+                unset($this->headerLines[$key]);
 
-		return $this;
-	}
+        return $this;
+    }
 }

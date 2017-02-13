@@ -3,162 +3,166 @@ namespace Exedra\Form\Input;
 
 class Base
 {
-	/**
-	 * List of attribute in key value pairs
-	 * @var array attributes
-	 */
-	protected $attributes = array();
+    /**
+     * List of attribute in key value pairs
+     * @var array attributes
+     */
+    protected $attributes = array();
 
-	/**
-	 * list of attribute in string
-	 * @var array attributeString
-	 */
-	protected $attributeString = array();
+    /**
+     * list of attribute in string
+     * @var array attributeString
+     */
+    protected $attributeString = array();
 
-	/**
-	 * List of input class
-	 * @var array classes
-	 */
-	protected $classes = array();
+    /**
+     * List of input class
+     * @var array classes
+     */
+    protected $classes = array();
 
-	/**
-	 * Overriding value
-	 * @var string override
-	 */
-	protected $override;
+    /**
+     * Overriding value
+     * @var string override
+     */
+    protected $override;
 
-	public function __construct($name = null)
-	{
-		if($name)
-			$this->name($name);
-	}
+    public function __construct($name = null)
+    {
+        if($name)
+            $this->name($name);
+    }
 
-	/**
-	 * Set input id
-	 * @param string id
-	 * @return this
-	 */
-	public function id($id)
-	{
-		$this->attr('id', $id);
+    /**
+     * Set input id
+     * @param string id
+     * @return this
+     */
+    public function id($id)
+    {
+        $this->attr('id', $id);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * Set input name
-	 * @param string name
-	 * @return this
-	 */
-	public function name($name)
-	{
-		$this->attributes['name'] = $name;
+    /**
+     * Set input name
+     * @param string name
+     * @return this
+     */
+    public function name($name)
+    {
+        $this->attributes['name'] = $name;
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * Add class to the stack.
-	 * @param string class
-	 * @return this
-	 */
-	public function addClass($class)
-	{
-		$this->classes[] = $class;
+    /**
+     * Add class to the stack.
+     * @param string class
+     * @return this
+     */
+    public function addClass($class)
+    {
+        $this->classes[] = $class;
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * Set input value
-	 * @param string value
-	 * @return this
-	 */
-	public function value($value)
-	{
-		$this->attributes['value'] = $value;
+    /**
+     * Set input value
+     * @param string value
+     * @return this
+     */
+    public function value($value)
+    {
+        $this->attributes['value'] = $value;
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * Set overriding input value
-	 * @param string value
-	 * @return this
-	 */
-	public function override($value)
-	{
-		$this->override = $value;
+    /**
+     * Set overriding input value
+     * @param string value
+     * @return this
+     */
+    public function override($value)
+    {
+        $this->override = $value;
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * Set input attribute
-	 * @param array|string|null $key
-	 * @param string $value
-	 * @return $this
-	 */
-	public function attr($key, $value = null)
-	{
-		if(is_array($key))
-		{
-			foreach($key as $k => $val)
-				$this->attributes[$k] = $val;
+    /**
+     * Set input attribute
+     * @param array|string|null $key
+     * @param string $value
+     * @return $this
+     */
+    public function attr($key, $value = null)
+    {
+        if(is_array($key))
+        {
+            foreach($key as $k => $val)
+                $this->attributes[$k] = $val;
 
-			return $this;
-		}
-		elseif($value === null)
-		{
-			$this->attributeString[] = $key;
+            return $this;
+        }
+        elseif($value === null)
+        {
+            $this->attributeString[] = $key;
 
-			return $this;
-		}
+            return $this;
+        }
 
-		if($key == 'class')
-			return $this->addClass($value);
+        if($key == 'class')
+            return $this->addClass($value);
 
-		$this->attributes[$key] = $value;
+        $this->attributes[$key] = $value;
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * Build input attribute
-	 * Also build input class attribtue
-	 * @return string
-	 */
-	protected function buildAttributes()
-	{
-		$attrs = array();
+    /**
+     * Build input attribute
+     * Also build input class attribtue
+     * @return string
+     */
+    protected function buildAttributes()
+    {
+        $attrs = array();
 
-		$class = '';
+        $class = '';
 
-		if(count($this->classes) > 0)
-			$class = 'class="'.implode(' ', $this->classes).'" ';
-		
-		if(count($this->attributeString) > 0)
-			$attrs = $this->attributeString;
+        if(count($this->classes) > 0)
+            $class = 'class="'.implode(' ', $this->classes).'" ';
 
-		foreach($this->attributes as $key => $value)
-			$attrs[] = $key.'="'.$value.'"';
+        if(count($this->attributeString) > 0)
+            $attrs = $this->attributeString;
 
-		return $class.implode(' ', $attrs);
-	}
+        foreach($this->attributes as $key => $value)
+            $attrs[] = $key.'="'.$value.'"';
 
-	/**
-	 * Get input value.
-	 * @return string
-	 */
-	public function getValue()
-	{
-		$value = $this->override ? : (isset($this->attributes['value']) ? $this->attributes['value'] : null);
+        return $class.implode(' ', $attrs);
+    }
 
-		return $value;
-	}
+    /**
+     * Get input value.
+     * @return string
+     */
+    public function getValue()
+    {
+        $value = $this->override ? : (isset($this->attributes['value']) ? $this->attributes['value'] : null);
 
-	public function __toString()
-	{
-		return $this->toString();
-	}
+        return $value;
+    }
+
+    public function toString()
+    {
+    }
+
+    public function __toString()
+    {
+        return $this->toString();
+    }
 }

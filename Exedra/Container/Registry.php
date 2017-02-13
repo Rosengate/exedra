@@ -26,11 +26,12 @@ class Registry implements \ArrayAccess
 		return isset($this->filters[$name]) ? $this->filters[$name] : array();
 	}
 
-	/**
-	 * Define dependency information
-	 * @param string name
-	 * @param mixed definition
-	 */
+    /**
+     * Define dependency information
+     * @param string $name
+     * @param mixed $definition
+     * @return mixed|void
+     */
 	public function offsetSet($name, $definition)
 	{
 		return $this->data[$name] = $definition;
@@ -38,7 +39,7 @@ class Registry implements \ArrayAccess
 
 	/**
 	 * Get dependency information
-	 * @param string name
+	 * @param string $name
 	 * @return mixed
 	 */
 	public function offsetGet($name)
@@ -48,7 +49,7 @@ class Registry implements \ArrayAccess
 
 	/**
 	 * Check dependepency registry existence
-	 * @param string name
+	 * @param string $name
 	 * @return bool
 	 */
 	public function offsetExists($name)
@@ -58,7 +59,7 @@ class Registry implements \ArrayAccess
 
 	/**
 	 * Remove dependency registry information
-	 * @param string name
+	 * @param string $name
 	 */
 	public function offsetUnset($name)
 	{
@@ -77,7 +78,7 @@ class Registry implements \ArrayAccess
 
 	/**
 	 * Get dependency information
-	 * @param string name
+	 * @param string $name
 	 */
 	public function get($name)
 	{
@@ -87,7 +88,7 @@ class Registry implements \ArrayAccess
 	/**
 	 * Register new dependency.
 	 * Throw exception if already the dependency already exists.
-	 * @param string name
+	 * @param string $name
 	 * @param mixed \Closure|string|array|object
 	 *
 	 * @throws \Exedra\Exception\Exception
@@ -102,7 +103,7 @@ class Registry implements \ArrayAccess
 
 	/**
 	 * Set dependency registry
-	 * @param string name
+	 * @param string $name
 	 * @param \Closure|string|array|object
 	 */
 	public function set($name, $pattern)
@@ -112,7 +113,7 @@ class Registry implements \ArrayAccess
 
 	/**
 	 * Check dependency information existence
-	 * @param string name
+	 * @param string $name
 	 * @return bool
 	 */
 	public function has($name)
@@ -122,7 +123,7 @@ class Registry implements \ArrayAccess
 
 	/**
 	 * Remove dependency information
-	 * @param string name
+	 * @param string $name
 	 */
 	public function remove($name)
 	{

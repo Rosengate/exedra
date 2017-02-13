@@ -3,297 +3,296 @@ namespace Exedra\Wizard;
 
 abstract class Wizardry
 {
-	/**
-	 * Command namespace
-	 * @var string|null
-	 */
-	protected static $namespace = 'app';
+    /**
+     * Command namespace
+     * @var string|null
+     */
+    protected static $namespace = 'app';
 
-	protected static $definitions = array();
+    protected static $definitions = array();
 
-	/**
-	 * Application instance
-	 * @var \Exedra\Application app
-	 */
-	protected $app;
+    /**
+     * Application instance
+     * @var \Exedra\Application app
+     */
+    protected $app;
 
-	/**
-	 * Wizard manager
-	 * @var \Exedra\Wizard\Manager
-	 */
-	protected $manager;
+    /**
+     * Wizard manager
+     * @var \Exedra\Wizard\Manager
+     */
+    protected $manager;
 
-	/**
-	 * Get meta information : namespace
-	 * If it's null, return 'app'
-	 * @return string
-	 */
-	public static function getNamespace()
-	{
-		return static::$namespace ? : 'app';
-	}
+    /**
+     * Get meta information : namespace
+     * If it's null, return 'app'
+     * @return string
+     */
+    public static function getNamespace()
+    {
+        return static::$namespace ? : 'app';
+    }
 
-	public function __construct(\Exedra\Wizard\Manager $manager, \Exedra\Application $app)
-	{
-		$this->manager = $manager;
+    public function __construct(\Exedra\Wizard\Manager $manager, \Exedra\Application $app)
+    {
+        $this->manager = $manager;
 
-		$this->app = $app;
-	}
+        $this->app = $app;
+    }
 
-	/**
-	 * Say something on console
-	 * @param string text
-	 * @param boolean break give line break
-	 */
-	public function say($text = '', $break = true)
-	{
-		if(is_array($text))
-			$text = implode("\n", $text).($break === true ? "\n" : '');
-		else
-			$text = $text.($break === true ? "\n" : '');
+    /**
+     * Say something on console
+     * @param string text
+     * @param boolean break give line break
+     */
+    public function say($text = '', $break = true)
+    {
+        if(is_array($text))
+            $text = implode("\n", $text).($break === true ? "\n" : '');
+        else
+            $text = $text.($break === true ? "\n" : '');
 
-		echo $text;
+        echo $text;
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * Read PHP input
-	 * @return string
-	 */
-	public function inputRead()
-	{
-		$text = fgets(fopen('php://stdin', 'rw'));
+    /**
+     * Read PHP input
+     * @return string
+     */
+    public function inputRead()
+    {
+        $text = fgets(fopen('php://stdin', 'rw'));
 
-		$text = trim($text);
+        $text = trim($text);
 
-		return $text;
-	}
+        return $text;
+    }
 
-	/**
-	 * Ask something on console
-	 * @param string text
-	 * @param mixed validation
-	 * @param boolean recursive is doing something recursie
-	 * @return string
-	 */
-	public function ask($text = '', $validation = null, $default = null, $recursive = false)
-	{
-		if(is_array($validation))
-			$validation[] = 'abort';
+    /**
+     * Ask something on console
+     * @param string text
+     * @param mixed validation
+     * @param boolean recursive is doing something recursie
+     * @return string
+     */
+    public function ask($text = '', $validation = null, $default = null, $recursive = false)
+    {
+        if(is_array($validation))
+            $validation[] = 'abort';
 
-		if(is_string($text) && is_array($validation) && $recursive === false)
-			$text = $text.' ('.implode(',', $validation).') : ';
+        if(is_string($text) && is_array($validation) && $recursive === false)
+            $text = $text.' ('.implode(',', $validation).') : ';
 
-		if(is_string($text) && $validation === null)
-			$text = trim(ucfirst($text)).': ';
+        if(is_string($text) && $validation === null)
+            $text = trim(ucfirst($text)).': ';
 
-		$this->say($text, false);
+        $this->say($text, false);
 
-		$answer = $this->inputRead();
+        $answer = $this->inputRead();
 
-		// if default is passed, and answer exactly empty.
-		if($default !== null && $answer === '')
-		{
-			$validation = null;
-			$answer = $default;
-		}
+        // if default is passed, and answer exactly empty.
+        if($default !== null && $answer === '')
+        {
+            $validation = null;
+            $answer = $default;
+        }
 
-		// if validation failed, recursive.
-		if($validation)
-		{
-			// quit
-			if($answer == 'abort')
-				return $this->abort();
+        // if validation failed, recursive.
+        if($validation)
+        {
+            // quit
+            if($answer == 'abort')
+                return $this->abort();
 
-			if(is_array($validation) && !in_array($answer, $validation))
-			{
-				return $this->say()->say('Please select a valid choice!')->ask($text, $validation, $default, true);
-			}
-			else if(is_callable($validation) && $validation($answer, $this) === false)
-			{
-				$this->say();
+            if(is_array($validation) && !in_array($answer, $validation))
+            {
+                return $this->say()->say('Please select a valid choice!')->ask($text, $validation, $default, true);
+            }
+            else if(is_callable($validation) && $validation($answer, $this) === false)
+            {
+                $this->say();
 
-				return $this->ask($text, $validation, $default, true);
-			}
-		}
+                return $this->ask($text, $validation, $default, true);
+            }
+        }
 
-		$this->say();
+        $this->say();
 
-		return $answer;
-	}
+        return $answer;
+    }
 
-	/**
-	 * Configure an associative array
-	 * @param array associative array
-	 */
-	public function configureAssoc(array $configuration, $validation = null)
-	{
-		$config = array();
+    /**
+     * Configure an associative array
+     * @param array associative array
+     */
+    public function configureAssoc(array $configuration, $validation = null)
+    {
+        $config = array();
 
-		foreach($configuration as $key => $value)
-		{
-			revalidate:
+        foreach($configuration as $key => $value)
+        {
+            revalidate:
 
-			$this->say('# '.$key.($value ? ' ('.$value.')':'').' : ', false);
+            $this->say('# '.$key.($value ? ' ('.$value.')':'').' : ', false);
 
-			$answer = $this->inputRead();
+            $answer = $this->inputRead();
 
-			$answer = $answer == '' ? $value : $answer;
+            $answer = $answer == '' ? $value : $answer;
 
-			if(is_callable($validation))
-			{
-				if($validation($key, $answer) === false)
-					goto revalidate;
-			}
+            if(is_callable($validation))
+            {
+                if($validation($key, $answer) === false)
+                    goto revalidate;
+            }
 
-			$config[$key] = $answer;
-		}
+            $config[$key] = $answer;
+        }
 
-		$this->say();
+        $this->say();
 
-		return $config;
-	}
+        return $config;
+    }
 
-	/**
-	 * Configure the given key
-	 * @return array associative array
-	 */
-	public function configureKeys(array $keys, $validation = null)
-	{
-		$config = array();
+    /**
+     * Configure the given key
+     * @return array associative array
+     */
+    public function configureKeys(array $keys, $validation = null)
+    {
+        $config = array();
 
-		foreach($keys as $key)
-		{
-			revalidate:
+        foreach($keys as $key)
+        {
+            revalidate:
 
-			$this->say('# '.$key.' : ', false);
+            $this->say('# '.$key.' : ', false);
 
-			$answer = $this->inputRead();
+            $answer = $this->inputRead();
 
-			if(is_callable($validation))
-			{
-				if($validation($key, $answer) === false)
-					goto revalidate;
-			}
+            if(is_callable($validation))
+            {
+                if($validation($key, $answer) === false)
+                    goto revalidate;
+            }
 
-			$config[$key] = $answer;
-		}
+            $config[$key] = $answer;
+        }
 
-		$this->say();
+        $this->say();
 
-		return $config;
-	}
+        return $config;
+    }
 
-	/**
-	 * Pretty print to console
-	 * @param string text
-	 * @param string wall delimiter
-	 */
-	public function sayNice($text, $wall = '|')
-	{
-		$width = strlen($dashes = '-------------------------------------------------------');
-		
-		$wallLength = (strlen($wall) + 1) * 2;
-		
-		$text = wordwrap($text, $width - $wallLength);
+    /**
+     * Pretty print to console
+     * @param string text
+     * @param string wall delimiter
+     */
+    public function sayNice($text, $wall = '|')
+    {
+        $width = strlen($dashes = '-------------------------------------------------------');
 
-		$texts = array();
+        $wallLength = (strlen($wall) + 1) * 2;
 
-		foreach(explode("\n", $text) as $line)
-			$texts[] = $wall.' '.$line.str_repeat(' ', $width-strlen($line) - $wallLength).' '.$wall;
+        $text = wordwrap($text, $width - $wallLength);
 
-		$this->say($dashes);
+        $texts = array();
 
-		$this->say($texts);
-		
-		$this->say($dashes);
-	}
+        foreach(explode("\n", $text) as $line)
+            $texts[] = $wall.' '.$line.str_repeat(' ', $width-strlen($line) - $wallLength).' '.$wall;
 
-	/**
-	 * Abort! abort!
-	 * Abort the console and stop anything.
-	 */
-	public function abort()
-	{
-		$lang = array('Well, as you like.', 'Abort! Abort!', 'See you later then!', 'Quitter!');
-		
-		$this->say();
+        $this->say($dashes);
 
-		$this->say($lang[rand(0, 3)]);
-		
-		exit;
-	}
+        $this->say($texts);
 
-	/**
-	 * Ask a choice based question
-	 * @param string question
-	 * @param array choices
-	 */
-	public function askChoices($question, array $choices)
-	{
-		$choiceNumbers = array();
+        $this->say($dashes);
+    }
 
-		$this->say($question);
+    /**
+     * Abort! abort!
+     * Abort the console and stop anything.
+     */
+    public function abort()
+    {
+        $lang = array('Well, as you like.', 'Abort! Abort!', 'See you later then!', 'Quitter!');
 
-		$num = 1;
-		$answers = array();
+        $this->say();
 
-		foreach($choices as $no => $choice)
-		{
-			$answers[$num] = $no;
-			$choiceNumbers[] = $num;
-			$choices[$no] = $num++.'. '.$choice;
-		}
+        $this->say($lang[rand(0, 3)]);
 
-		return $answers[$this->ask(array_merge($choices, array('', 'Option : ')), $choiceNumbers)];
-	}
+        exit;
+    }
 
-	public function confirm($question)
-	{
-		$answer = $this->ask($question, array('yes', 'no'));
+    /**
+     * Ask a choice based question
+     * @param string question
+     * @param array choices
+     */
+    public function askChoices($question, array $choices)
+    {
+        $choiceNumbers = array();
 
-		if(!in_array($answer, array('yes', 'no')))
-			return $this->confirm($question);
+        $this->say($question);
 
-		return in_array($answer, array('yes'));
-	}
+        $num = 1;
+        $answers = array();
 
-	/**
-	 * Tabulize the given table
-	 * @param \Exedra\Wizard\Tools\Table table
-	 */
-	public function tabulize(Tools\Table $table)
-	{
-		$table->printTable();
-	}
+        foreach($choices as $no => $choice)
+        {
+            $answers[$num] = $no;
+            $choiceNumbers[] = $num;
+            $choices[$no] = $num++.'. '.$choice;
+        }
 
-	/**
-	 * Validate by the given closure
-	 * If false returned, recursive.
-	 * @param string answer
-	 * @param \Closure closure
-	 */
-	public function validate($answer, \Closure $closure)
-	{
-		$result = $closure($answer);
+        return $answers[$this->ask(array_merge($choices, array('', 'Option : ')), $choiceNumbers)];
+    }
 
-		if($result === false)
-		{
-			$this->validate($this->ask('Re-answer'), $closure);
-		}
-	}
+    public function confirm($question)
+    {
+        $answer = $this->ask($question, array('yes', 'no'));
 
-	/**
-	 * Show some tick
-	 * @param string message
-	 * @param boolean|true tick
-	 */
-	public function tick($message, $tick = true)
-	{
-		$checked = $tick ? '[X]' : '[ ]';
+        if(!in_array($answer, array('yes', 'no')))
+            return $this->confirm($question);
 
-		$this->say($checked.' '.$message);
-	}
+        return in_array($answer, array('yes'));
+    }
 
+    /**
+     * Tabulize the given table
+     * @param \Exedra\Wizard\Tools\Table table
+     */
+    public function tabulize(Tools\Table $table)
+    {
+        $table->printTable();
+    }
+
+    /**
+     * Validate by the given closure
+     * If false returned, recursive.
+     * @param string answer
+     * @param \Closure closure
+     */
+    public function validate($answer, \Closure $closure)
+    {
+        $result = $closure($answer);
+
+        if($result === false)
+        {
+            $this->validate($this->ask('Re-answer'), $closure);
+        }
+    }
+
+    /**
+     * Show some tick
+     * @param string message
+     * @param boolean|true tick
+     */
+    public function tick($message, $tick = true)
+    {
+        $checked = $tick ? '[X]' : '[ ]';
+
+        $this->say($checked.' '.$message);
+    }
 }

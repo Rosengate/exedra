@@ -3,151 +3,151 @@ namespace Exedra\Support;
 
 class DotArray
 {
-	/**
-	 * Initialize array
-	 * @param array &storage
-	 * @param array $data
-	 */
-	public static function initialize(array &$storage, array $data)
-	{
-		foreach($data as $key => $value)
-		{
-			unset($storage[$key]);
+    /**
+     * Initialize array
+     * @param array &storage
+     * @param array $data
+     */
+    public static function initialize(array &$storage, array $data)
+    {
+        foreach($data as $key => $value)
+        {
+            unset($storage[$key]);
 
-			$next = &self::set($storage, $key, $value);
+            $next = &self::set($storage, $key, $value);
 
-			// recursive.
-			if(is_array($value))
-				self::initialize($next, $value);
-		}
-	}
+            // recursive.
+            if(is_array($value))
+                self::initialize($next, $value);
+        }
+    }
 
-	/**
-	 * Set value
-	 * @param array &storage
-	 * @param string $key
-	 * @param mixed $value
+    /**
+     * Set value
+     * @param array &storage
+     * @param string $key
+     * @param mixed $value
      * @return mixed
-	 */
-	public static function &set(&$storage, $key, $value)
-	{
-		// temporary replacement for escaped dot.
-		$key = str_replace("\.", "z#G1", $key);
+     */
+    public static function &set(&$storage, $key, $value)
+    {
+        // temporary replacement for escaped dot.
+        $key = str_replace("\.", "z#G1", $key);
 
-		$keys = explode('.', $key);
+        $keys = explode('.', $key);
 
-		foreach($keys as $key)
-		{
-			$key = str_replace("z#G1", ".", $key);
+        foreach($keys as $key)
+        {
+            $key = str_replace("z#G1", ".", $key);
 
-			if(!isset($storage[$key]) || !is_array($storage[$key]))
-				$storage[$key]	= array();
+            if(!isset($storage[$key]) || !is_array($storage[$key]))
+                $storage[$key]	= array();
 
-			$storage = &$storage[$key];
-			
-			$laststorage = &$storage;
-		}
+            $storage = &$storage[$key];
 
-		$storage = $value;
+            $laststorage = &$storage;
+        }
 
-		return $laststorage;
-	}
+        $storage = $value;
 
-	/**
-	 * Get value
-	 * @param array $storage
-	 * @param string $key
-	 * @return mixed
-	 */
-	public static function get($storage, $key)
-	{
-		$keys	= explode('.', $key);
+        return $laststorage;
+    }
 
-		foreach($keys as $key)
-			$storage	= &$storage[$key];
+    /**
+     * Get value
+     * @param array $storage
+     * @param string $key
+     * @return mixed
+     */
+    public static function get($storage, $key)
+    {
+        $keys	= explode('.', $key);
 
-		return $storage;
-	}
+        foreach($keys as $key)
+            $storage	= &$storage[$key];
 
-	/**
-	 * Get referenced value
-	 * @param array &$storage
-	 * @param string $key
-	 * @return mixed
-	 */
-	public static function &getReference(&$storage, $key)
-	{
-		$keys = explode('.', $key);
+        return $storage;
+    }
 
-		foreach($keys as $key)
-			$storage = &$storage[$key];
+    /**
+     * Get referenced value
+     * @param array &$storage
+     * @param string $key
+     * @return mixed
+     */
+    public static function &getReference(&$storage, $key)
+    {
+        $keys = explode('.', $key);
 
-		return $storage;
-	}
+        foreach($keys as $key)
+            $storage = &$storage[$key];
 
-	/**
-	 * Recursively loop through multidimensional array
-	 * With every loop receive a dotted key
-	 * @param array &$storage
-	 * @param \Closure $callback
-	 * @param array $prefix
-	 */
-	public static function each(array &$storage, \Closure $callback, array $prefix = array())
-	{
-		foreach($storage as $key => &$value)
-		{
-			if(is_array($value))
-				static::each($value, $callback, array_merge($prefix, array($key)));
-			else
-				$callback(implode('.', array_merge($prefix, array($key))), $value, $storage[$key]);
-		}
-	}
+        return $storage;
+    }
 
-	/**
-	 * Check key existence
-	 * @param array $storage
-	 * @param string $key
-	 * @return bool
-	 */
-	public static function has(array $storage, $key)
-	{
-		$keys	= explode('.', $key);
+    /**
+     * Recursively loop through multidimensional array
+     * With every loop receive a dotted key
+     * @param array &$storage
+     * @param \Closure $callback
+     * @param array $prefix
+     */
+    public static function each(array &$storage, \Closure $callback, array $prefix = array())
+    {
+        foreach($storage as $key => &$value)
+        {
+            if(is_array($value))
+                static::each($value, $callback, array_merge($prefix, array($key)));
+            else
+                $callback(implode('.', array_merge($prefix, array($key))), $value, $storage[$key]);
+        }
+    }
 
-		foreach($keys as $key)
-		{
-			if(!isset($storage[$key]))
-				return false;
+    /**
+     * Check key existence
+     * @param array $storage
+     * @param string $key
+     * @return bool
+     */
+    public static function has(array $storage, $key)
+    {
+        $keys	= explode('.', $key);
 
-			$storage	= $storage[$key];
-		}
+        foreach($keys as $key)
+        {
+            if(!isset($storage[$key]))
+                return false;
 
-		return true;
-	}
+            $storage	= $storage[$key];
+        }
 
-	/**
-	 * Delete key
-	 * @param array &storage
-	 * @param string $key
-	 */
-	public static function delete(&$storage, $key)
-	{
-		if($key == null)
-		{
-			$storage = array();
-			return;
-		}
+        return true;
+    }
 
-		$keys	= explode('.', $key);
+    /**
+     * Delete key
+     * @param array &storage
+     * @param string $key
+     */
+    public static function delete(&$storage, $key)
+    {
+        if($key == null)
+        {
+            $storage = array();
+            return;
+        }
 
-		foreach($keys as $no=>$key)
-		{
-			if($no == 0) continue;
+        $keys	= explode('.', $key);
 
-			$key	= array_shift($keys);
-			
-			$storage =& $storage[$key];
-		}
+        foreach($keys as $no=>$key)
+        {
+            if($no == 0) continue;
 
-		unset($storage[array_shift($keys)]);
-	}
+            $key	= array_shift($keys);
+
+            $storage =& $storage[$key];
+        }
+
+        unset($storage[array_shift($keys)]);
+    }
 }

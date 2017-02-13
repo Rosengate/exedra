@@ -16,8 +16,8 @@ class Select extends Base
 
 	/**
 	 * Set select options
-	 * @param array options
-	 * @return this
+	 * @param array $options
+	 * @return $this
 	 */
 	public function options(array $options)
 	{
@@ -29,9 +29,9 @@ class Select extends Base
 	/**
 	 * Set first option
 	 * If label is not passed, value will equal to '', and label set be using value
-	 * @param string value
-	 * @param string label (optional)
-	 * @return this
+	 * @param string $value
+	 * @param string $label (optional)
+	 * @return $this
 	 */
 	public function first($value, $label = null)
 	{

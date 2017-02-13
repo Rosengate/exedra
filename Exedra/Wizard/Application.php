@@ -3,122 +3,122 @@ namespace Exedra\Wizard;
 
 class Application extends Wizardry
 {
-	/**
-	 * @namespace app
-	 * @description List routes
-	 * @arguments.name list only routes with given name
-	 * @arguments.property specify route properties
-	 */
-	public function executeRoutes($arguments)
-	{
-		$table = new \Exedra\Wizard\Tools\Table;
+    /**
+     * @namespace app
+     * @description List routes
+     * @arguments.name list only routes with given name
+     * @arguments.property specify route properties
+     */
+    public function executeRoutes($arguments)
+    {
+        $table = new \Exedra\Wizard\Tools\Table;
 
-		$header = explode(' ', $arguments->get('property', 'name method tag uri'));
+        $header = explode(' ', $arguments->get('property', 'name method tag uri'));
 
-		$table->setHeader($header);
+        $table->setHeader($header);
 
-		$previousRoute = null;
+        $previousRoute = null;
 
-		$this->app->map->each(function(\Exedra\Routing\Route $route) use($table, $header, $arguments)
-		{
-			$routeName = $route->getAbsoluteName();
-			
-			$methods = $route->getMethod();
+        $this->app->map->each(function(\Exedra\Routing\Route $route) use($table, $header, $arguments)
+        {
+            $routeName = $route->getAbsoluteName();
 
-			if(count($methods) == 4)
-				$methods = 'any';
-			else
-				$methods = implode(', ', $methods);
+            $methods = $route->getMethod();
 
-			// only by name.
-			if(isset($arguments['name']))
-			{
-				if(strpos($routeName, $arguments['name']) !== 0)
-					return;
-			}
+            if(count($methods) == 4)
+                $methods = 'any';
+            else
+                $methods = implode(', ', $methods);
 
-			// list only routes that is executable
-			if(!$route->hasExecution())
-				return;
+            // only by name.
+            if(isset($arguments['name']))
+            {
+                if(strpos($routeName, $arguments['name']) !== 0)
+                    return;
+            }
 
-			$row = array();
+            // list only routes that is executable
+            if(!$route->hasExecution())
+                return;
 
-			$data = array(
-				'name' => $route->getAbsoluteName(), 
-				'method' => $methods,
-				'uri' => '/'.$route->getPath(true),
-				'tag' => $route->hasProperty('tag') ? $route->getProperty('tag') : ''
-				);
+            $row = array();
 
-			foreach($header as $col)
-			{
-				$col = strtolower($col);
+            $data = array(
+                'name' => $route->getAbsoluteName(),
+                'method' => $methods,
+                'uri' => '/'.$route->getPath(true),
+                'tag' => $route->hasProperty('tag') ? $route->getProperty('tag') : ''
+                );
 
-				$row[] = $data[$col];
-			}
+            foreach($header as $col)
+            {
+                $col = strtolower($col);
 
-			$table->addRow($row);
-		});
+                $row[] = $data[$col];
+            }
 
-		if($table->getRowCounts() === 0)
-			$table->addOneColumnRow('Not found!');
+            $table->addRow($row);
+        });
 
-		$this->say('Showing list of routes : ');
+        if($table->getRowCounts() === 0)
+            $table->addOneColumnRow('Not found!');
 
-		$this->tabulize($table);
-	}
+        $this->say('Showing list of routes : ');
 
-	/**
-	 * @description Serve application
-	 * @arguments.port port to be served on
-	 * @arguments.router router file to be served through
-	 */
-	public function executeServe(Arguments $arguments)
-	{
-		$validation = function($answer)
-		{
-			if($answer == '')
-				return true;
+        $this->tabulize($table);
+    }
 
-			if(!is_numeric($answer))
-			{
-				$this->say('Please specify only integer');
-				return false;
-			}
+    /**
+     * @description Serve application
+     * @arguments.port port to be served on
+     * @arguments.router router file to be served through
+     */
+    public function executeServe(Arguments $arguments)
+    {
+        $validation = function($answer)
+        {
+            if($answer == '')
+                return true;
 
-			if($answer < 7000)
-			{
-				$this->say('Please specify port greater than 7000');
-				return false;
-			}
-			else if($answer > 65500)
-			{
-				$this->say('Please specify port smaller than 65500');
-				return false;
-			}
+            if(!is_numeric($answer))
+            {
+                $this->say('Please specify only integer');
+                return false;
+            }
 
-			return true;
-		};
+            if($answer < 7000)
+            {
+                $this->say('Please specify port greater than 7000');
+                return false;
+            }
+            else if($answer > 65500)
+            {
+                $this->say('Please specify port smaller than 65500');
+                return false;
+            }
 
-		$port = isset($arguments['port']) && $arguments['port'] !== '' ? $arguments['port'] : $this->ask('Run server at port 9000 ? [leave empty/specify] : ', $validation, 9000);
+            return true;
+        };
 
-		$this->validate($port, $validation);
+        $port = isset($arguments['port']) && $arguments['port'] !== '' ? $arguments['port'] : $this->ask('Run server at port 9000 ? [leave empty/specify] : ', $validation, 9000);
 
-		// $dir = $this->app->config->get('dir.public', 'public');
-		$dir = $this->app->path['public'];
+        $this->validate($port, $validation);
 
-		if(!file_exists($dir))
-			return $this->say('Public folder doesn\'t exist. ('.$dir.')');
+        // $dir = $this->app->config->get('dir.public', 'public');
+        $dir = $this->app->path['public'];
 
-		if(isset($arguments['router']))
-			$router = ' '.$arguments['router'];
-		else
-			$router = '';
+        if(!file_exists($dir))
+            return $this->say('Public folder doesn\'t exist. ('.$dir.')');
 
-		chdir($dir);
+        if(isset($arguments['router']))
+            $router = ' '.$arguments['router'];
+        else
+            $router = '';
 
-		$this->say('PHP server started at localhost:'.$port.' on folder '.realpath($dir));
-		
-		exec('php -S localhost:'.$port.$router);
-	}
+        chdir($dir);
+
+        $this->say('PHP server started at localhost:'.$port.' on folder '.realpath($dir));
+
+        exec('php -S localhost:'.$port.$router);
+    }
 }
