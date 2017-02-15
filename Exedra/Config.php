@@ -12,6 +12,18 @@ class Config implements \ArrayAccess
     protected $storage = array();
 
     /**
+     * Initialize config storage by the given array
+     * @param array $config
+     * @return $this
+     */
+    public function initialize(array $config)
+    {
+        $this->storage = $config;
+
+        return $this;
+    }
+
+    /**
      * Set config value
      * @param string|array $key
      * @param mixed $value

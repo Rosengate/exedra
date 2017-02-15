@@ -72,7 +72,8 @@ $app = new \Exedra\Application(array(
     'path.app' => __DIR__.'/app',
     'path.src' => __DIR__.'/app/src',
     'path.routes' => __DIR__.'/app/routes',
-    'path.public' => __DIR__.'/public'
+    'path.public' => __DIR__.'/public',
+    'path.views' => __DIR__.'/app/views'
     ));
     
 $app->autoloadSrc();

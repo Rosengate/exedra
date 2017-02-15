@@ -55,6 +55,8 @@ class Application extends \Exedra\Container\Container implements Definition
         $pathRoot->register('src', isset($params['path.src']) ? $params['path.src'] : $pathApp->to('src'), true);
 
         $pathRoot->register('routes', isset($params['path.routes']) ? $params['path.routes'] : $pathApp->to('routes'), true);
+
+        $pathRoot->register('views', isset($params['path.views']) ? $params['path.views'] : $pathApp->to('views'), true);
     }
 
     /**
@@ -93,7 +95,7 @@ class Application extends \Exedra\Container\Container implements Definition
                 return new ControllerFactory($this->namespace);
             },
             '@view' => function(){
-                return new \Exedra\View\Factory($this->path['app']->create('views'));
+                return new \Exedra\View\Factory($this->path['views']);
             }
         ));
 

@@ -25,7 +25,6 @@ use Exedra\Wizard\Manager;
  * @property Group|Route[] $map
  * @property ProviderRegistry $provider
  * @property Config $config
- * @property MiddlewareRegistry $middleware
  * @property ServerRequest $request
  * @property UrlFactory $url
  * @property Session $session
