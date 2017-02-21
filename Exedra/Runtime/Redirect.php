@@ -2,7 +2,6 @@
 namespace Exedra\Runtime;
 
 use Exedra\Contracts\Url\UrlGenerator;
-use Exedra\Http\Response;
 
 class Redirect implements UrlGenerator
 {
