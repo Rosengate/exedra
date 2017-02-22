@@ -1,5 +1,6 @@
 <?php
 namespace Exedra;
+use Exedra\Support\Autoloader;
 
 /**
  * General loader for exedra, available on every 3 major instance. Exedra, Application and Exec.
@@ -27,8 +28,6 @@ class Path implements \ArrayAccess
     public function __construct($basePath = null)
     {
         $this->basePath = !$basePath ? null : rtrim($basePath, '/\\');
-
-        $this->autoloadRegister();
     }
 
     /**
@@ -123,7 +122,9 @@ class Path implements \ArrayAccess
      */
     public function registerAutoload($basePath, $prefix = '', $relative = true)
     {
-        $this->autoloadRegistry[] = array($basePath, $prefix, $relative);
+        $path = $relative ? $this->basePath . '/' . $basePath : $basePath;
+
+        Autoloader::getInstance()->registerAutoload($path, $prefix);
     }
 
     /**
@@ -146,52 +147,6 @@ class Path implements \ArrayAccess
     public function autoloadPsr4($namespace, $path, $relative = true)
     {
         return $this->registerAutoload($path, $namespace, $relative);
-    }
-
-    /**
-     * Get list of autoloaded registry
-     * @return array
-     */
-    public function getAutoloadRegistry()
-    {
-        return $this->autoloadRegistry;
-    }
-
-    /**
-     * Register autoloading
-     * @return void
-     */
-    protected function autoloadRegister()
-    {
-        $path = $this;
-
-        spl_autoload_register(function($class) use($path)
-        {
-            $basePath = (string) $path;
-
-            foreach($path->getAutoloadRegistry() as $structs)
-            {
-                $autoloadPath = $structs[0];
-
-                $namespace = $structs[1];
-
-                $relative = $structs[2];
-
-                if($namespace != '' && strpos($class, $namespace) !== 0)
-                    continue;
-
-                // remove namespace from path.
-                $classDir = substr($class, strlen($namespace));
-
-                $filename = $autoloadPath.DIRECTORY_SEPARATOR.(str_replace('\\', DIRECTORY_SEPARATOR, $classDir)).'.php';
-
-                if($relative)
-                    $filename = $path.DIRECTORY_SEPARATOR.$filename;
-
-                if(file_exists($filename))
-                    return require_once $filename;
-            }
-        });
     }
 
     /**
