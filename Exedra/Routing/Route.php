@@ -64,11 +64,13 @@ class Route implements Registrar
 	 * @var array aliases
 	 */
 	protected static $aliases = array(
-								'bind:middleware' => 'middleware',
-								'uri' => 'path',
-								'group' => 'subroutes',
-								'handler' => 'execute',
-								'verb' => 'method');
+        'bind:middleware' => 'middleware',
+        'uri' => 'path',
+        'group' => 'subroutes',
+        'handler' => 'execute',
+        'verb' => 'method',
+        'attr' => 'attribute'
+    );
 
 	/**
 	 * Route meta attributes
@@ -997,11 +999,19 @@ class Route implements Registrar
      * @param mixed $value
      * @return $this
      */
-	public function setAttribute($key, $value)
+	public function setAttribute($key, $value = null)
 	{
-		$this->attributes[$key] = $value;
+        if(is_array($key))
+        {
+            foreach($key as $item => $value)
+                $this->attributes[$item] = $value;
+        }
+        else
+        {
+            $this->attributes[$key] = $value;
+        }
 
-		return $this;
+        return $this;
 	}
 
 	/**
@@ -1029,11 +1039,9 @@ class Route implements Registrar
      * @param string $value
      * @return $this
      */
-	public function attr($key, $value)
+	public function attr($key, $value = null)
 	{
-		$this->attributes[$key] = $value;
-
-		return $this;
+	    return $this->setAttribute($key, $value);
 	}
 
     /**
