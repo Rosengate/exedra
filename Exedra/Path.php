@@ -2,9 +2,6 @@
 namespace Exedra;
 use Exedra\Support\Autoloader;
 
-/**
- * General loader for exedra, available on every 3 major instance. Exedra, Application and Exec.
- */
 class Path implements \ArrayAccess
 {
     /**
