@@ -3,6 +3,7 @@
 use Exedra\Container\Container;
 use Exedra\Http\ServerRequest;
 use Exedra\Provider\Registry as ProviderRegistry;
+use Exedra\Routing\ExecuteHandlers\ClosureHandler;
 use Exedra\Routing\Factory;
 use Exedra\Routing\Group;
 use Exedra\Support\Provider\Framework;
@@ -55,7 +56,7 @@ class Application extends Container
     {
         $this->services['service']->register(array(
             'config' => \Exedra\Config::class,
-            'routingFactory' => function(){ return new Factory((string) $this->path['routes']);},
+            'routingFactory' => function(){ return new Factory();},
             'map' => function() { return $this['routingFactory']->createGroup();},
             'request' => function(){ return \Exedra\Http\ServerRequest::createFromGlobals();},
             'url' => function() { return $this->create('url.factory', array($this->map, $this->request, $this->config->get('app.url', null), $this->config->get('asset.url', null)));},
@@ -66,6 +67,8 @@ class Application extends Container
             'runtime.response' => function(){ return \Exedra\Runtime\Response::createEmptyResponse();},
             'url.factory' => \Exedra\Url\UrlFactory::class
         ));
+
+        $this->map->addExecuteHandler('closure', ClosureHandler::class);
     }
 
     /**
@@ -124,7 +127,7 @@ class Application extends Container
         if(!$finding->isSuccess())
             throw new \Exedra\Exception\RouteNotFoundException('Route does not exist');
 
-        return $this->create('runtime.exe', array($this, $finding, $this->create('runtime.response')));
+        return $this->create('runtime.exe', array($this, $finding, $this->create('runtime.response')))->run();
     }
 
     /**

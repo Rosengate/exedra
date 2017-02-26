@@ -84,8 +84,6 @@ class Framework implements Provider
     {
         $app->routingFactory->addGroupHandler(new PathHandler($app->path['routes']));
 
-        $app->map->addExecuteHandler('closure', ClosureHandler::class);
-
         $app->map->addExecuteHandler('controller', Controller::class);
     }
 

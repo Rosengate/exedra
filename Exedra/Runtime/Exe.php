@@ -8,7 +8,6 @@ use Exedra\Path;
 use Exedra\Routing\Finding;
 use Exedra\Routing\Route;
 use Exedra\Support\Asset\AssetFactory;
-use Exedra\Support\Definitions\Exe as Definition;
 use Exedra\Support\DotArray;
 use Exedra\Support\Runtime\Form\Form;
 use Exedra\Url\UrlFactory;
@@ -72,9 +71,6 @@ class Exe extends Container
 
         // initiate service registry
         $this->setUp();
-
-        // Initiate execution handles/middlewares
-        $this->handle();
     }
 
     /**
@@ -127,7 +123,7 @@ class Exe extends Container
      * Handle application execution
      * Set response body
      */
-    protected function handle()
+    public function run()
     {
         $this->callStack = $this->finding->getCallStack();
 
