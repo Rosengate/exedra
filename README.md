@@ -16,16 +16,16 @@ as a supporting framework to your existing application.
 
 Imagine building a plane while flying it!
 
-## Installation
+# Installation
 #### Composer
 Install rosengate/exedra through your console, in your project folder.
 ~~~
 composer require rosengate/exedra dev-master
 ~~~
 
-## Documentation
+# Documentation
 Documentation and the homebase for exedra is currently hosted here : http://exedra.rosengate.com
-## Minimal Boot
+# Minimal Boot
 Creating an Exedra application is just as simple as instantiating the application, with almost no initial configuration at all.
 #### Bootstrap
 Create a bootstrap *app.php* file as a starting entry of your application, which can be used for the public facing front controller, or the console.
@@ -54,8 +54,8 @@ php -S localhost:8080
 ```
 Then, run the http://localhost:8080 on your browser.
 
-But, it'll print an error, because we haven't set up any route yet. Refer to the Routing Sample below if you need some result.
-## Framework provider
+Of course, it'll print an error, because we haven't set up any route yet. Refer to the Routing Sample below if you need some result.
+# Framework provider
 Exedra provides an easy set up for a minimal framework, and gets you quick registry for components like view, session, flash, form and console.
 
 Let's get a bit more of the framework through some quick setup.
@@ -122,7 +122,7 @@ php console /?
 php console routes /?
 ```
 
-## Routing Sample
+# Routing Sample
 It'll work for both the minimal boot and the framework setup above.
 
 #### Chainable routing
@@ -136,7 +136,17 @@ $app->map->middleware(function($exe)
 // or specify by class name
 $app->map->middleware(\App\Middleware\All::CLASS);
 
-$app->map->any('/api')->middleware(\App\Middleware\Api::CLASS)->group(function($api)
+$app->map['index']->get('/')
+    ->execute(function(Exe $exe) {
+    });
+
+$app->map['contact-us']
+    ->method(['GET', 'POST'])
+    ->path('/contact-us')
+    ->execute(function() {
+    });
+
+$app->map['api']->any('/api')->middleware(\App\Middleware\Api::CLASS)->group(function($api)
 {
     // or inversely, you can register the middleware into the current route, through this group.
     $api->middleware(\App\Middleware\ApiAuth::CLASS);
@@ -205,7 +215,7 @@ $app->map->addRoutes(array(
             'view' => array(
                 'method' => 'GET',
                 'path' => '/:id',
-                'execute' => ''controller=Book@View'
+                'execute' => 'controller=Book@View'
                 )
             )
         )
