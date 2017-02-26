@@ -122,6 +122,7 @@ class Exe extends Container
      * Initialize call stacks
      * Handle application execution
      * Set response body
+     * @return $this
      */
     public function run()
     {
@@ -132,6 +133,8 @@ class Exe extends Container
 
         // execute.
         $this->response->setBody($handle($this));
+
+        return $this;
     }
 
     /**
