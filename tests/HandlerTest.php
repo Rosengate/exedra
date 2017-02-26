@@ -5,7 +5,9 @@ class HandlerTest extends PHPUnit_Framework_TestCase
 	{
 		$this->app = new \Exedra\Application(__DIR__);
 
-		$this->app->autoloadSrc();
+        $this->app->provider->add(\Exedra\Support\Provider\Framework::class);
+
+        $this->app->autoloadSrc();
 	}
 
 	public function testFunctionalHandler()

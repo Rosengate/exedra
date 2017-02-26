@@ -24,4 +24,9 @@ interface UrlGenerator
      * @return string|Url
      */
     public function current();
+
+    /**
+     * @return string|Url
+     */
+    public function parent();
 }

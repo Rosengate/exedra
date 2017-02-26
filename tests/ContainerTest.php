@@ -23,6 +23,8 @@ class ContainerTest extends PHPUnit_Framework_TestCase
 	{
 		$this->app = new \Exedra\Application(__DIR__.'/Factory');
 
+        $this->app->provider->add(\Exedra\Support\Provider\Framework::class);
+
 		$this->app->path['src']->autoloadPsr4('App', '');
 
 		// build a basic case

@@ -85,6 +85,14 @@ class UrlFactory extends UrlGenerator
     }
 
     /**
+     * @return Url
+     */
+    public function parent()
+    {
+        return new Url(parent::parent());
+    }
+
+    /**
      * Get current url
      * @param array $query query
      * @return Url

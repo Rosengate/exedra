@@ -2,6 +2,7 @@
 namespace Exedra\Runtime;
 
 use Exedra\Contracts\Url\UrlGenerator;
+use Exedra\Url\Url;
 
 class Redirect implements UrlGenerator
 {
@@ -109,5 +110,13 @@ class Redirect implements UrlGenerator
         $url = $this->urlFactory->create($route, $params, $query);
 
         return $this->to($url);
+    }
+
+    /**
+     * @return string|Url
+     */
+    public function parent()
+    {
+        return $this->to($this->urlFactory->parent());
     }
 }

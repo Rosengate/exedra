@@ -4,6 +4,8 @@ class ContainerRegistryTest extends PHPUnit_Framework_TestCase
 	public function setUp()
 	{
 		$this->app = new \Exedra\Application(__DIR__.'/app');
+
+        $this->app->provider->add(\Exedra\Support\Provider\Framework::class);
 	}
 
 	public function testApplicationServiceRegistry()
@@ -20,7 +22,7 @@ class ContainerRegistryTest extends PHPUnit_Framework_TestCase
 
 		$this->assertTrue($app->config instanceof \Exedra\Config);
 
-		$this->assertTrue($app->get('routing.factory') instanceof \Exedra\Routing\Factory);
+		$this->assertTrue($app->get('routingFactory') instanceof \Exedra\Routing\Factory);
 
 		$this->assertTrue($app->map instanceof \Exedra\Routing\Group);
 

@@ -5,6 +5,8 @@ class FactoryUrlTest extends PHPUnit_Framework_TestCase
 	{
 		$this->app = new \Exedra\Application(__DIR__);
 
+        $this->app->provider->add(\Exedra\Support\Provider\Framework::class);
+
 		$this->map = $this->app->map;
 	}
 
@@ -95,10 +97,6 @@ class FactoryUrlTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals('http://example.com/foo/bar/baz', $this->app->url->foo('baz'));
 
 		$this->app->map['foo']->any('/')->execute(function(){ });
-
-		$exe = $this->app->execute('foo');
-
-		$this->assertEquals('http://example.com/foo/bar/baz/qux', $exe->url->foo('baz/qux'));
 	}
 }
 

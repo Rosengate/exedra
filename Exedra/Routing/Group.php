@@ -261,6 +261,16 @@ class Group implements \ArrayAccess, Registrar
     }
 
     /**
+     * Dispatch the
+     * @param ServerRequestInterface $request
+     * @return Finding
+     */
+    public function dispatch(ServerRequestInterface $request)
+    {
+        return $this->findByRequest($request);
+    }
+
+    /**
      * Make a finding by given absolute name
      * @param string $name.
      * @param array $parameters
@@ -430,6 +440,20 @@ class Group implements \ArrayAccess, Registrar
 
         // false default.
         return array('route'=> false, 'parameter'=> array(), 'continue' => false);
+    }
+
+    /**
+     * Recusively get the uppermost Routing\Group
+     * @return Group $group
+     */
+    public function getRootGroup()
+    {
+        if(!$this->route)
+            return $this;
+
+        $group = $this->route->getGroup();
+
+        return $group->getRootGroup();
     }
 
     /**

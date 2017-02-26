@@ -1,13 +1,25 @@
 <?php
 namespace Exedra\Support\Provider;
 
+use Exedra\Application;
+use Exedra\Exception\Exception;
+use Exedra\Exception\NotFoundException;
+use Exedra\Runtime\Exe;
+
 class Modular implements \Exedra\Provider\ProviderInterface
 {
-	public function register(\Exedra\Application $app)
+	public function register(Application $app)
 	{
+	    if(!$app->provider->has(Framework::class))
+	        throw new NotFoundException('This provider requires ['.Framework::class.'] in order to work.');
+
+        if(!$app->config->has('namespace'))
+            throw new Exception('config.namespace is required');
+
+
 		$app->path->register('modules', $app->path['app']->create('modules'));
 
-		$app->map->middleware(function($exe)
+		$app->map->middleware(function(Exe $exe)
 		{
 			if($exe->hasAttribute('module'))
 			{
@@ -17,7 +29,7 @@ class Modular implements \Exedra\Provider\ProviderInterface
 
 				$exe->view = $exe->create('factory.view', array($pathModule->create('views')));
 
-				$namespace = $exe->app->getNamespace().'\\'.ucfirst($module);
+				$namespace = $exe->app->config->get('namespace') . '\\' . ucfirst($module);
 
 				$exe->controller = $exe->create('factory.controller', array($namespace));
 

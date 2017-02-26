@@ -10,6 +10,8 @@ class MiddlewareTest extends PHPUnit_Framework_TestCase
 	{
 		$this->app = new \Exedra\Application(__DIR__.'/Factory');
 
+        $this->app->provider->add(\Exedra\Support\Provider\Framework::class);
+
 		$this->map = $this->app->map;
 
 		/*$this->app->middleware->register(array(

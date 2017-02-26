@@ -1,71 +1,42 @@
 <?php namespace Exedra;
 
+use Exedra\Container\Container;
+use Exedra\Http\ServerRequest;
+use Exedra\Provider\Registry as ProviderRegistry;
+use Exedra\Routing\Factory;
 use Exedra\Routing\Group;
-use Exedra\Support\Definitions\Application as Definition;
-use Exedra\Support\Runtime\ControllerFactory;
-use Exedra\Wizard\Manager;
+use Exedra\Support\Provider\Framework;
+use Exedra\Url\UrlFactory;
 
-class Application extends \Exedra\Container\Container implements Definition
+/**
+ * Class Application
+ * @package Exedra
+ *
+ * @property ProviderRegistry $provider
+ * @property Config $config
+ * @property Factory $routingFactory
+ * @property Group $map
+ * @property Path $path
+ * @property ServerRequest $request
+ * @property UrlFactory $url
+ */
+class Application extends Container
 {
-    protected $namespace = 'App';
-
     protected $failRoute = null;
 
     /**
      * Create a new application
      * @param string|array params [if string, expect root directory, else array of directories, and configuration]
      */
-    public function __construct($params)
+    public function __construct($rootDir)
     {
         parent::__construct();
 
-        $this->services['provider'] = new \Exedra\Provider\Registry($this);
+        $this->services['provider'] = new ProviderRegistry($this);
 
-        // default the namespace as [App]
-        if(isset($params['namespace']))
-            $this->namespace = $params['namespace'];
-
-        $this->setUpPath(is_array($params) ? $params : array('path.root' => $params));
+        $this->services['path'] = new Path($rootDir);
 
         $this->setUp();
-    }
-
-    /**
-     * Configure default paths.
-     * root, app, public, routes
-     * @param array $params
-     *
-     * @throws Exception\InvalidArgumentException
-     */
-    protected function setUpPath(array $params)
-    {
-        if(!isset($params['path.root']))
-            throw new Exception\InvalidArgumentException('[path.root] parameter is required, at least.');
-
-        $params['path.root'] = rtrim($params['path.root'], '/\\');
-
-        $this->services['path'] = $pathRoot = new Path($params['path.root']);
-
-        $pathRoot->register('root', $pathRoot); // recursive reference.
-
-        $pathRoot->register('public', isset($params['path.public']) ? $params['path.public'] : $pathRoot->to('public'), true);
-
-        $pathApp = $pathRoot->register('app', isset($params['path.app']) ? $params['path.app'] : $pathRoot->to('app'), true);
-
-        $pathRoot->register('src', isset($params['path.src']) ? $params['path.src'] : $pathApp->to('src'), true);
-
-        $pathRoot->register('routes', isset($params['path.routes']) ? $params['path.routes'] : $pathApp->to('routes'), true);
-
-        $pathRoot->register('views', isset($params['path.views']) ? $params['path.views'] : $pathApp->to('views'), true);
-    }
-
-    /**
-     * Autoload src folder with the app namespace.
-     * @return void
-     */
-    public function autoloadSrc()
-    {
-        $this->path['src']->autoloadPsr4($this->namespace, '');
     }
 
     /**
@@ -84,101 +55,25 @@ class Application extends \Exedra\Container\Container implements Definition
     {
         $this->services['service']->register(array(
             'config' => \Exedra\Config::class,
-            'routing.factory' => function(){ return new \Exedra\Routing\Factory((string) $this->path['routes']);},
-            'map' => function() { return $this['routing.factory']->createGroup();},
+            'routingFactory' => function(){ return new Factory((string) $this->path['routes']);},
+            'map' => function() { return $this['routingFactory']->createGroup();},
             'request' => function(){ return \Exedra\Http\ServerRequest::createFromGlobals();},
-            'url' => function() { return $this->create('factory.url', array($this->map, $this->request, $this->config->get('app.url', null), $this->config->get('asset.url', null)));},
-            '@session' => \Exedra\Session\Session::class,
-            '@flash' => array(\Exedra\Session\Flash::class, array('self.session')),
-            'wizard' => array(\Exedra\Wizard\Manager::class, array('self')),
-            '@controller' => function(){
-                return new ControllerFactory($this->namespace);
-            },
-            '@view' => function(){
-                return new \Exedra\View\Factory($this->path['views']);
-            }
+            'url' => function() { return $this->create('url.factory', array($this->map, $this->request, $this->config->get('app.url', null), $this->config->get('asset.url', null)));},
         ));
 
         $this->services['factory']->register(array(
             'runtime.exe' => \Exedra\Runtime\Exe::class,
-            'runtime.response' => function(){ return \Exedra\Runtime\Response::createEmptyResponse(); },
-            'factory.url' => \Exedra\Url\UrlFactory::class,
-            '@factory.controller' => ControllerFactory::class,
-            '@factory.view' => \Exedra\View\Factory::class
+            'runtime.response' => function(){ return \Exedra\Runtime\Response::createEmptyResponse();},
+            'url.factory' => \Exedra\Url\UrlFactory::class
         ));
-
-        $this->setUpHandlers();
-
-        $this->setUpWizard();
-    }
-
-    protected function setUpHandlers()
-    {
-        // register default handler
-        $this['service']->on('map', function(Group $map)
-        {
-            $map->addExecuteHandler('closure', \Exedra\Routing\ExecuteHandlers\ClosureHandler::class);
-
-            $map->addExecuteHandler('controller', \Exedra\Support\Runtime\Handler\Controller::class);
-        });
-    }
-
-    protected function setUpWizard()
-    {
-        $this->services['service']->on('wizard', function(Manager $wizard)
-        {
-            $wizard->add(\Exedra\Wizard\Application::class);
-        });
     }
 
     /**
-     * Get directory for app folder
-     * @param string|null path
-     * @return string
+     * @return Path
      */
-    public function getDir($path = null)
+    public function getRootDir()
     {
-        return (string) $this->path['app'] . ($path ? '/' . $path : '');
-    }
-
-    /**
-     * Alias for getDir
-     * @param string|null path
-     * @return string
-     */
-    public function getBaseDir($path = null)
-    {
-        return (string) $this->path['app'] . ($path ? '/' . $path : '');
-    }
-
-    /**
-     * Get root directory
-     * @param string|null $path
-     * @return string
-     */
-    public function getRootDir($path = null)
-    {
-        return (string) $this->path;
-    }
-
-    /**
-     * Get application namespace
-     * @param string|null $namespace
-     * @return string
-     */
-    public function getNamespace($namespace = null)
-    {
-        return $this->namespace . ($namespace ? '\\'.$namespace : '');
-    }
-
-    /**
-     * Get public directory
-     * @param string|null $path
-     * @return string
-     */
-    public function getPublicDir($path = null)
-    {
-        return (string) $this->path['public'] . ($path ? '/' . $path : '');
+        return $this->path;
     }
 
     /**
@@ -218,7 +113,7 @@ class Application extends \Exedra\Container\Container implements Definition
     }
 
     /**
-     * Create the exec instance by given finding.
+     * Execute the finding
      * @param \Exedra\Routing\Finding $finding
      * @return \Exedra\Runtime\Exe
      *
@@ -240,6 +135,8 @@ class Application extends \Exedra\Container\Container implements Definition
      */
     public function respond(\Exedra\Http\ServerRequest $request)
     {
+        $failRoute = $this->failRoute;
+
         try
         {
             $response = $this->request($request)
@@ -248,13 +145,13 @@ class Application extends \Exedra\Container\Container implements Definition
         }
         catch(\Exception $e)
         {
-            if($failRoute = $this->failRoute)
+            if($failRoute)
             {
                 $response = $this->execute($failRoute, array('exception' => $e, 'request' => $request), $request)
                                 ->finalize()
                                 ->getResponse();
 
-                $this->setFailRoute(null);
+                $failRoute = null;
             }
             else if($this->map->hasFailRoute())
             {
@@ -283,29 +180,6 @@ class Application extends \Exedra\Container\Container implements Definition
         $response = $this->respond($request ? : $this->request);
 
         $response->send();
-    }
-
-    /**
-     * An alias to console($arguments)
-     * @param array $arguments
-     * @return mixed
-     */
-    public function wizard(array $arguments)
-    {
-        return $this->console($arguments);
-    }
-
-    /**
-     * Listen to the console arguments.
-     * @param array $arguments
-     * @return mixed
-     */
-    public function console(array $arguments)
-    {
-        // shift out file name
-        array_shift($arguments);
-
-        return $this->wizard->listen($arguments);
     }
 
     /**

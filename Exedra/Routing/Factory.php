@@ -4,7 +4,6 @@ use Exedra\Contracts\Routing\GroupHandler;
 use Exedra\Exception\InvalidArgumentException;
 use Exedra\Routing\GroupHandlers\ArrayHandler;
 use Exedra\Routing\GroupHandlers\ClosureHandler;
-use Exedra\Routing\GroupHandlers\PathHandler;
 use Psr\Http\Message\ServerRequestInterface;
 
 /**
@@ -42,10 +41,8 @@ class Factory
      */
     protected $defaultGroupHandlers;
 
-    public function __construct($lookupPath)
+    public function __construct()
 	{
-		$this->lookupPath = rtrim($lookupPath, '/\\');
-
 		$this->setUp();
 	}
 
@@ -71,7 +68,7 @@ class Factory
 
         $this->addDefaultGroupHandler(new ClosureHandler());
         $this->addDefaultGroupHandler(new ArrayHandler());
-        $this->addDefaultGroupHandler(new PathHandler());
+//        $this->addDefaultGroupHandler(new PathHandler());
 
 		return $this;
 	}

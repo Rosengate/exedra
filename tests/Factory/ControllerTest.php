@@ -5,6 +5,10 @@ class FactoryControllerTest extends PHPUnit_Framework_TestCase
 	{
 		$app = new \Exedra\Application(__DIR__.'/Factory');
 
+        $app->provider->add(\Exedra\Support\Provider\Framework::class);
+
+        $app->config['namespace'] = 'App';
+
 		$this->app = $app;
 	}
 

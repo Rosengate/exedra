@@ -11,76 +11,66 @@ Introduction
 ======
 This PHP microframework focuses on nestable/groupable routing, mainly through Http Request components, with middlewarable routes and which hopefully will provide much modular application execution. Route is unique, and identifiable by name, tag, and queriable by Http Request. Imagine developing an application down the depth without losing the identity of the executions you planned, controlling the routes hierarchically with your own layers of middlewares.
 
-The goal is to be contextual, explicitful while being simple and minimal at the same time. Hence the focus on just being microframework. It will not surprise you with unintended heart attacks, but of course, number of what it intently can do would definitely surprise you. 
+The goal is to be contextual, explicitful while being simple and extremely minimal at the same time. It can be intended to work 
+as a supporting framework to your existing application.
 
 Imagine building a plane while flying it!
 
-Installation
-======
-### Composer
-===
+## Installation
+#### Composer
 Install rosengate/exedra through your console, in your project folder.
 ~~~
 composer require rosengate/exedra dev-master
 ~~~
 
-Documentation
-===
+## Documentation
 Documentation and the homebase for exedra is currently hosted here : http://exedra.rosengate.com
+## Minimal Boot
+Creating an Exedra application is just as simple as instantiating the application, with almost no initial configuration at all.
+#### Bootstrap
+Create a bootstrap *app.php* file as a starting entry of your application, which can be used for the public facing front controller, or the console.
 
-Quick Boot
-======
-Let's get it running through some quick usages.
-
-Assuming that you've done that installation through composer, at the end of this file, this is how your sample project directory may look like :
-```
-| /public
-| ─ index.php
-| /vendor
-| app.php
-| console
-| composer.json
-| composer.lock
-```
-#### /app.php
-You can write up the boot file (**app.php**) anywhere. But there're several important directory paths required to be configured.
-
-First, create the boot file named  **/app.php**
-
-##### Returns the \Exedra\Application
-And load the composer autoload accordingly. The **app.php** file should return the same \Exedra\Application instance, so it's usable for the front controller public/index.php, or wizard (console) later.
-
-Construct the application with your root directory (**path.root**) as the first argument.
+At the most minimal level, below would just work. The only argument it takes is the root dir of your application.
 ```php
 <?php
 require_once __DIR__.'/vendor/autoload.php';
 
 $app = new \Exedra\Application(__DIR__);
 
-$app->autoloadSrc();
-
 return $app;
 ```
-Or you may pass an array of paths and namespace like below :
+#### Dispatch
+Let's create a */public/index.php* as the front controller in order to test your app.
+```php
+<?php
+$app = require_once __DIR__.'/../app.php';
+
+$app->dispatch();
+```
+And simply test it with the built-in php server.
+```
+cd public
+php -S localhost:8080
+```
+Then, run the http://localhost:8080 on your browser.
+
+But, it'll print an error, because we haven't set up any route yet. Refer to the Routing Sample below if you need some result.
+## Framework provider
+Exedra provides an easy set up for a minimal framework, and gets you quick registry for components like view, session, flash, form and console.
+
+Let's get a bit more of the framework through some quick setup.
+#### Bootstrap
 ```php
 <?php
 require_once __DIR__.'/vendor/autoload.php';
 
-$app = new \Exedra\Application(array(
-    'namespace' => 'App',
-    'path.root' => __DIR__,
-    'path.app' => __DIR__.'/app',
-    'path.src' => __DIR__.'/app/src',
-    'path.routes' => __DIR__.'/app/routes',
-    'path.public' => __DIR__.'/public',
-    'path.views' => __DIR__.'/app/views'
-    ));
-    
-$app->autoloadSrc();
+$app = new \Exedra\Application(__DIR__);
+
+$app->provider->add(\Exedra\Support\Provider\Framework::class);
 
 return $app;
 ```
-These are optional and internally configured if not passed, only path.root is required. Originally it, may look something like this
+This provider determines a simple structure for your app, and autoload the [src] path with the default namespace prefix *App\\*.
 ```
 | .        //path.root
 | app      //path.app
@@ -88,11 +78,54 @@ These are optional and internally configured if not passed, only path.root is re
 | ─ routes //path.routes
 | public   //path.public
 ```
+You may retrieve this paths, from the root path of the application.
+```
+$app = $app->path['app'];
+$public = $app->path['public'];
+$src = $app->path['src'];
+$routes = $app->path['routes'];
+```
 
-The *autoloadSrc()* method basically just autoload the src folder, with the default namespace (App\) or the given through the constructor.
+#### Public index
+This file act as a public facing front controller of your application, which is usually located under /public/ folder, or **path.public** per configured above.
+```php
+<?php 
+$app = require_once __DIR__.'/../app.php';
 
-#### /app.php sample routing
-Now, in the same **app.php** let's write some nestful chatting api codes :
+$app->dispatch();
+```
+
+#### /console
+Create a file named **console**, in your project root directory, or anywhere convenient to you. And require the **app.php** again.
+```php
+<?php
+$app = require_once __DIR__.'/app.php';
+
+$app->console($argv);
+```
+##### Run the console wizard on your cli
+```
+php console
+```
+##### Start Basic PHP Server
+```
+php console serve -p 9000
+```
+and it'll serve based on the configured **path.public**, with port 9000.
+
+##### console help
+```
+php console /?
+```
+##### command specific help
+```
+php console routes /?
+```
+
+## Routing Sample
+It'll work for both the minimal boot and the framework setup above.
+
+#### Chainable routing
 ```php
 // global middleware
 $app->map->middleware(function($exe)
@@ -159,45 +192,7 @@ $app->map->any('/api')->middleware(\App\Middleware\Api::CLASS)->group(function($
 return $app;
 ```
 
-#### /public/index.php
-This file act as a public facing front controller of your application, which is usually located under /public/ folder, or **path.public** per configured above.
-```php
-<?php 
-$app = require_once __DIR__.'/../app.php';
-
-$app->dispatch();
-```
-
-#### /console
-Create a file named **console**, in your project root directory, or anywhere convenient to you. And require the **app.php** again.
-```php
-<?php
-$app = require_once __DIR__.'/app.php';
-
-$app->console($argv);
-```
-##### Run the console wizard on your cli
-```
-php console
-```
-##### Start Basic PHP Server
-```
-php console serve -p 9000
-```
-and it'll serve based on the **path.public** path configured, with port 9000.
-
-##### console help
-```
-php console /?
-```
-##### command specific help
-```
-php console routes /?
-```
-
-Another Examples
-======
-##### Default routing
+#### Array of routing
 ```php
 $app->map->addRoutes(array(
     'book' => array(
@@ -221,7 +216,7 @@ Some of the projects built on top of exedra :
 
 http://github.com/rosengate/exedra-web (hosted at exedra.rosengate.com)
 
-Exedron\Routeller
+Routing Controller
 ======
 Look out for an amazing annotation based routing-controller component
 

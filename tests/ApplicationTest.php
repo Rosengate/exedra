@@ -7,6 +7,8 @@ class ApplicationTest extends PHPUnit_Framework_TestCase
 	{
 		$this->app = new \Exedra\Application(__DIR__.'/Factory');
 
+        $this->app->provider->add(\Exedra\Support\Provider\Framework::class);
+
 		$this->app->map['foo']->any('/')->execute(function($exe)
 		{
 			return 'bar';
@@ -17,13 +19,15 @@ class ApplicationTest extends PHPUnit_Framework_TestCase
 	{
 		$app = new \Exedra\Application(__DIR__.'/Factory');
 
+        $app->provider->add(\Exedra\Support\Provider\Framework::class);
+
 		$this->assertEquals(__DIR__.'/Factory', $app->getRootDir());
 
 		// $this->assertEquals('TestApp', $app->getNamespace());
 
 		// $this->assertEquals('TestApp\\Foo\\Bar', $app->getNamespace('Foo\\Bar'));
 
-		$this->assertEquals(realpath(__DIR__.'/Factory/public'), realpath($app->getPublicDir()));
+		$this->assertEquals(realpath(__DIR__.'/Factory/public'), realpath($app->path['public']));
 
 		$this->assertEquals(realpath(__DIR__.'/Factory'), realpath($app->getRootDir()));
 	}
@@ -32,7 +36,7 @@ class ApplicationTest extends PHPUnit_Framework_TestCase
 	{
 		$app = $this->app;
 
-		$this->assertEquals(\Exedra\Runtime\Exe::CLASS, get_class($app->execute('foo')));
+        $this->assertTrue($app->execute('foo') instanceof \Exedra\Runtime\Exe);
 
 		$this->assertEquals('bar', $app->execute('foo')->response->getBody());
 	}
@@ -178,6 +182,8 @@ class ApplicationTest extends PHPUnit_Framework_TestCase
 
 		$app = new \Exedra\Application(__DIR__);
 
+        $app->provider->add(\Exedra\Support\Provider\Framework::class);
+
 		$app->map->any('/foo/bar')->execute(function()
 		{
 			return 'baz';
@@ -201,6 +207,8 @@ class ApplicationTest extends PHPUnit_Framework_TestCase
 			));
 
 		$app = new \Exedra\Application(__DIR__);
+
+        $app->provider->add(\Exedra\Support\Provider\Framework::class);
 
 		$app->map->any('/foo/bar')->execute(function()
 		{

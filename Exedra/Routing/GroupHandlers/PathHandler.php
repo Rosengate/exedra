@@ -10,6 +10,16 @@ use Exedra\Routing\Route;
 class PathHandler implements GroupHandler
 {
     /**
+     * @var string $lookupPath
+     */
+    protected $lookupPath;
+
+    public function __construct($path)
+    {
+        $this->lookupPath = $path;
+    }
+
+    /**
      * @param $pattern
      * @param Route|null $route
      * @return bool
@@ -32,7 +42,7 @@ class PathHandler implements GroupHandler
      */
     public function resolve(Factory $factory, $path, Route $route = null)
     {
-        $path = $factory->getLookupPath() . '/' . ltrim($path, '/\\');
+        $path = $this->lookupPath . '/' . ltrim($path, '/\\');
 
         if(!file_exists($path))
             throw new NotFoundException('File ['.$path.'] does not exists.');

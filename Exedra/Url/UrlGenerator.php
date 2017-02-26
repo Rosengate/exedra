@@ -2,6 +2,8 @@
 namespace Exedra\Url;
 
 use Exedra\Contracts\Url\UrlGenerator as UrlGeneratorInterface;
+use Exedra\Exception\NotFoundException;
+use Exedra\Routing\Group;
 
 /**
  * A route oriented url generator
@@ -32,6 +34,11 @@ class UrlGenerator implements UrlGeneratorInterface
      */
     protected $map;
 
+    /**
+     * @var null|Group $rootRouter
+     */
+    protected $rootRouter;
+
     public function __construct(
         \Exedra\Routing\Group $router,
         \Exedra\Http\ServerRequest $request = null,
@@ -39,6 +46,7 @@ class UrlGenerator implements UrlGeneratorInterface
         $assetUrl = null)
     {
         $this->map = $router;
+        $this->rootRouter = $router->getRootGroup();
         $this->request = $request;
         $this->setBase($appUrl ? : ($request ? $request->getUri()->getScheme().'://'.$request->getUri()->getAuthority() : null ));
         $this->setAsset($assetUrl ? : $this->baseUrl);
@@ -48,14 +56,16 @@ class UrlGenerator implements UrlGeneratorInterface
             return $this->addCallable($name, $closure);
         });
     }
+
     /**
      * Get previous url (referer)
      * @return string
+     * @throws NotFoundException
      */
     public function previous()
     {
         if(!$this->request)
-            throw new \Exedra\Exception\NotFoundException('Http Request does not exist.');
+            throw new NotFoundException('Http Request does not exist.');
 
         $referer = $this->request->getHeaderLine('referer');
 
@@ -64,17 +74,19 @@ class UrlGenerator implements UrlGeneratorInterface
     public function __call($name, array $args = array())
     {
         if(!isset($this->callables[$name]))
-            throw new \Exedra\Exception\NotFoundException('Method / callable ['.$name.'] does not exists');
+            throw new NotFoundException('Method / callable ['.$name.'] does not exists');
         if(isset($this->callables[$name.'_bound']))
             $callable = $this->callables[$name.'_bound'];
         else
             $callable = $this->callables[$name.'_bound'] = $this->callables[$name]->bindTo($this);
         return call_user_func_array($callable, $args);
     }
+
     /**
      * Register a callables
-     * @param string name
-     * @param \Closure callable
+     * @param string $name
+     * @param \Closure $callable
+     * @return $this
      */
     public function addCallable($name, \Closure $callable)
     {
@@ -84,7 +96,7 @@ class UrlGenerator implements UrlGeneratorInterface
     }
     /**
      * Get url prefixed with $baseUrl
-     * @param string path (optional)
+     * @param string $path (optional)
      * @return string
      */
     public function base($path = null)
@@ -93,7 +105,7 @@ class UrlGenerator implements UrlGeneratorInterface
     }
     /**
      * Alias to base()
-     * @param string path
+     * @param string $path
      * @return string
      */
     public function to($path = null)
@@ -102,7 +114,7 @@ class UrlGenerator implements UrlGeneratorInterface
     }
     /**
      * Get asset url prefixed with $assetUrl
-     * @param string asset path (optonal)
+     * @param string $asset path (optonal)
      * @return string
      */
     public function asset($asset = null)
@@ -111,8 +123,8 @@ class UrlGenerator implements UrlGeneratorInterface
     }
     /**
      * Set $baseUrl
-     * @param string baseUrl
-     * @return this
+     * @param string $baseUrl
+     * @return $this
      */
     public function setBase($baseUrl)
     {
@@ -121,8 +133,8 @@ class UrlGenerator implements UrlGeneratorInterface
     }
     /**
      * Set $assetUrl
-     * @param string assetUrl
-     * @return this
+     * @param string $assetUrl
+     * @return $this
      */
     public function setAsset($assetUrl)
     {
@@ -130,37 +142,63 @@ class UrlGenerator implements UrlGeneratorInterface
 
         return $this;
     }
+
     /**
-     * Create url by route name.
-     * @param string routeName
-     * @param array data
-     * @param mixed query (uri query string)
+     * Create url by route name
+     * relative to the given \Exedra\Routing\Group
+     * Force an absolute route, by prefixing with '@'
+     * @param string $routeName
+     * @param array $data
+     * @param mixed $query (uri query string)
      *
+     * @return string
      * @throws \InvalidArgumentException
      */
     public function create($routeName, array $data = array(), array $query = array())
     {
-        // get \Exedra\Routing\Route by name.
-        $route = $this->map->findRoute($routeName);
+        if(strpos($routeName, '@') === 0)
+            $route = $this->rootRouter->findRoute(substr($routeName, 1));
+        else
+            $route = $this->map->findRoute($routeName);
+
         if(!$route)
             throw new \InvalidArgumentException('Unable to find route ['.$routeName.']');
+
         $path = $route->getAbsolutePath($data);
+
         return $this->base($path).($query ? '?'. http_build_query($query) : null);
     }
+
+    public function parent()
+    {
+        $route = $this->map->getUpperRoute();
+
+        if(!$route)
+            throw new NotFoundException('Unable to find the parent route for the current route.');
+
+        $route = $route->getAbsoluteName();
+
+        return $this->create('@'.$route);
+    }
+
     /**
      * Alias to create()
-     * @param string routename
-     * @param array data
-     * @param array query
+     * @param string $routename
+     * @param array $data
+     * @param array $query
+     *
+     * @return Url|string
      */
     public function route($routeName, array $data = array(), array $query = array())
     {
         return $this->create($routeName, $data, $query);
     }
+
     /**
      * Get current url
-     * @param array query
+     * @param array $query
      * @return string
+     * @throws \Exedra\Exception\InvalidArgumentException
      */
     public function current(array $query = array())
     {

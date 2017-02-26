@@ -92,6 +92,15 @@ class Registry
     }
 
     /**
+     * @param string $name
+     * @return bool
+     */
+    public function has($name)
+    {
+        return isset($this->providers[$name]) || in_array($name, $this->providersDeferred);
+    }
+
+    /**
      * Register the given provider.
      * @param Provider $provider
      */

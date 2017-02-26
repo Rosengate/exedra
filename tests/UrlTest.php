@@ -16,6 +16,8 @@ class UrlTest extends PHPUnit_Framework_TestCase
     {
         $app = new \Exedra\Application(__DIR__);
 
+        $app->provider->add(\Exedra\Support\Provider\Framework::class);
+
         $app->map['foo']->get('/bar')->execute(function(){});
 
         $factory = new \Exedra\Url\UrlFactory($app->map, null, 'http://localhost');
@@ -59,6 +61,8 @@ class UrlTest extends PHPUnit_Framework_TestCase
     public function testGenerator()
     {
         $app = new \Exedra\Application(__DIR__);
+
+        $app->provider->add(\Exedra\Support\Provider\Framework::class);
 
         $app->map['foo']->get('/fox')->execute(function(){});
 

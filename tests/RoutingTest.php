@@ -8,6 +8,8 @@ class RoutingTest extends PHPUnit_Framework_TestCase
 		// build a basic case
 		$app = $this->app = new \Exedra\Application(__DIR__.'/Factory');
 
+        $app->provider->add(\Exedra\Support\Provider\Framework::class);
+
 		$app->map->addRoutes(array(
 			'one'=>['path' =>'path-one', 'execute'=> 'controller=hello@world'],
 			'two'=>['path' =>'path-two', 'subroutes'=> array(
@@ -207,6 +209,8 @@ class RoutingTest extends PHPUnit_Framework_TestCase
 	public function testSpecifiedNamedParam()
 	{
 		$app = new \Exedra\Application(__DIR__);
+
+        $app->provider->add(\Exedra\Support\Provider\Framework::class);
 
 		$app->map->any('/[foo|bar:name]/[baz|bad:type]')->execute(function($exe)
 		{

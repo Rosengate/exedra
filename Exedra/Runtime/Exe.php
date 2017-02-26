@@ -3,13 +3,30 @@ namespace Exedra\Runtime;
 
 use Exedra\Config;
 use Exedra\Container\Container;
+use Exedra\Http\ServerRequest;
+use Exedra\Path;
 use Exedra\Routing\Finding;
+use Exedra\Routing\Route;
 use Exedra\Support\Asset\AssetFactory;
 use Exedra\Support\Definitions\Exe as Definition;
+use Exedra\Support\DotArray;
 use Exedra\Support\Runtime\Form\Form;
-use Exedra\Support\Runtime\Url\UrlFactory;
+use Exedra\Url\UrlFactory;
 
-class Exe extends Container implements Definition
+/**
+ * Class Exe
+ * @package Exedra\Runtime
+ *
+ * @property ServerRequest $request
+ * @property Response $response
+ * @property Route $route
+ * @property Finding $finding
+ * @property Path $path
+ * @property Config $config
+ * @property Redirect $redirect
+ * @property UrlFactory $url
+ */
+class Exe extends Container
 {
     /**
      * Array of (referenced) parameters for this execution.
@@ -70,7 +87,7 @@ class Exe extends Container implements Definition
 
         $this->setBaseRoute($this->finding->getBaseRoute());
 
-        \Exedra\Support\DotArray::initialize($this->params, $this->finding->param());
+        DotArray::initialize($this->params, $this->finding->param());
 
         $this->services['request'] = $this->finding->getRequest();
     }
@@ -83,7 +100,7 @@ class Exe extends Container implements Definition
         $this->services['service']->register(array(
             'path' => function(){ return $this->app->path; },
             'config' => function() { return clone $this->app->config; },
-            'url' => function(){ return $this->create('factory.url', array($this->app->map, $this->request, $this->config->get('app.url', null), $this->config->get('asset.url', null), $this));},
+            'url' => function(){ return $this->app->create('url.factory', array($this->route->getGroup(), $this->request, $this->config->get('app.url', null), $this->config->get('asset.url', null)));},
             'redirect' => array(Redirect::class, array('self.response', 'self.url')),
             'form' => array(Form::class, array('self')),
             // thinking of deprecating the asset as service
@@ -207,7 +224,7 @@ class Exe extends Container implements Definition
 
     /**
      * Validate against given parameters
-     * @param array params
+     * @param array $params
      * @return boolean
      */
     public function isParams(array $params)
@@ -271,7 +288,7 @@ class Exe extends Container implements Definition
      */
     public function param($name, $default = null)
     {
-        return \Exedra\Support\DotArray::has($this->params, $name) ? \Exedra\Support\DotArray::get($this->params, $name) : $default;
+        return DotArray::has($this->params, $name) ? DotArray::get($this->params, $name) : $default;
     }
 
     /**
@@ -345,7 +362,7 @@ class Exe extends Container implements Definition
      */
     public function hasParam($name)
     {
-        return \Exedra\Support\DotArray::has($this->params, $name);
+        return DotArray::has($this->params, $name);
     }
 
     /**
@@ -356,7 +373,7 @@ class Exe extends Container implements Definition
      */
     public function setParam($key, $value = null)
     {
-        \Exedra\Support\DotArray::set($this->params, $key, $value);
+        DotArray::set($this->params, $key, $value);
     }
 
     /**
