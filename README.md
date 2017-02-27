@@ -233,7 +233,13 @@ Look out for an amazing annotation based routing-controller component
 http://github.com/exedron/routeller
 
 
-Roadmap to 0.3.0
+# Roadmap to 1.0.0
+- Full Test Coverages
+- Class and components naming
+- Removal of unnecessary codes
+- More clarity to handlers (group handler, execute handler)
+
+Roadmap to 0.3.0 [99% Done]
 ======
 - Adapt several PSR's styles and standards
   - PSR-7 Message Interfaces [DONE]
