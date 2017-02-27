@@ -50,11 +50,6 @@ class UrlGenerator implements UrlGeneratorInterface
         $this->request = $request;
         $this->setBase($appUrl ? : ($request ? $request->getUri()->getScheme().'://'.$request->getUri()->getAuthority() : null ));
         $this->setAsset($assetUrl ? : $this->baseUrl);
-        // add a dynamic alias to addCallable()
-        $this->addCallable('callable', function($name, \Closure $closure)
-        {
-            return $this->addCallable($name, $closure);
-        });
     }
 
     /**
