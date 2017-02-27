@@ -61,10 +61,10 @@ class MiddlewareTest extends PHPUnit_Framework_TestCase
 
         $finding = $this->app->map->findByName('foo');
 
-        $this->assertEquals('with-middleware', $this->app->exec($finding)->response->getBody());
+        $this->assertEquals('with-middleware', $this->app->run($finding)->response->getBody());
 
         $finding->removeMiddleware('foo-middleware');
 
-        $this->assertEquals('without-middleware', $this->app->exec($finding)->response->getBody());
+        $this->assertEquals('without-middleware', $this->app->run($finding)->response->getBody());
     }
 }

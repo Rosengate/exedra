@@ -1,6 +1,7 @@
 <?php namespace Exedra;
 
 use Exedra\Container\Container;
+use Exedra\Exception\RouteNotFoundException;
 use Exedra\Http\ServerRequest;
 use Exedra\Provider\Registry as ProviderRegistry;
 use Exedra\Routing\ExecuteHandlers\ClosureHandler;
@@ -8,6 +9,7 @@ use Exedra\Routing\Factory;
 use Exedra\Routing\Group;
 use Exedra\Support\Provider\Framework;
 use Exedra\Url\UrlFactory;
+use Exedra\View\View;
 
 /**
  * Class Application
@@ -88,8 +90,8 @@ class Application extends Container
     }
 
     /**
-     * Execute application with route name
-     * @param string|\Exedra\Http\ServerRequest $routeName
+     * Execute application given route name
+     * @param string $routeName
      * @param array $parameters
      * @param \Exedra\Http\ServerRequest $request
      * @return \Exedra\Runtime\Exe
@@ -102,31 +104,38 @@ class Application extends Container
         if(!is_string($routeName))
             throw new Exception\InvalidArgumentException('Argument 1 must be [string]');
 
-        return $this->exec($this->map->findByName($routeName, $parameters, $request));
+        $finding = $this->map->findByName($routeName, $parameters, $request);
+
+        if(!$finding->isSuccess())
+            throw new RouteNotFoundException('Route ['.$routeName.'] does not exist.');
+
+        return $this->run($finding);
     }
 
     /**
-     * Execute using http request
+     * Execute the http request
+     * And return the context
      * @param \Exedra\Http\ServerRequest|null $request
-     * @return \Exedra\Runtime\Exe
+     * @return Runtime\Exe
+     * @throws RouteNotFoundException
      */
     public function request(\Exedra\Http\ServerRequest $request = null)
     {
-        return $this->exec($this->map->findByRequest($request ? : $this->request));
+        $finding = $this->map->findByRequest($request = ($request ? : $this->request));
+
+        if(!$finding->isSuccess())
+            throw new RouteNotFoundException('Route for request '.$request->getMethod().' '.$request->getUri()->getPath().' does not exist');
+
+        return $this->run($finding);
     }
 
     /**
      * Execute the finding
      * @param \Exedra\Routing\Finding $finding
      * @return \Exedra\Runtime\Exe
-     *
-     * @throws \Exedra\Exception\RouteNotFoundException
      */
-    public function exec(\Exedra\Routing\Finding $finding)
+    public function run(\Exedra\Routing\Finding $finding)
     {
-        if(!$finding->isSuccess())
-            throw new \Exedra\Exception\RouteNotFoundException('Route does not exist');
-
         return $this->create('runtime.exe', array($this, $finding, $this->create('runtime.response')))->run();
     }
 
@@ -138,8 +147,6 @@ class Application extends Container
      */
     public function respond(\Exedra\Http\ServerRequest $request)
     {
-        $failRoute = $this->failRoute;
-
         try
         {
             $response = $this->request($request)
@@ -148,13 +155,13 @@ class Application extends Container
         }
         catch(\Exception $e)
         {
-            if($failRoute)
+            if($failRoute = $this->failRoute)
             {
                 $response = $this->execute($failRoute, array('exception' => $e, 'request' => $request), $request)
                                 ->finalize()
                                 ->getResponse();
 
-                $failRoute = null;
+                $this->failRoute = null;
             }
             else if($this->map->hasFailRoute())
             {
@@ -164,9 +171,12 @@ class Application extends Container
             }
             else
             {
+                $message = '<pre><h2>['.get_class($e).'] '.$e->getMessage().'</h2>'.PHP_EOL;
+                $message .= $e->getTraceAsString();
+
                 $response = \Exedra\Runtime\Response::createEmptyResponse()
                 ->setStatus(404)
-                ->setBody($e->getMessage());
+                ->setBody($message);
             }
         }
 
@@ -174,8 +184,8 @@ class Application extends Container
     }
 
     /**
-     * Dispatch and send the response
-     * Clear any flash
+     * Dispatch and send header
+     * And print the response
      * @param \Exedra\Http\ServerRequest|null $request
      */
     public function dispatch(\Exedra\Http\ServerRequest $request = null)
