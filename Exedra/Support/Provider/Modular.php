@@ -27,11 +27,11 @@ class Modular implements \Exedra\Provider\ProviderInterface
 
 				$pathModule = $exe->path['modules']->create(strtolower($module));
 
-				$exe->view = $exe->create('factory.view', array($pathModule->create('views')));
+				$exe->view = $exe->create('view.factory', array($pathModule->create('views')));
 
 				$namespace = $exe->app->config->get('namespace') . '\\' . ucfirst($module);
 
-				$exe->controller = $exe->create('factory.controller', array($namespace));
+				$exe->controller = $exe->create('controller.factory', array($namespace));
 
 				// autoload the controller path.
 				$pathModule->autoloadPsr4($namespace.'\\Controller', 'controllers');
