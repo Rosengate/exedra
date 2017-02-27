@@ -238,6 +238,7 @@ class Finding
 
     /**
      * @return array
+     * @throws InvalidArgumentException
      * @throws \Exedra\Exception\NotFoundException
      */
     public function getCallStack()
@@ -246,7 +247,10 @@ class Finding
         {
             $executePattern = $this->route->getProperty('execute');
 
-            throw new \Exedra\Exception\NotFoundException('The route execute handle was not properly resolved. '.(is_string($executePattern) ? ' ['.$executePattern.']' : ''));
+            if(!$executePattern)
+                throw new InvalidArgumentException('The route [' . $this->route->getAbsoluteName() . '] does not have execute handle.');
+
+            throw new InvalidArgumentException('The route [' . $this->route->getAbsoluteName() . '] execute handle was not properly resolved. '.(is_string($executePattern) ? ' ['.$executePattern.']' : ''));
         }
 
         return array_merge($this->middlewares, array($this->execute));
