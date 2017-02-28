@@ -39,8 +39,18 @@ $app = new \Exedra\Application(__DIR__);
 
 return $app;
 ```
+#### Hello World
+Add a little bit of routing to see some result.
+```php
+$app->map['hello']->get('/')->execute(function()
+{
+    return 'hello world';
+});
+```
+
+
 #### Dispatch
-Let's create a */public/index.php* as the front controller in order to test your app.
+Then create a */public/index.php* as the front controller in order to test your app.
 ```php
 <?php
 $app = require_once __DIR__.'/../app.php';
@@ -52,9 +62,8 @@ And simply test it with the built-in php server.
 cd public
 php -S localhost:8080
 ```
-Then, run the http://localhost:8080 on your browser.
+Then, run the http://localhost:8080 on your browser. Refer to the Routing Sample below if you need more result.
 
-Of course, it'll print an error, because we haven't set up any route yet. Refer to the Routing Sample below if you need some result.
 # Framework provider
 Exedra provides an easy set up for a minimal framework, and gets you quick registry for components like view, session, flash, form and console.
 
@@ -122,7 +131,36 @@ php console /?
 php console routes /?
 ```
 
-# Routing Sample
+# Standalone Components
+Or you might just want to use a little help there and here.
+#### View
+```php
+// register views lookup path under /views/
+$app->path->register('views', 'views');
+
+$app->provider->add(\Exedra\View\ViewProvider::class);
+```
+Then you can use the view factory even in the runtime context.
+```php
+$app->map['web']->any('/')->execute(function($exe)
+{
+    return $exe->view->create('index')->render();
+});
+```
+
+#### Session
+```php
+$app->provider->add(\Exedra\Session\SessionProvider::class);
+```
+
+#### Console
+```php
+$app->provider->add(\Exedra\Wizard\WizardProvider::class);
+```
+
+Have a look at those providers, on how they work, you might want to implement your own for more structured design.
+
+# More Routing Sample
 It'll work for both the minimal boot and the framework setup above.
 
 #### Chainable routing
