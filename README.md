@@ -85,13 +85,16 @@ This provider determines a simple structure for your app, and autoload the [src]
 | app      //path.app
 | ─ src    //path.src
 | ─ routes //path.routes
+| ─ views  //path.views
 | public   //path.public
 ```
 You may retrieve this paths, from the root path of the application.
 ```
+$root = $app->path;
 $app = $app->path['app'];
 $public = $app->path['public'];
 $src = $app->path['src'];
+$view = $app->path['views'];
 $routes = $app->path['routes'];
 ```
 
@@ -137,6 +140,9 @@ Or you might just want to use a little help there and here.
 ```php
 // register views lookup path under /views/
 $app->path->register('views', 'views');
+
+// or
+$app->path['views'] = 'views';
 
 $app->provider->add(\Exedra\View\ViewProvider::class);
 ```
