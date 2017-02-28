@@ -37,58 +37,78 @@ class Registry
     }
 
     /**
-     * Register the provider.
-     * If any types is passed, it will be assumed as deferred provider
+     * A flexible prover registrar
+     * Register the provider given the class name
+     * Or if the Provider itself, register
      * @param string $provider fully qualified class name
-     * @param array $dependencies
      * @return null
      */
-    public function add($provider, array $dependencies = array())
+    public function add($provider)
     {
-        if(count($dependencies) > 0)
+        if(is_object($provider) && $provider instanceof Provider)
+            return $this->register($provider);
+
+        if($this->lateRegistry == true)
         {
-            foreach($dependencies as $name)
+            $this->providers[$provider] = false;
+
+            return $this;
+        }
+
+        if(method_exists($provider, 'provides') && is_array($dependencies = $provider::provides()) && count($dependencies) > 0)
+            return $this->addDeferred($provider, $dependencies);
+
+        $this->providers[$provider] = true;
+
+        $this->register(new $provider);
+
+        return $this;
+    }
+
+    /**
+     * Deferred registry
+     * @param $provider
+     * @param array $dependencies
+     * @return $this
+     */
+    public function addDeferred($provider, array $dependencies)
+    {
+        foreach($dependencies as $name)
+        {
+            @list($type, $dependency) = explode('.', $name, 2);
+
+            if(!$dependency)
             {
-                @list($type, $dependency) = explode('.', $name, 2);
+                $dependency = $type;
 
-                if(!$dependency)
+                $type = 'service';
+            }
+            else
+            {
+                if(!in_array($type, array('service', 'callable', 'factory')))
                 {
-                    $dependency = $type;
-
                     $type = 'service';
+
+                    $dependency = $name;
                 }
-                else
-                {
-                    if(!in_array($type, array('service', 'callable', 'factory')))
-                    {
-                        $type = 'service';
-
-                        $dependency = $name;
-                    }
-                }
-
-                $this->providersDeferred[$type.'.'.$dependency] = $provider;
-            }
-        }
-        // register.
-        else
-        {
-            if($this->lateRegistry == true)
-            {
-                $this->providers[$provider] = false;
-
-                return;
             }
 
-            if(method_exists($provider, 'provides') && is_array($dependencies = $provider::provides()) && count($dependencies) > 0)
-                return $this->add($provider, $dependencies);
-
-            $this->providers[$provider] = true;
-
-            $this->register(new $provider);
+            $this->providersDeferred[$type.'.'.$dependency] = $provider;
         }
 
-        return;
+        return $this;
+    }
+
+    /**
+     * @param array $providers
+     * @return $this
+     */
+    public function batchAdd(array $providers)
+    {
+        foreach($providers as $provider)
+            $this->add($provider);
+
+        return $this;
     }
 
     /**
@@ -103,10 +123,26 @@ class Registry
     /**
      * Register the given provider.
      * @param Provider $provider
+     * @return $this
      */
     public function register(Provider $provider)
     {
         $provider->register($this->app);
+
+        return $this;
+    }
+
+    /**
+     * Batch register
+     * @param Provider[] $providers
+     * @return $this
+     */
+    public function batchRegister(array $providers)
+    {
+        foreach($providers as $provider)
+            $this->register($provider);
+
+        return $this;
     }
 
     /**
