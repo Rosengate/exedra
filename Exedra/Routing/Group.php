@@ -285,13 +285,13 @@ class Group implements \ArrayAccess, Registrar
     }
 
     /**
-     * Loop the routes within this routing group and it's subgroup
+     * Loop the routes within this routing group
      * Break on other closure result not equal to null
      * @param \Closure $closure
-     * @param bool $recursive
+     * @param bool $deep
      * @return mixed|null
      */
-    public function each(\Closure $closure, $recursive = true)
+    public function each(\Closure $closure, $deep = false)
     {
         foreach($this->storage as $route)
         {
@@ -300,9 +300,9 @@ class Group implements \ArrayAccess, Registrar
             if($result !== null)
                 return $result;
 
-            if($route->hasSubroutes() && $recursive)
+            if($route->hasSubroutes() && $deep)
             {
-                $result = $route->getSubroutes()->each($closure);
+                $result = $route->getSubroutes()->each($closure, true);
 
                 if($result !== null)
                     return $result;
@@ -380,7 +380,7 @@ class Group implements \ArrayAccess, Registrar
         {
             if($route->hasProperty('tag') && $route->getProperty('tag') == $tag)
                 return $route;
-        });
+        }, true);
 
         return $route ? : null;
     }

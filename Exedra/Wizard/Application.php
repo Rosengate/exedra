@@ -58,7 +58,7 @@ class Application extends Wizardry
             }
 
             $table->addRow($row);
-        });
+        }, true);
 
         if($table->getRowCounts() === 0)
             $table->addOneColumnRow('Not found!');
