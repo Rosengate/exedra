@@ -2,9 +2,9 @@
 namespace Exedra\Session;
 
 use Exedra\Application;
-use Exedra\Contracts\Provider\Provider as ProviderInterface;
+use Exedra\Contracts\Provider\Provider;
 
-class Provider implements ProviderInterface
+class SessionProvider implements Provider
 {
     public function register(Application $app)
     {

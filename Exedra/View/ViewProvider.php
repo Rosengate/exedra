@@ -2,10 +2,10 @@
 namespace Exedra\View;
 
 use Exedra\Application;
-use Exedra\Contracts\Provider\Provider as ProviderInterface;
+use Exedra\Contracts\Provider\Provider;
 use Exedra\Exception\NotFoundException;
 
-class Provider implements ProviderInterface
+class ViewProvider implements Provider
 {
     public function register(Application $app)
     {

@@ -2,9 +2,9 @@
 namespace Exedra\Form;
 
 use Exedra\Application;
-use Exedra\Contracts\Provider\Provider as ProviderInterface;
+use Exedra\Contracts\Provider\Provider;
 
-class Provider implements ProviderInterface
+class FormProvider implements Provider
 {
     public function register(Application $app)
     {
