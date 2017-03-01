@@ -1,9 +1,11 @@
 <?php
 namespace Exedra\Support\Runtime\Form;
 
+use Exedra\Runtime\Context;
+
 class Form extends \Exedra\Form\Form
 {
-    public function __construct(\Exedra\Runtime\Exe $exe)
+    public function __construct(Context $exe)
     {
         $this->exe = $exe;
 

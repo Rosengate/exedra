@@ -1,6 +1,7 @@
 <?php
 namespace Exedra\Routing;
 
+use Exedra\Exception\Exception;
 use Exedra\Exception\InvalidArgumentException;
 use Exedra\Routing\ExecuteHandlers\DynamicHandler;
 use Psr\Http\Message\ServerRequestInterface;
@@ -132,25 +133,22 @@ class Finding
      */
     protected function resolveMiddleware($middleware)
     {
-        if(is_string($middleware))
-        {
-            return function() use($middleware)
-            {
-                $middleware = new $middleware;
+        if(!is_string($middleware) && !is_object($middleware))
+            throw new InvalidArgumentException('Unable to resolve middleware with type [' . gettype($middleware) .']');
 
+        // expect a class name
+        if(is_string($middleware))
+            $middleware = new $middleware;
+
+        if(is_callable($middleware))
+            return $middleware;
+
+        if(method_exists($middleware, 'handle'))
+            return function() use($middleware) {
                 return call_user_func_array(array($middleware, 'handle'), func_get_args());
             };
-        }
 
-        if(is_object($middleware))
-        {
-            if(is_callable($middleware))
-                return $middleware;
-
-            throw new InvalidArgumentException('Middleware [' . get_class($middleware) . '] needs to be callable/invokeable');
-        }
-
-        throw new InvalidArgumentException('Unable to resolve a middleware.');
+        throw new InvalidArgumentException('Middleware [' . get_class($middleware) .'] has to be callable or implements method handle()');
     }
 
     /**

@@ -36,7 +36,7 @@ class ApplicationTest extends PHPUnit_Framework_TestCase
 	{
 		$app = $this->app;
 
-        $this->assertTrue($app->execute('foo') instanceof \Exedra\Runtime\Exe);
+        $this->assertTrue($app->execute('foo') instanceof \Exedra\Runtime\Context);
 
 		$this->assertEquals('bar', $app->execute('foo')->response->getBody());
 	}

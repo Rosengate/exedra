@@ -1,6 +1,7 @@
 <?php namespace Exedra;
 
 use Exedra\Container\Container;
+use Exedra\Exception\InvalidArgumentException;
 use Exedra\Exception\RouteNotFoundException;
 use Exedra\Http\ServerRequest;
 use Exedra\Provider\Registry as ProviderRegistry;
@@ -65,7 +66,7 @@ class Application extends Container
         ));
 
         $this->services['factory']->register(array(
-            'runtime.exe' => \Exedra\Runtime\Exe::class,
+            'runtime.context' => \Exedra\Runtime\Context::class,
             'runtime.response' => function(){ return \Exedra\Runtime\Response::createEmptyResponse();},
             'url.factory' => \Exedra\Url\UrlFactory::class
         ));
@@ -94,9 +95,10 @@ class Application extends Container
      * @param string $routeName
      * @param array $parameters
      * @param \Exedra\Http\ServerRequest $request
-     * @return \Exedra\Runtime\Exe
+     * @return \Exedra\Runtime\Context
      *
-     * @throws Exception\InvalidArgumentException
+     * @throws InvalidArgumentException
+     * @throws RouteNotFoundException
      */
     public function execute($routeName, array $parameters = array(), \Exedra\Http\ServerRequest $request = null)
     {
@@ -116,7 +118,7 @@ class Application extends Container
      * Execute the http request
      * And return the context
      * @param \Exedra\Http\ServerRequest|null $request
-     * @return Runtime\Exe
+     * @return Runtime\Context
      * @throws RouteNotFoundException
      */
     public function request(\Exedra\Http\ServerRequest $request = null)
@@ -132,11 +134,11 @@ class Application extends Container
     /**
      * Execute the finding
      * @param \Exedra\Routing\Finding $finding
-     * @return \Exedra\Runtime\Exe
+     * @return \Exedra\Runtime\Context
      */
     public function run(\Exedra\Routing\Finding $finding)
     {
-        return $this->create('runtime.exe', array($this, $finding, $this->create('runtime.response')))->run();
+        return $this->create('runtime.context', array($this, $finding, $this->create('runtime.response')))->run();
     }
 
     /**

@@ -185,6 +185,17 @@ class Group implements \ArrayAccess, Registrar
     }
 
     /**
+     * @param array|callable[] $middlewares
+     */
+    public function addMiddlewares(array $middlewares)
+    {
+        foreach($middlewares as $id => $middleware)
+            $this->addMiddleware($middleware, is_int($id) ? count($this->middlewares) : $id);
+
+        return $this;
+    }
+
+    /**
      * Get routing group based middlewares
      * @return array
      */

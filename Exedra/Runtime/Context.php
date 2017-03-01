@@ -13,7 +13,7 @@ use Exedra\Support\Runtime\Form\Form;
 use Exedra\Url\UrlFactory;
 
 /**
- * Class Exe
+ * Class Context
  * @package Exedra\Runtime
  *
  * @property ServerRequest $request
@@ -219,6 +219,11 @@ class Context extends Container
     public function next()
     {
         return call_user_func_array(next($this->callStack), func_get_args());
+    }
+
+    public function getNextCall()
+    {
+        return next($this->callStack);
     }
 
     /**
@@ -455,6 +460,14 @@ class Context extends Container
     }
 
     /**
+     * @return ServerRequest
+     */
+    public function getRequest()
+    {
+        return $this->request;
+    }
+
+    /**
      * Alias to getRouteName()
      * @param bool $absolute
      * @return string
@@ -531,7 +544,7 @@ class Context extends Container
      * Forward current request to the given route
      * @param string $route
      * @param array $args
-     * @return Exe
+     * @return Context
      */
     public function forward($route, array $args = array())
     {
@@ -545,7 +558,7 @@ class Context extends Container
      * @param string $route
      * @param array $parameters
      * @param \Exedra\Http\ServerRequest|null $request
-     * @return Exe
+     * @return Context
      */
     public function execute($route, array $parameters = array(), \Exedra\Http\ServerRequest $request = null)
     {
@@ -559,7 +572,7 @@ class Context extends Container
     /**
      * Alias to app->request()
      * @param \Exedra\Http\ServerRequest request
-     * @return \Exedra\Runtime\Exe
+     * @return \Exedra\Runtime\Context
      */
     public function request(\Exedra\Http\ServerRequest $request)
     {
@@ -568,7 +581,7 @@ class Context extends Container
 
     /**
      * Retrieve the actual execution instance
-     * @return \Exedra\Runtime\Exe
+     * @return \Exedra\Runtime\Context
      */
     public function finalize()
     {
@@ -578,7 +591,7 @@ class Context extends Container
         {
             $body = $exe->response->getBody();
 
-            if($body instanceof \Exedra\Runtime\Exe)
+            if($body instanceof \Exedra\Runtime\Context)
                 $exe = $body;
             else
                 break;
@@ -628,5 +641,13 @@ class Context extends Container
         }
 
         return $this->filter($type, $name, $this->resolve($name, $registry, $args));
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasRequest()
+    {
+        return $this->request ? true : false;
     }
 }

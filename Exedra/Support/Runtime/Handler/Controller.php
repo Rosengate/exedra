@@ -2,7 +2,7 @@
 namespace Exedra\Support\Runtime\Handler;
 
 use Exedra\Contracts\Routing\ExecuteHandler;
-use Exedra\Runtime\Exe;
+use Exedra\Runtime\Context;
 
 class Controller implements ExecuteHandler
 {
@@ -16,7 +16,7 @@ class Controller implements ExecuteHandler
 
     public function resolve($pattern)
     {
-        return function(Exe $exe) use($pattern)
+        return function(Context $exe) use($pattern)
         {
             $controllerAction	= str_replace('controller=', '', $pattern);
 

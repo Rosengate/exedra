@@ -4,7 +4,7 @@ namespace Exedra\Support\Provider;
 use Exedra\Application;
 use Exedra\Exception\Exception;
 use Exedra\Exception\NotFoundException;
-use Exedra\Runtime\Exe;
+use Exedra\Runtime\Context;
 
 class Modular implements \Exedra\Provider\ProviderInterface
 {
@@ -19,7 +19,7 @@ class Modular implements \Exedra\Provider\ProviderInterface
 
 		$app->path->register('modules', $app->path['app']->create('modules'));
 
-		$app->map->middleware(function(Exe $exe)
+		$app->map->middleware(function(Context $exe)
 		{
 			if($exe->hasAttribute('module'))
 			{
