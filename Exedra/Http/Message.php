@@ -26,7 +26,7 @@ class Message implements MessageInterface
 
     /**
      * Stream
-     * @param \Exedra\Http\Stream
+     * @var Stream
      */
     protected $body;
 
@@ -147,7 +147,7 @@ class Message implements MessageInterface
         switch(gettype($body))
         {
             case 'string':
-                $this->body = Stream::createFromContents($body);
+                $this->body = Stream::createFromContents($body, $mode);
             break;
             case 'object':
                 if($body instanceof Stream)
@@ -164,7 +164,20 @@ class Message implements MessageInterface
     {
         $message = clone $this;
 
-        return $message->setBody($body, 'r+');
+        switch(gettype($body))
+        {
+            case 'string':
+                $message->body = Stream::createFromContents($body);
+                break;
+            case 'object':
+                if($body instanceof Stream)
+                    $message->body = $body;
+                else
+                    $message->body = new Stream($body, 'r+');
+                break;
+        }
+
+        return $message;
     }
 
     public function hasHeader($header)

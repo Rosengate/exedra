@@ -10,7 +10,7 @@ class Stream implements StreamInterface
 {
     protected static $modes = array(
         'readable' => array('r', 'r+', 'w+', 'a+', 'x+', 'c+'),
-        'writable' => array('r+', 'w', 'w+', 'a', 'a+', 'x', 'x+', 'c', 'c+')
+        'writable' => array('r+', 'w', 'w+', 'a', 'a+', 'x', 'x+', 'c', 'c+', 'w+b')
         );
 
     protected $meta = array();
@@ -135,7 +135,7 @@ class Stream implements StreamInterface
         if(!$this->resource)
             return false;
 
-        return in_array($this->meta['mode'], self::$modes['writeable']);
+        return in_array($this->meta['mode'], self::$modes['writable']);
     }
 
     public function write($contents)

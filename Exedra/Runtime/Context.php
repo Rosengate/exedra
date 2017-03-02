@@ -11,6 +11,7 @@ use Exedra\Support\Asset\AssetFactory;
 use Exedra\Support\DotArray;
 use Exedra\Support\Runtime\Form\Form;
 use Exedra\Url\UrlFactory;
+use Psr\Http\Message\ResponseInterface;
 
 /**
  * Class Context
@@ -131,8 +132,12 @@ class Context extends Container
         // first handle.
         $handle = reset($this->callStack);
 
-        // execute.
-        $this->response->setBody($handle($this));
+        $response = $handle($this);
+
+        if($response instanceof Response)
+            $this->services['response'] = $response;
+        else
+            $this->response->setBody($response);
 
         return $this;
     }

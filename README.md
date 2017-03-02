@@ -16,6 +16,14 @@ as a supporting framework to your existing application.
 
 Imagine building a plane while flying it!
 
+# Features
+- Nestable routing
+- Minimal, contextual, flexible, framework agnostic
+- Routing component built for Psr7 Http Messages
+- Psr7 middleware support
+- Container based
+- Decoupled components
+
 # Installation
 #### Composer
 Install rosengate/exedra through your console, in your project folder.
@@ -269,6 +277,36 @@ $app->map->addRoutes(array(
 Some of the projects built on top of exedra :
 
 http://github.com/rosengate/exedra-web (hosted at exedra.rosengate.com)
+
+Psr Middleware
+======
+Double-pass signature psr7 http messages middleware bridge
+### Through middleware bridge
+```php
+use Exedra\Support\Psr7\BridgeMiddleware;
+
+$app->map->middleware(new BridgeMiddleware(array(
+    // list of psr7 middlewares
+));
+```
+The previous middleware must however be aware that the signature call of the psr7 middlewares returns the ResponseInterface.
+Although in exedra, you're free to return whether a string or the response object itself.
+
+For example :
+```php
+$app->map->middleware(function(Context $ctx) {
+    // this one will be ResponseInterface
+    $response = $ctx->next($ctx);
+    
+    return $response;
+});
+$app->map->middleware(new BridgeMiddleware(array(
+    // list of psr7 middlewares
+));
+```
+
+more on :
+https://github.com/php-fig/fig-standards/blob/master/proposed/http-middleware/middleware-meta.md
 
 Routing Controller
 ======
