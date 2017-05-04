@@ -131,6 +131,11 @@ class Container implements \ArrayAccess
         return $this->get($name);
     }
 
+    public function __isset($name)
+    {
+        return $this->services['service']->has($name);
+    }
+
     /**
      * Get service
      * If has none, find in services registry.
