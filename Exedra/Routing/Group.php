@@ -336,8 +336,10 @@ class Group implements \ArrayAccess, Registrar
     {
         if(isset($this->routes[$name]))
             return $this->routes[$name];
-        else
-            return $this->routes[$name] = $this->findRouteRecursively($name);
+        else if($route = $this->findRouteRecursively($name))
+            return $this->routes[$name] = $route;
+
+        return false;
     }
 
     /**
