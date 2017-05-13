@@ -46,6 +46,8 @@ class Context extends Container
      */
     protected $callStack;
 
+    protected $attributes = array();
+
     protected $currentModule;
 
     /**
@@ -321,6 +323,19 @@ class Context extends Container
     }
 
     /**
+     * Set a context based attribute
+     * @param string $key
+     * @param mixed $value
+     * @return $this
+     */
+    public function setAttr($key, $value)
+    {
+        $this->attributes[$key] = $value;
+
+        return $this;
+    }
+
+    /**
      * Alias to getAttribute
      * @param string $key
      * @param string|null default value
@@ -328,6 +343,9 @@ class Context extends Container
      */
     public function attr($key, $default = null)
     {
+        if (isset($this->attributes[$key]))
+            return $this->attributes[$key];
+
         return $this->finding->getAttribute($key, $default);
     }
 
