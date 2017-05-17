@@ -53,11 +53,18 @@ class Message implements MessageInterface
         return str_replace(' ', '-', ucwords(str_replace('-', ' ', strtolower($name))));
     }
 
+    /**
+     * @return string
+     */
     public function getProtocolVersion()
     {
         return $this->protocol;
     }
 
+    /**
+     * @param $version
+     * @return $this
+     */
     public function setProtocolVersion($version)
     {
         $this->protocol = $version;
@@ -65,6 +72,10 @@ class Message implements MessageInterface
         return $this;
     }
 
+    /**
+     * @param string $version
+     * @return Message|static
+     */
     public function withProtocolVersion($version)
     {
         $message = clone $this;
@@ -101,6 +112,11 @@ class Message implements MessageInterface
         return implode(', ', $this->getHeader($name));
     }
 
+    /**
+     * @param string $name
+     * @param string|\string[] $value
+     * @return Message|static
+     */
     public function withHeader($name, $value)
     {
         $message = clone $this;
@@ -123,6 +139,10 @@ class Message implements MessageInterface
         return $message->addHeader($name, $value);
     }
 
+    /**
+     * @param string $name
+     * @return Message
+     */
     public function withoutHeader($name)
     {
         $message = clone $this;
@@ -142,6 +162,11 @@ class Message implements MessageInterface
         return $this->body;
     }
 
+    /**
+     * @param $body
+     * @param string $mode
+     * @return $this
+     */
     public function setBody($body, $mode = 'r+')
     {
         switch(gettype($body))
@@ -160,6 +185,10 @@ class Message implements MessageInterface
         return $this;
     }
 
+    /**
+     * @param StreamInterface $body
+     * @return Message
+     */
     public function withBody(StreamInterface $body)
     {
         $message = clone $this;
@@ -180,11 +209,20 @@ class Message implements MessageInterface
         return $message;
     }
 
+    /**
+     * @param string $header
+     * @return bool
+     */
     public function hasHeader($header)
     {
         return isset($this->headers[strtolower($header)]);
     }
 
+    /**
+     * @param $name
+     * @param $value
+     * @return bool
+     */
     public function headerHas($name, $value)
     {
         $name = strtolower($name);
@@ -201,12 +239,18 @@ class Message implements MessageInterface
         $this->headerLines = array();
     }
 
+    /**
+     * @param array $headerLines
+     * @return $this
+     */
     public function setHeaders(array $headerLines)
     {
         foreach($headerLines as $header => $values)
             $this->headers[strtolower($header)] = $values;
 
         $this->headerLines = $headerLines;
+
+        return $this;
     }
 
     /**

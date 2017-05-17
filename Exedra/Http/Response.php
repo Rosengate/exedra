@@ -73,16 +73,27 @@ class Response extends Message implements ResponseInterface
         $this->body = clone $this->body;
     }
 
+    /**
+     * @return static
+     */
     public static function createEmptyResponse()
     {
         return new static(200, array(), new Stream(fopen('php://temp', 'r+')));
     }
 
+    /**
+     * @return int
+     */
     public function getStatusCode()
     {
         return $this->status;
     }
 
+    /**
+     * @param $status
+     * @param null $reason
+     * @return $this
+     */
     public function setStatus($status, $reason = null)
     {
         $this->status = $status;
@@ -92,6 +103,11 @@ class Response extends Message implements ResponseInterface
         return $this;
     }
 
+    /**
+     * @param int $status
+     * @param null $reason
+     * @return Response
+     */
     public function withStatus($status, $reason = null)
     {
         $response = clone $this;
@@ -99,6 +115,9 @@ class Response extends Message implements ResponseInterface
         return $response->setStatus($status, $reason);
     }
 
+    /**
+     * @return mixed|null|string
+     */
     public function getReasonPhrase()
     {
         if($this->reasonPhrase)
@@ -107,6 +126,10 @@ class Response extends Message implements ResponseInterface
         return isset($this->statuses[$this->status]) ? $this->statuses[$this->status] : 'Unknown';
     }
 
+    /**
+     * @param $status
+     * @return mixed|string
+     */
     public function getDefaultReasonPhrase($status)
     {
         return isset($this->statuses[$status]) ? $this->statuses[$status] : 'Unknown';
@@ -116,6 +139,7 @@ class Response extends Message implements ResponseInterface
      * Old method
      * @param string $name
      * @param string $value
+     * @return $this
      */
     public function header($name, $value)
     {
@@ -149,7 +173,7 @@ class Response extends Message implements ResponseInterface
 
     /**
      * Set location header (redirect)
-     * @param string url
+     * @param string $url
      */
     public function redirect($url)
     {
@@ -186,6 +210,9 @@ class Response extends Message implements ResponseInterface
         ob_end_clean();
     }
 
+    /**
+     * @return string
+     */
     public function __toString()
     {
         return $this->getBody()->toString();

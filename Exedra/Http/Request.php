@@ -28,6 +28,9 @@ class Request extends Message implements RequestInterface
         $this->uri = $uri;
     }
 
+    /**
+     * @return Request
+     */
     public function __clone()
     {
         $request = clone $this;
@@ -37,6 +40,9 @@ class Request extends Message implements RequestInterface
         return $request;
     }
 
+    /**
+     * @return string
+     */
     public function getRequestTarget()
     {
         if($this->requestTarget)
@@ -53,6 +59,10 @@ class Request extends Message implements RequestInterface
         return $target;
     }
 
+    /**
+     * @param $target
+     * @return mixed
+     */
     public function setRequestTarget($target)
     {
         $this->requestTarget = $target;
@@ -60,6 +70,10 @@ class Request extends Message implements RequestInterface
         return $this->requestTarget;
     }
 
+    /**
+     * @param mixed $target
+     * @return mixed
+     */
     public function withRequestTarget($target)
     {
         $request = clone $this;
@@ -67,16 +81,29 @@ class Request extends Message implements RequestInterface
         return $request->setRequestTarget($target);
     }
 
+    /**
+     * @param $method
+     * @return $this
+     */
     public function setMethod($method)
     {
         $this->method = strtoupper($method);
+
+        return $this;
     }
 
+    /**
+     * @return string
+     */
     public function getMethod()
     {
         return $this->method;
     }
 
+    /**
+     * @param string $method
+     * @return Request
+     */
     public function withMethod($method)
     {
         $request = clone $this;
@@ -86,11 +113,18 @@ class Request extends Message implements RequestInterface
         return $request;
     }
 
+    /**
+     * @return Uri
+     */
     public function getUri()
     {
         return $this->uri;
     }
 
+    /**
+     * @param $uri
+     * @return $this
+     */
     public function setUri($uri)
     {
         if(is_string($uri) || is_array($uri))
@@ -99,8 +133,15 @@ class Request extends Message implements RequestInterface
             $this->uri = $uri;
         else
             throw new \InvalidArgumentException('Invalid uri. Must be string, array, or Uri');
+
+        return $this;
     }
 
+    /**
+     * @param UriInterface $uri
+     * @param bool $preserveHost
+     * @return Request
+     */
     public function withUri(UriInterface $uri, $preserveHost = false)
     {
         $request = clone $this;

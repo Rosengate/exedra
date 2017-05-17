@@ -125,7 +125,7 @@ class UploadedFile implements UploadedFileInterface
     }
 
     /**
-     * Get upload error
+     * @return mixed
      */
     public function getError()
     {

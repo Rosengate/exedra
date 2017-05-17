@@ -38,11 +38,17 @@ class Stream implements StreamInterface
         return new static($handle);
     }
 
+    /**
+     * @return bool
+     */
     public function isAttached()
     {
         return is_resource($this->resource);
     }
 
+    /**
+     * @return null
+     */
     public function close()
     {
         if(!$this->resource)
@@ -51,6 +57,10 @@ class Stream implements StreamInterface
         fclose($this->resource);
     }
 
+    /**
+     * @param $resource
+     * @param string $mode
+     */
     public function attach($resource, $mode = 'r')
     {
         if(is_string($resource))
@@ -69,6 +79,9 @@ class Stream implements StreamInterface
         $this->meta = stream_get_meta_data($resource);
     }
 
+    /**
+     * @return null
+     */
     public function detach()
     {
         $resource = $this->resource;
@@ -78,6 +91,9 @@ class Stream implements StreamInterface
         return $resource;
     }
 
+    /**
+     * @return null|mixed
+     */
     public function getSize()
     {
         if(!$this->resource)
@@ -88,6 +104,9 @@ class Stream implements StreamInterface
         return $fstat['size'];
     }
 
+    /**
+     * @return int
+     */
     public function tell()
     {
         if(!$this->resource || ($position = ftell($this->resource)) === false)
@@ -96,11 +115,17 @@ class Stream implements StreamInterface
         return $position;
     }
 
+    /**
+     * @return bool
+     */
     public function eof()
     {
         return $this->resource ? feof($this->resource) : true;
     }
 
+    /**
+     * @return bool
+     */
     public function isSeekable()
     {
         if(!$this->resource)
@@ -111,6 +136,11 @@ class Stream implements StreamInterface
         return $meta['seekable'];
     }
 
+    /**
+     * @param int $offset
+     * @param int $whence
+     * @return $this
+     */
     public function seek($offset, $whence = SEEK_SET)
     {
         if(!$this->resource)
@@ -125,11 +155,17 @@ class Stream implements StreamInterface
         return $this;
     }
 
+    /**
+     * @return Stream
+     */
     public function rewind()
     {
         return $this->seek(0);
     }
 
+    /**
+     * @return bool
+     */
     public function isWritable()
     {
         if(!$this->resource)
@@ -138,6 +174,11 @@ class Stream implements StreamInterface
         return in_array($this->meta['mode'], self::$modes['writable']);
     }
 
+    /**
+     * @param string $contents
+     * @return null
+     * @throws \RuntimeException
+     */
     public function write($contents)
     {
         if(!$this->resource)
@@ -150,6 +191,9 @@ class Stream implements StreamInterface
             throw new \RuntimeException('Failed to write the resource');
     }
 
+    /**
+     * @return bool
+     */
     public function isReadable()
     {
         if(!$this->resource)
@@ -158,6 +202,10 @@ class Stream implements StreamInterface
         return in_array($this->meta['mode'], self::$modes['readable']);
     }
 
+    /**
+     * @param int $length
+     * @return string
+     */
     public function read($length)
     {
         if(!$this->resource)
@@ -172,6 +220,9 @@ class Stream implements StreamInterface
         return $data;
     }
 
+    /**
+     * @return string
+     */
     public function getContents()
     {
         if(!$this->resource)
@@ -183,11 +234,18 @@ class Stream implements StreamInterface
         return $data;
     }
 
+    /**
+     * @param null $key
+     * @return array|mixed
+     */
     public function getMetadata($key = null)
     {
         return isset($this->meta[$key]) ? $this->meta[$key] : $this->meta;
     }
 
+    /**
+     * @return string
+     */
     public function toString()
     {
         if(!$this->resource)
@@ -203,6 +261,9 @@ class Stream implements StreamInterface
         }
     }
 
+    /**
+     * @return string
+     */
     public function __toString()
     {
         return $this->toString();

@@ -134,6 +134,10 @@ class Uri implements UriInterface
         return $this->fragment;
     }
 
+    /**
+     * @param $scheme
+     * @return $this
+     */
     public function setScheme($scheme)
     {
         $this->scheme = $scheme;
@@ -141,6 +145,10 @@ class Uri implements UriInterface
         return $this;
     }
 
+    /**
+     * @param $user
+     * @return $this
+     */
     public function setUser($user)
     {
         $this->user = $user;
@@ -148,6 +156,10 @@ class Uri implements UriInterface
         return $this;
     }
 
+    /**
+     * @param $password
+     * @return $this
+     */
     public function setPassword($password)
     {
         $this->pass = $password;
@@ -155,6 +167,10 @@ class Uri implements UriInterface
         return $this;
     }
 
+    /**
+     * @param $host
+     * @return $this
+     */
     public function setHost($host)
     {
         $this->host = $host;
@@ -162,6 +178,10 @@ class Uri implements UriInterface
         return $this;
     }
 
+    /**
+     * @param $port
+     * @return $this
+     */
     public function setPort($port)
     {
         $this->port = $port;
@@ -169,6 +189,10 @@ class Uri implements UriInterface
         return $this;
     }
 
+    /**
+     * @param $path
+     * @return $this
+     */
     public function setPath($path)
     {
         $this->path = $path;
@@ -176,6 +200,10 @@ class Uri implements UriInterface
         return $this;
     }
 
+    /**
+     * @param $query
+     * @return $this
+     */
     public function setQuery($query)
     {
         $this->query = $query;
@@ -183,6 +211,10 @@ class Uri implements UriInterface
         return $this;
     }
 
+    /**
+     * @param $fragment
+     * @return $this
+     */
     public function setFragment($fragment)
     {
         $this->fragment = $fragment;
@@ -190,6 +222,10 @@ class Uri implements UriInterface
         return $this;
     }
 
+    /**
+     * @param string $scheme
+     * @return Uri
+     */
     public function withScheme($scheme)
     {
         $uri = clone $this;
@@ -197,6 +233,11 @@ class Uri implements UriInterface
         return $uri->setScheme($scheme);
     }
 
+    /**
+     * @param string $user
+     * @param null $password
+     * @return $this
+     */
     public function withUserInfo($user, $password = null)
     {
         $uri = clone $this;
@@ -204,6 +245,10 @@ class Uri implements UriInterface
         return $uri->setUser($user)->setPassword($password);
     }
 
+    /**
+     * @param string $host
+     * @return Uri
+     */
     public function withHost($host)
     {
         $uri = clone $this;
@@ -211,6 +256,10 @@ class Uri implements UriInterface
         return $uri->setHost($host);
     }
 
+    /**
+     * @param int|null $port
+     * @return Uri
+     */
     public function withPort($port)
     {
         $uri = clone $this;
@@ -218,6 +267,10 @@ class Uri implements UriInterface
         return $uri->setPort($port);
     }
 
+    /**
+     * @param string $path
+     * @return Uri
+     */
     public function withPath($path)
     {
         $uri = clone $this;
@@ -225,6 +278,10 @@ class Uri implements UriInterface
         return $uri->setPath($path);
     }
 
+    /**
+     * @param string $query
+     * @return Uri
+     */
     public function withQuery($query)
     {
         $uri = clone $this;
@@ -232,6 +289,10 @@ class Uri implements UriInterface
         return $uri->setQuery($query);
     }
 
+    /**
+     * @param string $fragment
+     * @return Uri
+     */
     public function withFragment($fragment)
     {
         $uri = clone $this;
@@ -239,6 +300,9 @@ class Uri implements UriInterface
         return $uri->setFragment($fragment);
     }
 
+    /**
+     * @return string
+     */
     public function toString()
     {
         $uri = '';
@@ -263,6 +327,9 @@ class Uri implements UriInterface
         return $uri;
     }
 
+    /**
+     * @return string
+     */
     public function __toString()
     {
         return $this->toString();

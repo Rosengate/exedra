@@ -19,6 +19,9 @@ class ServerRequest extends Message implements ServerRequestInterface
 
     protected $cookies;
 
+    /**
+     * @var array|UploadedFile[]
+     */
     protected $uploadedFiles = array();
 
     protected $parsedBody = array();
@@ -30,6 +33,11 @@ class ServerRequest extends Message implements ServerRequestInterface
     protected $params = array();
 
     protected $requestTarget;
+
+    /**
+     * @var array $bodyParsers
+     */
+    protected $bodyParsers;
 
     public function __construct(
         $method,
@@ -300,11 +308,18 @@ class ServerRequest extends Message implements ServerRequestInterface
         return $request;
     }
 
+    /**
+     * @return array|UploadedFile[]
+     */
     public function getUploadedFiles()
     {
         return $this->uploadedFiles;
     }
 
+    /**
+     * @param array $uploadedFiles
+     * @return $this
+     */
     public function setUploadedFiles(array $uploadedFiles)
     {
         $this->uploadedFiles = $uploadedFiles;
@@ -312,6 +327,10 @@ class ServerRequest extends Message implements ServerRequestInterface
         return $this;
     }
 
+    /**
+     * @param array $uploadedFiles
+     * @return ServerRequest
+     */
     public function withUploadedFiles(array $uploadedFiles)
     {
         $request = clone $this;
@@ -321,6 +340,10 @@ class ServerRequest extends Message implements ServerRequestInterface
         return $request;
     }
 
+    /**
+     * @return array
+     * @throws \Exedra\Exception\Exception
+     */
     public function getParsedBody()
     {
         if($this->parsedBody)
@@ -339,6 +362,9 @@ class ServerRequest extends Message implements ServerRequestInterface
         return $this->parsedBody;
     }
 
+    /**
+     * @return string|null
+     */
     public function getMediaType()
     {
         $contentType = $this->getHeaderLine('Content-Type');
@@ -352,11 +378,22 @@ class ServerRequest extends Message implements ServerRequestInterface
         return $contentTypeParts[0];
     }
 
+    /**
+     * @param $type
+     * @param \Closure $callable
+     * @return $this
+     */
     public function registerMediaTypeParser($type, \Closure $callable)
     {
         $this->bodyParsers[$type] = $callable->bindTo($this);
+
+        return $this;
     }
 
+    /**
+     * @param $parsedBody
+     * @return $this
+     */
     public function setParsedBody($parsedBody)
     {
         $this->parsedBody = $parsedBody;
@@ -364,6 +401,10 @@ class ServerRequest extends Message implements ServerRequestInterface
         return $this;
     }
 
+    /**
+     * @param array|null|object $parsedBody
+     * @return ServerRequest
+     */
     public function withParsedBody($parsedBody)
     {
         $request = clone $this;
@@ -371,16 +412,29 @@ class ServerRequest extends Message implements ServerRequestInterface
         return $request->setParsedBody($parsedBody);
     }
 
+    /**
+     * @return array
+     */
     public function getAttributes()
     {
         return $this->attributes;
     }
 
+    /**
+     * @param string $name
+     * @param null $default
+     * @return mixed|null
+     */
     public function getAttribute($name, $default = null)
     {
         return isset($this->attributes[$name]) ? $this->attributes[$name] : $default;
     }
 
+    /**
+     * @param $name
+     * @param $value
+     * @return $this
+     */
     public function setAttribute($name, $value)
     {
         $this->attributes[$name] = $value;
@@ -388,6 +442,11 @@ class ServerRequest extends Message implements ServerRequestInterface
         return $this;
     }
 
+    /**
+     * @param string $name
+     * @param mixed $value
+     * @return ServerRequest
+     */
     public function withAttribute($name, $value)
     {
         $request = clone $this;
@@ -395,6 +454,10 @@ class ServerRequest extends Message implements ServerRequestInterface
         return $request->setAttribute($name, $value);;
     }
 
+    /**
+     * @param $name
+     * @return $this
+     */
     public function removeAttribute($name)
     {
         unset($this->attributes[$name]);
@@ -402,6 +465,10 @@ class ServerRequest extends Message implements ServerRequestInterface
         return $this;
     }
 
+    /**
+     * @param string $name
+     * @return ServerRequest
+     */
     public function withoutAttribute($name)
     {
         $request = clone $this;
@@ -409,16 +476,26 @@ class ServerRequest extends Message implements ServerRequestInterface
         return $request->removeAttribute($name);
     }
 
+    /**
+     * @return bool
+     */
     public function isAjax()
     {
         return strtolower($this->getHeaderLine('x-requested-with')) == 'xmlhttprequest';
     }
 
+    /**
+     * @return mixed
+     */
     public function header()
     {
         return $this->headers;
     }
 
+    /**
+     * @param $method
+     * @return bool
+     */
     public function isMethod($method)
     {
         return strtolower($method) == strtolower($this->method);
