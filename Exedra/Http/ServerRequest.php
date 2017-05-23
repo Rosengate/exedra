@@ -91,8 +91,18 @@ class ServerRequest extends Message implements ServerRequestInterface
 
         $uriParts = parse_url($server['REQUEST_URI']);
 
-        $uriParts['host'] = $server['SERVER_NAME'];
-        $uriParts['port'] = $server['SERVER_PORT'];
+        if(isset($server['HTTP_HOST']))
+        {
+            list($host, $port) = explode(':', $server['HTTP_HOST']);
+            $uriParts['host'] = $host;
+            $uriParts['port'] = $port;
+        }
+        else
+        {
+            $uriParts['host'] = $server['SERVER_NAME'];
+            $uriParts['port'] = $server['SERVER_PORT'];
+        }
+
         $uriParts['scheme'] = isset($server['REQUEST_SCHEME']) ? $server['REQUEST_SCHEME'] : ( isset($server['HTTPS']) && $server['HTTPS'] == 'on' ? 'https' : 'http' );
 
         $headers = array();
