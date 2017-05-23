@@ -1024,6 +1024,16 @@ class Route implements Registrar
 		return $this->attributes[$key];
 	}
 
+    /**
+     * Check whether attribute exist
+     * @param string $key
+     * @return bool
+     */
+    public function hasAttribute($key)
+    {
+        return isset($this->attributes[$key]);
+	}
+
 	/**
 	 * Get all attributes
 	 * @return array
