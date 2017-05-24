@@ -174,10 +174,13 @@ class Response extends Message implements ResponseInterface
     /**
      * Set location header (redirect)
      * @param string $url
+     * @return $this
      */
     public function redirect($url)
     {
         $this->setHeader('Location', $url);
+
+        return $this;
     }
 
     /**
