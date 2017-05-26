@@ -36,10 +36,11 @@ class Url extends \Exedra\Http\Uri
         if(!$this->query)
             return $this->setQueryParams(array($key => $value));
 
-        if(is_string($value))
-            $this->query .= '&' . $key . '=' . $value;
-        else
-            $this->query .= '&' . http_build_query(array($key => $value));
+        $params = $this->getQueryParams();
+
+        $params[$key] = $value;
+
+        $this->setQueryParams($params);
 
         return $this;
     }
