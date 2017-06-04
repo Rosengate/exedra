@@ -156,9 +156,9 @@ $app->provider->add(\Exedra\View\ViewProvider::class);
 ```
 Then you can use the view factory even in the runtime context.
 ```php
-$app->map['web']->any('/')->execute(function($exe)
+$app->map['web']->any('/')->execute(function($context)
 {
-    return $exe->view->create('index')->render();
+    return $context->view->create('index')->render();
 });
 ```
 
@@ -180,16 +180,16 @@ It'll work for both the minimal boot and the framework setup above.
 #### Chainable routing
 ```php
 // global middleware
-$app->map->middleware(function($exe)
+$app->map->middleware(function($context)
 {
-    return $exe->next($exe);
+    return $context->next($context);
 });
 
 // or specify by class name
 $app->map->middleware(\App\Middleware\All::CLASS);
 
 $app->map['index']->get('/')
-    ->execute(function(Exe $exe) {
+    ->execute(function(Context $context) {
     });
 
 $app->map['contact-us']
@@ -207,15 +207,15 @@ $app->map['api']->any('/api')->middleware(\App\Middleware\Api::CLASS)->group(fun
     {
         // create new user
         // POST /api/users
-        $users->post('/')->execute(function($exe)
+        $users->post('/')->execute(function($context)
         {
             
         });
         
         // GET /api/users/:id
-        $users->get('/:id')->execute(function($exe)
+        $users->get('/:id')->execute(function($context)
         {
-            return $exe->param('id');
+            return $context->param('id');
         });
     });
     
@@ -223,13 +223,13 @@ $app->map['api']->any('/api')->middleware(\App\Middleware\Api::CLASS)->group(fun
     {
         // create new channel
         // POST /api/channels
-        $channels->post('/')->execute(function($exe)
+        $channels->post('/')->execute(function($context)
         {
             
         });
         
         // GET /api/channels
-        $channels->get('/')->execute(function($exe)
+        $channels->get('/')->execute(function($context)
         {
         
         });
@@ -307,6 +307,43 @@ $app->map->middleware(new BridgeMiddleware(array(
 
 more on :
 https://github.com/php-fig/fig-standards/blob/master/proposed/http-middleware/middleware-meta.md
+
+Independent Routing Component
+======
+So, you want to use the routing component alone, because it definitely can be done. The only thing it cares is, 
+the psr7 ServerRequest interface. A sample usage using guzzle http ServerRequest.
+
+```php
+use Exedra\Routing\Group;
+use \GuzzleHttp\Psr7\ServerRequest;
+
+$routingFactory = new \Exedra\Routing\Factory;
+
+$router = $routingFactory->createGroup();
+
+$router->addExecuteHandler('execute', \Exedra\Routing\ExecuteHandlers\ClosureHandler::class);
+
+// a simple routing, and some middleware
+$router->middleware(function(ServerRequest $request, $next) {
+    return $next($request);
+});
+
+$router['hello']->any('/hello')->group(function(Group $group) {
+    $group['world']->any('/world')->execute(function() {
+        return 'hello world';
+    });
+});
+
+// dispatch the guzzle ServerRequest
+$finding = $router->findByRequest($request = ServerRequest::fromGlobals());
+
+if(!$finding->isSuccess())
+    throw new \Exception('Oops, couldn\'t match any page.');
+
+$callStack = $finding->getCallStack();
+
+echo $callStack($request, $callStack->getNextCaller());
+```
 
 Routing Controller
 ======
