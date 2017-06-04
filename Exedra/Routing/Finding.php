@@ -138,7 +138,7 @@ class Finding
      */
     protected function resolveMiddleware($middleware)
     {
-        if(!is_string($middleware) && !is_object($middleware))
+        if(!is_string($middleware) && !is_object($middleware) && !is_array($middleware))
             throw new InvalidArgumentException('Unable to resolve middleware with type [' . gettype($middleware) .']');
 
         $method = 'handle';
