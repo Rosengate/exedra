@@ -141,16 +141,31 @@ class Finding
         if(!is_string($middleware) && !is_object($middleware))
             throw new InvalidArgumentException('Unable to resolve middleware with type [' . gettype($middleware) .']');
 
+        $method = 'handle';
+
         // expect a class name
         if(is_string($middleware))
+        {
+            list($middleware, $method) = explode('@', $middleware);
+
             $middleware = new $middleware;
+
+            $method = $method ? : 'handle';
+        }
+
+        if(is_array($middleware))
+        {
+            return function() use($middleware) {
+                return call_user_func_array($middleware, func_get_args());
+            };
+        }
 
         if(is_callable($middleware))
             return $middleware;
 
-        if(method_exists($middleware, 'handle'))
-            return function() use($middleware) {
-                return call_user_func_array(array($middleware, 'handle'), func_get_args());
+        if(method_exists($middleware, $method))
+            return function() use($middleware, $method) {
+                return call_user_func_array(array($middleware, $method), func_get_args());
             };
 
         throw new InvalidArgumentException('Middleware [' . get_class($middleware) .'] has to be callable or implements method handle()');
