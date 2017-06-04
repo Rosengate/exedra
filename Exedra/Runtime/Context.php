@@ -122,29 +122,6 @@ class Context extends Container
     }
 
     /**
-     * Initialize call stacks
-     * Handle application execution
-     * Set response body
-     * @return $this
-     */
-    public function run()
-    {
-        $this->callStack = $this->finding->getCallStack();
-
-        // first handle.
-        $handle = reset($this->callStack);
-
-        $response = $handle($this);
-
-        if($response instanceof Response)
-            $this->services['response'] = $response;
-        else
-            $this->response->setBody($response);
-
-        return $this;
-    }
-
-    /**
      * Get execution namespace
      * @return string
      */
@@ -225,12 +202,12 @@ class Context extends Container
      */
     public function next()
     {
-        return call_user_func_array(next($this->callStack), func_get_args());
+        return call_user_func_array(array($this->finding->getCallStack(), 'next'), func_get_args());
     }
 
     public function getNextCall()
     {
-        return next($this->callStack);
+        return $this->finding->getCallStack()->getNextCall();
     }
 
     /**

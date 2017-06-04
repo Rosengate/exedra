@@ -8,6 +8,7 @@ use Exedra\Provider\Registry as ProviderRegistry;
 use Exedra\Routing\ExecuteHandlers\ClosureHandler;
 use Exedra\Routing\Factory;
 use Exedra\Routing\Group;
+use Exedra\Runtime\Response;
 use Exedra\Support\Provider\Framework;
 use Exedra\Url\UrlFactory;
 use Exedra\View\View;
@@ -132,13 +133,25 @@ class Application extends Container
     }
 
     /**
-     * Execute the finding
+     * Execute the call stack
      * @param \Exedra\Routing\Finding $finding
      * @return \Exedra\Runtime\Context
      */
     public function run(\Exedra\Routing\Finding $finding)
     {
-        return $this->create('runtime.context', array($this, $finding, $this->create('runtime.response')))->run();
+        $callStack = $finding->getCallStack();
+
+        $context = $this->create('runtime.context', array($this, $finding, $this->create('runtime.response')));
+
+        // The Call
+        $response = $callStack->call($context);
+
+        if($response instanceof Response)
+            $context['service']->response = $response;
+        else
+            $context->response->setBody($response);
+
+        return $context;
     }
 
     /**

@@ -66,6 +66,11 @@ class Finding
     protected $execute;
 
     /**
+     * @var CallStack $callStack
+     */
+    protected $callStack;
+
+    /**
      * @param \Exedra\Routing\Route|null
      * @param array $parameters
      * @param mixed $request
@@ -80,7 +85,7 @@ class Finding
         {
             $this->addParameters($parameters);
 
-            $this->resolve();
+            $this->callStack = $this->resolve();
         }
     }
 
@@ -152,8 +157,10 @@ class Finding
     }
 
     /**
-     * Resolve finding informations
+     * Resolve finding informations and returns a CallStack
      * resolve, baseRoute, middlewares, config, attributes
+     * @return CallStack
+     * @throws InvalidArgumentException
      */
     public function resolve()
     {
@@ -232,10 +239,12 @@ class Finding
                 $this->execute = $resolve;
             }
         }
+
+        return new CallStack(array_merge($this->middlewares, array($this->execute)));
     }
 
     /**
-     * @return array
+     * @return CallStack
      * @throws InvalidArgumentException
      * @throws \Exedra\Exception\NotFoundException
      */
@@ -251,7 +260,7 @@ class Finding
             throw new InvalidArgumentException('The route [' . $this->route->getAbsoluteName() . '] execute handle was not properly resolved. '.(is_string($executePattern) ? ' ['.$executePattern.']' : ''));
         }
 
-        return array_merge($this->middlewares, array($this->execute));
+        return $this->callStack;
     }
 
     /**
