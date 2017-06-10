@@ -122,7 +122,7 @@ class Group implements \ArrayAccess, Registrar
         if($this->route)
             $this->route->setMiddleware($middleware);
         else
-            $this->middlewares = array($middleware);
+            $this->middlewares = array(array($middleware));
 
         return $this;
     }
@@ -152,33 +152,30 @@ class Group implements \ArrayAccess, Registrar
     /**
      * Alias to addMiddleware
      * @param mixed $middleware
-     * @param null|string $name
+     * @param array $properties
      * @return $this
      */
-    public function middleware($middleware, $name = null)
+    public function middleware($middleware, array $properties = array())
     {
-        return $this->addMiddleware($middleware, $name);
+        return $this->addMiddleware($middleware, $properties);
     }
 
     /**
      * Inversely add middleware on upper route
      * If there's this group is on the top (not route dependant), register middleware on app
      * @param mixed $middleware
-     * @param null|string $name
+     * @param array $properties
      * @return $this
      */
-    public function addMiddleware($middleware, $name = null)
+    public function addMiddleware($middleware, array $properties = array())
     {
         if($this->route)
         {
-            $this->route->addMiddleware($middleware, $name);
+            $this->route->addMiddleware($middleware, $properties);
         }
         else
         {
-            if($name)
-                $this->middlewares[$name] = $middleware;
-            else
-                $this->middlewares[] = $middleware;
+            $this->middlewares[] = array($middleware, $properties);
         }
 
         return $this;
@@ -186,11 +183,18 @@ class Group implements \ArrayAccess, Registrar
 
     /**
      * @param array|callable[] $middlewares
+     * @return $this
      */
     public function addMiddlewares(array $middlewares)
     {
         foreach($middlewares as $id => $middleware)
-            $this->addMiddleware($middleware, is_int($id) ? count($this->middlewares) : $id);
+        {
+            // assuming the second entry is the properties
+            if(is_array($middleware))
+                $this->addMiddleware($middleware[0], $middleware[1]);
+            else
+                $this->addMiddleware($middleware);
+        }
 
         return $this;
     }

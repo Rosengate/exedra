@@ -3,17 +3,28 @@ namespace Exedra\Routing;
 
 class CallStack
 {
-    protected $stacks;
+    protected $callables;
 
-    public function __construct(array $stacks)
+    protected $initiated = false;
+
+    public function addCallable(callable $callable, array $properties = array())
     {
-        $this->stacks = $stacks;
+        $this->callables[] = new Call($callable, $properties);
+
+        return $this;
     }
 
-    public function removeCall($name)
+    public function reset()
     {
-        if(isset($this->stacks[$name]))
-            unset($this->stacks[$name]);
+        $this->initiated = false;
+
+        reset($this->callables);
+    }
+
+    public function removeCallable($name)
+    {
+        if(isset($this->callables[$name]))
+            unset($this->callables[$name]);
 
         return $this;
     }
@@ -39,22 +50,22 @@ class CallStack
     }
 
     /**
-     * @return mixed
+     * Get the next call, and move the pointer
+     * If movement hasn't initiated, get current
+     * @return Call
      */
-    public function getNextCall()
+    public function getNextCallable()
     {
-        return next($this->stacks);
-    }
+        if(!$this->initiated)
+        {
+            reset($this->callables);
 
-    /**
-     * Initiate the first call
-     * @return mixed
-     */
-    public function call()
-    {
-        reset($this->stacks);
+            $this->initiated = true;
 
-        return call_user_func_array(current($this->stacks), func_get_args());
+            return current($this->callables);
+        }
+
+        return next($this->callables);
     }
 
     /**
@@ -63,7 +74,16 @@ class CallStack
      */
     public function next()
     {
-        return call_user_func_array(next($this->stacks), func_get_args());
+        if(!$this->initiated)
+        {
+            reset($this->callables);
+
+            $this->initiated = true;
+
+            return current($this->callables);
+        }
+
+        return call_user_func_array(next($this->callables), func_get_args());
     }
 
     /**
@@ -72,6 +92,6 @@ class CallStack
      */
     public function __invoke()
     {
-        return call_user_func_array(array($this, 'call'), func_get_args());
+        return call_user_func_array(array($this, 'next'), func_get_args());
     }
 }

@@ -198,16 +198,45 @@ class Context extends Container
 
     /**
      * Point and execute the next handler
+     * If there's an injectable argument, inject them, and create another $next caller
      * @return mixed
      */
     public function next()
     {
-        return call_user_func_array(array($this->finding->getCallStack(), 'next'), func_get_args());
+        $callStack = $this->finding->getCallStack();
+
+        $callable = $callStack->getNextCallable();
+
+        if($callable->hasDependencies())
+        {
+            $args = array();
+
+            foreach($callable->getDependencies() as $injectable)
+                $args[] = $this->tokenResolve($injectable);
+
+            $context = $this;
+
+            // $next callable
+            $next = function() use($context, &$next)
+            {
+                $args = func_get_args();
+
+                $args[] = $next;
+
+                return call_user_func_array(array($context, 'next'), $args);
+            };
+
+            $args[] = $next;
+
+            return call_user_func_array($callable, $args);
+        }
+
+        return call_user_func_array($callable, func_get_args());
     }
 
     public function getNextCall()
     {
-        return $this->finding->getCallStack()->getNextCall();
+        return $this->finding->getCallStack()->getNextCallable();
     }
 
     /**

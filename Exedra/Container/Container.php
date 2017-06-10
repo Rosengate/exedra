@@ -162,6 +162,9 @@ class Container implements \ArrayAccess
         if(isset($this->invokables[$name]))
             return call_user_func_array($this->invokables[$name], $args);
 
+        if(method_exists($this, $name))
+            return call_user_func_array(array($this, $name), $args);
+
         return $this->solve('callable', $name, $args);
     }
 
@@ -244,6 +247,50 @@ class Container implements \ArrayAccess
     }
 
     /**
+     * Resolve services, factories, callables by given token
+     * @param string $name
+     * @return mixed
+     */
+    public function tokenResolve($name)
+    {
+        switch($name)
+        {
+            case 'self':
+                return $this;
+                break;
+            default:
+                $split = explode('.', $name, 2);
+
+                if(isset($split[1]))
+                {
+                    switch($split[0])
+                    {
+                        case 'self':
+                            return $this->{$split[1]};
+                            break;
+                        case 'service':
+                            return $this->get($split[1]);
+                            break;
+                        case 'factory':
+                            return $this->create($split[1]);
+                            break;
+                        case 'callable':
+                            return $this->__call($split[1]);
+                            break;
+                        default:
+                            return $this->{$arg};
+                            break;
+                    }
+                }
+                else
+                {
+                    return $this->get($name);
+                }
+            break;
+        }
+    }
+
+    /**
      * Actual resolve the given type of registry
      * @param mixed registry
      * @return mixed
@@ -276,41 +323,8 @@ class Container implements \ArrayAccess
                     if(!is_string($arg))
                         throw new \Exedra\Exception\InvalidArgumentException('['.get_class($this).'] Argument for array based ['.$name.'] registry must be string');
 
-                    switch($arg)
-                    {
-                        case 'self':
-                            $arguments[] = $this;
-                        break;
-                        default:
-                            $split = explode('.', $arg, 2);
-
-                            if(isset($split[1]))
-                            {
-                                switch($split[0])
-                                {
-                                    case 'self':
-                                        $arguments[] = $this->{$split[1]};
-                                    break;
-                                    case 'service':
-                                        $arguments[] = $this->get($split[1]);
-                                    break;
-                                    case 'factory':
-                                        $arguments[] = $this->create($split[1]);
-                                    break;
-                                    case 'callable':
-                                        $arguments[] = $this->__call($split[1]);
-                                    break;
-                                    default:
-                                        $arguments[] = $this->{$arg};
-                                    break;
-                                }
-                            }
-                            else
-                            {
-                                $arguments[] = $this->get($arg);
-                            }
-                        break;
-                    }
+                    if($arg = $this->tokenResolve($arg))
+                        $arguments[] = $arg;
                 }
             }
 

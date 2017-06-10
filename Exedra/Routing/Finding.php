@@ -15,12 +15,6 @@ class Finding
     public $route;
 
     /**
-     * List of found middlewares
-     * @var array $middlewares
-     */
-    public $middlewares = array();
-
-    /**
      * Finding attributes
      * @var array $attributes
      */
@@ -46,9 +40,7 @@ class Finding
 
     /**
      * Request instance
-     * Since exedra didn't implement it
-     * It'll not be typehinted
-     * @var \Psr\Http\Message\RequestInterface|null $request
+     * @var \Psr\Http\Message\ServerRequestInterface|null $request
      */
     protected $request = null;
 
@@ -173,13 +165,15 @@ class Finding
 
     /**
      * Resolve finding informations and returns a CallStack
-     * resolve, baseRoute, middlewares, config, attributes
+     * resolve baseRoute, middlewares, config, attributes
      * @return CallStack
      * @throws InvalidArgumentException
      */
-    public function resolve()
+    protected function resolve()
     {
         $this->baseRoute = null;
+
+        $callStack = new CallStack;
 
         $executePattern = $this->route->getProperty('execute');
 
@@ -198,25 +192,11 @@ class Finding
                 $this->baseRoute = $route->getAbsoluteName();
 
             foreach($route->getGroup()->getMiddlewares() as $key => $middleware)
-            {
-                $middleware = $this->resolveMiddleware($middleware);
-
-                if(is_string($key))
-                    $this->middlewares[$key] = $middleware;
-                else
-                    $this->middlewares[] = $middleware;
-            }
+                $callStack->addCallable($this->resolveMiddleware($middleware[0]), $middleware[1]);
 
             // append all route middlewares
             foreach($route->getProperty('middleware') as $key => $middleware)
-            {
-                $middleware = $this->resolveMiddleware($middleware);
-
-                if(is_string($key))
-                    $this->middlewares[$key] = $middleware;
-                else
-                    $this->middlewares[] = $middleware;
-            }
+                $callStack->addCallable($this->resolveMiddleware($middleware[0]), $middleware[1]);
 
             foreach($route->getAttributes() as $key => $value)
                 $this->attributes[$key] = $value;
@@ -251,59 +231,37 @@ class Finding
                 if(!is_callable($resolve))
                     throw new \Exedra\Exception\InvalidArgumentException('The resolve() method for handler ['.get_class($handler).'] must return \Closure or callable');
 
+                $properties = array();
+
+                if($this->route->hasDependencies())
+                    $properties['dependencies'] = $this->route->getProperty('dependencies');
+
+                if(!$resolve)
+                {
+                    $executePattern = $this->route->getProperty('execute');
+
+                    if(!$executePattern)
+                        throw new InvalidArgumentException('The route [' . $this->route->getAbsoluteName() . '] does not have execute handle.');
+
+                    throw new InvalidArgumentException('The route [' . $this->route->getAbsoluteName() . '] execute handle was not properly resolved. '.(is_string($executePattern) ? ' ['.$executePattern.']' : ''));
+                }
+
+                $callStack->addCallable($resolve, $properties);
+
                 $this->execute = $resolve;
             }
         }
 
-        return new CallStack(array_merge($this->middlewares, array($this->execute)));
+        return $callStack;
     }
 
     /**
+     * Get callables stack
      * @return CallStack
-     * @throws InvalidArgumentException
-     * @throws \Exedra\Exception\NotFoundException
      */
     public function getCallStack()
     {
-        if(!$this->execute)
-        {
-            $executePattern = $this->route->getProperty('execute');
-
-            if(!$executePattern)
-                throw new InvalidArgumentException('The route [' . $this->route->getAbsoluteName() . '] does not have execute handle.');
-
-            throw new InvalidArgumentException('The route [' . $this->route->getAbsoluteName() . '] execute handle was not properly resolved. '.(is_string($executePattern) ? ' ['.$executePattern.']' : ''));
-        }
-
         return $this->callStack;
-    }
-
-    /**
-     * Check has middlewares or not
-     * @return boolean
-     */
-    public function hasMiddlewares()
-    {
-        return count($this->middlewares) > 0;
-    }
-
-    /**
-     * @return array
-     */
-    public function getMiddlewares()
-    {
-        return $this->middlewares;
-    }
-
-    /**
-     * @param $key
-     * @return $this
-     */
-    public function removeMiddleware($key)
-    {
-        unset($this->middlewares[$key]);
-
-        return $this;
     }
 
     /**

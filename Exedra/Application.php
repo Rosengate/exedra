@@ -139,12 +139,10 @@ class Application extends Container
      */
     public function run(\Exedra\Routing\Finding $finding)
     {
-        $callStack = $finding->getCallStack();
-
         $context = $this->create('runtime.context', array($this, $finding, $this->create('runtime.response')));
 
-        // The Call
-        $response = $callStack->call($context);
+        // The first call
+        $response = $context->next($context);
 
         if($response instanceof Response)
             $context['service']->response = $response;

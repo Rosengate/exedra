@@ -69,7 +69,8 @@ class Route implements Registrar
         'group' => 'subroutes',
         'handler' => 'execute',
         'verb' => 'method',
-        'attr' => 'attribute'
+        'attr' => 'attribute',
+        'injects' => 'dependencies'
     );
 
 	/**
@@ -890,19 +891,19 @@ class Route implements Registrar
      * @param mixed $middleware
      * @return $this
      */
-	public function setMiddleware($middleware)
+	public function setMiddleware($middleware, array $properties = array())
 	{
 		// reset on each call
 		$this->properties['middleware'] = array();
 
 		if(!is_array($middleware))
 		{
-			$this->properties['middleware'][] = $middleware;
+			$this->properties['middleware'][] = array($middleware, $properties);
 		}
 		else
 		{
 			foreach($middleware as $m)
-				$this->properties['middleware'][] = $m;
+				$this->properties['middleware'][] = array($m);
 		}
 
 		return $this;
@@ -1173,6 +1174,49 @@ class Route implements Registrar
 		$this->setProperty('requestable', $flag);
 
 		return $this;
+	}
+
+    /**
+     * Set dependencies for execute arguments
+     * @param array|mixed $dependencies
+     * @return $this
+     */
+    public function setDependencies($dependencies)
+    {
+        if(!is_array($dependencies))
+            $dependencies = array($dependencies);
+
+        $this->setProperty('dependencies', $dependencies);
+
+        return $this;
+	}
+
+    /**
+     * @return bool
+     */
+    public function hasDependencies()
+    {
+        return isset($this->properties['dependencies']);
+	}
+
+    /**
+     * Alias to setDependencies
+     * @param array|mixed $dependencies
+     * @return Route
+     */
+    public function dependencies($dependencies)
+    {
+        return $this->setDependencies($dependencies);
+	}
+
+    /**
+     * Alias to setDependencies
+     * @param array|mixed $dependencies
+     * @return $this
+     */
+    public function injects($dependencies)
+    {
+        return $this->setDependencies($dependencies);
 	}
 
     /**
