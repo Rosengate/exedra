@@ -1211,7 +1211,7 @@ class Route implements Registrar
      * @param array|mixed $dependencies
      * @return $this
      */
-    public function injects($dependencies)
+    public function inject($dependencies)
     {
         return $this->setDependencies($dependencies);
 	}
