@@ -70,7 +70,7 @@ class Route implements Registrar
         'handler' => 'execute',
         'verb' => 'method',
         'attr' => 'attribute',
-        'injects' => 'dependencies'
+        'inject' => 'dependencies'
     );
 
 	/**
