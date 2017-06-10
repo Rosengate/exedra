@@ -673,6 +673,21 @@ class Context extends Container
     }
 
     /**
+     * @param string $name
+     * @return mixed
+     */
+    public function tokenResolve($name)
+    {
+        if(strpos($name, 'context') === 0)
+            $name = str_replace('context', 'self', $name);
+
+        if(strpos($name, 'app.') === 0)
+            return $this->app->tokenResolve(str_replace('app.', 'self.', $name));
+
+        return parent::tokenResolve($name);
+    }
+
+    /**
      * @return bool
      */
     public function hasRequest()

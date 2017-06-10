@@ -364,7 +364,7 @@ class Route implements Registrar
 		}
 
 		if(count($missingParameters) > 0)
-            throw new \Exedra\Exception\InvalidArgumentException("Url.Create : Route parameter(s) is missing [".implode(', ', $missingParameters)."].");
+            throw new \Exedra\Exception\InvalidArgumentException("Route parameter(s) is missing [".implode(', ', $missingParameters)."].");
 
         return implode('/', $newSegments);
 	}
