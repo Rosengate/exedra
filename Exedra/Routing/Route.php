@@ -925,15 +925,12 @@ class Route implements Registrar
     /**
      * Add middleware to existing
      * @param mixed $middleware
-     * @param null $name
+     * @param array $properties
      * @return $this
      */
-	public function addMiddleware($middleware, $name = null)
+	public function addMiddleware($middleware, array $properties = array())
 	{
-	    if($name)
-	        $this->properties['middleware'][$name] = $middleware;
-        else
-            $this->properties['middleware'][] = $middleware;
+        $this->properties['middleware'][] = array($middleware, $properties);
 
 		return $this;
 	}

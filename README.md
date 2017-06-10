@@ -23,6 +23,7 @@ Imagine building a plane while flying it!
 - Psr7 middleware support
 - Container based
 - Decoupled components
+- Explicit dependency injection (no auto wiring)
 
 # Installation
 #### Composer
