@@ -253,6 +253,12 @@ class Container implements \ArrayAccess
      */
     public function tokenResolve($name)
     {
+        if(strpos($name, 'self.callable') === 0)
+            $name = str_replace('self.callable.', 'callable.', $name);
+
+        if(strpos($name, 'self.factory') === 0)
+            $name = str_replace('self.factory.', 'factory.', $name);
+
         switch($name)
         {
             case 'self':
