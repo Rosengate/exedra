@@ -40,10 +40,20 @@ class BridgeMiddleware
         if(!$context->hasRequest())
             throw new NotFoundException('Request is not available in this context.');
 
+        $context->setMutables(array(
+            'request', 'response'
+        ));
+
         $middlewares = $this->middlewares;
 
-        $middlewares[] = function($request, $response) use($context, $args)
+        // the last middleware
+        $middlewares[] = function(ServerRequest $request, $response) use($context, $args)
         {
+            $context->response = $response;
+
+            // mutate the request object
+            $context->request = $request;
+
             $contents = call_user_func_array($context->getNextCall(), $args);
 
             return $context->getResponse()->setBody(Stream::createFromContents($contents));
@@ -51,10 +61,24 @@ class BridgeMiddleware
 
         reset($middlewares);
 
-        $first = current($middlewares);
+        $next = function($request, $response) use(&$middlewares, &$next)
+        {
+            $call = next($middlewares);
+
+            return $call($request, $response, $next);
+        };
+
+        $first = function($request, $response) use(&$middlewares, $next)
+        {
+            reset($middlewares);
+
+            $call = current($middlewares);
+
+            return $call($request, $response, $next);
+        };
 
         // expect a ResponseInterface
-        $response = $first($context->getRequest(), $context->getResponse(), next($middlewares));
+        $response = $first($context->getRequest(), $context->getResponse(), $next);
 
         return $response;
     }
