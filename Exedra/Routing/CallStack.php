@@ -89,7 +89,7 @@ class CallStack
 
             $this->initiated = true;
 
-            return current($this->callables);
+            return call_user_func_array(current($this->callables), func_get_args());
         }
 
         return call_user_func_array(next($this->callables), func_get_args());
