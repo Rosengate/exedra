@@ -2,6 +2,7 @@
 namespace Exedra\Http;
 
 use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\StreamInterface;
 
 class Response extends Message implements ResponseInterface
 {
@@ -11,7 +12,7 @@ class Response extends Message implements ResponseInterface
 
     protected $statuses;
 
-    public function __construct($status = 200, array $headers = array(), Stream $body, $protocol = '1.1', $reason = null)
+    public function __construct($status = 200, array $headers = array(), StreamInterface $body, $protocol = '1.1', $reason = null)
     {
         parent::__construct($headers, $body, $protocol);
 
@@ -79,6 +80,15 @@ class Response extends Message implements ResponseInterface
     public static function createEmptyResponse()
     {
         return new static(200, array(), new Stream(fopen('php://temp', 'r+')));
+    }
+
+    /**
+     * @param ResponseInterface $response
+     * @return static
+     */
+    public static function createFromPsrResponse(ResponseInterface $response)
+    {
+        return new static($response->getStatusCode(), $response->getHeaders(), $response->getBody(), $response->getProtocolVersion(), $response->getReasonPhrase());
     }
 
     /**

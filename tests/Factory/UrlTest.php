@@ -23,7 +23,7 @@ class FactoryUrlTest extends PHPUnit_Framework_TestCase
 			));
 
 		// simple uri
-		$this->assertEquals('/uri1/uri2', $this->app->execute('tester', array('route'=> 'r1'))->response->getBody());
+		$this->assertEquals('/uri1/uri2', (string) $this->app->execute('tester', array('route'=> 'r1'))->response->getBody());
 
 		$this->assertEquals('/uri1/simple-param', $this->app->execute('tester', 
 			array(

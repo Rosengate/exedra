@@ -3,6 +3,7 @@ namespace Exedra\Runtime;
 
 use Exedra\Config;
 use Exedra\Container\Container;
+use Exedra\Http\Response;
 use Exedra\Http\ServerRequest;
 use Exedra\Path;
 use Exedra\Routing\Finding;
@@ -59,7 +60,7 @@ class Context extends Container
     public function __construct(
         \Exedra\Application $app,
         \Exedra\Routing\Finding $finding,
-        \Exedra\Runtime\Response $response)
+        \Exedra\Http\Response $response)
     {
         parent::__construct();
 

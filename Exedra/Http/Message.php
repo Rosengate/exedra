@@ -30,7 +30,7 @@ class Message implements MessageInterface
      */
     protected $body;
 
-    public function __construct(array $headers, Stream $body, $protocol = '1.1')
+    public function __construct(array $headers, StreamInterface $body, $protocol = '1.1')
     {
         $this->headers = $headers;
 

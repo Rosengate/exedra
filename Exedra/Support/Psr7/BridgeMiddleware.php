@@ -57,6 +57,15 @@ class BridgeMiddleware
 
             $contents = call_user_func_array($context->getNextCall(), $args);
 
+            if(is_object($contents))
+            {
+                if($contents instanceof ResponseInterface)
+                    return $contents;
+
+                if($contents instanceof Context)
+                    return $context->response;
+            }
+
             return $context->getResponse()->setBody(Stream::createFromContents($contents));
         };
 

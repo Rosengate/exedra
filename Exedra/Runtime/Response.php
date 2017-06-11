@@ -1,5 +1,6 @@
 <?php
 namespace Exedra\Runtime;
+use Psr\Http\Message\ResponseInterface;
 
 /**
  * An application execution oriented response
@@ -9,6 +10,15 @@ namespace Exedra\Runtime;
  */
 class Response extends \Exedra\Http\Response
 {
+    /**
+     * @param ResponseInterface $response
+     * @return static
+     */
+    public static function createFromPsrResponse(ResponseInterface $response)
+    {
+        return new static($response->getStatusCode(), $response->getHeaders(), (string) $response->getBody(), $response->getProtocolVersion(), $response->getReasonPhrase());
+    }
+
 	public function setBody($body, $mode = null)
 	{
 		$this->body = $body;

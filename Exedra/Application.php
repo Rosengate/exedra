@@ -5,6 +5,7 @@ use Exedra\Container\Container;
 use Exedra\Exception\InvalidArgumentException;
 use Exedra\Exception\RouteNotFoundException;
 use Exedra\Http\ServerRequest;
+use Exedra\Http\Stream;
 use Exedra\Provider\Registry as ProviderRegistry;
 use Exedra\Routing\ExecuteHandlers\ClosureHandler;
 use Exedra\Routing\Factory;
@@ -13,6 +14,7 @@ use Exedra\Routing\Group;
 use Exedra\Runtime\Context;
 use Exedra\Runtime\Response;
 use Exedra\Url\UrlFactory;
+use Psr\Http\Message\ResponseInterface;
 
 /**
  * Class Application
@@ -147,8 +149,12 @@ class Application extends Container
         $response = $context->next($context);
 
         // mutate the context and update the response
-        if($response instanceof Response)
+        if($response instanceof \Exedra\Http\Response)
             $context->services['response'] = $response;
+        else if($response instanceof ResponseInterface)
+            $context->services['response'] = \Exedra\Http\Response::createFromPsrResponse($response);
+        else if(get_class($context->response) == \Exedra\Http\Response::class)
+            $context->response->setBody(Stream::createFromContents($response));
         else
             $context->response->setBody($response);
 
