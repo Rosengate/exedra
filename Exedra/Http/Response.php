@@ -178,7 +178,11 @@ class Response extends Message implements ResponseInterface
     {
         $this->sendHeader();
 
-        echo $this->getBody()->rewind()->getContents();
+        $body = $this->getBody();
+
+        $body->rewind();
+
+        echo $body->getContents();
     }
 
     /**
