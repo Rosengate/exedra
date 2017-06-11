@@ -75,8 +75,8 @@ class Session
 
     /**
      * Set a session by the given key.
-     * @param string key
-     * @param mixed value
+     * @param string $key
+     * @param mixed $value
      * @return \Exedra\Session\Session
      */
     public function set($key, $value)

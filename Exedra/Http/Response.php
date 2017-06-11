@@ -196,18 +196,21 @@ class Response extends Message implements ResponseInterface
     }
 
     /**
-     * Close and response
+     * Close and respond
      * http://stackoverflow.com/questions/138374/close-a-connection-early
      */
     public function close()
     {
         $contents = ob_get_clean();
+        header("Connection: close\r\n");
         header("Content-Encoding: none\r\n");
         ignore_user_abort(true);
         ob_start();
         echo $contents;
         $size = ob_get_length();
         header("Content-Length: $size");
+        if(function_exists('fastcgi_finish_request'))
+            fastcgi_finish_request();
         ob_end_flush();
         flush();
         ob_end_clean();

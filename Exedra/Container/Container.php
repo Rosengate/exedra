@@ -33,7 +33,7 @@ class Container implements \ArrayAccess
 
     /**
      * registry exist check
-     * @param string type
+     * @param string $type
      * @return bool
      */
     public function offsetExists($type)
@@ -60,7 +60,7 @@ class Container implements \ArrayAccess
 
     /**
      * Empty the service
-     * @param string key
+     * @param string $key
      */
     public function offsetUnset($key)
     {
@@ -72,7 +72,7 @@ class Container implements \ArrayAccess
 
     /**
      * Get container registry
-     * @param string type
+     * @param string $type
      * @return \Exedra\Container\Registry
      */
     public function registry($type)
@@ -82,8 +82,9 @@ class Container implements \ArrayAccess
 
     /**
      * Set service.
-     * @param string name
-     * @param mixed service
+     * @param string $name
+     * @param mixed $value
+     * @throws \Exedra\Exception\Exception
      */
     public function __set($name, $value)
     {
@@ -97,7 +98,7 @@ class Container implements \ArrayAccess
 
     /**
      * Register mutable services
-     * @param array names
+     * @param array $services
      */
     public function setMutables(array $services)
     {
@@ -108,7 +109,7 @@ class Container implements \ArrayAccess
     /**
      * Get service
      * If has none, resolve
-     * @param string name
+     * @param string $name
      * @return mixed
      */
     public function get($name)
@@ -123,7 +124,7 @@ class Container implements \ArrayAccess
      * Get service
      * If has none, find in services registry.
      * Alias to get()
-     * @param string name
+     * @param string $name
      * @return mixed
      */
     public function __get($name)
@@ -131,6 +132,10 @@ class Container implements \ArrayAccess
         return $this->get($name);
     }
 
+    /**
+     * @param $name
+     * @return bool
+     */
     public function __isset($name)
     {
         return $this->services['service']->has($name);
@@ -140,7 +145,7 @@ class Container implements \ArrayAccess
      * Get service
      * If has none, find in services registry.
      * Alias to get()
-     * @param string key
+     * @param string $name
      * @return \Exedra\Container\Registry
      */
     public function offsetGet($name)
@@ -150,8 +155,8 @@ class Container implements \ArrayAccess
 
     /**
      * Invoke the registered callable
-     * @param string name
-     * @param array args
+     * @param string $name
+     * @param array $args
      * @return mixed
      *
      * @throws \InvalidArgumentException
@@ -170,8 +175,8 @@ class Container implements \ArrayAccess
 
     /**
      * Invoke the registered factory
-     * @param string name
-     * @param array args
+     * @param string $name
+     * @param array $args
      * @return mixed
      *
      * @throws \InvalidArgumentException
@@ -183,9 +188,9 @@ class Container implements \ArrayAccess
 
     /**
      * All-capable dependency call.
-     * @param string type
-     * @param string name
-     * @param array args
+     * @param string $type
+     * @param string $name
+     * @param array $args
      * @return mixed
      */
     public function dependencyCall($type, $name, array $args = array())
@@ -206,10 +211,10 @@ class Container implements \ArrayAccess
 
     /**
      * Solve the given type of registry
-     * @param string type services|callables|factories
-     * @param string name
+     * @param string $type services|callables|factories
+     * @param string $name
+     * @param array $args
      * @return mixed
-     *
      * @throws \Exedra\Exception\InvalidArgumentException for failing to find in registry
      */
     protected function solve($type, $name, array $args = array())
@@ -298,8 +303,11 @@ class Container implements \ArrayAccess
 
     /**
      * Actual resolve the given type of registry
-     * @param mixed registry
+     * @param $name
+     * @param $registry
+     * @param array $args
      * @return mixed
+     * @throws \Exedra\Exception\InvalidArgumentException
      */
     protected function resolve($name, $registry, array $args = array())
     {

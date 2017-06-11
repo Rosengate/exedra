@@ -163,6 +163,9 @@ class ServerRequest extends Message implements ServerRequestInterface
         );
     }
 
+    /**
+     * @return string
+     */
     public function getRequestTarget()
     {
         if($this->requestTarget)
@@ -179,13 +182,21 @@ class ServerRequest extends Message implements ServerRequestInterface
         return $target;
     }
 
+    /**
+     * @param $target
+     * @return $this
+     */
     public function setRequestTarget($target)
     {
         $this->requestTarget = $target;
 
-        return $this->requestTarget;
+        return $this;
     }
 
+    /**
+     * @param mixed $target
+     * @return ServerRequest
+     */
     public function withRequestTarget($target)
     {
         $request = clone $this;
@@ -193,16 +204,29 @@ class ServerRequest extends Message implements ServerRequestInterface
         return $request->setRequestTarget($target);
     }
 
+    /**
+     * @param $method
+     * @return $this
+     */
     public function setMethod($method)
     {
         $this->method = strtoupper($method);
+
+        return $this;
     }
 
+    /**
+     * @return string
+     */
     public function getMethod()
     {
         return $this->method;
     }
 
+    /**
+     * @param string $method
+     * @return ServerRequest
+     */
     public function withMethod($method)
     {
         $request = clone $this;
@@ -212,11 +236,17 @@ class ServerRequest extends Message implements ServerRequestInterface
         return $request;
     }
 
+    /**
+     * @return Uri
+     */
     public function getUri()
     {
         return $this->uri;
     }
 
+    /**
+     * @param $uri
+     */
     public function setUri($uri)
     {
         if(is_string($uri) || is_array($uri))
@@ -227,6 +257,11 @@ class ServerRequest extends Message implements ServerRequestInterface
             throw new \InvalidArgumentException('Invalid uri. Must be string, array, or Uri');
     }
 
+    /**
+     * @param UriInterface $uri
+     * @param bool $preserveHost
+     * @return ServerRequest
+     */
     public function withUri(UriInterface $uri, $preserveHost = false)
     {
         $request = clone $this;
@@ -276,6 +311,10 @@ class ServerRequest extends Message implements ServerRequestInterface
         return array_key_exists($name, $this->cookies) ? $this->cookies[$name] : $default;
     }
 
+    /**
+     * @param array $params
+     * @return $this
+     */
     public function setCookieParams(array $params)
     {
         $this->cookies = $params;
@@ -283,6 +322,10 @@ class ServerRequest extends Message implements ServerRequestInterface
         return $this;
     }
 
+    /**
+     * @param array $params
+     * @return ServerRequest
+     */
     public function withCookieParams(array $params)
     {
         $request = clone $this;
@@ -292,6 +335,9 @@ class ServerRequest extends Message implements ServerRequestInterface
         return $request;
     }
 
+    /**
+     * @return array
+     */
     public function getQueryParams()
     {
         if($this->queryParams)
@@ -302,6 +348,10 @@ class ServerRequest extends Message implements ServerRequestInterface
         return $this->queryParams;
     }
 
+    /**
+     * @param array $queryParams
+     * @return $this
+     */
     public function setQueryParams(array $queryParams)
     {
         $this->queryParams = $queryParams;
@@ -309,6 +359,10 @@ class ServerRequest extends Message implements ServerRequestInterface
         return $this;
     }
 
+    /**
+     * @param array $queryParams
+     * @return ServerRequest
+     */
     public function withQueryParams(array $queryParams)
     {
         $request = clone $this;

@@ -22,6 +22,11 @@ class Stream implements StreamInterface
         $this->attach($handle, $mode);
     }
 
+    /**
+     * @param $contents
+     * @param string $mode
+     * @return Stream
+     */
     public static function createFromContents($contents, $mode = 'r+')
     {
         $handle = fopen('php://temp', $mode);
@@ -31,6 +36,11 @@ class Stream implements StreamInterface
         return new self($handle);
     }
 
+    /**
+     * @param $path
+     * @param string $mode
+     * @return static
+     */
     public static function createFromPath($path, $mode = 'r+')
     {
         $handle = fopen($path, $mode);

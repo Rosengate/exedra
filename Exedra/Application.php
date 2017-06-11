@@ -1,5 +1,6 @@
 <?php namespace Exedra;
 
+use Exedra\Config;
 use Exedra\Container\Container;
 use Exedra\Exception\InvalidArgumentException;
 use Exedra\Exception\RouteNotFoundException;
@@ -7,11 +8,11 @@ use Exedra\Http\ServerRequest;
 use Exedra\Provider\Registry as ProviderRegistry;
 use Exedra\Routing\ExecuteHandlers\ClosureHandler;
 use Exedra\Routing\Factory;
+use Exedra\Routing\Finding;
 use Exedra\Routing\Group;
+use Exedra\Runtime\Context;
 use Exedra\Runtime\Response;
-use Exedra\Support\Provider\Framework;
 use Exedra\Url\UrlFactory;
-use Exedra\View\View;
 
 /**
  * Class Application
@@ -59,17 +60,17 @@ class Application extends Container
     protected function setUp()
     {
         $this->services['service']->register(array(
-            'config' => \Exedra\Config::class,
+            'config' => Config::class,
             'routingFactory' => function(){ return new Factory();},
             'map' => function() { return $this['routingFactory']->createGroup();},
-            'request' => function(){ return \Exedra\Http\ServerRequest::createFromGlobals();},
+            'request' => function(){ return ServerRequest::createFromGlobals();},
             'url' => function() { return $this->create('url.factory', array($this->map, $this->request, $this->config->get('app.url', null), $this->config->get('asset.url', null)));},
         ));
 
         $this->services['factory']->register(array(
-            'runtime.context' => \Exedra\Runtime\Context::class,
-            'runtime.response' => function(){ return \Exedra\Runtime\Response::createEmptyResponse();},
-            'url.factory' => \Exedra\Url\UrlFactory::class
+            'runtime.context' => Context::class,
+            'runtime.response' => function(){ return Response::createEmptyResponse();},
+            'url.factory' => UrlFactory::class
         ));
 
         $this->map->addExecuteHandler('closure', ClosureHandler::class);
@@ -84,7 +85,7 @@ class Application extends Container
     }
 
     /**
-     * @return \Exedra\Http\ServerRequest
+     * @return ServerRequest
      */
     public function getRequest()
     {
@@ -95,13 +96,13 @@ class Application extends Container
      * Execute application given route name
      * @param string $routeName
      * @param array $parameters
-     * @param \Exedra\Http\ServerRequest $request
-     * @return \Exedra\Runtime\Context
+     * @param ServerRequest $request
+     * @return Context
      *
      * @throws InvalidArgumentException
      * @throws RouteNotFoundException
      */
-    public function execute($routeName, array $parameters = array(), \Exedra\Http\ServerRequest $request = null)
+    public function execute($routeName, array $parameters = array(), ServerRequest $request = null)
     {
         // expect it as route name
         if(!is_string($routeName))
@@ -118,11 +119,11 @@ class Application extends Container
     /**
      * Execute the http request
      * And return the context
-     * @param \Exedra\Http\ServerRequest|null $request
+     * @param ServerRequest|null $request
      * @return Runtime\Context
      * @throws RouteNotFoundException
      */
-    public function request(\Exedra\Http\ServerRequest $request = null)
+    public function request(ServerRequest $request = null)
     {
         $finding = $this->map->findByRequest($request = ($request ? : $this->request));
 
@@ -134,10 +135,10 @@ class Application extends Container
 
     /**
      * Execute the call stack
-     * @param \Exedra\Routing\Finding $finding
-     * @return \Exedra\Runtime\Context
+     * @param Finding $finding
+     * @return Context
      */
-    public function run(\Exedra\Routing\Finding $finding)
+    public function run(Finding $finding)
     {
         $context = $this->create('runtime.context', array($this, $finding, $this->create('runtime.response')));
 
@@ -155,10 +156,10 @@ class Application extends Container
     /**
      * Dispatch and return the response
      * Handle uncaught \Exedra\Exception\Exception
-     * @param \Exedra\Http\ServerRequest|null $request
-     * @return \Exedra\Runtime\Response
+     * @param ServerRequest|null $request
+     * @return Response
      */
-    public function respond(\Exedra\Http\ServerRequest $request)
+    public function respond(ServerRequest $request)
     {
         try
         {
@@ -187,7 +188,7 @@ class Application extends Container
                 $message = '<pre><h2>['.get_class($e).'] '.$e->getMessage().'</h2>'.PHP_EOL;
                 $message .= $e->getTraceAsString();
 
-                $response = \Exedra\Runtime\Response::createEmptyResponse()
+                $response = Response::createEmptyResponse()
                 ->setStatus(404)
                 ->setBody($message);
             }
@@ -199,9 +200,9 @@ class Application extends Container
     /**
      * Dispatch and send header
      * And print the response
-     * @param \Exedra\Http\ServerRequest|null $request
+     * @param ServerRequest|null $request
      */
-    public function dispatch(\Exedra\Http\ServerRequest $request = null)
+    public function dispatch(ServerRequest $request = null)
     {
         $response = $this->respond($request ? : $this->request);
 

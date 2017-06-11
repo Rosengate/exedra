@@ -7,6 +7,11 @@ class CallStack
 
     protected $initiated = false;
 
+    /**
+     * @param callable $callable
+     * @param array $properties
+     * @return $this
+     */
     public function addCallable(callable $callable, array $properties = array())
     {
         $this->callables[] = new Call($callable, $properties);
@@ -21,6 +26,10 @@ class CallStack
         reset($this->callables);
     }
 
+    /**
+     * @param $name
+     * @return $this
+     */
     public function removeCallable($name)
     {
         if(isset($this->callables[$name]))
