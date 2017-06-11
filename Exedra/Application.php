@@ -140,13 +140,15 @@ class Application extends Container
      */
     public function run(Finding $finding)
     {
+        /** @var Context $context */
         $context = $this->create('runtime.context', array($this, $finding, $this->create('runtime.response')));
 
         // The first call
         $response = $context->next($context);
 
+        // mutate the context and update the response
         if($response instanceof Response)
-            $context['service']->response = $response;
+            $context->services['response'] = $response;
         else
             $context->response->setBody($response);
 

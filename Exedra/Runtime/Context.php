@@ -410,7 +410,7 @@ class Context extends Container
     }
 
     /**
-     * A public functionality to add parameter(s) to $exe.
+     * A public functionality to add parameter(s) to $context.
      * @param string $key
      * @param mixed $value
      * @return $this;
@@ -614,19 +614,19 @@ class Context extends Container
      */
     public function finalize()
     {
-        $exe = $this;
+        $context = $this;
 
         while(true)
         {
-            $body = $exe->response->getBody();
+            $body = $context->response->getBody();
 
             if($body instanceof \Exedra\Runtime\Context)
-                $exe = $body;
+                $context = $body;
             else
                 break;
         }
 
-        return $exe;
+        return $context;
     }
 
     /**
