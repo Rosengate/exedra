@@ -3,6 +3,7 @@ namespace Exedra\Support\Psr7;
 
 use Exedra\Exception\InvalidArgumentException;
 use Exedra\Exception\NotFoundException;
+use Exedra\Http\ServerRequest;
 use Exedra\Http\Stream;
 use Exedra\Runtime\Context;
 use Psr\Http\Message\ResponseInterface;
