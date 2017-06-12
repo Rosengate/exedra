@@ -3,7 +3,6 @@ namespace Exedra\Runtime;
 
 use Exedra\Config;
 use Exedra\Container\Container;
-use Exedra\Http\Response;
 use Exedra\Http\ServerRequest;
 use Exedra\Path;
 use Exedra\Routing\Finding;
@@ -19,7 +18,7 @@ use Psr\Http\Message\ResponseInterface;
  * @package Exedra\Runtime
  *
  * @property ServerRequest $request
- * @property Response $response
+ * @property \Exedra\Http\Response $response
  * @property Route $route
  * @property Finding $finding
  * @property Path $path
