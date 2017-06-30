@@ -145,9 +145,8 @@ class UrlGenerator implements UrlGeneratorInterface
      * @param string $routeName
      * @param array $data
      * @param mixed $query (uri query string)
-     *
      * @return string
-     * @throws \InvalidArgumentException
+     * @throws NotFoundException
      */
     public function create($routeName, array $data = array(), array $query = array())
     {
@@ -157,7 +156,7 @@ class UrlGenerator implements UrlGeneratorInterface
             $route = $this->map->findRoute($routeName);
 
         if(!$route)
-            throw new \InvalidArgumentException('Unable to find route ['.$routeName.']');
+            throw new NotFoundException('Unable to find route ['.$routeName.']');
 
         $path = $route->getAbsolutePath($data);
 

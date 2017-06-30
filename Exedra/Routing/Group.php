@@ -19,6 +19,12 @@ class Group implements \ArrayAccess, Registrar
     protected $routes = array();
 
     /**
+     * Alias for route name
+     * @var array
+     */
+    protected $aliasIndices = array();
+
+    /**
      * Routing group based middlewares
      * Addable on group not bound to any route
      * @var array $middlewares
@@ -357,6 +363,10 @@ class Group implements \ArrayAccess, Registrar
         $routeName = array_shift($routeNames);
         $isTag = strpos($routeName, '#') === 0;
 
+        // alias check
+        if(isset($this->aliasIndices[$routeName]))
+            $routeName = $this->aliasIndices[$routeName];
+
         // search by route name
         if(!$isTag)
         {
@@ -582,5 +592,23 @@ class Group implements \ArrayAccess, Registrar
         $this->addRoute($route);
 
         return $route->tag($tag);
+    }
+
+    /**
+     * Set alias for given route name
+     * This is a good for a case where dev decided to change route name
+     * @param string $name
+     * @param string|array $alias
+     * @return $this
+     */
+    public function addAlias($name, $alias)
+    {
+        if(is_array($alias))
+            foreach($alias as $item)
+                $this->aliasIndices[$item] = $name;
+        else
+            $this->aliasIndices[$alias] = $name;
+
+        return $this;
     }
 }
