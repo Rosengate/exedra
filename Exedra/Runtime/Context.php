@@ -99,7 +99,12 @@ class Context extends Container
         $this->services['service']->register(array(
             'path' => function(){ return $this->app->path; },
             'config' => function() { return clone $this->app->config; },
-            'url' => function(){ return $this->app->create('url.factory', array($this->route->getGroup(), $this->request, $this->config->get('app.url', null), $this->config->get('asset.url', null)));},
+            'url' => function(){
+                $baseUrl = $this->app->url->getBaseUrl();
+                $assetUrl = $this->app->url->getAssetUrl();
+
+                return $this->app->create('url.factory', array($this->route->getGroup(), $this->request ? : null, $baseUrl, $assetUrl));
+            },
             'redirect' => array(Redirect::class, array('self.response', 'self.url')),
             'form' => array(Form::class, array('self')),
             // thinking of deprecating the asset as service

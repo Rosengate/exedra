@@ -25,7 +25,7 @@ use Psr\Http\Message\ResponseInterface;
  * @property Factory $routingFactory
  * @property Group $map
  * @property Path $path
- * @property ServerRequest $request
+ * @property ServerRequest|null $request
  * @property UrlFactory $url
  */
 class Application extends Container
@@ -65,8 +65,8 @@ class Application extends Container
             'config' => Config::class,
             'routingFactory' => function(){ return new Factory();},
             'map' => function() { return $this['routingFactory']->createGroup();},
-            'request' => function(){ return ServerRequest::createFromGlobals();},
-            'url' => function() { return $this->create('url.factory', array($this->map, $this->request, $this->config->get('app.url', null), $this->config->get('asset.url', null)));},
+            'request' => function(){ return isset($_SERVER['REQUEST_URI']) ? ServerRequest::createFromGlobals() : null;},
+            'url' => function() { return $this->create('url.factory', array($this->map, $this->request ? : null, $this->config->get('app.url', null), $this->config->get('asset.url', null)));},
         ));
 
         $this->services['factory']->register(array(

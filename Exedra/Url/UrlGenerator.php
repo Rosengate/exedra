@@ -3,7 +3,9 @@ namespace Exedra\Url;
 
 use Exedra\Contracts\Url\UrlGenerator as UrlGeneratorInterface;
 use Exedra\Exception\NotFoundException;
+use Exedra\Http\ServerRequest;
 use Exedra\Routing\Group;
+use MongoDB\Driver\Server;
 
 /**
  * A route oriented url generator
@@ -50,6 +52,16 @@ class UrlGenerator implements UrlGeneratorInterface
         $this->request = $request;
         $this->setBase($appUrl ? : ($request ? $request->getUri()->getScheme().'://'.$request->getUri()->getAuthority() : null ));
         $this->setAsset($assetUrl ? : $this->baseUrl);
+    }
+
+    public function getBaseUrl()
+    {
+        return $this->baseUrl;
+    }
+
+    public function getAssetUrl()
+    {
+        return $this->assetUrl;
     }
 
     /**
