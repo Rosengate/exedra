@@ -374,10 +374,22 @@ class Group implements \ArrayAccess, Registrar
             foreach($this->storage as $route)
             {
                 if($route->getName() === $routeName)
-                    if(count($routeNames) > 0 && $route->hasSubroutes())
-                        return $route->getSubroutes()->findRouteRecursively($routeNames);
+                {
+                    // still has depth
+                    if(count($routeNames) > 0)
+                    {
+                        // and route has group
+                        if($route->hasSubroutes())
+                            return $route->getSubroutes()->findRouteRecursively($routeNames);
+                        else
+                            return false;
+                    }
+                    // the end of search
                     else
+                    {
                         return $route;
+                    }
+                }
             }
         }
         // search by route tag under this group.
