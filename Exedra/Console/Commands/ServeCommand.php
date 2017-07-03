@@ -1,7 +1,6 @@
 <?php
 namespace Exedra\Console\Commands;
 
-use Exedra\Path;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputArgument;
@@ -13,9 +12,9 @@ class ServeCommand extends Command
 {
     protected $path;
 
-    public function __construct(Path $path)
+    public function __construct($path)
     {
-        $this->path = $path;
+        $this->path = (string) $path;
 
         parent::__construct();
     }
