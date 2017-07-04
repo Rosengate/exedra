@@ -32,8 +32,6 @@ class ContainerRegistryTest extends PHPUnit_Framework_TestCase
 
 		$this->assertTrue($app->url instanceof \Exedra\Url\UrlFactory);
 
-		$this->assertTrue($app->wizard instanceof \Exedra\Wizard\Manager);
-
 		// $this->assertTrue($app->module instanceof \Exedra\Module\Registry);
 
 		$this->assertTrue($app->path instanceof \Exedra\Path);

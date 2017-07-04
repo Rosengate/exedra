@@ -53,7 +53,6 @@ class Framework implements Provider
         $app['service']->register(array(
             '@session' => \Exedra\Session\Session::class,
             '@flash' => array(\Exedra\Session\Flash::class, array('self.session')),
-            'wizard' => array(\Exedra\Wizard\Manager::class, array('self')),
             '@controller' => function(){
                 if(!$this->config->has('namespace'))
                     throw new Exception('The ['.ControllerFactory::class.'] require config.namespace in order to work');
@@ -85,11 +84,6 @@ class Framework implements Provider
         $app->routingFactory->addGroupHandler(new PathHandler($app->path['routes']));
 
         $app->map->addExecuteHandler('controller', Controller::class);
-    }
-
-    protected function setUpWizard(Application $app)
-    {
-        $app->wizard->add(\Exedra\Wizard\Application::class);
     }
 
     protected function setUpAutoloading(Application $app)
