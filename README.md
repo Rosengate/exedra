@@ -37,6 +37,31 @@ Documentation
 - [Routing Controller](https://github.com/Rosengate/exedra/wiki/viii.-Routing-Controller)
 - [Psr7 Middleware](https://github.com/Rosengate/exedra/wiki/viv.-Psr-Middleware)
 
+# Usage
+Create an index.php file with the following contents.
+```php
+<?php
+use Exedra\Routing\Group;
+use Exedra\Runtime\Context;
+use Exedra\Application;
+
+require_once __DIR__ . '/vendor/autoload.php';
+
+$app = new Application(__DIR__);
+
+$app->map['web']->any('/hello')->group(function(Group $group) {
+    $group['welcome']->get('/:name')->execute(function(Context $context) {
+        return 'Hello ' . $context->param('name');
+    });
+});
+
+$app->dispatch();
+```
+And run a simple web server on the same dir.
+```
+php -S localhost:9000
+```
+
 # Roadmap to 1.0.0
 - Full Test Coverages
 - Class and components naming
