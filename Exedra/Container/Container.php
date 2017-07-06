@@ -81,7 +81,7 @@ class Container implements \ArrayAccess
     }
 
     /**
-     * Set service.
+     * Set and eager service / property
      * @param string $name
      * @param mixed $value
      * @throws \Exedra\Exception\Exception
@@ -107,6 +107,48 @@ class Container implements \ArrayAccess
     }
 
     /**
+     * Register a container lifetime service
+     * Alias to $container['service']->set() method
+     * @param string $name
+     * @param \Closure|array|string $resolvable
+     * @return $this
+     */
+    public function add($name, $resolvable)
+    {
+        $this->services['service']->add($name, $resolvable);
+
+        return $this;
+    }
+
+    /**
+     * Register a factory
+     * Alias to $container['factory']->add() method
+     * @param $name
+     * @param \Closure|array|string $resolvable
+     * @return $this
+     */
+    public function factory($name, $resolvable)
+    {
+        $this->services['factory']->add($name, $resolvable);
+
+        return $this;
+    }
+
+    /**
+     * Register method
+     * Alias to $container['callable']->set() method
+     * @param $name
+     * @param \Closure|array|string
+     * @return $this
+     */
+    public function func($name, $resolvable)
+    {
+        $this->services['callable']->add($name, $resolvable);
+
+        return $this;
+    }
+
+    /**
      * Get service
      * If has none, resolve
      * @param string $name
@@ -117,7 +159,7 @@ class Container implements \ArrayAccess
         if(array_key_exists($name, $this->services))
             return $this->services[$name];
 
-        return $this->services[$name] = $this->solve('service', $name);
+        return $this->services[$name] = $this->solve('service', $name, array($this));
     }
 
     /**
