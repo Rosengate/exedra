@@ -172,24 +172,24 @@ class Application extends Container
         try
         {
             $response = $this->request($request)
-                            ->finalize()
-                            ->getResponse();
+                ->finalize()
+                ->getResponse();
         }
         catch(\Exception $e)
         {
             if($failRoute = $this->failRoute)
             {
                 $response = $this->execute($failRoute, array('exception' => $e, 'request' => $request), $request)
-                                ->finalize()
-                                ->getResponse();
+                    ->finalize()
+                    ->getResponse();
 
                 $this->failRoute = null;
             }
             else if($this->map->hasFailRoute())
             {
                 $response = $this->execute($this->map->getFailRoute(), array('exception' => $e, 'request' => $request), $request)
-                                ->finalize()
-                                ->getResponse();
+                    ->finalize()
+                    ->getResponse();
             }
             else
             {
@@ -197,8 +197,8 @@ class Application extends Container
                 $message .= $e->getTraceAsString();
 
                 $response = Response::createEmptyResponse()
-                ->setStatus(404)
-                ->setBody($message);
+                    ->setStatus(404)
+                    ->setBody($message);
             }
         }
 
@@ -260,6 +260,6 @@ class Application extends Container
             $registry = $this->services[$type]->get($name);
         }
 
-        return $this->filter($type, $name, $this->resolve($name, $registry, $args));
+        return $this->filter($type, $name, $this->resolve($type, $name, $registry, $args));
     }
 }

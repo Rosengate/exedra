@@ -674,7 +674,7 @@ class Context extends Container
             $registry = $this->services[$type]->get($name);
         }
 
-        return $this->filter($type, $name, $this->resolve($name, $registry, $args));
+        return $this->filter($type, $name, $this->resolve($type, $name, $registry, $args));
     }
 
     /**

@@ -129,7 +129,7 @@ class Container implements \ArrayAccess
      */
     public function factory($name, $resolvable)
     {
-        $this->services['factory']->add($name, $resolvable);
+        $this->services['factory']->set($name, $resolvable);
 
         return $this;
     }
@@ -143,7 +143,7 @@ class Container implements \ArrayAccess
      */
     public function func($name, $resolvable)
     {
-        $this->services['callable']->add($name, $resolvable);
+        $this->services['callable']->set($name, $resolvable);
 
         return $this;
     }
@@ -241,13 +241,13 @@ class Container implements \ArrayAccess
         {
             case 'service':
                 return $this->get($name);
-            break;
+                break;
             case 'callable':
                 return $this->__call($name, $args);
-            break;
+                break;
             case 'factory':
                 return $this->create($name, $args);
-            break;
+                break;
         }
     }
 
@@ -282,7 +282,7 @@ class Container implements \ArrayAccess
 
         $registry = $this->services[$type]->get($name);
 
-        return $this->filter($type, $name, $this->resolve($name, $registry, $args));
+        return $this->filter($type, $name, $this->resolve($type, $name, $registry, $args));
     }
 
     protected function filter($type, $name, $resolve)
@@ -339,7 +339,7 @@ class Container implements \ArrayAccess
                 {
                     return $this->get($name);
                 }
-            break;
+                break;
         }
     }
 
@@ -351,13 +351,17 @@ class Container implements \ArrayAccess
      * @return mixed
      * @throws \Exedra\Exception\InvalidArgumentException
      */
-    protected function resolve($name, $registry, array $args = array())
+    protected function resolve($type, $name, $registry, array $args = array())
     {
         if($registry instanceof \Closure)
             return call_user_func_array($registry->bindTo($this), $args);
 
-        if(is_string($registry))
-            return $this->instantiate($registry, $args);
+        if(is_string($registry)) {
+            if($type == 'service')
+                return $this->instantiate($registry);
+            else
+                return $this->instantiate($registry, $args);
+        }
 
         // assume index 0 as class name
         if(is_array($registry))
@@ -393,33 +397,33 @@ class Container implements \ArrayAccess
         throw new \Exedra\Exception\InvalidArgumentException('['.get_class($this).'] Unable to resolve the ['.$name.'] registry');
     }
 
-    protected function instantiate($class, array $arguments)
+    protected function instantiate($class, array $arguments = array())
     {
         switch(count($arguments))
         {
             case 0:
                 return new $class();
-            break;
+                break;
             case 1:
                 return new $class($arguments[0]);
-            break;
+                break;
             case 2:
                 return new $class($arguments[0], $arguments[1]);
-            break;
+                break;
             case 3:
                 return new $class($arguments[0], $arguments[1], $arguments[2]);
-            break;
+                break;
             case 4:
                 return new $class($arguments[0], $arguments[1], $arguments[2], $arguments[3]);
-            break;
+                break;
             case 5:
                 return new $class($arguments[0], $arguments[1], $arguments[2], $arguments[3], $arguments[4]);
-            break;
+                break;
             default:
                 $reflection = new \ReflectionClass($class);
 
                 return $reflection->newInstanceArgs($arguments);
-            break;
+                break;
         }
     }
 }
