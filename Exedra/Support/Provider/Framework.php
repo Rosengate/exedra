@@ -11,6 +11,11 @@ use Exedra\Support\Runtime\ControllerFactory;
 use Exedra\Support\Runtime\Handler\Controller;
 use Exedra\View\Factory as ViewFactory;
 
+/**
+ * Class Framework
+ * @package Exedra\Support\Provider
+ * @deprecated
+ */
 class Framework implements Provider
 {
     public function register(Application $app)
