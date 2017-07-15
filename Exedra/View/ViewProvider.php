@@ -16,6 +16,6 @@ class ViewProvider implements Provider
             return $this->create('view.factory', array($this->path['views']));
         });
 
-        $app['factory']->add('@view.factory', Factory::class);
+        $app['factory']->add('@view.factory', ViewFactory::class);
     }
 }
