@@ -683,7 +683,15 @@ class Route implements Registrar
 	{
 		$type = @get_class($pattern) ? : gettype($pattern);
 
-        $router = $this->group->factory->resolveGroup($pattern, $this);
+        try {
+            $router = $this->group->factory->resolveGroup($pattern, $this);
+        } catch (InvalidArgumentException $e) {
+            $route = $this->getAbsoluteName();
+
+            $pattern = is_string($pattern) ? ' (' . $pattern . ')' : '';
+
+            throw new \Exedra\Exception\InvalidArgumentException('Unable to resolve group [' . $type . $pattern . '] on route @' . $route . '.');
+        }
 
         if(!$router)
             throw new \Exedra\Exception\InvalidArgumentException('Unable to resolve route group ['.$type.']. It must be type of \Closure, string, or array');
