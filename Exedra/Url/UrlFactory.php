@@ -19,13 +19,23 @@ class UrlFactory extends UrlGenerator
     }
 
     /**
+     * Create Url object
+     *
+     * @param string $url
+     */
+    protected function createUrl($url)
+    {
+        return new Url($url);
+    }
+
+    /**
      * @param $name
      * @param array $args
      * @return Url
      */
     public function __call($name, array $args = array())
     {
-        return new Url(parent::__call($name, $args));
+        return $this->createUrl(parent::__call($name, $args));
     }
 
     /**
@@ -35,7 +45,7 @@ class UrlFactory extends UrlGenerator
      */
     public function base($path = null)
     {
-        return new Url(parent::base($path));
+        return $this->createUrl(parent::base($path));
     }
 
     /**
@@ -55,7 +65,7 @@ class UrlFactory extends UrlGenerator
      */
     public function asset($asset = null)
     {
-        return new Url(parent::asset($asset));
+        return $this->createUrl(parent::asset($asset));
     }
 
     /**
@@ -69,7 +79,7 @@ class UrlFactory extends UrlGenerator
      */
     public function create($routeName, array $data = array(), array $query = array())
     {
-        return new Url(parent::create($routeName, $data, $query));
+        return $this->createUrl(parent::create($routeName, $data, $query));
     }
 
     /**
@@ -89,7 +99,7 @@ class UrlFactory extends UrlGenerator
      */
     public function parent()
     {
-        return new Url(parent::parent());
+        return $this->createUrl(parent::parent());
     }
 
     /**
@@ -100,6 +110,6 @@ class UrlFactory extends UrlGenerator
      */
     public function current(array $query = array())
     {
-        return new Url(parent::current($query));
+        return $this->createUrl(parent::current($query));
     }
 }
