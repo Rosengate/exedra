@@ -15,7 +15,10 @@ class UrlFactory extends UrlGenerator
     {
         $url = parent::previous();
 
-        return $url ? new Url($url) : false;
+        if(!$url)
+            return false;
+
+        return $this->createUrl($url);
     }
 
     /**
