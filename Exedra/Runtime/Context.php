@@ -103,7 +103,7 @@ class Context extends Container
                 $baseUrl = $this->app->url->getBaseUrl();
                 $assetUrl = $this->app->url->getAssetUrl();
 
-                return $this->app->create('url.factory', array($this->route->getGroup(), $this->request ? : null, $baseUrl, $assetUrl));
+                return $this->app->create('url.factory', array($this->route->getGroup(), $this->request ? : null, $baseUrl, $assetUrl, $this->app->url->getFilters()));
             },
             'redirect' => array(Redirect::class, array('self.response', 'self.url')),
             'form' => array(Form::class, array('self')),

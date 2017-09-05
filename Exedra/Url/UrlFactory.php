@@ -7,6 +7,46 @@ namespace Exedra\Url;
 class UrlFactory extends UrlGenerator
 {
     /**
+     * Url filters
+     * @var array|\Closure[]
+     */
+    protected $filters = array();
+
+    public function __construct(
+        \Exedra\Routing\Group $router,
+        \Exedra\Http\ServerRequest $request = null,
+        $appUrl = null,
+        $assetUrl = null,
+        array $filters = array()
+    )
+    {
+        $this->filters = $filters;
+
+        parent::__construct($router, $request, $appUrl, $assetUrl);
+    }
+
+    /**
+     * Add Url filter
+     *
+     * @param \Closure $filter
+     * @return $this
+     */
+    public function addFilter(\Closure $filter)
+    {
+        $this->filters[] = $filter;
+
+        return $this;
+    }
+
+    /**
+     * @return array|\Closure[]
+     */
+    public function getFilters()
+    {
+        return $this->filters;
+    }
+
+    /**
      * Get previous url (referer)
      * @return Url|false
      * @throws \Exedra\Exception\NotFoundException
@@ -22,13 +62,18 @@ class UrlFactory extends UrlGenerator
     }
 
     /**
-     * Create Url object
-     *
      * @param string $url
      */
     protected function createUrl($url)
     {
-        return new Url($url);
+        $url = new Url($url);
+
+        // apply filters
+        if($this->filters)
+            foreach($this->filters as $filter)
+                $url = $filter($url);
+
+        return $url;
     }
 
     /**
