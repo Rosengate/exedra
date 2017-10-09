@@ -56,4 +56,14 @@ class Url extends \Exedra\Http\Uri
 
         return $this;
     }
+
+    /**
+     * Append path
+     * @param string $path
+     * @return $this
+     */
+    public function addPath($path)
+    {
+        return $this->setPath(rtrim($this->getPath(), '/') . '/' . ltrim($path));
+    }
 }
