@@ -164,6 +164,23 @@ class ServerRequest extends Message implements ServerRequestInterface
     }
 
     /**
+     * @param ServerRequestInterface $request
+     * @return static
+     */
+    public static function createFromServerRequest(ServerRequestInterface $request)
+    {
+        return new static(
+            $request->getMethod(),
+            new Uri((string) $request->getUri()),
+            $request->getHeaders(),
+            Stream::createFromContents($request->getBody()->getContents()),
+            $request->getServerParams(),
+            $request->getCookieParams(),
+            $request->getUploadedFiles()
+        );
+    }
+
+    /**
      * @return string
      */
     public function getRequestTarget()
