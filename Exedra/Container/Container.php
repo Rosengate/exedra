@@ -108,7 +108,7 @@ class Container implements \ArrayAccess
 
     /**
      * Register a container lifetime service
-     * Alias to $container['service']->set() method
+     * Alias to $container['service']->add() method
      * @param string $name
      * @param \Closure|array|string $resolvable
      * @return $this
@@ -116,6 +116,20 @@ class Container implements \ArrayAccess
     public function add($name, $resolvable)
     {
         $this->services['service']->add($name, $resolvable);
+
+        return $this;
+    }
+
+    /**
+     * Register a container lifetime service
+     * Alias to $container['service']->set() method
+     * @param $name
+     * @param \Closure|array|string $resolvable
+     * @return $this
+     */
+    public function set($name, $resolvable)
+    {
+        $this->services['service']->set($name, $resolvable);
 
         return $this;
     }
