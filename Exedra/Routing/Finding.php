@@ -138,7 +138,7 @@ class Finding
         // expect a class name
         if(is_string($middleware))
         {
-            list($middleware, $method) = explode('@', $middleware);
+            @list($middleware, $method) = explode('@', $middleware);
 
             $middleware = new $middleware;
 
