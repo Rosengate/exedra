@@ -14,7 +14,7 @@ class RouteListCommand extends Command
 {
     protected $group;
 
-    public function __construct(Group $group, $name = null)
+    public function __construct(Group $group, $name = 'app:routes')
     {
         $this->group = $group;
 
@@ -23,7 +23,6 @@ class RouteListCommand extends Command
 
     public function configure()
     {
-        $this->setName('app:routes');
         $this->setDescription('List all routes');
         $this->addArgument('property', InputArgument::OPTIONAL | InputArgument::IS_ARRAY, 'Route property(s)', array('name', 'method', 'tag', 'uri'));
         $this->addOption('name', null, InputOption::VALUE_REQUIRED);
