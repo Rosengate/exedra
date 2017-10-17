@@ -3,6 +3,11 @@ namespace Exedra\Support\Runtime\Form;
 
 use Exedra\Runtime\Context;
 
+/**
+ * Class Form
+ * @package Exedra\Support\Runtime\Form
+ * @deprecated
+ */
 class Form extends \Exedra\Form\Form
 {
     public function __construct(Context $exe)

@@ -4,6 +4,11 @@ namespace Exedra\Support\Runtime\Handler;
 use Exedra\Contracts\Routing\ExecuteHandler;
 use Exedra\Runtime\Context;
 
+/**
+ * Class Controller
+ * @package Exedra\Support\Runtime\Handler
+ * @deprecated
+ */
 class Controller implements ExecuteHandler
 {
     public function validate($pattern)

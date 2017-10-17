@@ -1,6 +1,11 @@
 <?php
 namespace Exedra\Support\Runtime;
 
+/**
+ * Class ControllerFactory
+ * @package Exedra\Support\Runtime
+ * @deprecated
+ */
 class ControllerFactory
 {
     /**

@@ -1,6 +1,11 @@
 <?php
 namespace Exedra\Support\Asset;
 
+/**
+ * Class AssetFactory
+ * @package Exedra\Support\Asset
+ * @deprecated
+ */
 class AssetFactory
 {
     /**

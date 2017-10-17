@@ -1,6 +1,11 @@
 <?php
 namespace Exedra\Support\Asset;
 
+/**
+ * Class Asset
+ * @package Exedra\Support\Asset
+ * @deprecated
+ */
 class Asset
 {
     protected $filepath;

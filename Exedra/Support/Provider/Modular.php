@@ -6,6 +6,11 @@ use Exedra\Exception\Exception;
 use Exedra\Exception\NotFoundException;
 use Exedra\Runtime\Context;
 
+/**
+ * Class Modular
+ * @package Exedra\Support\Provider
+ * @deprecated
+ */
 class Modular implements \Exedra\Provider\ProviderInterface
 {
 	public function register(Application $app)
