@@ -25,6 +25,12 @@ class Group implements \ArrayAccess, Registrar
     protected $aliasIndices = array();
 
     /**
+     * Alias for group
+     * @var array
+     */
+    protected $groupAliasIndices = array();
+
+    /**
      * Routing group based middlewares
      * Addable on group not bound to any route
      * @var array $middlewares
@@ -346,7 +352,20 @@ class Group implements \ArrayAccess, Registrar
     {
         if(isset($this->routes[$name]))
             return $this->routes[$name];
-        else if($route = $this->findRouteRecursively($name))
+
+        // alias check
+        if(isset($this->aliasIndices[$name])) {
+            $name = $this->aliasIndices[$name];
+        } else {
+            foreach($this->groupAliasIndices as $alias => $routeName) {
+                if(strpos($name, $alias) === 0) {
+                    $name = substr_replace($name, $routeName, 0, strlen($alias));
+                    break;
+                }
+            }
+        }
+
+        if($route = $this->findRouteRecursively($name))
             return $this->routes[$name] = $route;
 
         return false;
@@ -359,13 +378,27 @@ class Group implements \ArrayAccess, Registrar
      */
     protected function findRouteRecursively($routeName)
     {
+        // alias check
+        if(is_string($routeName)) {
+            if(isset($this->aliasIndices[$routeName])) {
+                $routeName = $this->aliasIndices[$routeName];
+            } else {
+                foreach($this->groupAliasIndices as $alias => $name) {
+                    if(strpos($routeName, $alias) === 0) {
+                        $routeName = substr_replace($routeName, $name, 0, strlen($alias));
+                        break;
+                    }
+                }
+            }
+        }
+
         $routeNames = !is_array($routeName) ? explode('.', $routeName) : $routeName;
         $routeName = array_shift($routeNames);
         $isTag = strpos($routeName, '#') === 0;
 
         // alias check
-        if(isset($this->aliasIndices[$routeName]))
-            $routeName = $this->aliasIndices[$routeName];
+//        if(isset($this->aliasIndices[$routeName]))
+//            $routeName = $this->aliasIndices[$routeName];
 
         // search by route name
         if(!$isTag)
@@ -604,19 +637,55 @@ class Group implements \ArrayAccess, Registrar
     }
 
     /**
-     * Set alias for given route name
-     * This is a good for a case where dev decided to change route name
-     * @param string $name
-     * @param string|array $alias
-     * @return $this
+     * Set alias for given route
+     *
+     * @param $name
+     * @param $alias
      */
-    public function addAlias($name, $alias)
+    public function addRouteAlias($routeName, $alias)
     {
         if(is_array($alias))
             foreach($alias as $item)
-                $this->aliasIndices[$item] = $name;
+                $this->aliasIndices[$item] = $routeName;
         else
-            $this->aliasIndices[$alias] = $name;
+            $this->aliasIndices[$alias] = $routeName;
+
+        return $this;
+    }
+
+    /**
+     * Set alias for given group
+     *
+     * @param string $groupName
+     * @param string|array $alias
+     * @return $this
+     */
+    public function addGroupAlias($groupName, $alias)
+    {
+       if(is_array($alias))
+           foreach($alias as $item)
+               $this->groupAliasIndices[$item] = $groupName;
+       else
+           $this->groupAliasIndices[$alias] = $groupName;
+
+        return $this;
+    }
+
+    /**
+     * Use addRouteAlias instead
+     *
+     * @param string $routeName
+     * @param string|array $alias
+     * @deprecated
+     * @return $this
+     */
+    public function addAlias($routeName, $alias)
+    {
+        if(is_array($alias))
+            foreach($alias as $item)
+                $this->aliasIndices[$item] = $routeName;
+        else
+            $this->aliasIndices[$alias] = $routeName;
 
         return $this;
     }
