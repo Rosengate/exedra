@@ -1,4 +1,8 @@
 <?php
+
+/**
+ * @property \Exedra\Application $app
+ */
 class FactoryUrlTest extends PHPUnit_Framework_TestCase
 {
 	public function setUp()
@@ -87,9 +91,9 @@ class FactoryUrlTest extends PHPUnit_Framework_TestCase
 			return null;
 		};
 
-		$this->app->url->addCallable('foo', function($var)
+		$this->app->url->addCallable('foo', function(\Exedra\Url\UrlFactory $urlFactory, $var)
 		{
-			return $this->base('bar/'.$var);
+			return $urlFactory->base('bar/'.$var);
 		});
 
 		$this->assertEquals('http://example.com/foo/bar/baz', $this->app->url->foo('baz'));

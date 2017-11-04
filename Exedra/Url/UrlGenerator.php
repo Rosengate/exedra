@@ -39,12 +39,14 @@ class UrlGenerator implements UrlGeneratorInterface
     public function __construct(
         \Exedra\Routing\Group $router,
         \Exedra\Http\ServerRequest $request = null,
-        $appUrl = null)
+        $appUrl = null,
+        array $callables = array())
     {
         $this->map = $router;
         $this->rootRouter = $router->getRootGroup();
         $this->request = $request;
         $this->setBase($appUrl ? : ($request ? $request->getUri()->getScheme().'://'.$request->getUri()->getAuthority() : null ));
+        $this->callables = $callables;
     }
 
     public function getBaseUrl()
@@ -70,11 +72,8 @@ class UrlGenerator implements UrlGeneratorInterface
     {
         if(!isset($this->callables[$name]))
             throw new NotFoundException('Method / callable ['.$name.'] does not exists');
-        if(isset($this->callables[$name.'_bound']))
-            $callable = $this->callables[$name.'_bound'];
-        else
-            $callable = $this->callables[$name.'_bound'] = $this->callables[$name]->bindTo($this);
-        return call_user_func_array($callable, $args);
+
+        return call_user_func_array($this->callables[$name], array_merge(array($this), $args));
     }
 
     /**
@@ -88,6 +87,16 @@ class UrlGenerator implements UrlGeneratorInterface
         $this->callables[$name] = $callable;
 
         return $this;
+    }
+
+    /**
+     * Get all callables
+     *
+     * @return \Closure[]
+     */
+    public function getCallables()
+    {
+        return $this->callables;
     }
 
     /**

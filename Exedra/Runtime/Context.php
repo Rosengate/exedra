@@ -97,17 +97,19 @@ class Context extends Container
     protected function setUp()
     {
         $this->services['service']->register(array(
-            'path' => function(){ return $this->app->path; },
-            'config' => function() { return clone $this->app->config; },
-            'url' => function(){
-                $baseUrl = $this->app->url->getBaseUrl();
+            'path' => function(Context $context){ return $context->app->path; },
+            'config' => function(Context $context) { return clone $context->app->config; },
+            'url' => function(Context $context){
+                $urlFactory = $context->app->url;
 
-                return $this->app->create('url.factory', array($this->route->getGroup(), $this->request ? : null, $baseUrl, $this->app->url->getFilters()));
+                $baseUrl = $urlFactory->getBaseUrl();
+
+                return $context->app->create('url.factory', array($context->route->getGroup(), $context->request ? : null, $baseUrl, $urlFactory->getFilters(), $urlFactory->getCallables()));
             },
             'redirect' => array(Redirect::class, array('self.response', 'self.url')),
             'form' => array(Form::class, array('self')),
             // thinking of deprecating the asset as service
-            'asset' => function(){ return new AssetFactory($this->url, $this->app->path['public'], $this->config->get('asset', array()));}
+            'asset' => function(Context $context){ return new AssetFactory($context->url, $context->app->path['public'], $context->config->get('asset', array()));}
         ));
 
         $this->services['factory']->add('factory.url', UrlFactory::class);

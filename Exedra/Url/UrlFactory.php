@@ -16,12 +16,13 @@ class UrlFactory extends UrlGenerator
         \Exedra\Routing\Group $router,
         \Exedra\Http\ServerRequest $request = null,
         $appUrl = null,
-        array $filters = array()
+        array $filters = array(),
+        array $callables = array()
     )
     {
         $this->filters = $filters;
 
-        parent::__construct($router, $request, $appUrl);
+        parent::__construct($router, $request, $appUrl, $callables);
     }
 
     /**
