@@ -17,12 +17,7 @@ class UrlGenerator implements UrlGeneratorInterface
      * @var string
      */
     protected $baseUrl;
-    /**
-     * Absolute base asset url
-     * If not given on construct, will use the baseUrl
-     * @var string
-     */
-    protected $assetUrl;
+
     /**
      * Request instance
      * @var \Exedra\Http\ServerRequest|null
@@ -44,24 +39,17 @@ class UrlGenerator implements UrlGeneratorInterface
     public function __construct(
         \Exedra\Routing\Group $router,
         \Exedra\Http\ServerRequest $request = null,
-        $appUrl = null,
-        $assetUrl = null)
+        $appUrl = null)
     {
         $this->map = $router;
         $this->rootRouter = $router->getRootGroup();
         $this->request = $request;
         $this->setBase($appUrl ? : ($request ? $request->getUri()->getScheme().'://'.$request->getUri()->getAuthority() : null ));
-        $this->setAsset($assetUrl ? : $this->baseUrl);
     }
 
     public function getBaseUrl()
     {
         return $this->baseUrl;
-    }
-
-    public function getAssetUrl()
-    {
-        return $this->assetUrl;
     }
 
     /**
@@ -101,6 +89,7 @@ class UrlGenerator implements UrlGeneratorInterface
 
         return $this;
     }
+
     /**
      * Get url prefixed with $baseUrl
      * @param string $path (optional)
@@ -110,6 +99,7 @@ class UrlGenerator implements UrlGeneratorInterface
     {
         return ($this->baseUrl ? rtrim($this->baseUrl, '/' ).'/' : '/').($path ? trim($path, '/') : '');
     }
+
     /**
      * Alias to base()
      * @param string $path
@@ -119,15 +109,7 @@ class UrlGenerator implements UrlGeneratorInterface
     {
         return $this->base($path);
     }
-    /**
-     * Get asset url prefixed with $assetUrl
-     * @param string $asset path (optonal)
-     * @return string
-     */
-    public function asset($asset = null)
-    {
-        return rtrim($this->assetUrl,"/").($asset ? "/". trim($asset, '/') : '');
-    }
+
     /**
      * Set $baseUrl
      * @param string $baseUrl
@@ -136,17 +118,6 @@ class UrlGenerator implements UrlGeneratorInterface
     public function setBase($baseUrl)
     {
         $this->baseUrl = $baseUrl;
-        return $this;
-    }
-    /**
-     * Set $assetUrl
-     * @param string $assetUrl
-     * @return $this
-     */
-    public function setAsset($assetUrl)
-    {
-        $this->assetUrl	= $assetUrl;
-
         return $this;
     }
 

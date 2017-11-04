@@ -16,13 +16,12 @@ class UrlFactory extends UrlGenerator
         \Exedra\Routing\Group $router,
         \Exedra\Http\ServerRequest $request = null,
         $appUrl = null,
-        $assetUrl = null,
         array $filters = array()
     )
     {
         $this->filters = $filters;
 
-        parent::__construct($router, $request, $appUrl, $assetUrl);
+        parent::__construct($router, $request, $appUrl);
     }
 
     /**
@@ -63,6 +62,7 @@ class UrlFactory extends UrlGenerator
 
     /**
      * @param string $url
+     * @return Url|string
      */
     protected function createUrl($url)
     {
@@ -104,16 +104,6 @@ class UrlFactory extends UrlGenerator
     public function to($path = null)
     {
         return $this->base($path);
-    }
-
-    /**
-     * Get asset url prefixed with $assetUrl
-     * @param string $asset path (optonal)
-     * @return Url
-     */
-    public function asset($asset = null)
-    {
-        return $this->createUrl(parent::asset($asset));
     }
 
     /**

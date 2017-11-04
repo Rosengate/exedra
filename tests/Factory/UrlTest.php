@@ -73,8 +73,6 @@ class FactoryUrlTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals('http://example.com/foo/bar/baz', $this->app->url->base('bar/baz'));
 		
 		$this->assertEquals('http://example.com/foo/bar/baz', $this->app->url->to('bar/baz'));
-
-		$this->assertEquals('http://example.com/foo/assets/bazt', $this->app->url->asset('bazt'));
 	}
 
 	public function testAddCallable()
