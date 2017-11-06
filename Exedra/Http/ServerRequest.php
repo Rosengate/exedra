@@ -20,7 +20,7 @@ class ServerRequest extends Message implements ServerRequestInterface
     protected $cookies;
 
     /**
-     * @var array|UploadedFile[]
+     * @var UploadedFile[]
      */
     protected $uploadedFiles = array();
 
@@ -395,6 +395,20 @@ class ServerRequest extends Message implements ServerRequestInterface
     public function getUploadedFiles()
     {
         return $this->uploadedFiles;
+    }
+
+    /**
+     * Get UploadedFile from given key
+     *
+     * @param string $key
+     * @return UploadedFile|null
+     */
+    public function getUploadedFile($key)
+    {
+        if(isset($this->uploadedFiles[$key]))
+            return $this->uploadedFiles[$key];
+
+        return null;
     }
 
     /**
