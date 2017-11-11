@@ -1006,19 +1006,28 @@ class Route implements Registrar
      * @return $this
      */
 	public function setAttribute($key, $value = null)
-	{
+    {
         if(is_array($key))
         {
-            foreach($key as $item => $value)
-                $this->attributes[$item] = $value;
+            foreach($key as $item => $value) {
+                if(strrpos($item, '[]') == ($itemLength = strlen($item) - 2)) {
+                    $this->attributes[substr($item, 0, $itemLength)][] = $value;
+                } else {
+                    $this->attributes[$item] = $value;
+                }
+            }
         }
         else
         {
-            $this->attributes[$key] = $value;
+            if(strrpos($key, '[]') == ($keyLength = strlen($key) - 2)) {
+                $this->attributes[substr($key, 0, $keyLength)][] = $value;
+            } else {
+                $this->attributes[$key] = $value;
+            }
         }
 
         return $this;
-	}
+    }
 
 	/**
 	 * Get attribute
@@ -1085,6 +1094,7 @@ class Route implements Registrar
 
     /**
      * Set meta information
+     * @deprecated
      * @param string $key
      * @param mixed $value
      * @return $this
@@ -1106,6 +1116,7 @@ class Route implements Registrar
 
     /**
      * Alias to setAttribute(), but without first arg checked as if its array.
+     * @deprecated
      * @param string $key
      * @param mixed $value
      * @return $this

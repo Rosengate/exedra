@@ -198,8 +198,18 @@ class Finding
             foreach($route->getProperty('middleware') as $key => $middleware)
                 $callStack->addCallable($this->resolveMiddleware($middleware[0]), $middleware[1]);
 
-            foreach($route->getAttributes() as $key => $value)
-                $this->attributes[$key] = $value;
+            foreach($route->getAttributes() as $key => $value) {
+                if(is_array($value)) {
+                    if(isset($this->attributes[$key]) && !is_array($this->attributes[$key]))
+                        throw new Exception('Unable to push value into attribute [' . $key . '] on route ' . $route->getAbsoluteName(). '. The attribute type is not an array.');
+
+                    foreach($value as $val) {
+                        $this->attributes[$key][] = $val;
+                    }
+                } else {
+                    $this->attributes[$key] = $value;
+                }
+            }
 
             // pass conig.
             if($route->hasProperty('config'))
