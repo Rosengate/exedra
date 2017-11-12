@@ -158,13 +158,24 @@ class Factory
         throw new InvalidArgumentException('Unable to resolve the routing group pattern');
     }
 
-	public function addGroupHandler(GroupHandler $handler)
+    /**
+     * Add routing GroupHandler
+     * @param GroupHandler $handler
+     * @return $this
+     */
+    public function addGroupHandler(GroupHandler $handler)
     {
         $this->groupHandlers[] = $handler;
 
         return $this;
     }
 
+    /**
+     * Add default group handler
+     * This default is looked at the last order
+     * @param GroupHandler $handler
+     * @return $this
+     */
     protected function addDefaultGroupHandler(GroupHandler $handler)
     {
         $this->defaultGroupHandlers[] = $handler;

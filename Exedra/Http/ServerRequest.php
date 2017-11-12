@@ -76,6 +76,9 @@ class ServerRequest extends Message implements ServerRequestInterface
         });
     }
 
+    /**
+     * @param array $headerLines
+     */
     protected function setHeaderLines(array $headerLines)
     {
         $this->headerLines = $headerLines;

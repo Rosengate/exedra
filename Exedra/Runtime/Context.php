@@ -1,6 +1,7 @@
 <?php
 namespace Exedra\Runtime;
 
+use Exedra\Application;
 use Exedra\Config;
 use Exedra\Container\Container;
 use Exedra\Http\ServerRequest;
@@ -25,6 +26,7 @@ use Psr\Http\Message\ResponseInterface;
  * @property Config $config
  * @property Redirect $redirect
  * @property UrlFactory $url
+ * @property Application app
  */
 class Context extends Container
 {
@@ -63,7 +65,7 @@ class Context extends Container
     {
         parent::__construct();
 
-        $this->app = $app;
+        $this->services['app'] = $app;
 
         $this->services['finding'] = $finding;
 
@@ -453,7 +455,7 @@ class Context extends Container
      * @param array $keys
      * @return array
      */
-    public function params(array $keys = array())
+    public function params(array $keys = array(), $onlyExistingParams = false)
     {
         if(count($keys) == 0)
             return $this->params;
@@ -464,7 +466,10 @@ class Context extends Container
         {
             $key = trim($key);
 
-            $params[$key] = isset($this->params[$key]) ? $this->params[$key] : null;
+            if($onlyExistingParams && isset($this->params[$key]))
+                $params[$key] = $this->params[$key];
+            else
+                $params[$key] = isset($this->params[$key]) ? $this->params[$key] : null;
         }
 
         return $params;

@@ -2,6 +2,7 @@
 namespace Exedra\Runtime;
 
 use Exedra\Contracts\Url\UrlGenerator;
+use Exedra\Http\Response;
 use Exedra\Url\Url;
 
 class Redirect implements UrlGenerator
@@ -55,7 +56,7 @@ class Redirect implements UrlGenerator
      * Refresh the page.
      * alias to \Exedra\Http\Response::refresh()
      * @param int $time
-     * @return Response
+     * @return \Exedra\Http\Response
      */
     public function refresh($time = 0)
     {
