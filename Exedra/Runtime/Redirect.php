@@ -2,7 +2,6 @@
 namespace Exedra\Runtime;
 
 use Exedra\Contracts\Url\UrlGenerator;
-use Exedra\Http\Response;
 use Exedra\Url\Url;
 
 class Redirect implements UrlGenerator
@@ -89,7 +88,7 @@ class Redirect implements UrlGenerator
      * @param string $route
      * @param array $params
      * @param mixed $query string
-     * @return Response|\Exedra\Url\Url|string
+     * @return \Exedra\Http\Response|\Exedra\Url\Url|string
      */
     public function route($route = null, array $params = array(), array $query = array())
     {
