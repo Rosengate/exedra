@@ -223,7 +223,7 @@ class Context extends Container
     public function hasRoute($route, array $params = array())
     {
         if(strpos($route, '@') === 0)
-            $isRoute = strpos($this->getAbsoluteRoute(), substr($route, 1)) === 0;
+            $isRoute = strpos($this->route->getAbsoluteName(), substr($route, 1)) === 0;
         else
             $isRoute = strpos($this->getRouteName(), $route) === 0;
 
@@ -245,7 +245,7 @@ class Context extends Container
     public function isRoute($route, array $params = array())
     {
         if(strpos($route, '@') === 0)
-            $isRoute = $this->getAbsoluteRoute() == substr($route, 1);
+            $isRoute = $this->route->getAbsoluteName() == substr($route, 1);
         else
             $isRoute = $this->getRouteName() == $route;
 
@@ -426,9 +426,11 @@ class Context extends Container
         if($absolute !== true)
         {
             $baseRoute = $this->getBaseRoute();
-            $absoluteRoute = $this->getAbsoluteRoute();
 
-            if(!$baseRoute) return $absoluteRoute;
+            $absoluteRoute = $this->route->getAbsoluteName();
+
+            if(!$baseRoute)
+                return $absoluteRoute;
 
             $route	= substr($absoluteRoute, strlen($baseRoute)+1, strlen($absoluteRoute));
 
@@ -450,6 +452,7 @@ class Context extends Container
 
     /**
      * Alias to getRouteName()
+     * @deprecated 
      * @param bool $absolute
      * @return string
      */
@@ -460,6 +463,7 @@ class Context extends Container
 
     /**
      * get absolute route.
+     * @deprecated
      * @return string current route absolute name.
      */
     public function getAbsoluteRoute()
@@ -470,6 +474,7 @@ class Context extends Container
     /**
      * Get parent route. For example, route for public.main.index will return public.main.
      * Used on getBaseRoute()
+     * @deprecated
      * @return string of parent route name.
      */
     public function getParentRoute()
@@ -495,7 +500,7 @@ class Context extends Container
         if($this->baseRoute)
             $baseRoute	= $this->baseRoute;
         else
-            $baseRoute	= $this->getParentRoute();
+            $baseRoute	= $this->route->getParentRouteName();
 
         return $baseRoute ? $baseRoute : null;
     }
