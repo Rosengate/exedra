@@ -48,9 +48,10 @@ class Context extends Container
      */
     protected $callStack;
 
+    /**
+     * @var array $attributes
+     */
     protected $attributes = array();
-
-    protected $currentModule;
 
     /**
      * Route for handling exception
@@ -130,15 +131,6 @@ class Context extends Container
     }
 
     /**
-     * Get execution namespace
-     * @return string
-     */
-    public function getNamespace($namespace = null)
-    {
-        return $this->app->getNamespace() . ($namespace ? '\\'.$namespace : '');
-    }
-
-    /**
      * Get application instance
      * @return \Exedra\Application
      */
@@ -148,51 +140,12 @@ class Context extends Container
     }
 
     /**
-     * Get current module based on finding
-     * @return string
-     */
-    public function getModule()
-    {
-        if($this->currentModule)
-            return $this->currentModule;
-
-        return $this->module[$this->finding->getModule() ? : 'Application'];
-    }
-
-    /**
      * Get response instance
-     * @return \Exedra\Runtime\Response
+     * @return \Exedra\Runtime\Response|\Exedra\Http\Response
      */
     public function getResponse()
     {
         return $this->response;
-    }
-
-    /**
-     * Get base dir for this execution instance. A concenated app base directory
-     * @return string.
-     */
-    public function getBaseDir()
-    {
-        return rtrim($this->app->getBaseDir(), '/');
-    }
-
-    /**
-     * Set route for handling exception
-     * @var string route
-     */
-    public function setFailRoute($route)
-    {
-        $this->failRoute = $route;
-    }
-
-    /**
-     * Get route for handling exception
-     * @return string
-     */
-    public function getFailRoute()
-    {
-        return $this->failRoute;
     }
 
     /**
@@ -272,7 +225,7 @@ class Context extends Container
         if(strpos($route, '@') === 0)
             $isRoute = strpos($this->getAbsoluteRoute(), substr($route, 1)) === 0;
         else
-            $isRoute = strpos($this->getRoute(), $route) === 0;
+            $isRoute = strpos($this->getRouteName(), $route) === 0;
 
         if(!$isRoute)
             return false;
@@ -294,7 +247,7 @@ class Context extends Container
         if(strpos($route, '@') === 0)
             $isRoute = $this->getAbsoluteRoute() == substr($route, 1);
         else
-            $isRoute = $this->getRoute() == $route;
+            $isRoute = $this->getRouteName() == $route;
 
         if(!$isRoute)
             return false;
@@ -323,6 +276,9 @@ class Context extends Container
      */
     public function hasAttribute($key)
     {
+        if(isset($this->attributes[$key]))
+            return true;
+
         return $this->finding->hasAttribute($key);
     }
 
@@ -333,6 +289,9 @@ class Context extends Container
      */
     public function hasAttr($key)
     {
+        if(isset($this->attributes[$key]))
+            return true;
+
         return $this->finding->hasAttribute($key);
     }
 
@@ -371,29 +330,10 @@ class Context extends Container
      */
     public function getAttribute($key, $default = null)
     {
-        return $this->finding->getAttribute($key, $default);
-    }
+        if (isset($this->attributes[$key]))
+            return $this->attributes[$key];
 
-    /**
-     * Alias to get attribute
-     * For backward compatibility
-     * @param string $key
-     */
-    public function meta($key, $default = null)
-    {
         return $this->finding->getAttribute($key, $default);
-    }
-
-    /**
-     * Alias to hasAttr
-     * For backward compatibility
-     * Check whether given meta key exists
-     * @param string $key
-     * @return bool
-     */
-    public function hasMeta($key)
-    {
-        return $this->finding->hasAttribute($key);
     }
 
     /**
@@ -453,6 +393,7 @@ class Context extends Container
     /**
      * Get parameters by the given list of key
      * @param array $keys
+     * @param bool $onlyExistingParams
      * @return array
      */
     public function params(array $keys = array(), $onlyExistingParams = false)

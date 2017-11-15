@@ -1,6 +1,7 @@
 <?php
 namespace Exedra\Routing;
 
+use Exedra\Contracts\Routing\ExecuteHandler;
 use Exedra\Exception\Exception;
 use Exedra\Exception\InvalidArgumentException;
 use Exedra\Routing\ExecuteHandlers\DynamicHandler;
@@ -27,12 +28,6 @@ class Finding
     public $parameters = array();
 
     /**
-     * string of module name.
-     * @var string|null
-     */
-    protected $module = null;
-
-    /**
      * string of route base
      * @var string|null $baseRoute
      */
@@ -54,8 +49,6 @@ class Finding
      * @var array handlers
      */
     protected $handlers = array();
-
-    protected $execute;
 
     /**
      * @var CallStack $callStack
@@ -167,6 +160,7 @@ class Finding
      * Resolve finding informations and returns a CallStack
      * resolve baseRoute, middlewares, config, attributes
      * @return CallStack
+     * @throws Exception
      * @throws InvalidArgumentException
      */
     protected function resolve()
@@ -177,21 +171,21 @@ class Finding
 
         $executePattern = $this->route->getProperty('execute');
 
+        $handlers = array();
+
         foreach($this->route->getFullRoutes() as $route)
         {
-            // get the latest module and route base
-            if($route->hasProperty('module'))
-                $this->module = $route->getProperty('module');
+            $group = $route->getGroup();
 
             // stack all the handlers
-            foreach($route->getGroup()->getExecuteHandlers() as $name => $handler)
-                $this->handlers[$name] = $handler;
+            foreach($group->getExecuteHandlers() as $name => $handler)
+                $handlers[$name] = $handler;
 
             // if has parameter base, and it's true, set base route to the current route.
-            if($route->hasProperty('base') && $route->getProperty('base') === true)
+            if($route->getProperty('base') === true)
                 $this->baseRoute = $route->getAbsoluteName();
 
-            foreach($route->getGroup()->getMiddlewares() as $key => $middleware)
+            foreach($group->getMiddlewares() as $key => $middleware)
                 $callStack->addCallable($this->resolveMiddleware($middleware[0]), $middleware[1]);
 
             // append all route middlewares
@@ -211,35 +205,37 @@ class Finding
                 }
             }
 
-            // pass conig.
-            if($route->hasProperty('config'))
-                $this->config = array_merge($this->config, $route->getProperty('config'));
+            // pass config.
+            if($config = $route->getProperty('config'))
+                $this->config = array_merge($this->config, $config);
         }
 
-        foreach($this->handlers as $name => $class)
+        foreach($handlers as $name => $class)
         {
+            $handler = null;
+
             if(is_string($class))
             {
                 $handler = new $class;
             }
             else if(is_object($class))
             {
-                if($class instanceof \Closure)
-                {
+                if($class instanceof \Closure) {
                     $class($handler = new DynamicHandler());
+                } else if($class instanceof ExecuteHandler) {
+                    $handler = $class;
                 }
             }
-            else
-            {
-                throw new InvalidArgumentException('Handler must be either class name, or \Closure');
-            }
+
+            if(!$handler || !is_object($handler) || !($handler instanceof ExecuteHandler))
+                throw new InvalidArgumentException('Handler must be either class name, ' . ExecuteHandler::class . ' or \Closure ');
 
             if($handler->validate($executePattern))
             {
                 $resolve = $handler->resolve($executePattern);
 
                 if(!is_callable($resolve))
-                    throw new \Exedra\Exception\InvalidArgumentException('The resolve() method for handler ['.get_class($handler).'] must return \Closure or callable');
+                    throw new \Exedra\Exception\InvalidArgumentException('The resolve() method for handler [' . get_class($handler) . '] must return \Closure or callable');
 
                 $properties = array();
 
@@ -257,8 +253,6 @@ class Finding
                 }
 
                 $callStack->addCallable($resolve, $properties);
-
-                $this->execute = $resolve;
             }
         }
 
@@ -272,15 +266,6 @@ class Finding
     public function getCallStack()
     {
         return $this->callStack;
-    }
-
-    /**
-     * Get stacked handlers
-     * @return array
-     */
-    public function getHandlers()
-    {
-        return $this->handlers;
     }
 
     /**
@@ -311,15 +296,6 @@ class Finding
     public function hasAttribute($key)
     {
         return array_key_exists($key, $this->attributes);
-    }
-
-    /**
-     * Module on this finding.
-     * @return string referenced module name
-     */
-    public function getModule()
-    {
-        return $this->module;
     }
 
     /**

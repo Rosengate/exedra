@@ -74,7 +74,7 @@ class Route implements Registrar
     );
 
 	/**
-	 * Route meta attributes
+	 * Route attributes
 	 * @var array $attributes
 	 */
 	protected $attributes = array();
@@ -1092,50 +1092,14 @@ class Route implements Registrar
         return $this;
     }
 
-    /**
-     * Set meta information
-     * @deprecated
-     * @param string $key
-     * @param mixed $value
-     * @return $this
-     */
-	public function setMeta($key, $value = null)
-	{
-		if(is_array($key))
-		{
-			foreach($key as $k => $v)
-				$this->attributes[$k] = $value;
-
-			return $this;
-		}
-
-		$this->attributes[$key] = $value;
-
-		return $this;
-	}
-
-    /**
-     * Alias to setAttribute(), but without first arg checked as if its array.
-     * @deprecated
-     * @param string $key
-     * @param mixed $value
-     * @return $this
-     */
-	public function meta($key, $value)
-	{
-		$this->attributes[$key] = $value;
-
-		return $this;
-	}
-
 	/**
 	 * Get route property
 	 * @param string $key
 	 * @return mixed
 	 */
-	public function getProperty($key)
+	public function getProperty($key, $default = null)
 	{
-		return $this->properties[$key];
+		return isset($this->properties[$key]) ? $this->properties[$key] : $default;
 	}
 
 	/**
