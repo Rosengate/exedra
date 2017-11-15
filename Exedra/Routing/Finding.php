@@ -68,7 +68,8 @@ class Finding
 
         if($route)
         {
-            $this->addParameters($parameters);
+            foreach($parameters as $key => $param)
+                $this->parameters[$key] = $param;
 
             $this->callStack = $this->resolve();
         }
@@ -84,27 +85,24 @@ class Finding
     }
 
     /**
-     * Append given parameters
-     * @param array $parameters
+     * Get named parameter value
+     * @param string $name
+     * @param null|mixed $default
+     * @return mixed|null
      */
-    public function addParameters(array $parameters)
+    public function param($name, $default = null)
     {
-        foreach($parameters as $key => $param)
-            $this->parameters[$key] = $param;
+        return isset($this->parameters[$name]) ? $this->parameters[$name] : $default;
     }
 
     /**
-     * Get findings parameter
-     * Return all if no argument passed
-     * @param string|null $name
-     * @return array|mixed
+     * Get all named parameters
+     *
+     * @return array
      */
-    public function param($name = null)
+    public function getParameters()
     {
-        if($name === null)
-            return $this->parameters;
-
-        return $this->parameters[$name];
+        return $this->parameters;
     }
 
     /**

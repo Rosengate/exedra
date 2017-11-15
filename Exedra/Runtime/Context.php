@@ -89,7 +89,7 @@ class Context extends Container
 
         $this->setBaseRoute($this->finding->getBaseRoute());
 
-        DotArray::initialize($this->params, $this->finding->param());
+        DotArray::initialize($this->params, $this->finding->getParameters());
 
         $this->services['request'] = $this->finding->getRequest();
     }
