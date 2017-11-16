@@ -55,7 +55,7 @@ class BridgeMiddleware
             // mutate the request object
             $context->request = $request;
 
-            $contents = call_user_func_array($context->getNextCall(), $args);
+            $contents = call_user_func_array($context->finding->getCallStack()->getNextCallable(), $args);
 
             if(is_object($contents))
             {

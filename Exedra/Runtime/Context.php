@@ -9,10 +9,8 @@ use Exedra\Path;
 use Exedra\Routing\Finding;
 use Exedra\Routing\Route;
 use Exedra\Support\Asset\AssetFactory;
-use Exedra\Support\DotArray;
 use Exedra\Support\Runtime\Form\Form;
 use Exedra\Url\UrlFactory;
-use Psr\Http\Message\ResponseInterface;
 
 /**
  * Class Context
@@ -37,12 +35,6 @@ class Context extends Container
     protected $params = array();
 
     /**
-     * Base route to be appended on every execution scope based functionality.
-     * @var string
-     */
-    protected $baseRoute = null;
-
-    /**
      * stack of callables
      * @var array callStack
      */
@@ -60,8 +52,8 @@ class Context extends Container
     protected $failRoute = null;
 
     public function __construct(
-        \Exedra\Application $app,
-        \Exedra\Routing\Finding $finding,
+        Application $app,
+        Finding $finding,
         \Exedra\Http\Response $response)
     {
         parent::__construct();
@@ -87,9 +79,7 @@ class Context extends Container
         // Initiate registry, route, params, and set base route based on finding.
         $this->services['route'] = $this->finding->getRoute();
 
-        $this->setBaseRoute($this->finding->getBaseRoute());
-
-        DotArray::initialize($this->params, $this->finding->getParameters());
+        $this->params = $this->finding->getParameters();
 
         $this->services['request'] = $this->finding->getRequest();
     }
@@ -114,8 +104,6 @@ class Context extends Container
             // thinking of deprecating the asset as service
             'asset' => function(Context $context){ return new AssetFactory($context->url, $context->app->path['public'], $context->config->get('asset', array()));}
         ));
-
-        $this->services['factory']->add('factory.url', UrlFactory::class);
 
         $this->setUpConfig();
     }
@@ -195,69 +183,6 @@ class Context extends Container
         return call_user_func_array($callable, func_get_args());
     }
 
-    public function getNextCall()
-    {
-        return $this->finding->getCallStack()->getNextCallable();
-    }
-
-    /**
-     * Validate against given parameters
-     * @param array $params
-     * @return boolean
-     */
-    public function isParams(array $params)
-    {
-        foreach($params as $key => $value)
-            if($this->param($key) != $value)
-                return false;
-
-        return true;
-    }
-
-    /**
-     * Check if the given route exists within the current route.
-     * @param string $route
-     * @param array $params
-     * @return boolean
-     */
-    public function hasRoute($route, array $params = array())
-    {
-        if(strpos($route, '@') === 0)
-            $isRoute = strpos($this->route->getAbsoluteName(), substr($route, 1)) === 0;
-        else
-            $isRoute = strpos($this->getRouteName(), $route) === 0;
-
-        if(!$isRoute)
-            return false;
-
-        if(count($params) === 0)
-            return true;
-
-        return $this->isParams($params);
-    }
-
-    /**
-     * Check if the given route is equal
-     * @param string $route
-     * @param array $params
-     * @return boolean
-     */
-    public function isRoute($route, array $params = array())
-    {
-        if(strpos($route, '@') === 0)
-            $isRoute = $this->route->getAbsoluteName() == substr($route, 1);
-        else
-            $isRoute = $this->getRouteName() == $route;
-
-        if(!$isRoute)
-            return false;
-
-        if(count($params) === 0)
-            return true;
-
-        return $this->isParams($params);
-    }
-
     /**
      * Get execution parameter
      * @param string $name
@@ -266,20 +191,7 @@ class Context extends Container
      */
     public function param($name, $default = null)
     {
-        return DotArray::has($this->params, $name) ? DotArray::get($this->params, $name) : $default;
-    }
-
-    /**
-     * Check whether given attribute exists
-     * @param string $key
-     * @return boolean
-     */
-    public function hasAttribute($key)
-    {
-        if(isset($this->attributes[$key]))
-            return true;
-
-        return $this->finding->hasAttribute($key);
+        return isset($this->params[$name]) ? $this->params[$name] : $default;
     }
 
     /**
@@ -309,28 +221,14 @@ class Context extends Container
     }
 
     /**
-     * Alias to getAttribute
+     * Get attribute
      * @param string $key
      * @param string|null default value
      * @return mixed
      */
     public function attr($key, $default = null)
     {
-        if (isset($this->attributes[$key]))
-            return $this->attributes[$key];
-
-        return $this->finding->getAttribute($key, $default);
-    }
-
-    /**
-     * Get attribute
-     * @param string $key
-     * @param string|null default value
-     * @return mixed
-     */
-    public function getAttribute($key, $default = null)
-    {
-        if (isset($this->attributes[$key]))
+        if (array_key_exists($this->attributes[$key], $key))
             return $this->attributes[$key];
 
         return $this->finding->getAttribute($key, $default);
@@ -343,7 +241,7 @@ class Context extends Container
      */
     public function hasParam($name)
     {
-        return DotArray::has($this->params, $name);
+        return isset($this->params[$name]);
     }
 
     /**
@@ -354,44 +252,26 @@ class Context extends Container
      */
     public function setParam($key, $value = null)
     {
-        DotArray::set($this->params, $key, $value);
-    }
-
-    /**
-     * A public functionality to add parameter(s) to $context.
-     * @param string $key
-     * @param mixed $value
-     * @return $this;
-     */
-    public function addParam($key, $value = null)
-    {
-        if(is_array($key))
-        {
-            foreach($key as $k=>$v)
-                $this->setParam($k, $v);
-        }
-        else
-        {
-            if(isset($this->params[$key]))
-                throw new \InvalidArgumentException('The given key ['.$key.'] has already exist');
-
-            $this->params[$key] = $value;
-        }
+        $this->params[$key] = $value;
 
         return $this;
     }
 
     /**
+     * Merge params with given
+     * prioritize the existing so that it don't get replaced.
      * @param array $params
+     * @return $this
      */
     public function addParams(array $params)
     {
-        foreach($params as $key => $value)
-            $this->setParam($key, $value);
+        $this->params = array_merge($params, $this->params);
+
+        return $this;
     }
 
     /**
-     * Get parameters by the given list of key
+     * Get params by the given list of keys
      * @param array $keys
      * @param bool $onlyExistingParams
      * @return array
@@ -403,8 +283,7 @@ class Context extends Container
 
         $params = array();
 
-        foreach($keys as $key)
-        {
+        foreach($keys as $key) {
             $key = trim($key);
 
             if($onlyExistingParams && isset($this->params[$key]))
@@ -417,92 +296,11 @@ class Context extends Container
     }
 
     /**
-     * Route name relative to the current base route, return absolute route if true boolean is given as argument.
-     * @param boolean $absolute, if true. will directly return absolute route. The same use of getAbsoluteRoute
-     * @return string
-     */
-    public function getRouteName($absolute = false)
-    {
-        if($absolute !== true)
-        {
-            $baseRoute = $this->getBaseRoute();
-
-            $absoluteRoute = $this->route->getAbsoluteName();
-
-            if(!$baseRoute)
-                return $absoluteRoute;
-
-            $route	= substr($absoluteRoute, strlen($baseRoute)+1, strlen($absoluteRoute));
-
-            return $route;
-        }
-        else
-        {
-            return $this->route->getAbsoluteName();
-        }
-    }
-
-    /**
      * @return ServerRequest
      */
     public function getRequest()
     {
         return $this->request;
-    }
-
-    /**
-     * Alias to getRouteName()
-     * @deprecated 
-     * @param bool $absolute
-     * @return string
-     */
-    public function getRoute($absolute = false)
-    {
-        return $this->getRouteName($absolute);
-    }
-
-    /**
-     * get absolute route.
-     * @deprecated
-     * @return string current route absolute name.
-     */
-    public function getAbsoluteRoute()
-    {
-        return $this->route->getAbsoluteName();
-    }
-
-    /**
-     * Get parent route. For example, route for public.main.index will return public.main.
-     * Used on getBaseRoute()
-     * @deprecated
-     * @return string of parent route name.
-     */
-    public function getParentRoute()
-    {
-        return $this->route->getParentRouteName();
-    }
-
-    /**
-     * Set a base route for this execution
-     * @param string $route
-     */
-    public function setBaseRoute($route)
-    {
-        $this->baseRoute = $route;
-    }
-
-    /**
-     * Get base route for this execution
-     * @return string|null
-     */
-    public function getBaseRoute()
-    {
-        if($this->baseRoute)
-            $baseRoute	= $this->baseRoute;
-        else
-            $baseRoute	= $this->route->getParentRouteName();
-
-        return $baseRoute ? $baseRoute : null;
     }
 
     /**
@@ -513,13 +311,10 @@ class Context extends Container
      */
     public function baseRoute($route)
     {
-        if(strpos($route, '@') === 0)
-        {
+        if(strpos($route, '@') === 0) {
             $route = substr($route, 1, strlen($route)-1);
-        }
-        else
-        {
-            $baseRoute = $this->getBaseRoute();
+        } else {
+            $baseRoute = $this->route->getParentRouteName();
             $route		= $baseRoute ? $baseRoute.'.'.$route : $route;
         }
 

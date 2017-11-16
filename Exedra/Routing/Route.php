@@ -36,7 +36,6 @@ class Route implements Registrar
 	 * - middleware
 	 * - subroutes
 	 * - config
-	 * - base
 	 * - requestable
 	 */
 	protected $properties = array(
@@ -747,28 +746,6 @@ class Route implements Registrar
 		$name = $this->name;
 
 		$this->absoluteName = $group->getUpperRoute() ? $group->getUpperRoute()->getAbsoluteName().'.'.$name : $name;
-	}
-
-	/**
-	 * Set base route
-	 */
-	public function setBase($baseRoute)
-	{
-		$this->setProperty('base', $baseRoute);
-		
-		return $this;
-	}
-
-    /**
-     * Alias to setBase
-     * @param string $baseRoute
-     * @return $this
-     */
-	public function base($baseRoute)
-	{
-		$this->setProperty('base', $baseRoute);
-
-		return $this;
 	}
 
 	/**

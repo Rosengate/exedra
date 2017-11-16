@@ -28,12 +28,6 @@ class Finding
     public $parameters = array();
 
     /**
-     * string of route base
-     * @var string|null $baseRoute
-     */
-    protected $baseRoute = null;
-
-    /**
      * Request instance
      * @var \Psr\Http\Message\ServerRequestInterface|null $request
      */
@@ -156,15 +150,13 @@ class Finding
 
     /**
      * Resolve finding informations and returns a CallStack
-     * resolve baseRoute, middlewares, config, attributes
+     * resolve middlewares, config, attributes
      * @return CallStack
      * @throws Exception
      * @throws InvalidArgumentException
      */
     protected function resolve()
     {
-        $this->baseRoute = null;
-
         $callStack = new CallStack;
 
         $executePattern = $this->route->getProperty('execute');
@@ -178,10 +170,6 @@ class Finding
             // stack all the handlers
             foreach($group->getExecuteHandlers() as $name => $handler)
                 $handlers[$name] = $handler;
-
-            // if has parameter base, and it's true, set base route to the current route.
-            if($route->getProperty('base') === true)
-                $this->baseRoute = $route->getAbsoluteName();
 
             foreach($group->getMiddlewares() as $key => $middleware)
                 $callStack->addCallable($this->resolveMiddleware($middleware[0]), $middleware[1]);
@@ -294,15 +282,6 @@ class Finding
     public function hasAttribute($key)
     {
         return array_key_exists($key, $this->attributes);
-    }
-
-    /**
-     * Get base route configured for this Finding.
-     * @return string
-     */
-    public function getBaseRoute()
-    {
-        return $this->baseRoute;
     }
 
     /**
