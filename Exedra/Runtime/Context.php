@@ -228,7 +228,7 @@ class Context extends Container
      */
     public function attr($key, $default = null)
     {
-        if (array_key_exists($this->attributes[$key], $key))
+        if(isset($this->attributes[$key]))
             return $this->attributes[$key];
 
         return $this->finding->getAttribute($key, $default);
