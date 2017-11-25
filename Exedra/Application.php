@@ -110,12 +110,12 @@ class Application extends Container
         if(!is_string($routeName))
             throw new Exception\InvalidArgumentException('Argument 1 must be [string]');
 
-        $finding = $this->map->findByName($routeName, $parameters, $request);
+        $route = $this->map->findRoute($routeName);
 
-        if(!$finding->isSuccess())
-            throw new RouteNotFoundException('Route ['.$routeName.'] does not exist.');
+        if(!$route)
+            throw new RouteNotFoundException('Route [' . $routeName . '] does not exist.');
 
-        return $this->run($finding);
+        return $this->run($this->map->getFactory()->createFinding($route, $parameters, $request));
     }
 
     /**
@@ -128,9 +128,6 @@ class Application extends Container
     public function request(ServerRequest $request = null)
     {
         $finding = $this->map->findByRequest($request = ($request ? : $this->request));
-
-        if(!$finding->isSuccess())
-            throw new RouteNotFoundException('Route for request '.$request->getMethod().' '.$request->getUri()->getPath().' does not exist');
 
         return $this->run($finding);
     }

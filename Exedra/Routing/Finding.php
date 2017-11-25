@@ -10,7 +10,7 @@ use Psr\Http\Message\ServerRequestInterface;
 class Finding
 {
     /**
-     * Found route
+     * Matched route
      * @var Route $route
      */
     public $route;
@@ -54,7 +54,7 @@ class Finding
      * @param array $parameters
      * @param mixed $request
      */
-    public function __construct(Route $route = null, array $parameters = array(), ServerRequestInterface $request = null)
+    public function __construct(Route $route, array $parameters = array(), ServerRequestInterface $request = null)
     {
         $this->route = $route;
 
@@ -97,15 +97,6 @@ class Finding
     public function getParameters()
     {
         return $this->parameters;
-    }
-
-    /**
-     * Whether finding is successful
-     * @return boolean
-     */
-    public function isSuccess()
-    {
-        return $this->route ? true : false;
     }
 
     /**

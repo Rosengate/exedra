@@ -40,6 +40,6 @@ class GroupTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals('foo.bar', $this->rootGroup->getFailRoute());
 
-        $this->assertEquals(true, $this->rootGroup->findByRequest($request)->isSuccess());
+        $this->assertInstanceOf(\Exedra\Routing\Finding::class, $this->rootGroup->findByRequest($request));
     }
 }

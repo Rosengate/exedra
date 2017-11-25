@@ -1,7 +1,9 @@
 <?php namespace Exedra\Routing;
 
 use Exedra\Contracts\Routing\Registrar;
+use Exedra\Exception\Exception;
 use Exedra\Exception\InvalidArgumentException;
+use Exedra\Exception\RouteNotFoundException;
 use Psr\Http\Message\ServerRequestInterface;
 
 class Group implements \ArrayAccess, Registrar
@@ -279,36 +281,16 @@ class Group implements \ArrayAccess, Registrar
      * Make a finding by \Exedra\Http\Request
      * @param ServerRequestInterface $request
      * @return Finding
+     * @throws RouteNotFoundException
      */
     public function findByRequest(ServerRequestInterface $request)
     {
         $result = $this->findRouteByRequest($request, trim($request->getUri()->getPath(), '/'));
 
-        return $this->factory->createFinding($result['route'] ? : null, $result['parameter'], $request);
-    }
+        if(!$result['route'])
+            throw new RouteNotFoundException('Route for request '.$request->getMethod().' '.$request->getUri()->getPath().' does not exist');
 
-    /**
-     * Dispatch the
-     * @param ServerRequestInterface $request
-     * @return Finding
-     */
-    public function dispatch(ServerRequestInterface $request)
-    {
-        return $this->findByRequest($request);
-    }
-
-    /**
-     * Make a finding by given absolute name
-     * @param string $name.
-     * @param array $parameters
-     * @param ServerRequestInterface $request forwarded request, for this Finding
-     * @return Finding
-     */
-    public function findByName($name, array $parameters = array(), ServerRequestInterface $request = null)
-    {
-        $route = $this->findRoute($name);
-
-        return $this->factory->createFinding($route ? : null, $parameters, $request);
+        return $this->factory->createFinding($result['route'], $result['parameter'], $request);
     }
 
     /**
@@ -396,10 +378,6 @@ class Group implements \ArrayAccess, Registrar
         $routeName = array_shift($routeNames);
         $isTag = strpos($routeName, '#') === 0;
 
-        // alias check
-//        if(isset($this->aliasIndices[$routeName]))
-//            $routeName = $this->aliasIndices[$routeName];
-
         // search by route name
         if(!$isTag)
         {
@@ -440,6 +418,8 @@ class Group implements \ArrayAccess, Registrar
     }
 
     /**
+     * Find route by given tag
+     *
      * @param string $tag
      * @return Route|null
      */
@@ -554,10 +534,12 @@ class Group implements \ArrayAccess, Registrar
 
     public function offsetSet($offset, $value)
     {
+        throw new Exception('offsetSet operation not allowed.');
     }
 
     public function offsetUnset($offset)
     {
+        throw new Exception('OffsetUnset not allowed.');
     }
 
     /**
@@ -639,8 +621,9 @@ class Group implements \ArrayAccess, Registrar
     /**
      * Set alias for given route
      *
-     * @param $name
-     * @param $alias
+     * @param string $routeName
+     * @param string $alias
+     * @return $this
      */
     public function addRouteAlias($routeName, $alias)
     {

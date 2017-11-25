@@ -148,9 +148,9 @@ class RoutingTest extends PHPUnit_Framework_TestCase
 				)]
 			));
 
-		$finding = $this->map->findByName('r1.sr2');
+		$route = $this->map->findRoute('r1.sr2');
 
-		$this->assertEquals('r1.sr2', $finding->route->getAbsoluteName());
+		$this->assertEquals('r1.sr2', $route->getAbsoluteName());
 	}
 
 	public function testExecution()
@@ -221,11 +221,13 @@ class RoutingTest extends PHPUnit_Framework_TestCase
 
 		$this->assertEquals($app->respond(ServerRequest::createFromArray(['uri' => ['path' => '/bar/bad']]))->getBody(), 'bar bad');
 
-		$this->assertTrue($app->map->findByRequest(ServerRequest::createFromArray(['uri' => ['path' => '/foo/bad']]))->isSuccess());
+        $this->assertInstanceOf(\Exedra\Routing\Finding::class, $app->map->findByRequest(ServerRequest::createFromArray(['uri' => ['path' => '/foo/bad']])));
 
-		$this->assertFalse($app->map->findByRequest(ServerRequest::createFromArray(['uri' => ['path' => '/bas/bad']]))->isSuccess());
+        $this->expectException(\Exedra\Exception\RouteNotFoundException::class);
 
-		$this->assertFalse($app->map->findByRequest(ServerRequest::createFromArray(['uri' => ['path' => '/foo/qux']]))->isSuccess());
+        $app->map->findByRequest(ServerRequest::createFromArray(['uri' => ['path' => '/bas/bad']]));
+
+        $app->map->findByRequest(ServerRequest::createFromArray(['uri' => ['path' => '/foo/qux']]));
 	}
 
 	public function testMultioptional()
