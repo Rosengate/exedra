@@ -7,6 +7,7 @@ use Psr\Http\Message\ServerRequestInterface;
 interface Validator
 {
     /**
+     * Validate route in route matching process
      *
      * @param Route $route
      * @param ServerRequestInterface $request

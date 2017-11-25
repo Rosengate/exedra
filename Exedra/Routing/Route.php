@@ -31,7 +31,6 @@ class Route implements Registrar
 	 * @var array properties
 	 * - method
 	 * - path
-	 * - ajax
 	 * - execute
 	 * - middleware
 	 * - subroutes
@@ -71,6 +70,11 @@ class Route implements Registrar
         'attr' => 'attribute',
         'inject' => 'dependencies'
     );
+
+    /**
+     * @var array
+     */
+    protected static $classCaches = array();
 
 	/**
 	 * Route attributes
@@ -180,7 +184,7 @@ class Route implements Registrar
 	public function getPath($absolute = false)
 	{
 		if(!$absolute)
-			return $this->getProperty('path');
+		    return $this->properties['path'];
 
 		$routes = $this->getFullRoutes();
 
@@ -263,7 +267,7 @@ class Route implements Registrar
         if(!$bool)
             return $this;
 
-        $name = $this->getName();
+        $name = $this->name;
 
         if(!$name)
             throw new InvalidArgumentException('This route has to be named first.');
@@ -313,7 +317,7 @@ class Route implements Registrar
 	 */
 	public function getParameterizedPath(array $data)
 	{
-		$path = $this->getProperty('path');
+		$path = $this->properties['path'];
 
 		$segments	= explode('/', $path);
 
@@ -376,45 +380,48 @@ class Route implements Registrar
      */
 	public function match(ServerRequestInterface $request, $path)
 	{
-		foreach(array('method', 'path', 'ajax') as $key)
-		{
-			// if this parameter wasn't set, skip validation.
-			if(!$this->hasProperty($key))
-				continue;
+	    if(isset($this->properties['method'])) {
+	        if(!in_array(strtolower($request->getMethod()), $this->properties['method']))
+	            return array(
+	                'route' => false,
+                    'parameter' => false,
+                    'continue' => false
+                );
+        }
 
-			switch($key)
-			{
-				case 'method':
-                    $value = $request->getMethod();
-                    // return false because method doesn't exist.
-                    if(!in_array(strtolower($value), $this->getProperty('method')))
-                        return array('route' => false, 'parameter' => false, 'continue' => false);
+        if(isset($this->properties['path'])) {
+            $result = $this->matchPath($path);
 
-				break;
-				case 'path':
-                    $result = $this->matchPath($path);
+            if(!$result['matched'])
+                return array(
+                    'route' =>false,
+                    'parameter' => $result['parameter'],
+                    'continue' => $result['continue']
+                );
 
-                    if(!$result['matched'])
-                        return array('route' =>false, 'parameter' => $result['parameter'], 'continue' => $result['continue']);
+            if($this->properties['validators']) {
+                $flag = $this->matchValidators($request, $path, $result['parameter']);
 
-                    if($this->properties['validators'])
-                    {
-                        $flag = $this->matchValidators($request, $path, $result['parameter']);
+                if($flag === false)
+                    return array(
+                        'route' => false,
+                        'parameter' => false,
+                        'continue' => false
+                    );
+            }
 
-                        if($flag === false)
-                            return array('route' => false, 'parameter' => false, 'continue' => false);
-                    }
+            return array(
+                'route' => $this,
+                'parameter' => $result['parameter'],
+                'continue' => $result['continue']
+            );
+        }
 
-                    return array('route' => $this, 'parameter' => $result['parameter'], 'continue' => $result['continue']);
-				break;
-				case 'ajax':
-                    if((strtolower($request->getHeaderLine('x-requested-with')) == 'xmlhttprequest') != $this->getProperty('ajax'))
-                        return array('route' => false, 'parameter' => false, 'continue' => false);
-				break;
-			}
-		}
-
-		return array('route'=>false, 'parameter'=> array(), 'continue'=> false);
+        return array(
+            'route'=>false,
+            'parameter'=> array(),
+            'continue'=> false
+        );
 	}
 
     /**
@@ -422,30 +429,30 @@ class Route implements Registrar
      * @param ServerRequestInterface $request
      * @param $path
      * @param array $parameters
-     * @return int
+     * @return bool
      * @throws InvalidArgumentException
      */
-    protected function matchValidators(ServerRequestInterface $request, $path, array $parameters = array())
+    protected function matchValidators(ServerRequestInterface $request, $path, array &$parameters = array())
     {
-        foreach($this->getProperty('validators') as $validation)
+        foreach($this->properties['validators'] as $validation)
         {
-            if(is_string($validation))
-            {
-                /** @var Validator $validationObj */
-                $validationObj = new $validation;
+            if(is_string($validation)) {
+                if(!isset(static::$classCaches[$validation])) {
+                    /** @var Validator $validationObj */
+                    $validationObj = new $validation;
 
-                if(!($validationObj instanceof Validator))
-                    throw new InvalidArgumentException('The [' . $validation . '] validator must be type of [' . Validator::class . '].');
+                    if(!($validationObj instanceof Validator))
+                        throw new InvalidArgumentException('The [' . $validation . '] validator must be type of [' . Validator::class . '].');
+                } else {
+                    $validationObj = static::$classCaches[$validation];
+                }
 
                 $flag = $validationObj->validate($parameters, $this, $request, $path);
             }
-            else if(is_object($validation) && ($validation instanceof \Closure))
-            {
+            else if(is_object($validation) && ($validation instanceof \Closure)) {
                 $flag = $validation($parameters, $this, $request, $path);
-            }
-            else
-            {
-                throw new InvalidArgumentException('The validator must be type of [' . Validator::class . ']');
+            } else {
+                throw new InvalidArgumentException('The validator must be type of [' . Validator::class . '] or [' . \Closure::class . ']');
             }
 
             if(!$flag || $flag === false)
@@ -465,9 +472,9 @@ class Route implements Registrar
 	{
 		$continue = true;
 
-		$routePath = $this->getProperty('path');
+		$routePath = $this->properties['path'];
 
-		if($this->getProperty('requestable') === false)
+		if($this->properties['requestable'] === false)
 			return false;
 
 		if($routePath === false)
@@ -706,10 +713,10 @@ class Route implements Registrar
 	 */
 	public function getMethod()
 	{
-		if(!$this->hasProperty('method'))
+	    if(!isset($this->properties['method']))
 			return array('get', 'post', 'put', 'delete', 'patch', 'options');
 
-		return $this->getProperty('method');
+        return $this->properties['method'];
 	}
 
 	/**
@@ -1069,11 +1076,12 @@ class Route implements Registrar
         return $this;
     }
 
-	/**
-	 * Get route property
-	 * @param string $key
-	 * @return mixed
-	 */
+    /**
+     * Get route property
+     * @param string $key
+     * @param null $default
+     * @return mixed
+     */
 	public function getProperty($key, $default = null)
 	{
 		return isset($this->properties[$key]) ? $this->properties[$key] : $default;
@@ -1108,7 +1116,7 @@ class Route implements Registrar
 	 */
 	public function isRequestable()
 	{
-		return $this->getPath() !== false && $this->getProperty('requestable') === true;
+		return $this->getPath() !== false && $this->properties['requestable'] === true;
 	}
 
 	/**
