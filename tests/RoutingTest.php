@@ -223,7 +223,7 @@ class RoutingTest extends PHPUnit_Framework_TestCase
 
         $this->assertInstanceOf(\Exedra\Routing\Finding::class, $app->map->findByRequest(ServerRequest::createFromArray(['uri' => ['path' => '/foo/bad']])));
 
-        $this->expectException(\Exedra\Exception\RouteNotFoundException::class);
+        $this->setExpectedException(\Exedra\Exception\RouteNotFoundException::class);
 
         $app->map->findByRequest(ServerRequest::createFromArray(['uri' => ['path' => '/bas/bad']]));
 
