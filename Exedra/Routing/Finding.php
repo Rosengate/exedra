@@ -152,6 +152,9 @@ class Finding
 
         $executePattern = $this->route->getProperty('execute');
 
+        if(null === $executePattern)
+            throw new InvalidArgumentException('The route [' . $this->route->getAbsoluteName() . '] does not have execute handle.');
+
         $handlers = array();
 
         foreach($this->route->getFullRoutes() as $route)
@@ -220,14 +223,7 @@ class Finding
                     $properties['dependencies'] = $this->route->getProperty('dependencies');
 
                 if(!$resolve)
-                {
-                    $executePattern = $this->route->getProperty('execute');
-
-                    if(!$executePattern)
-                        throw new InvalidArgumentException('The route [' . $this->route->getAbsoluteName() . '] does not have execute handle.');
-
                     throw new InvalidArgumentException('The route [' . $this->route->getAbsoluteName() . '] execute handle was not properly resolved. '.(is_string($executePattern) ? ' ['.$executePattern.']' : ''));
-                }
 
                 $callStack->addCallable($resolve, $properties);
             }
