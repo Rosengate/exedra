@@ -4,6 +4,7 @@ namespace Exedra\Runtime;
 use Exedra\Application;
 use Exedra\Config;
 use Exedra\Container\Container;
+use Exedra\Exception\Exception;
 use Exedra\Http\ServerRequest;
 use Exedra\Path;
 use Exedra\Routing\Finding;
@@ -69,6 +70,13 @@ class Context extends Container
 
         // initiate service registry
         $this->setUp();
+
+        $callStack = $finding->getCallStack();
+
+        if(!$callStack)
+            throw new Exception('The route [' . $finding->getRoute()->getAbsoluteName() . '] does not have execute handle.');
+
+        $this->callStack = $callStack;
     }
 
     /**
@@ -149,6 +157,7 @@ class Context extends Container
      * Point and execute the next handler
      * If there's an injectable argument, inject them, and create another $next caller
      * @return mixed
+     * @throws Exception
      */
     public function next()
     {

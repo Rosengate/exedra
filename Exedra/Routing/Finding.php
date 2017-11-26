@@ -25,7 +25,7 @@ class Finding
      * Route parameters
      * @var array $parameters
      */
-    public $parameters = array();
+    protected $parameters = array();
 
     /**
      * Request instance
@@ -45,7 +45,7 @@ class Finding
     protected $handlers = array();
 
     /**
-     * @var CallStack $callStack
+     * @var CallStack|null $callStack
      */
     protected $callStack;
 
@@ -142,7 +142,7 @@ class Finding
     /**
      * Resolve finding informations and returns a CallStack
      * resolve middlewares, config, attributes
-     * @return CallStack
+     * @return CallStack|null
      * @throws Exception
      * @throws InvalidArgumentException
      */
@@ -151,9 +151,6 @@ class Finding
         $callStack = new CallStack;
 
         $executePattern = $this->route->getProperty('execute');
-
-        if(null === $executePattern)
-            throw new InvalidArgumentException('The route [' . $this->route->getAbsoluteName() . '] does not have execute handle.');
 
         $handlers = array();
 
@@ -226,15 +223,17 @@ class Finding
                     throw new InvalidArgumentException('The route [' . $this->route->getAbsoluteName() . '] execute handle was not properly resolved. '.(is_string($executePattern) ? ' ['.$executePattern.']' : ''));
 
                 $callStack->addCallable($resolve, $properties);
+
+                return $callStack;
             }
         }
 
-        return $callStack;
+        return null;
     }
 
     /**
      * Get callables stack
-     * @return CallStack
+     * @return CallStack|null
      */
     public function getCallStack()
     {
