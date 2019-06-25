@@ -1,5 +1,6 @@
 <?php
 namespace Exedra\Runtime;
+use Exedra\Http\Stream;
 use Psr\Http\Message\ResponseInterface;
 
 /**
@@ -24,6 +25,16 @@ class Response extends \Exedra\Http\Response
 		$this->body = $body;
 
 		return $this;
+	}
+
+    public function write($contents)
+    {
+        if($this->body instanceof Stream)
+            $this->body->write($contents);
+        else
+            $this->body = $contents;
+
+        return $this;
 	}
 
 	public function send()
