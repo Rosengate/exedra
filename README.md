@@ -27,6 +27,8 @@ Imagine building a plane while flying it!
 
 Documentation
 ======
+More detailed documentation can be found at http://exedra.rosengate.com
+
 - [Home](https://github.com/Rosengate/exedra/wiki)
 - [Installation](https://github.com/Rosengate/exedra/wiki/ii.-Installation)
 - [Minimal Setup](https://github.com/Rosengate/exedra/wiki/iii.-Minimal-Setup)
@@ -34,7 +36,7 @@ Documentation
 - [Routing Examples](https://github.com/Rosengate/exedra/wiki/v.-Routing-Examples)
 - [API](https://github.com/Rosengate/exedra/wiki/vi.-API)
 - [Independent Routing Components](https://github.com/Rosengate/exedra/wiki/vii.-Independent-Routing-Component---Examples)
-- [Routing Controller](https://github.com/Rosengate/exedra/wiki/viii.-Routing-Controller)
+- [Routing Controller](https://github.com/Rosengate/exedra/tree/master/Exedra/Routeller)
 - [Psr7 Middleware](https://github.com/Rosengate/exedra/wiki/viv.-Psr-Middleware)
 
 # Usage
