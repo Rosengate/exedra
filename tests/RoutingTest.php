@@ -1,9 +1,9 @@
 <?php
 use Exedra\Http\ServerRequest;
 
-class RoutingTest extends PHPUnit_Framework_TestCase
+class RoutingTest extends \BaseTestCase
 {
-	public function setUp()
+	public function caseSetUp()
 	{
 		// build a basic case
 		$app = $this->app = new \Exedra\Application(__DIR__.'/Factory');
@@ -223,7 +223,7 @@ class RoutingTest extends PHPUnit_Framework_TestCase
 
         $this->assertInstanceOf(\Exedra\Routing\Finding::class, $app->map->findByRequest(ServerRequest::createFromArray(['uri' => ['path' => '/foo/bad']])));
 
-        $this->setExpectedException(\Exedra\Exception\RouteNotFoundException::class);
+        $this->expectException(\Exedra\Exception\RouteNotFoundException::class);
 
         $app->map->findByRequest(ServerRequest::createFromArray(['uri' => ['path' => '/bas/bad']]));
 

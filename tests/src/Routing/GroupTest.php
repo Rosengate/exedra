@@ -1,5 +1,5 @@
 <?php
-class GroupTest extends PHPUnit_Framework_TestCase
+class GroupTest extends \BaseTestCase
 {
     /**
      * @var \Exedra\Routing\Group $rootGroup
@@ -8,7 +8,7 @@ class GroupTest extends PHPUnit_Framework_TestCase
 
     protected $factory;
 
-    public function setUp()
+    public function caseSetUp()
     {
         $this->factory = new \Exedra\Routing\Factory;
 

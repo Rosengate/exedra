@@ -1,7 +1,7 @@
 <?php
-class HttpServerRequestTest extends PHPUnit_Framework_TestCase
+class HttpServerRequestTest extends \BaseTestCase
 {
-	public function setUp()
+	public function caseSetUp()
 	{
 
 	}

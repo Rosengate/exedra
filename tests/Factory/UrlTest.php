@@ -3,9 +3,9 @@
 /**
  * @property \Exedra\Application $app
  */
-class FactoryUrlTest extends PHPUnit_Framework_TestCase
+class FactoryUrlTest extends \BaseTestCase
 {
-	public function setUp()
+	public function caseSetUp()
 	{
 		$this->app = new \Exedra\Application(__DIR__);
 

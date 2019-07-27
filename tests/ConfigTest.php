@@ -1,7 +1,7 @@
 <?php
-class ConfigTest extends PHPUnit_Framework_TestCase
+class ConfigTest extends BaseTestCase
 {
-	public function setUp()
+	public function caseSetUp()
 	{
 		$this->config = new \Exedra\Config;
 	}

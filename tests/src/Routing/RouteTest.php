@@ -1,5 +1,5 @@
 <?php
-class RouteTest extends PHPUnit_Framework_TestCase
+class RouteTest extends \BaseTestCase
 {
     /** @var \Exedra\Routing\Factory */
     protected $factory;
@@ -7,7 +7,7 @@ class RouteTest extends PHPUnit_Framework_TestCase
     /** @var \Exedra\Routing\Group $rootGroup */
     protected $rootGroup;
 
-    public function setUp()
+    public function caseSetUp()
     {
         $this->factory = new \Exedra\Routing\Factory();
 
@@ -110,11 +110,6 @@ class RouteTest extends PHPUnit_Framework_TestCase
         $route = $this->createNestedRoute();
 
         $this->assertTrue($route->hasSubroutes());
-    }
-
-    public function testResolveGroup()
-    {
-        $this->createNestedRoute();
     }
 
     public function testGetMethod()

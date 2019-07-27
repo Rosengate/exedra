@@ -1,7 +1,7 @@
 <?php
-class PathTest extends PHPUnit_Framework_TestCase
+class PathTest extends \BaseTestCase
 {
-	public function setUp()
+	public function caseSetUp()
 	{
 		$this->path = new \Exedra\Path(__DIR__.'/Factory');
 

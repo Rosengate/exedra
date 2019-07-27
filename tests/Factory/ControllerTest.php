@@ -1,7 +1,7 @@
 <?php
-class FactoryControllerTest extends PHPUnit_Framework_TestCase
+class FactoryControllerTest extends \BaseTestCase
 {
-	public function setUp()
+	public function caseSetUp()
 	{
 		$app = new \Exedra\Application(__DIR__.'/Factory');
 

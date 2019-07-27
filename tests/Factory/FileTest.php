@@ -1,7 +1,7 @@
 <?php
-class FactoryFileTest extends PHPUnit_Framework_TestCase
+class FactoryFileTest extends \BaseTestCase
 {
-	public function setUp()
+	public function caseSetUp()
 	{
 		$this->basePath = new \Exedra\Path(__DIR__);
 

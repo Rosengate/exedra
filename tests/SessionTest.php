@@ -1,7 +1,7 @@
 <?php
-class SessionTest extends PHPUnit_Framework_TestCase
+class SessionTest extends \BaseTestCase
 {
-	public function setUp()
+	public function caseSetUp()
 	{
 		$this->storage = array();
 

@@ -1,7 +1,7 @@
 <?php
-class ProviderTest extends PHPUnit_Framework_TestCase
+class ProviderTest extends \BaseTestCase
 {
-	public function setUp()
+	public function caseSetUp()
 	{
 		$this->app = new \Exedra\Application(__DIR__.'/Factory');
 

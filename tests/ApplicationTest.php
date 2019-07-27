@@ -1,9 +1,9 @@
 <?php
 require_once __DIR__.'/autoload.php';
 
-class ApplicationTest extends PHPUnit_Framework_TestCase
+class ApplicationTest extends BaseTestCase
 {
-	public function setUp()
+	public function caseSetUp()
 	{
 		$this->app = new \Exedra\Application(__DIR__.'/Factory');
 

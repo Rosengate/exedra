@@ -1,9 +1,9 @@
 <?php
 use Exedra\Support\DotArray;
 
-class DotArrayTest extends PHPUnit_Framework_TestCase
+class DotArrayTest extends BaseTestCase
 {
-	public function setUp()
+	public function caseSetUp()
 	{
 		$this->storage = array();
 	}

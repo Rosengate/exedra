@@ -35,8 +35,9 @@ class Application extends Container
     /**
      * Create a new application
      * @param string|array params [if string, expect root directory, else array of directories, and configuration]
+     * @param string|null class that extends Exedra\Runtime\Context
      */
-    public function __construct($rootDir)
+    public function __construct($rootDir, $context = null)
     {
         parent::__construct();
 
@@ -45,6 +46,9 @@ class Application extends Container
         $this->services['path'] = new Path($rootDir);
 
         $this->setUp();
+
+        if ($context)
+            $this->factory('runtime.context', $context);
     }
 
     /**

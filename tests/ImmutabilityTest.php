@@ -1,7 +1,7 @@
 <?php
-class ImmutabilityTest extends PHPUnit_Framework_TestCase
+class ImmutabilityTest extends \BaseTestCase
 {
-	public function setUp()
+	public function caseSetUp()
 	{
 		$this->app = new \Exedra\Application(__DIR__);
 

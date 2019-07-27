@@ -1,55 +1,58 @@
 <?php
-class MiddlewareTest extends PHPUnit_Framework_TestCase
+class MiddlewareTest extends \BaseTestCase
 {
     /**
      * @var \Exedra\Application $app
      */
     protected $app;
 
-	public function setUp()
+    /**
+     * @var \Exedra\Routing\Group
+     */
+    protected $map;
+
+	public function caseSetUp()
 	{
 		$this->app = new \Exedra\Application(__DIR__.'/Factory');
 
         $this->app->provider->add(\Exedra\Support\Provider\Framework::class);
 
 		$this->map = $this->app->map;
-
-		/*$this->app->middleware->register(array(
-			'global' => function($exe)
-			{
-				$exe->text = 'global';
-
-				return $exe->next($exe);
-			},
-			'limiter' => \App\Middleware\RateLimiter::CLASS,
-			'decorator' => function($exe)
-			{
-				return $exe->text.'-bar-baz!';
-			}
-		));*/
 	}
 
 	public function testRegistry()
 	{
-//		$this->map->middleware('global');
+	    $this->map->middleware(function(\Exedra\Runtime\Context $context) {
+	        return 'first-' . $context->next($context);
+        }, ['name' => 'first']);
 
-//		$this->map['foo']->any('/')->middleware('limiter')->execute(function(){});
-//
-//		$this->map->addRoutes(array(
-//			'bar' => array(
-//				'path' => '/foo',
-//				'middleware' => 'decorator',
-//				'execute' => function(){})
-//			));
-//
-//		$this->assertEquals('global-foo-bar!', $this->app->execute('foo')->response->getBody());
-//
-//		$this->assertEquals('global-bar-baz!', $this->app->execute('bar')->response->getBody());
+	    $this->map->middleware(function(\Exedra\Runtime\Context $context) {
+	        return 'second-' . $context->next($context);
+        }, ['name' => 'second']);
+
+		$this->map['foo']->any('/')->execute(function(){
+		    return 'foo';
+        });
+
+		$this->map->addRoutes(array(
+			'bar' => array(
+				'path' => '/foo',
+				'execute' => function(){
+				    return 'bar';
+                })
+			));
+
+		$this->assertEquals('first-second-foo', $this->app->execute('foo')->response->getBody());
+
+		$this->assertEquals('first-second-bar', $this->app->execute('bar')->response->getBody());
+
+		$finding = $this->map->findRoute('foo');
+
 	}
 
-	public function testMiddlewareRemoval()
+	/*public function testMiddlewareRemoval()
     {
-        /*$this->map->middleware(function()
+        $this->map->middleware(function()
         {
             return 'with-middleware';
         }, 'foo-middleware');
@@ -65,6 +68,6 @@ class MiddlewareTest extends PHPUnit_Framework_TestCase
 
         $finding->getCallStack()->removeCall('foo-middleware');
 
-        $this->assertEquals('without-middleware', $this->app->run($finding)->response->getBody());*/
-    }
+        $this->assertEquals('without-middleware', $this->app->run($finding)->response->getBody());
+    }*/
 }

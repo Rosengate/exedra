@@ -1,7 +1,7 @@
 <?php
-class HttpResponseTest extends PHPUnit_Framework_TestCase
+class HttpResponseTest extends \BaseTestCase
 {
-	public function setUp()
+	public function caseSetUp()
 	{
 		$this->response = \Exedra\Runtime\Response::createEmptyResponse();
 	}

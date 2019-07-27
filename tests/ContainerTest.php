@@ -17,9 +17,9 @@ class Bar
 	}
 }
 
-class ContainerTest extends PHPUnit_Framework_TestCase
+class ContainerTest extends BaseTestCase
 {
-	public function setUp()
+	public function caseSetUp()
 	{
 		$this->app = new \Exedra\Application(__DIR__.'/Factory');
 

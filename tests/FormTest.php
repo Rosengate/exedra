@@ -1,7 +1,7 @@
 <?php
-class FormTest extends PHPUnit_Framework_TestCase
+class FormTest extends \BaseTestCase
 {
-	public function setUp()
+	public function caseSetUp()
 	{
 		$this->form = new \Exedra\Form\Form;
 	}
