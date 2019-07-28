@@ -1,5 +1,6 @@
 <?php
 namespace Exedra\Routing;
+use Exedra\Contracts\Routing\ExecuteHandler;
 use Exedra\Contracts\Routing\GroupHandler;
 use Exedra\Contracts\Routing\RoutingHandler;
 use Exedra\Exception\InvalidArgumentException;
@@ -13,24 +14,24 @@ use Psr\Http\Message\ServerRequestInterface;
  */
 class Factory
 {
-	/**
-	 * Classes registry
-	 * @var array $registry
-	 */
-	protected $registry = array();
+    /**
+     * Classes registry
+     * @var array $registry
+     */
+    protected $registry = array();
 
-	/**
-	 * Reflection of classes on creating
-	 * @var array $reflections
-	 */
-	protected $reflections = array();
+    /**
+     * Reflection of classes on creating
+     * @var array $reflections
+     */
+    protected $reflections = array();
 
-	/**
-	 * Routes lookup path
-	 * Used when a string based subroutes is passed
-	 * @var string $path
-	 */
-	protected $lookupPath;
+    /**
+     * Routes lookup path
+     * Used when a string based subroutes is passed
+     * @var string $path
+     */
+    protected $lookupPath;
 
     /**
      * @var GroupHandler[] $groupHandlers
@@ -43,58 +44,64 @@ class Factory
     protected $routingHandlers = array();
 
     /**
+     * @var ExecuteHandler[] $executeHandlers
+     */
+    protected $executeHandlers = array();
+
+    /**
      * @var GroupHandler[] $defaultGroupHandlers
      */
     protected $defaultGroupHandlers;
 
     public function __construct()
-	{
-		$this->setUp();
-	}
+    {
+        $this->setUp();
+    }
 
-	/**
-	 * Get routes lookup path
-	 * @return string
-	 */
-	public function getLookupPath()
-	{
-		return $this->lookupPath;
-	}
+    /**
+     * Get routes lookup path
+     * @return string
+     */
+    public function getLookupPath()
+    {
+        return $this->lookupPath;
+    }
 
-	/**
-	 * Register basic components [finding, route, group]
-	 */
-	protected function setUp()
-	{
-		$this->register(array(
-			'finding' => Finding::class,
-			'route' => Route::class,
-			'group' => Group::class
-			));
+    /**
+     * Register basic components [finding, route, group]
+     */
+    protected function setUp()
+    {
+        $this->register(array(
+            'finding' => Finding::class,
+            'route' => Route::class,
+            'group' => Group::class
+        ));
 
         $this->addDefaultGroupHandler(new ClosureHandler());
         $this->addDefaultGroupHandler(new ArrayHandler());
 //        $this->addDefaultGroupHandler(new PathHandler());
+        $this->addExecuteHandlers(new ExecuteHandlers\ClosureHandler());
 
-		return $this;
-	}
+        return $this;
+    }
 
     /**
      * Register classname
      * @param array $registry
      * @return $this
      */
-	public function register(array $registry)
-	{
-		foreach($registry as $name => $classname)
-		{
-			$this->registry[$name] = $classname;
+    public function register(array $registry)
+    {
+        foreach($registry as $name => $classname)
+        {
+            $this->registry[$name] = $classname;
 
-			unset($this->reflections[$name]);
-		}
+            unset($this->reflections[$name]);
+        }
 
-		return $this;
-	}
+        return $this;
+    }
 
     /**
      * General method to create classes from the registered list.
@@ -102,27 +109,27 @@ class Factory
      * @param array $arguments
      * @return mixed
      */
-	public function create($name, array $arguments = array())
-	{
-		if(!isset($this->reflections[$name]))
-			$this->reflections[$name] = new \ReflectionClass($this->registry[$name]);
+    public function create($name, array $arguments = array())
+    {
+        if(!isset($this->reflections[$name]))
+            $this->reflections[$name] = new \ReflectionClass($this->registry[$name]);
 
-		$reflection = $this->reflections[$name];
+        $reflection = $this->reflections[$name];
 
-		return $reflection->newInstanceArgs($arguments);
-	}
+        return $reflection->newInstanceArgs($arguments);
+    }
 
     /**
-	 * Create route object
-	 * @param \Exedra\Routing\Group $group of where the route is based on
-	 * @param string $name
-	 * @param array $parameters route parameter
-	 * @return \Exedra\Routing\Route
-	 */
-	public function createRoute(Group $group, $name, array $parameters)
-	{
-		return $this->create('route', array($group, $name, $parameters));
-	}
+     * Create route object
+     * @param \Exedra\Routing\Group $group of where the route is based on
+     * @param string $name
+     * @param array $parameters route parameter
+     * @return \Exedra\Routing\Route
+     */
+    public function createRoute(Group $group, $name, array $parameters)
+    {
+        return $this->create('route', array($group, $name, $parameters));
+    }
 
     /**
      * Create routing group object
@@ -194,12 +201,24 @@ class Factory
     }
 
     /**
-     * Get routing handlers
-     * @return RoutingHandler[]
+     * Add execute handler
+     * @param ExecuteHandler $handler
+     * @return $this
      */
-    public function getRoutingHandlers()
+    public function addExecuteHandlers(ExecuteHandler $handler)
     {
-        return $this->routingHandlers;
+        $this->executeHandlers[] = $handler;
+
+        return $this;
+    }
+
+    /**
+     * Get execute handlers
+     * @return ExecuteHandler[]
+     */
+    public function getExecuteHandlers()
+    {
+        return array_merge($this->executeHandlers, $this->routingHandlers);
     }
 
     /**
@@ -215,15 +234,15 @@ class Factory
         return $this;
     }
 
-	/**
-	 * Create route finding
-	 * @param Route|null $route
-	 * @param array $parameters
-	 * @param ServerRequestInterface $request
-	 * @return \Exedra\Routing\Finding
-	 */
-	public function createFinding(Route $route = null, array $parameters = null, ServerRequestInterface $request = null)
-	{
-		return $this->create('finding', array($route, $parameters, $request));
-	}
+    /**
+     * Create route finding
+     * @param Route|null $route
+     * @param array $parameters
+     * @param ServerRequestInterface $request
+     * @return \Exedra\Routing\Finding
+     */
+    public function createFinding(Route $route = null, array $parameters = null, ServerRequestInterface $request = null)
+    {
+        return $this->create('finding', array($route, $parameters, $request));
+    }
 }

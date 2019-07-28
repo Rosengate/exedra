@@ -78,8 +78,6 @@ class Application extends Container
             'runtime.response' => function(){ return Response::createEmptyResponse();},
             'url.factory' => UrlFactory::class
         ));
-
-        $this->map->addExecuteHandler('closure', ClosureHandler::class);
     }
 
     /**

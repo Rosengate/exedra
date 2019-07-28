@@ -158,12 +158,12 @@ class Finding
         foreach($this->route->getFullRoutes() as $route) {
             $group = $route->getGroup();
 
+            foreach($group->factory->getExecuteHandlers() as $handler)
+                $handlers[get_class($handler)] = $handler;
+
             // stack all the handlers
             foreach($group->getExecuteHandlers() as $name => $handler)
                 $handlers[$name] = $handler;
-
-            foreach($group->factory->getRoutingHandlers() as $handler)
-                $handlers[get_class($handler)] = $handler;
 
             foreach($group->getMiddlewares() as $key => $middleware)
                 $callStack->addCallable($this->resolveMiddleware($middleware[0]), $middleware[1]);
