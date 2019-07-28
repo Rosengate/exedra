@@ -5,7 +5,7 @@ use Exedra\Contracts\Routing\ExecuteHandler;
 
 class FooHandler implements ExecuteHandler
 {
-	public function validate($pattern)
+	public function validateHandle($pattern)
 	{
 		if(strpos($pattern, 'bar=') === 0)
 			return true;
@@ -13,7 +13,7 @@ class FooHandler implements ExecuteHandler
 		return false;
 	}
 
-	public function resolve($pattern)
+	public function resolveHandle($pattern)
 	{
 		return function($exe) use($pattern)
 		{

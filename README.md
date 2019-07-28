@@ -29,17 +29,7 @@ Documentation
 ======
 More detailed documentation can be found at http://exedra.rosengate.com
 
-- [Home](https://github.com/Rosengate/exedra/wiki)
-- [Installation](https://github.com/Rosengate/exedra/wiki/ii.-Installation)
-- [Minimal Setup](https://github.com/Rosengate/exedra/wiki/iii.-Minimal-Setup)
-- [Framework Provider](https://github.com/Rosengate/exedra/wiki/iv.-Framework-Provider)
-- [Routing Examples](https://github.com/Rosengate/exedra/wiki/v.-Routing-Examples)
-- [API](https://github.com/Rosengate/exedra/wiki/vi.-API)
-- [Independent Routing Components](https://github.com/Rosengate/exedra/wiki/vii.-Independent-Routing-Component---Examples)
-- [Routing Controller](https://github.com/Rosengate/exedra/tree/master/Exedra/Routeller)
-- [Psr7 Middleware](https://github.com/Rosengate/exedra/wiki/viv.-Psr-Middleware)
-
-# Usage
+# Example
 Create an index.php file with the following contents.
 ```php
 <?php
@@ -63,6 +53,7 @@ And run a simple web server on the same dir.
 ```
 php -S localhost:9000
 ```
+Then open up your browser and type `http://localhost:9000/hello/world` to get your `Hello world`.
 
 # Roadmap to 1.0.0
 - Full Test Coverages
@@ -70,7 +61,7 @@ php -S localhost:9000
 - Removal of unnecessary codes
 - More clarity to handlers (group handler, execute handler)
 
-Roadmap to 0.3.0 [99% Done]
+Roadmap to 1.0.0 [99% Done]
 ======
 - Adapt several PSR's styles and standards
   - PSR-7 Message Interfaces [DONE]
@@ -89,3 +80,7 @@ Roadmap to 0.3.0 [99% Done]
 Thank you!
 ======
 I hope you guys like it!
+
+License
+======
+[MIT License](LICENSE)

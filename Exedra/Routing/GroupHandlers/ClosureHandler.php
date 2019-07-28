@@ -7,7 +7,7 @@ use Exedra\Routing\Route;
 
 class ClosureHandler implements GroupHandler
 {
-    public function validate($pattern, Route $route = null)
+    public function validateGroup($pattern, Route $route = null)
     {
         if(is_object($pattern) && $pattern instanceof \Closure)
             return true;
@@ -15,7 +15,7 @@ class ClosureHandler implements GroupHandler
         return false;
     }
 
-    public function resolve(Factory $factory, $callback, Route $route = null)
+    public function resolveGroup(Factory $factory, $callback, Route $route = null)
     {
         $router = $factory->createGroup(array(), $route);
 

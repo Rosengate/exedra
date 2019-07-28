@@ -24,7 +24,7 @@ class PathHandler implements GroupHandler
      * @param Route|null $route
      * @return bool
      */
-    public function validate($pattern, Route $route = null)
+    public function validateGroup($pattern, Route $route = null)
     {
         if(is_string($pattern))
             return true;
@@ -40,7 +40,7 @@ class PathHandler implements GroupHandler
      * @throws InvalidArgumentException
      * @throws NotFoundException
      */
-    public function resolve(Factory $factory, $path, Route $route = null)
+    public function resolveGroup(Factory $factory, $path, Route $route = null)
     {
         $path = $this->lookupPath . '/' . ltrim($path, '/\\');
 

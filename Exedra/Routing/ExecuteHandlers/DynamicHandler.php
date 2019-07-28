@@ -9,14 +9,14 @@ class DynamicHandler implements ExecuteHandler
 
     protected $resolve;
 
-    public function validate($pattern)
+    public function validateHandle($pattern)
     {
         $validation = $this->validation;
 
         return $validation($pattern);
     }
 
-    public function resolve($pattern)
+    public function resolveHandle($pattern)
     {
         $resolve = $this->resolve;
 

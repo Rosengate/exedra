@@ -7,12 +7,12 @@ use Exedra\Routing\Route;
 
 class ArrayHandler implements GroupHandler
 {
-    public function validate($pattern, Route $route = null)
+    public function validateGroup($pattern, Route $route = null)
     {
         return is_array($pattern);
     }
 
-    public function resolve(Factory $factory, $routes, Route $route = null)
+    public function resolveGroup(Factory $factory, $routes, Route $route = null)
     {
         return $factory->createGroup($routes, $route);
     }

@@ -10,7 +10,7 @@ class ExecuteHandler implements \Exedra\Contracts\Routing\ExecuteHandler
      * @param mixed $pattern
      * @return boolean
      */
-    public function validate($pattern)
+    public function validateHandle($pattern)
     {
         if(is_string($pattern) && strpos($pattern, 'routeller=') === 0)
             return true;
@@ -22,15 +22,14 @@ class ExecuteHandler implements \Exedra\Contracts\Routing\ExecuteHandler
      * Resolve into Closure or callable
      * @return \Closure|callable
      */
-    public function resolve($pattern)
+    public function resolveHandle($pattern)
     {
         list($class, $method) = explode('@', str_replace('routeller=', '', $pattern));
 
         /** @var Controller $controller */
         $controller = $class::instance();
 
-        return function() use($controller, $method)
-        {
+        return function() use($controller, $method) {
             return call_user_func_array(array($controller, $method), func_get_args());
         };
     }

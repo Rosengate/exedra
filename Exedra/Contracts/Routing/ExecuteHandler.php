@@ -4,15 +4,16 @@ namespace Exedra\Contracts\Routing;
 interface ExecuteHandler
 {
     /**
-     * Validate given handler pattern
+     * Validate given execute handler pattern
      * @param mixed $pattern
      * @return boolean
      */
-    public function validate($pattern);
+    public function validateHandle($pattern);
 
     /**
-     * Resolve into Closure or callable
+     * Resolve handle into Closure or callable
+     * @param string $pattern
      * @return \Closure|callable
      */
-    public function resolve($pattern);
+    public function resolveHandle($pattern);
 }

@@ -5,7 +5,7 @@ use Exedra\Contracts\Routing\ExecuteHandler;
 
 class ClosureHandler implements ExecuteHandler
 {
-    public function validate($pattern)
+    public function validateHandle($pattern)
     {
         if($pattern instanceof \Closure)
             return true;
@@ -13,7 +13,7 @@ class ClosureHandler implements ExecuteHandler
         return false;
     }
 
-    public function resolve($pattern)
+    public function resolveHandle($pattern)
     {
         return $pattern;
     }

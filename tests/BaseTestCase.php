@@ -13,5 +13,5 @@ abstract class BaseTestCase extends \PHPUnit_Framework_TestCase
         self::setExpectedException($exception);
     }
 
-    abstract function caseSetUp();
+    abstract public function caseSetUp();
 }

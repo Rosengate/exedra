@@ -11,7 +11,7 @@ use Exedra\Runtime\Context;
  */
 class Controller implements ExecuteHandler
 {
-    public function validate($pattern)
+    public function validateHandle($pattern)
     {
         if(is_string($pattern) && strpos($pattern, "controller=") === 0)
             return true;
@@ -19,7 +19,7 @@ class Controller implements ExecuteHandler
         return false;
     }
 
-    public function resolve($pattern)
+    public function resolveHandle($pattern)
     {
         return function(Context $exe) use($pattern)
         {

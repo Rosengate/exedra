@@ -152,15 +152,18 @@ class Finding
 
         $executePattern = $this->route->getProperty('execute');
 
+        /** @var ExecuteHandler[] $handlers */
         $handlers = array();
 
-        foreach($this->route->getFullRoutes() as $route)
-        {
+        foreach($this->route->getFullRoutes() as $route) {
             $group = $route->getGroup();
 
             // stack all the handlers
             foreach($group->getExecuteHandlers() as $name => $handler)
                 $handlers[$name] = $handler;
+
+            foreach($group->factory->getRoutingHandlers() as $handler)
+                $handlers[get_class($handler)] = $handler;
 
             foreach($group->getMiddlewares() as $key => $middleware)
                 $callStack->addCallable($this->resolveMiddleware($middleware[0]), $middleware[1]);
@@ -187,16 +190,12 @@ class Finding
                 $this->config = array_merge($this->config, $config);
         }
 
-        foreach($handlers as $name => $class)
-        {
+        foreach($handlers as $name => $class) {
             $handler = null;
 
-            if(is_string($class))
-            {
+            if(is_string($class)) {
                 $handler = new $class;
-            }
-            else if(is_object($class))
-            {
+            } else if(is_object($class)) {
                 if($class instanceof \Closure) {
                     $class($handler = new DynamicHandler());
                 } else if($class instanceof ExecuteHandler) {
@@ -207,12 +206,11 @@ class Finding
             if(!$handler || !is_object($handler) || !($handler instanceof ExecuteHandler))
                 throw new InvalidArgumentException('Handler must be either class name, ' . ExecuteHandler::class . ' or \Closure ');
 
-            if($handler->validate($executePattern))
-            {
-                $resolve = $handler->resolve($executePattern);
+            if($handler->validateHandle($executePattern)) {
+                $resolve = $handler->resolveHandle($executePattern);
 
                 if(!is_callable($resolve))
-                    throw new \Exedra\Exception\InvalidArgumentException('The resolve() method for handler [' . get_class($handler) . '] must return \Closure or callable');
+                    throw new \Exedra\Exception\InvalidArgumentException('The resolveHandle() method for handler [' . get_class($handler) . '] must return \Closure or callable');
 
                 $properties = array();
 

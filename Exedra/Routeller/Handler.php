@@ -52,7 +52,7 @@ class Handler implements GroupHandler
         $this->isAutoReload = isset($this->options['auto_reload']) && $this->options['auto_reload'] === true ? true : false;
     }
 
-    public function validate($pattern, Route $route = null)
+    public function validateGroup($pattern, Route $route = null)
     {
         if(is_string($pattern)) {
             if(strpos($pattern, 'routeller=') === 0)
@@ -83,7 +83,7 @@ class Handler implements GroupHandler
      * @return \Exedra\Routing\Group
      * @throws Exception
      */
-    public function resolve(Factory $factory, $controller, Route $parentRoute = null)
+    public function resolveGroup(Factory $factory, $controller, Route $parentRoute = null)
     {
         $group = $factory->createGroup(array(), $parentRoute);
 
@@ -95,10 +95,10 @@ class Handler implements GroupHandler
 
                 $controller = $classname::instance()->{$method}($this->app);
 
-                if(!$this->validate($controller))
+                if(!$this->validateGroup($controller))
                     throw new Exception('Unable to validate the routing group for [' . $classname . '::' . $method .'()]');
 
-                return $this->resolve($factory, $controller, $parentRoute);
+                return $this->resolveGroup($factory, $controller, $parentRoute);
             } else if(strpos($controller, 'routeller_call') === 0) {
                 list($classname, $method) = explode('@', str_replace('routeller_call=', '', $controller));
 

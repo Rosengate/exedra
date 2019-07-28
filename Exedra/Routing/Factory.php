@@ -1,6 +1,7 @@
 <?php
 namespace Exedra\Routing;
 use Exedra\Contracts\Routing\GroupHandler;
+use Exedra\Contracts\Routing\RoutingHandler;
 use Exedra\Exception\InvalidArgumentException;
 use Exedra\Routing\GroupHandlers\ArrayHandler;
 use Exedra\Routing\GroupHandlers\ClosureHandler;
@@ -35,6 +36,11 @@ class Factory
      * @var GroupHandler[] $groupHandlers
      */
     protected $groupHandlers = array();
+
+    /**
+     * @var RoutingHandler[] $routingHandlers
+     */
+    protected $routingHandlers = array();
 
     /**
      * @var GroupHandler[] $defaultGroupHandlers
@@ -139,20 +145,25 @@ class Factory
      */
     public function resolveGroup($pattern, $route = null)
     {
-        foreach($this->groupHandlers as $handler)
-        {
-            if(!$handler->validate($pattern, $route))
+        foreach($this->groupHandlers as $handler) {
+            if(!$handler->validateGroup($pattern, $route))
                 continue;
 
-            return $handler->resolve($this, $pattern, $route);
+            return $handler->resolveGroup($this, $pattern, $route);
         }
 
-        foreach($this->defaultGroupHandlers as $handler)
-        {
-            if(!$handler->validate($pattern, $route))
+        foreach($this->routingHandlers as $handler) {
+            if (!$handler->validateGroup($pattern, $route))
                 continue;
 
-            return $handler->resolve($this, $pattern, $route);
+            return $handler->resolveGroup($this, $pattern, $route);
+        }
+
+        foreach($this->defaultGroupHandlers as $handler) {
+            if(!$handler->validateGroup($pattern, $route))
+                continue;
+
+            return $handler->resolveGroup($this, $pattern, $route);
         }
 
         throw new InvalidArgumentException('Unable to resolve the routing group pattern');
@@ -168,6 +179,27 @@ class Factory
         $this->groupHandlers[] = $handler;
 
         return $this;
+    }
+
+    /**
+     * Add routing handler
+     * @param RoutingHandler $handler
+     * @return $this
+     */
+    public function addRoutingHandler(RoutingHandler $handler)
+    {
+        $this->routingHandlers[] = $handler;
+
+        return $this;
+    }
+
+    /**
+     * Get routing handlers
+     * @return RoutingHandler[]
+     */
+    public function getRoutingHandlers()
+    {
+        return $this->routingHandlers;
     }
 
     /**
