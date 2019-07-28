@@ -1,4 +1,5 @@
 <?php
+
 namespace Exedra\Routeller\Console\Commands;
 
 use Exedra\Application;
@@ -40,33 +41,32 @@ class RouteListCommand extends \Exedra\Console\Commands\RouteListCommand
 
         $total = 0;
 
-        $this->group->each(function(\Exedra\Routing\Route $route) use($table, $header, $input, &$total)
-        {
+        $this->group->each(function (\Exedra\Routing\Route $route) use ($table, $header, $input, &$total) {
             $routeName = $route->getAbsoluteName();
 
             $methods = $route->getMethod();
 
-            if(count($methods) == 4)
+            if (count($methods) == 4)
                 $methods = 'any';
             else
                 $methods = implode(', ', $methods);
 
             // list only routes that is executable
-            if(!$route->hasExecution())
+            if (!$route->hasExecution())
                 return;
 
-            if($name = $input->getOption('name'))
-                if(strpos($routeName, $name) !== 0)
+            if ($name = $input->getOption('name'))
+                if (strpos($routeName, $name) !== 0)
                     return;
 
             $row = array();
 
             $action = null;
 
-            if(is_string($execute = $route->getProperty('execute')) && strpos($execute, 'routeller=') === 0) {
+            if (is_string($execute = $route->getProperty('execute')) && strpos($execute, 'routeller=') === 0) {
                 $action = str_replace('routeller=', '', $execute);
             } else {
-                if(is_object($execute) && $execute instanceof \Closure) {
+                if (is_object($execute) && $execute instanceof \Closure) {
                     $ref = new \ReflectionFunction($execute);
 
                     $rootDir = $this->app->getRootDir();
@@ -81,11 +81,11 @@ class RouteListCommand extends \Exedra\Console\Commands\RouteListCommand
                 'name' => $route->getAbsoluteName(),
                 'action' => $action,
                 'method' => count($route->getMethod()) == 6 ? 'any' : $methods,
-                'uri' => '/'.$route->getPath(true),
+                'uri' => '/' . $route->getPath(true),
                 'tag' => $route->hasProperty('tag') ? $route->getProperty('tag') : ''
             );
 
-            foreach($header as $col) {
+            foreach ($header as $col) {
                 $col = strtolower($col);
 
                 $row[] = $data[$col];
@@ -96,7 +96,7 @@ class RouteListCommand extends \Exedra\Console\Commands\RouteListCommand
             $total++;
         }, true);
 
-        if($total == 0)
+        if ($total == 0)
             $table->addRow(array(new TableCell('<info>Can\'t find any route</info>', array(
                 'colspan' => count($header)
             ))));

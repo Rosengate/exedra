@@ -1,5 +1,7 @@
 <?php
+
 namespace Exedra\Routing;
+
 use Exedra\Contracts\Routing\ExecuteHandler;
 use Exedra\Contracts\Routing\GroupHandler;
 use Exedra\Contracts\Routing\RoutingHandler;
@@ -93,8 +95,7 @@ class Factory
      */
     public function register(array $registry)
     {
-        foreach($registry as $name => $classname)
-        {
+        foreach ($registry as $name => $classname) {
             $this->registry[$name] = $classname;
 
             unset($this->reflections[$name]);
@@ -111,7 +112,7 @@ class Factory
      */
     public function create($name, array $arguments = array())
     {
-        if(!isset($this->reflections[$name]))
+        if (!isset($this->reflections[$name]))
             $this->reflections[$name] = new \ReflectionClass($this->registry[$name]);
 
         $reflection = $this->reflections[$name];
@@ -152,22 +153,22 @@ class Factory
      */
     public function resolveGroup($pattern, $route = null)
     {
-        foreach($this->groupHandlers as $handler) {
-            if(!$handler->validateGroup($pattern, $route))
-                continue;
-
-            return $handler->resolveGroup($this, $pattern, $route);
-        }
-
-        foreach($this->routingHandlers as $handler) {
+        foreach ($this->groupHandlers as $handler) {
             if (!$handler->validateGroup($pattern, $route))
                 continue;
 
             return $handler->resolveGroup($this, $pattern, $route);
         }
 
-        foreach($this->defaultGroupHandlers as $handler) {
-            if(!$handler->validateGroup($pattern, $route))
+        foreach ($this->routingHandlers as $handler) {
+            if (!$handler->validateGroup($pattern, $route))
+                continue;
+
+            return $handler->resolveGroup($this, $pattern, $route);
+        }
+
+        foreach ($this->defaultGroupHandlers as $handler) {
+            if (!$handler->validateGroup($pattern, $route))
                 continue;
 
             return $handler->resolveGroup($this, $pattern, $route);

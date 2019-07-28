@@ -1,4 +1,5 @@
 <?php
+
 namespace Exedra\Support\Asset;
 
 /**
@@ -16,7 +17,7 @@ class Asset
 
     public function __construct(\Exedra\Url\UrlFactory $urlFactory, $type, $filepath, $filename, $persistable = false)
     {
-        if(!in_array($type, array('js', 'css')))
+        if (!in_array($type, array('js', 'css')))
             throw new \InvalidArgumentException('Accept only js and css');
 
         $this->urlFactory = $urlFactory;
@@ -50,7 +51,7 @@ class Asset
     public function create(\Closure $closure)
     {
         ob_start();
-        echo '/*GENERATED AT '.date('Y-m-d H:i:s').'*/';
+        echo '/*GENERATED AT ' . date('Y-m-d H:i:s') . '*/';
         $closure();
         $content = ob_get_clean();
 
@@ -63,7 +64,7 @@ class Asset
 
         $dirs = implode(DIRECTORY_SEPARATOR, $dirs);
 
-        if(!is_dir($dirs))
+        if (!is_dir($dirs))
             mkdir($dirs, '755', true);
 
         // keep replacing those content
@@ -96,13 +97,12 @@ class Asset
      */
     public function tag()
     {
-        switch($this->type)
-        {
+        switch ($this->type) {
             case 'js':
-                return '<script type="text/javascript" src="'.$this->url().'"></script>';
+                return '<script type="text/javascript" src="' . $this->url() . '"></script>';
                 break;
             case 'css':
-                return '<link rel="stylesheet" type="text/css" href="'.$this->url().'">';
+                return '<link rel="stylesheet" type="text/css" href="' . $this->url() . '">';
                 break;
         }
     }

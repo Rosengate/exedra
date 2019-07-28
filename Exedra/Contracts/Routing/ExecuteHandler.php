@@ -1,4 +1,5 @@
 <?php
+
 namespace Exedra\Contracts\Routing;
 
 interface ExecuteHandler

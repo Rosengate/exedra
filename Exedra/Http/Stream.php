@@ -1,5 +1,7 @@
 <?php
+
 namespace Exedra\Http;
+
 use Psr\Http\Message\StreamInterface;
 
 /**
@@ -11,7 +13,7 @@ class Stream implements StreamInterface
     protected static $modes = array(
         'readable' => array('r', 'r+', 'w+', 'a+', 'x+', 'c+'),
         'writable' => array('r+', 'w', 'w+', 'a', 'a+', 'x', 'x+', 'c', 'c+', 'w+b')
-        );
+    );
 
     protected $meta = array();
 
@@ -61,7 +63,7 @@ class Stream implements StreamInterface
      */
     public function close()
     {
-        if(!$this->resource)
+        if (!$this->resource)
             return null;
 
         fclose($this->resource);
@@ -73,15 +75,14 @@ class Stream implements StreamInterface
      */
     public function attach($resource, $mode = 'r')
     {
-        if(is_string($resource))
-        {
+        if (is_string($resource)) {
             $resource = @fopen($resource, $mode);
 
-            if(!$resource)
+            if (!$resource)
                 throw new \InvalidArgumentException('Please provide string reference to the resource, or the resource itself.');
         }
 
-        if(!is_resource($resource) || get_resource_type($resource) != 'stream')
+        if (!is_resource($resource) || get_resource_type($resource) != 'stream')
             throw new \InvalidArgumentException('Please provide string reference to the resource, or the resource itself.', 1);
 
         $this->resource = $resource;
@@ -106,7 +107,7 @@ class Stream implements StreamInterface
      */
     public function getSize()
     {
-        if(!$this->resource)
+        if (!$this->resource)
             return null;
 
         $fstat = fstat($this->resource);
@@ -119,7 +120,7 @@ class Stream implements StreamInterface
      */
     public function tell()
     {
-        if(!$this->resource || ($position = ftell($this->resource)) === false)
+        if (!$this->resource || ($position = ftell($this->resource)) === false)
             throw new \RuntimeException('Couldn\'t get stream position');
 
         return $position;
@@ -138,7 +139,7 @@ class Stream implements StreamInterface
      */
     public function isSeekable()
     {
-        if(!$this->resource)
+        if (!$this->resource)
             return false;
 
         $meta = stream_get_meta_data($this->resource);
@@ -153,13 +154,13 @@ class Stream implements StreamInterface
      */
     public function seek($offset, $whence = SEEK_SET)
     {
-        if(!$this->resource)
+        if (!$this->resource)
             throw new \RuntimeException('No resource is available');
 
-        if(!$this->isSeekable())
+        if (!$this->isSeekable())
             throw new \RuntimeException('Resource is not seekable');
 
-        if(fseek($this->resource, $offset, $whence !== 0))
+        if (fseek($this->resource, $offset, $whence !== 0))
             throw new \RuntimeException('Failed to seek the resource');
 
         return $this;
@@ -178,7 +179,7 @@ class Stream implements StreamInterface
      */
     public function isWritable()
     {
-        if(!$this->resource)
+        if (!$this->resource)
             return false;
 
         return in_array($this->meta['mode'], self::$modes['writable']);
@@ -191,13 +192,13 @@ class Stream implements StreamInterface
      */
     public function write($contents)
     {
-        if(!$this->resource)
+        if (!$this->resource)
             throw new \RuntimeException('No resource is available');
 
-        if(!$this->isWritable())
+        if (!$this->isWritable())
             throw new \RuntimeException('Resource is not writeable');
 
-        if(fwrite($this->resource, $contents) === false)
+        if (fwrite($this->resource, $contents) === false)
             throw new \RuntimeException('Failed to write the resource');
     }
 
@@ -206,7 +207,7 @@ class Stream implements StreamInterface
      */
     public function isReadable()
     {
-        if(!$this->resource)
+        if (!$this->resource)
             return false;
 
         return in_array($this->meta['mode'], self::$modes['readable']);
@@ -218,13 +219,13 @@ class Stream implements StreamInterface
      */
     public function read($length)
     {
-        if(!$this->resource)
+        if (!$this->resource)
             throw new \RuntimeException('No resource is available');
 
-        if(!$this->isReadable())
+        if (!$this->isReadable())
             throw new \RuntimeException('Resource is not readable');
 
-        if(($data = fread($this->resource, $length)) === false)
+        if (($data = fread($this->resource, $length)) === false)
             throw new \RuntimeException('Failed to read the resource');
 
         return $data;
@@ -235,10 +236,10 @@ class Stream implements StreamInterface
      */
     public function getContents()
     {
-        if(!$this->resource)
+        if (!$this->resource)
             throw new \RuntimeException('No resource is available');
 
-        if(($data = stream_get_contents($this->resource)) === false)
+        if (($data = stream_get_contents($this->resource)) === false)
             throw new \RuntimeException('Failed to get the contents of the resource');
 
         return $data;
@@ -258,15 +259,12 @@ class Stream implements StreamInterface
      */
     public function toString()
     {
-        if(!$this->resource)
+        if (!$this->resource)
             return '';
 
-        try
-        {
+        try {
             return $this->rewind()->getContents();
-        }
-        catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
             return '';
         }
     }

@@ -1,4 +1,5 @@
 <?php
+
 namespace Exedra\View;
 
 use Exedra\Application;
@@ -9,10 +10,10 @@ class ViewProvider implements Provider
 {
     public function register(Application $app)
     {
-        if(!$app->path->hasRegistry('views'))
+        if (!$app->path->hasRegistry('views'))
             throw new NotFoundException('path.views is required.');
 
-        $app['service']->add('@view', function() {
+        $app['service']->add('@view', function () {
             return $this->create('view.factory', array($this->path['views']));
         });
 

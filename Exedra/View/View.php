@@ -1,4 +1,5 @@
 <?php
+
 namespace Exedra\View;
 
 use Exedra\Exception\InvalidArgumentException;
@@ -27,12 +28,12 @@ class View implements \ArrayAccess
      * List of key of data required, before view can be rendered.
      * @var array
      */
-    protected $required 	= array();
+    protected $required = array();
 
     /**
      * List of callbacks, of what can be done with the data, on callbackResolve()
      */
-    protected $callbacks	= array();
+    protected $callbacks = array();
 
     /**
      * @var string $contents
@@ -41,9 +42,9 @@ class View implements \ArrayAccess
 
     public function __construct($path = null, $data = null)
     {
-        if($path) $this->setPath($path);
+        if ($path) $this->setPath($path);
 
-        if($data) $this->set($data);
+        if ($data) $this->set($data);
 
         // $this->loader = $loader;
     }
@@ -94,15 +95,11 @@ class View implements \ArrayAccess
      */
     public function setRequired($keys)
     {
-        if(is_string($keys))
-        {
-            $this->setRequired(explode(",",$keys));
-        }
-        else
-        {
-            foreach($keys as $key)
-            {
-                if(!in_array($key, $this->required))
+        if (is_string($keys)) {
+            $this->setRequired(explode(",", $keys));
+        } else {
+            foreach ($keys as $key) {
+                if (!in_array($key, $this->required))
                     $this->required[] = $key;
             }
         }
@@ -128,7 +125,7 @@ class View implements \ArrayAccess
      */
     public function setCallback($key, $callback)
     {
-        $this->callbacks[$key]	= $callback;
+        $this->callbacks[$key] = $callback;
         return $this;
     }
 
@@ -138,10 +135,9 @@ class View implements \ArrayAccess
      */
     protected function callbackResolve($data)
     {
-        foreach($data as $key=>$val)
-        {
-            if(isset($this->callbacks[$key]))
-                $data[$key]	= $this->callbacks[$key]($val);
+        foreach ($data as $key => $val) {
+            if (isset($this->callbacks[$key]))
+                $data[$key] = $this->callbacks[$key]($val);
         }
 
         return $data;
@@ -163,7 +159,7 @@ class View implements \ArrayAccess
      */
     public function setPath($path)
     {
-        $this->path	= $path;
+        $this->path = $path;
         return $this;
     }
 
@@ -185,16 +181,14 @@ class View implements \ArrayAccess
      */
     public function set($key, $value = null)
     {
-        if(!$value && is_array($key))
-        {
-            foreach($key as $k=>$v)
-            {
-                $this->set($k,$v);
+        if (!$value && is_array($key)) {
+            foreach ($key as $k => $v) {
+                $this->set($k, $v);
             }
             return $this;
         }
 
-        $this->data[$key]	= $value;
+        $this->data[$key] = $value;
 
         return $this;
     }
@@ -207,7 +201,7 @@ class View implements \ArrayAccess
      */
     public function get($key = null, $default = null)
     {
-        if($key === null)
+        if ($key === null)
             return $this->data;
 
         return isset($this->data[$key]) ? $this->data[$key] : $default;
@@ -227,7 +221,7 @@ class View implements \ArrayAccess
      */
     public function getContents()
     {
-        if(!$this->isReady())
+        if (!$this->isReady())
             return;
 
         ob_start();
@@ -245,20 +239,17 @@ class View implements \ArrayAccess
      */
     protected function requirementCheck()
     {
-        if(count($this->required) > 0)
-        {
+        if (count($this->required) > 0) {
             // non-exists list
-            $nonExist	= array();
+            $nonExist = array();
 
-            foreach($this->required as $k)
-            {
-                if(!isset($this->data[$k]))
-                {
-                    $nonExist[]	= $k;
+            foreach ($this->required as $k) {
+                if (!isset($this->data[$k])) {
+                    $nonExist[] = $k;
                 }
             }
 
-            if(count($nonExist) > 0)
+            if (count($nonExist) > 0)
                 return $nonExist;
         }
 
@@ -288,10 +279,10 @@ class View implements \ArrayAccess
      */
     protected function isReady()
     {
-        if($requiredArgs = $this->requirementCheck())
-            throw new InvalidArgumentException('View.render : Missing required argument(s) for view ['. $this->path .'] : '. implode(', ', $requiredArgs) .'');
+        if ($requiredArgs = $this->requirementCheck())
+            throw new InvalidArgumentException('View.render : Missing required argument(s) for view [' . $this->path . '] : ' . implode(', ', $requiredArgs) . '');
 
-        if($this->path == null)
+        if ($this->path == null)
             throw new InvalidArgumentException('Path was not set');
 
         return true;
@@ -306,7 +297,7 @@ class View implements \ArrayAccess
      */
     public function render()
     {
-        if($this->prepared === false)
+        if ($this->prepared === false)
             $this->prepare();
 
         $this->prepared = false;

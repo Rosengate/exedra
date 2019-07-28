@@ -1,4 +1,5 @@
 <?php
+
 namespace Exedra\Support\Runtime\Form;
 
 use Exedra\Runtime\Context;
@@ -23,7 +24,7 @@ class Form extends \Exedra\Form\Form
      */
     public function initialize(array $data = array())
     {
-        if($this->exe->flash->has('form_data'))
+        if ($this->exe->flash->has('form_data'))
             $this->set($this->exe->flash->get('form_data'));
 
         parent::initialize($data);
@@ -37,7 +38,7 @@ class Form extends \Exedra\Form\Form
      */
     public function flash(array $data = array())
     {
-        if(count($data) == 0 && $this->exe->request === null)
+        if (count($data) == 0 && $this->exe->request === null)
             return;
 
         $data = count($data) > 0 ? $data : $this->exe->request->getParsedBody();

@@ -1,4 +1,5 @@
 <?php
+
 namespace Exedra\Runtime;
 
 use Exedra\Contracts\Url\UrlGenerator;
@@ -104,7 +105,7 @@ class Redirect implements UrlGenerator
      */
     public function toRoute($route = null, $params = array(), $query = array())
     {
-        if(!$route)
+        if (!$route)
             return $this->refresh();
 
         $url = $this->urlFactory->create($route, $params, $query);

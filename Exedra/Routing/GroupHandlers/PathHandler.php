@@ -1,4 +1,5 @@
 <?php
+
 namespace Exedra\Routing\GroupHandlers;
 
 use Exedra\Contracts\Routing\GroupHandler;
@@ -26,7 +27,7 @@ class PathHandler implements GroupHandler
      */
     public function validateGroup($pattern, Route $route = null)
     {
-        if(is_string($pattern))
+        if (is_string($pattern))
             return true;
 
         return false;
@@ -44,14 +45,14 @@ class PathHandler implements GroupHandler
     {
         $path = $this->lookupPath . '/' . ltrim($path, '/\\');
 
-        if(!file_exists($path))
-            throw new NotFoundException('File ['.$path.'] does not exists.');
+        if (!file_exists($path))
+            throw new NotFoundException('File [' . $path . '] does not exists.');
 
         $closure = require $path;
 
         // expecting a \Closure from this loaded file.
-        if(!($closure instanceof \Closure))
-            throw new InvalidArgumentException('Failed to create routing group. The path ['.$path.'] must return a \Closure.');
+        if (!($closure instanceof \Closure))
+            throw new InvalidArgumentException('Failed to create routing group. The path [' . $path . '] must return a \Closure.');
 
         $group = $factory->createGroup(array(), $route);
 

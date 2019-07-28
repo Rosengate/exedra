@@ -1,4 +1,5 @@
 <?php
+
 namespace Exedra\Session;
 
 use Exedra\Support\DotArray;
@@ -20,7 +21,7 @@ class Session
 
     public function __construct(&$storage = null)
     {
-        if($storage !== null)
+        if ($storage !== null)
             $this->storage = &$storage;
         else
             $this->start();
@@ -31,7 +32,7 @@ class Session
      */
     public function start()
     {
-        if(!self::hasStarted())
+        if (!self::hasStarted())
             session_start();
 
         $this->storage = &$_SESSION;
@@ -81,7 +82,7 @@ class Session
      */
     public function set($key, $value)
     {
-        DotArray::set($this->getStorage(), $key,$value);
+        DotArray::set($this->getStorage(), $key, $value);
 
         return $this;
     }

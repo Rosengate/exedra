@@ -1,4 +1,5 @@
 <?php
+
 namespace Exedra\Contracts\Url;
 
 use Exedra\Url\Url;

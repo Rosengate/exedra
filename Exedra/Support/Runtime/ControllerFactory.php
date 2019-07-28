@@ -1,4 +1,5 @@
 <?php
+
 namespace Exedra\Support\Runtime;
 
 /**
@@ -40,7 +41,7 @@ class ControllerFactory
 
         $className .= '\\Controller';
 
-        $className .= '\\'.$class;
+        $className .= '\\' . $class;
 
         return $className;
     }
@@ -55,33 +56,27 @@ class ControllerFactory
     {
         $className = $definition;
 
-        if(is_array($definition))
-        {
+        if (is_array($definition)) {
             $className = $definition['class'];
 
-            if(isset($definition['arguments']))
+            if (isset($definition['arguments']))
                 $args = array_merge($args, $definition['arguments']);
-        }
-        else
-        {
+        } else {
             $className = $definition;
         }
 
         $className = $this->buildClassName($className);
 
         // class name does not exists in the given path.
-        if(!class_exists($className))
-            throw new \Exedra\Exception\NotFoundException('Class named ['.$className.'] does not exists.');
+        if (!class_exists($className))
+            throw new \Exedra\Exception\NotFoundException('Class named [' . $className . '] does not exists.');
 
-        if(count($args))
-        {
-            $reflection	= new \ReflectionClass($className);
+        if (count($args)) {
+            $reflection = new \ReflectionClass($className);
 
-            $instance	= $reflection->newInstanceArgs($args);
-        }
-        else
-        {
-            $instance	= new $className;
+            $instance = $reflection->newInstanceArgs($args);
+        } else {
+            $instance = new $className;
         }
 
         return $instance;
@@ -100,27 +95,21 @@ class ControllerFactory
      */
     public function execute($definition, $method, array $args = array())
     {
-        if(is_string($definition))
-        {
-            $instance	= $this->create($definition);
-        }
-        else if(is_array($definition))
-        {
-            if(isset($definition['class']))
+        if (is_string($definition)) {
+            $instance = $this->create($definition);
+        } else if (is_array($definition)) {
+            if (isset($definition['class']))
                 $instance = $this->create($definition);
             else
-                $instance	= $this->create($definition[0], $definition[1]);
-        }
-        else
-        {
-            $instance	= $definition;
+                $instance = $this->create($definition[0], $definition[1]);
+        } else {
+            $instance = $definition;
         }
 
-        if(!method_exists($instance, $method))
-        {
-            $reflection	= new \ReflectionClass($instance);
+        if (!method_exists($instance, $method)) {
+            $reflection = new \ReflectionClass($instance);
 
-            throw new \Exedra\Exception\NotFoundException($reflection->getName()." : Method [$method] does not exists.");
+            throw new \Exedra\Exception\NotFoundException($reflection->getName() . " : Method [$method] does not exists.");
         }
 
         return call_user_func_array(array($instance, $method), $args);

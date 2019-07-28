@@ -1,4 +1,5 @@
 <?php
+
 namespace Exedra\Support\Provider;
 
 use Exedra\Application;
@@ -20,7 +21,7 @@ class Framework implements Provider
 {
     public function register(Application $app)
     {
-        if(!$app->config->has('namespace'))
+        if (!$app->config->has('namespace'))
             $app->config->set('namespace', 'App');
 
         $this->setUpPaths($app);
@@ -58,16 +59,16 @@ class Framework implements Provider
         $app['service']->register(array(
             '@session' => \Exedra\Session\Session::class,
             '@flash' => array(\Exedra\Session\Flash::class, array('self.session')),
-            '@controller' => function(){
-                if(!$this->config->has('namespace'))
-                    throw new Exception('The ['.ControllerFactory::class.'] require config.namespace in order to work');
+            '@controller' => function () {
+                if (!$this->config->has('namespace'))
+                    throw new Exception('The [' . ControllerFactory::class . '] require config.namespace in order to work');
 
                 return $this->create('controller.factory', array($this->config->get('namespace')));
             },
-            '@view' => function(){
+            '@view' => function () {
                 return $this->create('view.factory', array($this->path['views']));
             },
-            '@form' => function(){
+            '@form' => function () {
                 return new Form();
             }
         ));
@@ -78,7 +79,7 @@ class Framework implements Provider
         ));
 
         $app['callable']->register(array(
-            'autoloadSrc' => function() {
+            'autoloadSrc' => function () {
                 $this->path['src']->autoloadPsr4($this->config['namespace'], '');
             }
         ));

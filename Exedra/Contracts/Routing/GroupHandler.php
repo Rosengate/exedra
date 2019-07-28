@@ -1,4 +1,5 @@
 <?php
+
 namespace Exedra\Contracts\Routing;
 
 use Exedra\Routing\Factory;

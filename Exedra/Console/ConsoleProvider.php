@@ -1,4 +1,5 @@
 <?php
+
 namespace Exedra\Console;
 
 use Exedra\Application;
@@ -10,7 +11,7 @@ class ConsoleProvider implements Provider
 {
     public function register(Application $app)
     {
-        $app['service']->add('console', function() use($app) {
+        $app['service']->add('console', function () use ($app) {
             $console = new \Symfony\Component\Console\Application();
 
             $console->add(new RouteListCommand($app->map));

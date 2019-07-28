@@ -1,4 +1,5 @@
 <?php
+
 namespace Exedra\Routing;
 
 class CallStack
@@ -32,7 +33,7 @@ class CallStack
      */
     public function removeCallable($name)
     {
-        if(isset($this->callables[$name]))
+        if (isset($this->callables[$name]))
             unset($this->callables[$name]);
 
         return $this;
@@ -46,8 +47,7 @@ class CallStack
     {
         $callStack = $this;
 
-        $next = function() use($callStack, &$next)
-        {
+        $next = function () use ($callStack, &$next) {
             $args = func_get_args();
 
             $args[] = $next;
@@ -65,8 +65,7 @@ class CallStack
      */
     public function getNextCallable()
     {
-        if(!$this->initiated)
-        {
+        if (!$this->initiated) {
             reset($this->callables);
 
             $this->initiated = true;
@@ -83,8 +82,7 @@ class CallStack
      */
     public function next()
     {
-        if(!$this->initiated)
-        {
+        if (!$this->initiated) {
             reset($this->callables);
 
             $this->initiated = true;

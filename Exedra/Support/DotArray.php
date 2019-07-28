@@ -1,4 +1,5 @@
 <?php
+
 namespace Exedra\Support;
 
 class DotArray
@@ -10,14 +11,13 @@ class DotArray
      */
     public static function initialize(array &$storage, array $data)
     {
-        foreach($data as $key => $value)
-        {
+        foreach ($data as $key => $value) {
             unset($storage[$key]);
 
             $next = &self::set($storage, $key, $value);
 
             // recursive.
-            if(is_array($value))
+            if (is_array($value))
                 self::initialize($next, $value);
         }
     }
@@ -36,12 +36,11 @@ class DotArray
 
         $keys = explode('.', $key);
 
-        foreach($keys as $key)
-        {
+        foreach ($keys as $key) {
             $key = str_replace("z#G1", ".", $key);
 
-            if(!isset($storage[$key]) || !is_array($storage[$key]))
-                $storage[$key]	= array();
+            if (!isset($storage[$key]) || !is_array($storage[$key]))
+                $storage[$key] = array();
 
             $storage = &$storage[$key];
 
@@ -61,10 +60,10 @@ class DotArray
      */
     public static function get($storage, $key)
     {
-        $keys	= explode('.', $key);
+        $keys = explode('.', $key);
 
-        foreach($keys as $key)
-            $storage	= &$storage[$key];
+        foreach ($keys as $key)
+            $storage = &$storage[$key];
 
         return $storage;
     }
@@ -79,7 +78,7 @@ class DotArray
     {
         $keys = explode('.', $key);
 
-        foreach($keys as $key)
+        foreach ($keys as $key)
             $storage = &$storage[$key];
 
         return $storage;
@@ -94,9 +93,8 @@ class DotArray
      */
     public static function each(array &$storage, \Closure $callback, array $prefix = array())
     {
-        foreach($storage as $key => &$value)
-        {
-            if(is_array($value))
+        foreach ($storage as $key => &$value) {
+            if (is_array($value))
                 static::each($value, $callback, array_merge($prefix, array($key)));
             else
                 $callback(implode('.', array_merge($prefix, array($key))), $value, $storage[$key]);
@@ -111,14 +109,13 @@ class DotArray
      */
     public static function has(array $storage, $key)
     {
-        $keys	= explode('.', $key);
+        $keys = explode('.', $key);
 
-        foreach($keys as $key)
-        {
-            if(!isset($storage[$key]))
+        foreach ($keys as $key) {
+            if (!isset($storage[$key]))
                 return false;
 
-            $storage	= $storage[$key];
+            $storage = $storage[$key];
         }
 
         return true;
@@ -131,19 +128,17 @@ class DotArray
      */
     public static function delete(&$storage, $key)
     {
-        if($key == null)
-        {
+        if ($key == null) {
             $storage = array();
             return;
         }
 
-        $keys	= explode('.', $key);
+        $keys = explode('.', $key);
 
-        foreach($keys as $no=>$key)
-        {
-            if($no == 0) continue;
+        foreach ($keys as $no => $key) {
+            if ($no == 0) continue;
 
-            $key	= array_shift($keys);
+            $key = array_shift($keys);
 
             $storage =& $storage[$key];
         }

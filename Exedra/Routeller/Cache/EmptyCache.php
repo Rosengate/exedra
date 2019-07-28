@@ -1,4 +1,5 @@
 <?php
+
 namespace Exedra\Routeller\Cache;
 
 class EmptyCache implements CacheInterface

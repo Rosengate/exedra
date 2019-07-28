@@ -1,4 +1,5 @@
 <?php
+
 namespace Exedra\Runtime;
 
 use Exedra\Application;
@@ -73,7 +74,7 @@ class Context extends Container
 
         $callStack = $finding->getCallStack();
 
-        if(!$callStack)
+        if (!$callStack)
             throw new Exception('The route [' . $finding->getRoute()->getAbsoluteName() . '] does not have execute handle.');
 
         $this->callStack = $callStack;
@@ -98,19 +99,25 @@ class Context extends Container
     protected function setUp()
     {
         $this->services['service']->register(array(
-            'path' => function(Context $context){ return $context->app->path; },
-            'config' => function(Context $context) { return clone $context->app->config; },
-            'url' => function(Context $context){
+            'path' => function (Context $context) {
+                return $context->app->path;
+            },
+            'config' => function (Context $context) {
+                return clone $context->app->config;
+            },
+            'url' => function (Context $context) {
                 $urlFactory = $context->app->url;
 
                 $baseUrl = $urlFactory->getBaseUrl();
 
-                return $context->app->create('url.factory', array($context->route->getGroup(), $context->request ? : null, $baseUrl, $urlFactory->getFilters(), $urlFactory->getCallables()));
+                return $context->app->create('url.factory', array($context->route->getGroup(), $context->request ?: null, $baseUrl, $urlFactory->getFilters(), $urlFactory->getCallables()));
             },
             'redirect' => array(Redirect::class, array('self.response', 'self.url')),
             'form' => array(Form::class, array('self')),
             // thinking of deprecating the asset as service
-            'asset' => function(Context $context){ return new AssetFactory($context->url, $context->app->path['public'], $context->config->get('asset', array()));}
+            'asset' => function (Context $context) {
+                return new AssetFactory($context->url, $context->app->path['public'], $context->config->get('asset', array()));
+            }
         ));
 
         $this->setUpConfig();
@@ -120,8 +127,7 @@ class Context extends Container
     {
         $finding = $this->finding;
 
-        $this->services['service']->on('config', function(Config $config) use($finding)
-        {
+        $this->services['service']->on('config', function (Config $config) use ($finding) {
             $config->set($this->finding->getConfig());
         });
     }
@@ -165,18 +171,16 @@ class Context extends Container
 
         $callable = $callStack->getNextCallable();
 
-        if($callable->hasDependencies())
-        {
+        if ($callable->hasDependencies()) {
             $args = array();
 
-            foreach($callable->getDependencies() as $injectable)
+            foreach ($callable->getDependencies() as $injectable)
                 $args[] = $this->tokenResolve($injectable);
 
             $context = $this;
 
             // $next callable
-            $next = function() use($context, &$next)
-            {
+            $next = function () use ($context, &$next) {
                 $args = func_get_args();
 
                 $args[] = $next;
@@ -210,7 +214,7 @@ class Context extends Container
      */
     public function hasAttr($key)
     {
-        if(isset($this->attributes[$key]))
+        if (isset($this->attributes[$key]))
             return true;
 
         return $this->finding->hasAttribute($key);
@@ -237,7 +241,7 @@ class Context extends Container
      */
     public function attr($key, $default = null)
     {
-        if(isset($this->attributes[$key]))
+        if (isset($this->attributes[$key]))
             return $this->attributes[$key];
 
         return $this->finding->getAttribute($key, $default);
@@ -287,15 +291,15 @@ class Context extends Container
      */
     public function params(array $keys = array(), $onlyExistingParams = false)
     {
-        if(count($keys) == 0)
+        if (count($keys) == 0)
             return $this->params;
 
         $params = array();
 
-        foreach($keys as $key) {
+        foreach ($keys as $key) {
             $key = trim($key);
 
-            if($onlyExistingParams && isset($this->params[$key]))
+            if ($onlyExistingParams && isset($this->params[$key]))
                 $params[$key] = $this->params[$key];
             else
                 $params[$key] = isset($this->params[$key]) ? $this->params[$key] : null;
@@ -320,11 +324,11 @@ class Context extends Container
      */
     public function baseRoute($route)
     {
-        if(strpos($route, '@') === 0) {
-            $route = substr($route, 1, strlen($route)-1);
+        if (strpos($route, '@') === 0) {
+            $route = substr($route, 1, strlen($route) - 1);
         } else {
             $baseRoute = $this->route->getParentRouteName();
-            $route		= $baseRoute ? $baseRoute.'.'.$route : $route;
+            $route = $baseRoute ? $baseRoute . '.' . $route : $route;
         }
 
         return $route;
@@ -354,7 +358,7 @@ class Context extends Container
     {
         $route = $this->baseRoute($route);
 
-        $request = $request ? : $this->request;
+        $request = $request ?: $this->request;
 
         return $this->app->execute($route, $parameters, $request);
     }
@@ -377,11 +381,10 @@ class Context extends Container
     {
         $context = $this;
 
-        while(true)
-        {
+        while (true) {
             $body = $context->response->getBody();
 
-            if($body instanceof \Exedra\Runtime\Context)
+            if ($body instanceof \Exedra\Runtime\Context)
                 $context = $body;
             else
                 break;
@@ -402,31 +405,24 @@ class Context extends Container
      */
     protected function solve($type, $name, array $args = array())
     {
-        if(!$this->services[$type]->has($name))
-        {
-            if($this->app[$type]->has('@'.$name))
-            {
+        if (!$this->services[$type]->has($name)) {
+            if ($this->app[$type]->has('@' . $name)) {
                 return $this->app->dependencyCall($type, $name, $args);
-            }
-            else
-            {
+            } else {
                 $isShared = false;
 
-                if($type == 'callable' && ($this->app['service']->has($name) || $isShared = $this->app['service']->has('@'.$name)))
-                {
-                    $service = $this->app->get($isShared ? '@'.$name : $name);
+                if ($type == 'callable' && ($this->app['service']->has($name) || $isShared = $this->app['service']->has('@' . $name))) {
+                    $service = $this->app->get($isShared ? '@' . $name : $name);
 
                     $this->invokables[$name] = $service;
 
-                    if(is_callable($service))
+                    if (is_callable($service))
                         return call_user_func_array($service, $args);
                 }
 
-                throw new \Exedra\Exception\InvalidArgumentException('['.get_class($this).'] Unable to find ['.$name.'] in the registered '.$type);
+                throw new \Exedra\Exception\InvalidArgumentException('[' . get_class($this) . '] Unable to find [' . $name . '] in the registered ' . $type);
             }
-        }
-        else
-        {
+        } else {
             $registry = $this->services[$type]->get($name);
         }
 
@@ -439,10 +435,10 @@ class Context extends Container
      */
     public function tokenResolve($name)
     {
-        if(strpos($name, 'context') === 0)
+        if (strpos($name, 'context') === 0)
             $name = str_replace('context', 'self', $name);
 
-        if(strpos($name, 'app.') === 0)
+        if (strpos($name, 'app.') === 0)
             return $this->app->tokenResolve(str_replace('app.', 'self.', $name));
 
         return parent::tokenResolve($name);

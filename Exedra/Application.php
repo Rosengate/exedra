@@ -67,15 +67,25 @@ class Application extends Container
     {
         $this->services['service']->register(array(
             'config' => Config::class,
-            'routingFactory' => function(){ return new Factory();},
-            'map' => function() { return $this['routingFactory']->createGroup();},
-            'request' => function(){ return isset($_SERVER['REQUEST_URI']) ? ServerRequest::createFromGlobals() : null;},
-            'url' => function() { return $this->create('url.factory', array($this->map, $this->request ? : null, $this->config->get('app.url', null)));},
+            'routingFactory' => function () {
+                return new Factory();
+            },
+            'map' => function () {
+                return $this['routingFactory']->createGroup();
+            },
+            'request' => function () {
+                return isset($_SERVER['REQUEST_URI']) ? ServerRequest::createFromGlobals() : null;
+            },
+            'url' => function () {
+                return $this->create('url.factory', array($this->map, $this->request ?: null, $this->config->get('app.url', null)));
+            },
         ));
 
         $this->services['factory']->register(array(
             'runtime.context' => Context::class,
-            'runtime.response' => function(){ return Response::createEmptyResponse();},
+            'runtime.response' => function () {
+                return Response::createEmptyResponse();
+            },
             'url.factory' => UrlFactory::class
         ));
     }
@@ -109,12 +119,12 @@ class Application extends Container
     public function execute($routeName, array $parameters = array(), ServerRequest $request = null)
     {
         // expect it as route name
-        if(!is_string($routeName))
+        if (!is_string($routeName))
             throw new Exception\InvalidArgumentException('Argument 1 must be [string]');
 
         $route = $this->map->findRoute($routeName);
 
-        if(!$route)
+        if (!$route)
             throw new RouteNotFoundException('Route [' . $routeName . '] does not exist.');
 
         return $this->run($this->map->getFactory()->createFinding($route, $parameters, $request));
@@ -129,7 +139,7 @@ class Application extends Container
      */
     public function request(ServerRequest $request = null)
     {
-        $finding = $this->map->findByRequest($request = ($request ? : $this->request));
+        $finding = $this->map->findByRequest($request = ($request ?: $this->request));
 
         return $this->run($finding);
     }
@@ -148,11 +158,11 @@ class Application extends Container
         $response = $context->next($context);
 
         // mutate the context and update the response
-        if($response instanceof \Exedra\Http\Response)
+        if ($response instanceof \Exedra\Http\Response)
             $context->services['response'] = $response;
-        else if($response instanceof ResponseInterface)
+        else if ($response instanceof ResponseInterface)
             $context->services['response'] = \Exedra\Http\Response::createFromPsrResponse($response);
-        else if(get_class($context->response) == \Exedra\Http\Response::class)
+        else if (get_class($context->response) == \Exedra\Http\Response::class)
             $context->response->setBody(Stream::createFromContents($response));
         else
             $context->response->setBody($response);
@@ -168,31 +178,23 @@ class Application extends Container
      */
     public function respond(ServerRequest $request)
     {
-        try
-        {
+        try {
             $response = $this->request($request)
                 ->finalize()
                 ->getResponse();
-        }
-        catch(\Exception $e)
-        {
-            if($failRoute = $this->failRoute)
-            {
+        } catch (\Exception $e) {
+            if ($failRoute = $this->failRoute) {
                 $response = $this->execute($failRoute, array('exception' => $e, 'request' => $request), $request)
                     ->finalize()
                     ->getResponse();
 
                 $this->failRoute = null;
-            }
-            else if($this->map->hasFailRoute())
-            {
+            } else if ($this->map->hasFailRoute()) {
                 $response = $this->execute($this->map->getFailRoute(), array('exception' => $e, 'request' => $request), $request)
                     ->finalize()
                     ->getResponse();
-            }
-            else
-            {
-                $message = '<pre><h2>['.get_class($e).'] '.$e->getMessage().'</h2>'.PHP_EOL;
+            } else {
+                $message = '<pre><h2>[' . get_class($e) . '] ' . $e->getMessage() . '</h2>' . PHP_EOL;
                 $message .= $e->getTraceAsString();
 
                 $response = Response::createEmptyResponse()
@@ -211,7 +213,7 @@ class Application extends Container
      */
     public function dispatch(ServerRequest $request = null)
     {
-        $response = $this->respond($request ? : $this->request);
+        $response = $this->respond($request ?: $this->request);
 
         $response->send();
     }
@@ -229,33 +231,26 @@ class Application extends Container
     protected function solve($type, $name, array $args = array())
     {
         // keep pinging the provider registry.
-        $this->services['provider']->listen($type.'.'.$name);
+        $this->services['provider']->listen($type . '.' . $name);
 
-        if(!$this->services[$type]->has($name))
-        {
-            if($this->services[$type]->has('@'.$name))
-            {
-                $registry = $this->services[$type]->get('@'.$name);
-            }
-            else
-            {
+        if (!$this->services[$type]->has($name)) {
+            if ($this->services[$type]->has('@' . $name)) {
+                $registry = $this->services[$type]->get('@' . $name);
+            } else {
                 $isShared = false;
 
-                if($type == 'callable' && ($this->services['service']->has($name) || $isShared = $this->services['service']->has('@'.$name)))
-                {
-                    $service = $this->get($isShared ? '@'.$name : $name);
+                if ($type == 'callable' && ($this->services['service']->has($name) || $isShared = $this->services['service']->has('@' . $name))) {
+                    $service = $this->get($isShared ? '@' . $name : $name);
 
                     $this->invokables[$name] = $service;
 
-                    if(is_callable($service))
+                    if (is_callable($service))
                         return call_user_func_array($service, $args);
                 }
 
-                throw new Exception\InvalidArgumentException('['.get_class($this).'] Unable to find ['.$name.'] in the registered '.$type);
+                throw new Exception\InvalidArgumentException('[' . get_class($this) . '] Unable to find [' . $name . '] in the registered ' . $type);
             }
-        }
-        else
-        {
+        } else {
             $registry = $this->services[$type]->get($name);
         }
 

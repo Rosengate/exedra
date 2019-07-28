@@ -1,5 +1,7 @@
 <?php
+
 namespace Exedra\Runtime;
+
 use Exedra\Http\Stream;
 use Psr\Http\Message\ResponseInterface;
 
@@ -17,30 +19,30 @@ class Response extends \Exedra\Http\Response
      */
     public static function createFromPsrResponse(ResponseInterface $response)
     {
-        return new static($response->getStatusCode(), $response->getHeaders(), (string) $response->getBody(), $response->getProtocolVersion(), $response->getReasonPhrase());
+        return new static($response->getStatusCode(), $response->getHeaders(), (string)$response->getBody(), $response->getProtocolVersion(), $response->getReasonPhrase());
     }
 
-	public function setBody($body, $mode = null)
-	{
-		$this->body = $body;
+    public function setBody($body, $mode = null)
+    {
+        $this->body = $body;
 
-		return $this;
-	}
+        return $this;
+    }
 
     public function write($contents)
     {
-        if($this->body instanceof Stream)
+        if ($this->body instanceof Stream)
             $this->body->write($contents);
         else
             $this->body = $contents;
 
         return $this;
-	}
+    }
 
-	public function send()
-	{
-		$this->sendHeader();
+    public function send()
+    {
+        $this->sendHeader();
 
-		echo $this->body;
-	}
+        echo $this->body;
+    }
 }

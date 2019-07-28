@@ -1,30 +1,31 @@
 <?php
+
 namespace Exedra\Container;
 
 class Registry implements \ArrayAccess
 {
-	protected $data = array();
+    protected $data = array();
 
-	/**
-	 * List of configures on dependency resolve
-	 * @param array configures
-	 */
-	protected $filters = array();
+    /**
+     * List of configures on dependency resolve
+     * @param array configures
+     */
+    protected $filters = array();
 
-	public function __construct(array $registry = array())
-	{
-		$this->data = $registry;
-	}
+    public function __construct(array $registry = array())
+    {
+        $this->data = $registry;
+    }
 
-	public function on($name, \Closure $callable)
-	{
-		$this->filters[$name][] = $callable;
-	}
+    public function on($name, \Closure $callable)
+    {
+        $this->filters[$name][] = $callable;
+    }
 
-	public function getFilters($name)
-	{
-		return isset($this->filters[$name]) ? $this->filters[$name] : array();
-	}
+    public function getFilters($name)
+    {
+        return isset($this->filters[$name]) ? $this->filters[$name] : array();
+    }
 
     /**
      * Define dependency information
@@ -32,129 +33,126 @@ class Registry implements \ArrayAccess
      * @param mixed $definition
      * @return mixed|void
      */
-	public function offsetSet($name, $definition)
-	{
-		return $this->data[$name] = $definition;
-	}
+    public function offsetSet($name, $definition)
+    {
+        return $this->data[$name] = $definition;
+    }
 
-	/**
-	 * Get dependency information
-	 * @param string $name
-	 * @return mixed
-	 */
-	public function offsetGet($name)
-	{
-		return $this->data[$name];
-	}
+    /**
+     * Get dependency information
+     * @param string $name
+     * @return mixed
+     */
+    public function offsetGet($name)
+    {
+        return $this->data[$name];
+    }
 
-	/**
-	 * Check dependepency registry existence
-	 * @param string $name
-	 * @return bool
-	 */
-	public function offsetExists($name)
-	{
-		return isset($this->data[$name]);
-	}
+    /**
+     * Check dependepency registry existence
+     * @param string $name
+     * @return bool
+     */
+    public function offsetExists($name)
+    {
+        return isset($this->data[$name]);
+    }
 
-	/**
-	 * Remove dependency registry information
-	 * @param string $name
-	 */
-	public function offsetUnset($name)
-	{
-		unset($this->data[$name]);
-	}
+    /**
+     * Remove dependency registry information
+     * @param string $name
+     */
+    public function offsetUnset($name)
+    {
+        unset($this->data[$name]);
+    }
 
-	/**
-	 * Register list of dependency
-	 * @param array registry
-	 */
-	public function register(array $registry)
-	{
-		foreach($registry as $key => $reg)
-			$this->data[$key] = $reg;
-	}
+    /**
+     * Register list of dependency
+     * @param array registry
+     */
+    public function register(array $registry)
+    {
+        foreach ($registry as $key => $reg)
+            $this->data[$key] = $reg;
+    }
 
-	/**
-	 * Get dependency information
-	 * @param string $name
-	 */
-	public function get($name)
-	{
-		return $this->data[$name];
-	}
+    /**
+     * Get dependency information
+     * @param string $name
+     */
+    public function get($name)
+    {
+        return $this->data[$name];
+    }
 
-	/**
-	 * Register new dependency.
-	 * Throw exception if already the dependency already exists.
-	 * @param string $name
-	 * @param mixed \Closure|string|array|object
-	 *
-	 * @throws \Exedra\Exception\Exception
-	 */
-	public function add($name, $pattern)
-	{
-		if(isset($this->data[$name]))
-			throw new \Exedra\Exception\Exception('Registry by name ['.$name.'] already exist.');
-			
-		$this->data[$name] = $pattern;
-	}
+    /**
+     * Register new dependency.
+     * Throw exception if already the dependency already exists.
+     * @param string $name
+     * @param mixed \Closure|string|array|object
+     *
+     * @throws \Exedra\Exception\Exception
+     */
+    public function add($name, $pattern)
+    {
+        if (isset($this->data[$name]))
+            throw new \Exedra\Exception\Exception('Registry by name [' . $name . '] already exist.');
 
-	/**
-	 * Set dependency registry
-	 * @param string $name
-	 * @param \Closure|string|array|object
-	 */
-	public function set($name, $pattern)
-	{
-		$this->data[$name] = $pattern;
-	}
+        $this->data[$name] = $pattern;
+    }
 
-	/**
-	 * Check dependency information existence
-	 * @param string $name
-	 * @return bool
-	 */
-	public function has($name)
-	{
-		return isset($this->data[$name]);
-	}
+    /**
+     * Set dependency registry
+     * @param string $name
+     * @param \Closure|string|array|object
+     */
+    public function set($name, $pattern)
+    {
+        $this->data[$name] = $pattern;
+    }
 
-	/**
-	 * Remove dependency information
-	 * @param string $name
-	 */
-	public function remove($name)
-	{
-		unset($this->data[$name]);
-	}
+    /**
+     * Check dependency information existence
+     * @param string $name
+     * @return bool
+     */
+    public function has($name)
+    {
+        return isset($this->data[$name]);
+    }
 
-	/**
-	 * Get all registered dependencies
-	 * @return array
-	 */
-	public function getAll()
-	{
-		return $this->data;
-	}
+    /**
+     * Remove dependency information
+     * @param string $name
+     */
+    public function remove($name)
+    {
+        unset($this->data[$name]);
+    }
 
-	/**
-	 * Clear registry
-	 */
-	public function clear($name = null)
-	{
-		if($name)
-		{
-			unset($this->data[$name]);
+    /**
+     * Get all registered dependencies
+     * @return array
+     */
+    public function getAll()
+    {
+        return $this->data;
+    }
 
-			unset($this->filters[$name]);
-		}
-		else
-		{
-			$this->data = array();
+    /**
+     * Clear registry
+     */
+    public function clear($name = null)
+    {
+        if ($name) {
+            unset($this->data[$name]);
 
-			$this->filters = array();
-		}
-	}
+            unset($this->filters[$name]);
+        } else {
+            $this->data = array();
+
+            $this->filters = array();
+        }
+    }
 }

@@ -1,5 +1,7 @@
 <?php
+
 namespace Exedra;
+
 use Exedra\Support\Autoloader;
 
 class Path implements \ArrayAccess
@@ -75,14 +77,14 @@ class Path implements \ArrayAccess
      */
     protected function loadFile($file, $data, $once = false)
     {
-        $file = $this->basePath.'/'.ltrim($file, '/\\');
+        $file = $this->basePath . '/' . ltrim($file, '/\\');
 
-        if(!file_exists($file))
+        if (!file_exists($file))
             throw new \Exedra\Exception\NotFoundException("File [$file] not found");
 
         extract($data);
 
-        if($once)
+        if ($once)
             return require_once $file;
         else
             return require $file;
@@ -96,7 +98,7 @@ class Path implements \ArrayAccess
      */
     public function has($path)
     {
-        return file_exists($this->basePath.'/'.ltrim($path, '/\\'));
+        return file_exists($this->basePath . '/' . ltrim($path, '/\\'));
     }
 
     /**
@@ -108,7 +110,7 @@ class Path implements \ArrayAccess
      */
     public function isExists($path = null)
     {
-        return file_exists($this->basePath.($path ? '/'.ltrim($path, '/\\') : ''));
+        return file_exists($this->basePath . ($path ? '/' . ltrim($path, '/\\') : ''));
     }
 
     /**
@@ -128,7 +130,7 @@ class Path implements \ArrayAccess
      * Alias to registerAutoload
      * @param string $path
      * @param string|null $namespace
-     * @param boolean|true $relative, if false, will consider the path given as absolute.
+     * @param boolean|true $relative , if false, will consider the path given as absolute.
      */
     public function autoload($path, $namespace = '', $relative = true)
     {
@@ -163,7 +165,7 @@ class Path implements \ArrayAccess
      */
     public function path($path)
     {
-        return new \Exedra\Path($this->basePath . ($path ? '/'.ltrim($path, '/\\') : ''));
+        return new \Exedra\Path($this->basePath . ($path ? '/' . ltrim($path, '/\\') : ''));
     }
 
     /**
@@ -173,7 +175,7 @@ class Path implements \ArrayAccess
      */
     public function create($path)
     {
-        return new \Exedra\Path($this->basePath . ($path ? '/'.ltrim($path, '/\\') : ''));
+        return new \Exedra\Path($this->basePath . ($path ? '/' . ltrim($path, '/\\') : ''));
     }
 
     /**
@@ -184,7 +186,7 @@ class Path implements \ArrayAccess
      */
     public function to($path)
     {
-        return $this->basePath.'/'.ltrim($path, '/\\');
+        return $this->basePath . '/' . ltrim($path, '/\\');
     }
 
     /**
@@ -196,9 +198,9 @@ class Path implements \ArrayAccess
      */
     public function getContents($file)
     {
-        $file = $this->basePath.'/'.ltrim($file, '/\\');
+        $file = $this->basePath . '/' . ltrim($file, '/\\');
 
-        if(!file_exists($file))
+        if (!file_exists($file))
             throw new \Exedra\Exception\NotFoundException("File [$file] not found");
 
         return file_get_contents($file);
@@ -214,7 +216,7 @@ class Path implements \ArrayAccess
      */
     public function putContents($file, $contents, $flag = null, $context = null)
     {
-        $file = $this->basePath.'/'.ltrim($file, '/\\');
+        $file = $this->basePath . '/' . ltrim($file, '/\\');
 
         return file_put_contents($file, $contents, $flag, $context);
     }
@@ -226,14 +228,13 @@ class Path implements \ArrayAccess
      */
     public function offsetSet($name, $path)
     {
-        if($path instanceof \Exedra\Path)
-        {
+        if ($path instanceof \Exedra\Path) {
             $this->pathRegistry[$name] = $path;
 
             return;
         }
 
-        $path = $this->basePath.'/'.ltrim($path, '/\\');
+        $path = $this->basePath . '/' . ltrim($path, '/\\');
 
         $this->pathRegistry[$name] = new static($path);
     }
@@ -248,8 +249,8 @@ class Path implements \ArrayAccess
     public function offsetGet($name)
     {
         // create a loader by the same path and name.
-        if(!isset($this->pathRegistry[$name]))
-            throw new \Exedra\Exception\NotFoundException('Path with registry ['.$name.'] does not exist.');
+        if (!isset($this->pathRegistry[$name]))
+            throw new \Exedra\Exception\NotFoundException('Path with registry [' . $name . '] does not exist.');
 
         return $this->pathRegistry[$name];
     }
@@ -282,10 +283,10 @@ class Path implements \ArrayAccess
      */
     public function register($name, $path, $absolute = false)
     {
-        if($path instanceof \Exedra\Path)
+        if ($path instanceof \Exedra\Path)
             return $this->pathRegistry[$name] = $path;
 
-        $path = $absolute ? $path : $this->basePath.'/'.ltrim($path, '/\\');
+        $path = $absolute ? $path : $this->basePath . '/' . ltrim($path, '/\\');
 
         $this->pathRegistry[$name] = new static($path);
 
@@ -302,8 +303,8 @@ class Path implements \ArrayAccess
     public function get($name)
     {
         // create a loader by the same path and name.
-        if(!isset($this->pathRegistry[$name]))
-            throw new \Exedra\Exception\NotFoundException('Path with registry ['.$name.'] does not exist.');
+        if (!isset($this->pathRegistry[$name]))
+            throw new \Exedra\Exception\NotFoundException('Path with registry [' . $name . '] does not exist.');
 
         return $this->pathRegistry[$name];
     }

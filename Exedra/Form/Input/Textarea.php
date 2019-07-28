@@ -1,4 +1,5 @@
 <?php
+
 namespace Exedra\Form\Input;
 
 class Textarea extends Base
@@ -11,7 +12,7 @@ class Textarea extends Base
     {
         $attributes = $this->buildAttributes();
 
-        return '<textarea '.$attributes.'>';
+        return '<textarea ' . $attributes . '>';
     }
 
     /**
@@ -27,19 +28,19 @@ class Textarea extends Base
 
         $attributes = $this->attributes;
 
-        if(isset($attributes['value']))
+        if (isset($attributes['value']))
             unset($attributes['value']);
 
-        if(count($this->classes) > 0)
-            $class = 'class="'.implode(' ', $this->classes).'" ';
+        if (count($this->classes) > 0)
+            $class = 'class="' . implode(' ', $this->classes) . '" ';
 
-        if(count($this->attributeString) > 0)
+        if (count($this->attributeString) > 0)
             $attrs = $this->attributeString;
 
-        foreach($attributes as $key => $value)
-            $attrs[] = $key.'="'.$value.'"';
+        foreach ($attributes as $key => $value)
+            $attrs[] = $key . '="' . $value . '"';
 
-        return $class.implode(' ', $attrs);
+        return $class . implode(' ', $attrs);
     }
 
     /**
@@ -57,6 +58,6 @@ class Textarea extends Base
      */
     public function toString()
     {
-        return $this->open().$this->getValue().$this->close();
+        return $this->open() . $this->getValue() . $this->close();
     }
 }

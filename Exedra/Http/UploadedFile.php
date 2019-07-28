@@ -1,5 +1,7 @@
 <?php
+
 namespace Exedra\Http;
+
 use Psr\Http\Message\UploadedFileInterface;
 
 /**
@@ -52,16 +54,15 @@ class UploadedFile implements UploadedFileInterface
     {
         $normalizedFiles = array();
 
-        foreach($files as $name => $file)
-        {
-            if(is_array($file) && !isset($file['tmp_name']))
+        foreach ($files as $name => $file) {
+            if (is_array($file) && !isset($file['tmp_name']))
                 $normalizedFiles[$name] = static::parseFiles($file);
-            else if(isset($file['tmp_name']) && is_array($file['tmp_name']))
+            else if (isset($file['tmp_name']) && is_array($file['tmp_name']))
                 $normalizedFiles[$name] = static::normalizeFilesTree($file);
-            else if(isset($file['tmp_name']))
+            else if (isset($file['tmp_name']))
                 $normalizedFiles[$name] = new static(
                     $file['name'], $file['type'], $file['tmp_name'], $file['error'], $file['size']
-                    );
+                );
         }
 
         return $normalizedFiles;
@@ -75,21 +76,21 @@ class UploadedFile implements UploadedFileInterface
      */
     protected static function normalizeFilesTree(array $file)
     {
-        if(!is_array($file['tmp_name']))
+        if (!is_array($file['tmp_name']))
             return new static(
                 $file['name'], $file['type'], $file['tmp_name'], $file['error'], $file['size']
-                );
+            );
 
         $normalizedFiles = array();
 
-        foreach(array_keys($file['tmp_name']) as $key)
+        foreach (array_keys($file['tmp_name']) as $key)
             $normalizedFiles[$key] = static::normalizeFilesTree(array(
                 'tmp_name' => $file['tmp_name'][$key],
                 'name' => $file['name'][$key],
                 'type' => $file['type'][$key],
                 'error' => $file['error'][$key],
                 'size' => $file['size'][$key]
-                ));
+            ));
 
         return $normalizedFiles;
     }
@@ -100,7 +101,7 @@ class UploadedFile implements UploadedFileInterface
      */
     public function getStream()
     {
-        if(!$this->stream)
+        if (!$this->stream)
             $this->stream = Stream::createFromPath($this->path);
 
         return $this->stream;

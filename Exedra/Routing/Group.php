@@ -68,7 +68,7 @@ class Group implements \ArrayAccess, Registrar
 
         $this->route = $route;
 
-        if(count($routes) > 0)
+        if (count($routes) > 0)
             $this->addRoutes($routes);
     }
 
@@ -82,10 +82,10 @@ class Group implements \ArrayAccess, Registrar
      */
     public function setFactory($factory)
     {
-        if(is_string($factory))
+        if (is_string($factory))
             $factory = new $factory($this->factory->getLookupPath());
 
-        if(!($factory instanceof Factory))
+        if (!($factory instanceof Factory))
             throw new InvalidArgumentException('The map factory must be the the type of [\Exedra\Routing\Factory].');
 
         $this->factory = $factory;
@@ -133,7 +133,7 @@ class Group implements \ArrayAccess, Registrar
      */
     public function setMiddleware($middleware)
     {
-        if($this->route)
+        if ($this->route)
             $this->route->setMiddleware($middleware);
         else
             $this->middlewares = array(array($middleware));
@@ -183,12 +183,9 @@ class Group implements \ArrayAccess, Registrar
      */
     public function addMiddleware($middleware, array $properties = array())
     {
-        if($this->route)
-        {
+        if ($this->route) {
             $this->route->addMiddleware($middleware, $properties);
-        }
-        else
-        {
+        } else {
             $this->middlewares[] = array($middleware, $properties);
         }
 
@@ -201,10 +198,9 @@ class Group implements \ArrayAccess, Registrar
      */
     public function addMiddlewares(array $middlewares)
     {
-        foreach($middlewares as $id => $middleware)
-        {
+        foreach ($middlewares as $id => $middleware) {
             // assuming the second entry is the properties
-            if(is_array($middleware))
+            if (is_array($middleware))
                 $this->addMiddleware($middleware[0], $middleware[1]);
             else
                 $this->addMiddleware($middleware);
@@ -229,7 +225,7 @@ class Group implements \ArrayAccess, Registrar
      */
     public function addRoutes(array $routes)
     {
-        foreach($routes as $name => $routeData)
+        foreach ($routes as $name => $routeData)
             $this->addRoute($this->factory->createRoute($this, $name, $routeData));
 
         return $this;
@@ -246,7 +242,7 @@ class Group implements \ArrayAccess, Registrar
         $route = $this->findRoute($name);
 
         // if has subroutes, use the that subroutes, else, create a new subroute.
-        if($route->hasSubroutes())
+        if ($route->hasSubroutes())
             $route->getSubroutes()->addRoutes($routes);
         else
             $route->setSubroutes($routes);
@@ -287,8 +283,8 @@ class Group implements \ArrayAccess, Registrar
     {
         $result = $this->findRouteByRequest($request, trim($request->getUri()->getPath(), '/'));
 
-        if(!$result['route'])
-            throw new RouteNotFoundException('Route for request '.$request->getMethod().' '.$request->getUri()->getPath().' does not exist');
+        if (!$result['route'])
+            throw new RouteNotFoundException('Route for request ' . $request->getMethod() . ' ' . $request->getUri()->getPath() . ' does not exist');
 
         return $this->factory->createFinding($result['route'], $result['parameter'], $request);
     }
@@ -302,18 +298,16 @@ class Group implements \ArrayAccess, Registrar
      */
     public function each(\Closure $closure, $deep = false)
     {
-        foreach($this->storage as $route)
-        {
+        foreach ($this->storage as $route) {
             $result = $closure($route);
 
-            if($result !== null)
+            if ($result !== null)
                 return $result;
 
-            if($route->hasSubroutes() && $deep)
-            {
+            if ($route->hasSubroutes() && $deep) {
                 $result = $route->getSubroutes()->each($closure, true);
 
-                if($result !== null)
+                if ($result !== null)
                     return $result;
             }
         }
@@ -332,22 +326,22 @@ class Group implements \ArrayAccess, Registrar
      */
     public function findRoute($name)
     {
-        if(isset($this->routes[$name]))
+        if (isset($this->routes[$name]))
             return $this->routes[$name];
 
         // alias check
-        if(isset($this->aliasIndices[$name])) {
+        if (isset($this->aliasIndices[$name])) {
             $name = $this->aliasIndices[$name];
         } else {
-            foreach($this->groupAliasIndices as $alias => $routeName) {
-                if(strpos($name, $alias) === 0) {
+            foreach ($this->groupAliasIndices as $alias => $routeName) {
+                if (strpos($name, $alias) === 0) {
                     $name = substr_replace($name, $routeName, 0, strlen($alias));
                     break;
                 }
             }
         }
 
-        if($route = $this->findRouteRecursively($name))
+        if ($route = $this->findRouteRecursively($name))
             return $this->routes[$name] = $route;
 
         return false;
@@ -361,12 +355,12 @@ class Group implements \ArrayAccess, Registrar
     protected function findRouteRecursively($routeName)
     {
         // alias check
-        if(is_string($routeName)) {
-            if(isset($this->aliasIndices[$routeName])) {
+        if (is_string($routeName)) {
+            if (isset($this->aliasIndices[$routeName])) {
                 $routeName = $this->aliasIndices[$routeName];
             } else {
-                foreach($this->groupAliasIndices as $alias => $name) {
-                    if(strpos($routeName, $alias) === 0) {
+                foreach ($this->groupAliasIndices as $alias => $name) {
+                    if (strpos($routeName, $alias) === 0) {
                         $routeName = substr_replace($routeName, $name, 0, strlen($alias));
                         break;
                     }
@@ -379,16 +373,13 @@ class Group implements \ArrayAccess, Registrar
         $isTag = strpos($routeName, '#') === 0;
 
         // search by route name
-        if(!$isTag)
-        {
+        if (!$isTag) {
             // loop this group, and find the route.
-            foreach($this->storage as $route)
-            {
-                if($route->getName() === $routeName)
-                {
+            foreach ($this->storage as $route) {
+                if ($route->getName() === $routeName) {
                     // still has depth
-                    if(count($routeNames) > 0)
-                        if($route->hasSubroutes())
+                    if (count($routeNames) > 0)
+                        if ($route->hasSubroutes())
                             return $route->getSubroutes()->findRouteRecursively($routeNames);
                         else
                             return false;
@@ -396,16 +387,13 @@ class Group implements \ArrayAccess, Registrar
                     return $route;
                 }
             }
-        }
-        // search by route tag under this group.
-        else
-        {
+        } // search by route tag under this group.
+        else {
             $route = $this->findRouteByTag(substr($routeName, 1));
 
-            if($route)
-            {
-                if(count($routeNames) > 0)
-                    if($route->hasSubroutes())
+            if ($route) {
+                if (count($routeNames) > 0)
+                    if ($route->hasSubroutes())
                         return $route->getSubroutes()->findRouteRecursively($routeNames);
                     else
                         return false;
@@ -425,13 +413,12 @@ class Group implements \ArrayAccess, Registrar
      */
     public function findRouteByTag($tag)
     {
-        $route = $this->each(function(Route $route) use($tag)
-        {
-            if($route->hasProperty('tag') && $route->getProperty('tag') == $tag)
+        $route = $this->each(function (Route $route) use ($tag) {
+            if ($route->hasProperty('tag') && $route->getProperty('tag') == $tag)
                 return $route;
         }, true);
 
-        return $route ? : null;
+        return $route ?: null;
     }
 
     /**
@@ -445,8 +432,7 @@ class Group implements \ArrayAccess, Registrar
     protected function findRouteByRequest(ServerRequestInterface $request, $groupUriPath, array $passedParameters = array())
     {
         // loop the group and find.
-        foreach($this->storage as $route)
-        {
+        foreach ($this->storage as $route) {
             $result = $route->match($request, $groupUriPath);
 
             $remainingPath = $route->getRemainingPath($groupUriPath);
@@ -454,41 +440,37 @@ class Group implements \ArrayAccess, Registrar
             $hasSubroutes = $route->hasSubroutes();
 
             // if have found, or to do a deeper search
-            if(($result['route'] != false) || ($result['continue'] === true && ($remainingPath != '' && $hasSubroutes)))
-            {
+            if (($result['route'] != false) || ($result['continue'] === true && ($remainingPath != '' && $hasSubroutes))) {
                 $executionPriority = $route->hasSubroutes() && $route->hasExecution() && $remainingPath == '';
 
                 // 1. if found. and no more subroute. OR
                 // 2. has subroutes but, has execution,
-                if(!$route->hasSubroutes() || $executionPriority)
-                {
+                if (!$route->hasSubroutes() || $executionPriority) {
                     // prepare the final parameter by merging the passed parameter, with result parameter.
                     $params = array_merge($passedParameters, $result['parameter']);
 
                     return array(
-                        'route'=> $result['route'],
-                        'parameter'=> $params,
-                        'continue'=> $result['continue']);
-                }
-                else
-                {
+                        'route' => $result['route'],
+                        'parameter' => $params,
+                        'continue' => $result['continue']);
+                } else {
                     // if has passed parameter.
                     $passedParameters = array_merge(count($result['parameter']) > 0 ? $result['parameter'] : array(), $passedParameters);
 
                     $subrouteResult = $route->getSubroutes()->findRouteByRequest($request, $remainingPath, $passedParameters);
 
                     // if found. else. continue on this group.
-                    if($subrouteResult['route'] != false)
+                    if ($subrouteResult['route'] != false)
                         return $subrouteResult;
                 }
             }
         }
 
-        if($this->failRoute)
+        if ($this->failRoute)
             return array('route' => $this->findRoute($this->failRoute), 'parameter' => array('request' => $request), 'continue' => false);
 
         // false default.
-        return array('route'=> false, 'parameter'=> array(), 'continue' => false);
+        return array('route' => false, 'parameter' => array(), 'continue' => false);
     }
 
     /**
@@ -497,7 +479,7 @@ class Group implements \ArrayAccess, Registrar
      */
     public function getRootGroup()
     {
-        if(!$this->route)
+        if (!$this->route)
             return $this;
 
         $group = $this->route->getGroup();
@@ -522,7 +504,7 @@ class Group implements \ArrayAccess, Registrar
      */
     public function offsetGet($name)
     {
-        if(isset($this->routes[$name]))
+        if (isset($this->routes[$name]))
             return $this->routes[$name];
 
         $route = $this->factory->createRoute($this, $name, array());
@@ -554,7 +536,7 @@ class Group implements \ArrayAccess, Registrar
 
         $parameters['path'] = $path;
 
-        if($method)
+        if ($method)
             $parameters['method'] = $method;
 
         $route = $this->factory->createRoute($this, null, $parameters);
@@ -627,8 +609,8 @@ class Group implements \ArrayAccess, Registrar
      */
     public function addRouteAlias($routeName, $alias)
     {
-        if(is_array($alias))
-            foreach($alias as $item)
+        if (is_array($alias))
+            foreach ($alias as $item)
                 $this->aliasIndices[$item] = $routeName;
         else
             $this->aliasIndices[$alias] = $routeName;
@@ -645,11 +627,11 @@ class Group implements \ArrayAccess, Registrar
      */
     public function addGroupAlias($groupName, $alias)
     {
-       if(is_array($alias))
-           foreach($alias as $item)
-               $this->groupAliasIndices[$item] = $groupName;
-       else
-           $this->groupAliasIndices[$alias] = $groupName;
+        if (is_array($alias))
+            foreach ($alias as $item)
+                $this->groupAliasIndices[$item] = $groupName;
+        else
+            $this->groupAliasIndices[$alias] = $groupName;
 
         return $this;
     }
@@ -664,8 +646,8 @@ class Group implements \ArrayAccess, Registrar
      */
     public function addAlias($routeName, $alias)
     {
-        if(is_array($alias))
-            foreach($alias as $item)
+        if (is_array($alias))
+            foreach ($alias as $item)
                 $this->aliasIndices[$item] = $routeName;
         else
             $this->aliasIndices[$alias] = $routeName;

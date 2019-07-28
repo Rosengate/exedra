@@ -1,4 +1,5 @@
 <?php
+
 namespace Exedra;
 
 use Exedra\Support\DotArray;
@@ -31,9 +32,8 @@ class Config implements \ArrayAccess
      */
     public function set($key, $value = null)
     {
-        if(is_array($key))
-        {
-            foreach($key as $k => $v)
+        if (is_array($key)) {
+            foreach ($key as $k => $v)
                 $this->set($k, $v);
 
             return $this;
@@ -52,7 +52,7 @@ class Config implements \ArrayAccess
      */
     public function get($key, $default = null)
     {
-        if(!$this->has($key))
+        if (!$this->has($key))
             return $default;
 
         return DotArray::get($this->storage, $key);
@@ -94,7 +94,7 @@ class Config implements \ArrayAccess
      */
     public function &offsetGet($key)
     {
-        if(!$this->has($key))
+        if (!$this->has($key))
             return null;
 
         return DotArray::getReference($this->storage, $key);

@@ -1,4 +1,5 @@
 <?php
+
 namespace Exedra\Form\Input;
 
 class Base
@@ -29,7 +30,7 @@ class Base
 
     public function __construct($name = null)
     {
-        if($name)
+        if ($name)
             $this->name($name);
     }
 
@@ -101,21 +102,18 @@ class Base
      */
     public function attr($key, $value = null)
     {
-        if(is_array($key))
-        {
-            foreach($key as $k => $val)
+        if (is_array($key)) {
+            foreach ($key as $k => $val)
                 $this->attributes[$k] = $val;
 
             return $this;
-        }
-        elseif($value === null)
-        {
+        } elseif ($value === null) {
             $this->attributeString[] = $key;
 
             return $this;
         }
 
-        if($key == 'class')
+        if ($key == 'class')
             return $this->addClass($value);
 
         $this->attributes[$key] = $value;
@@ -134,16 +132,16 @@ class Base
 
         $class = '';
 
-        if(count($this->classes) > 0)
-            $class = 'class="'.implode(' ', $this->classes).'" ';
+        if (count($this->classes) > 0)
+            $class = 'class="' . implode(' ', $this->classes) . '" ';
 
-        if(count($this->attributeString) > 0)
+        if (count($this->attributeString) > 0)
             $attrs = $this->attributeString;
 
-        foreach($this->attributes as $key => $value)
-            $attrs[] = $key.'="'.$value.'"';
+        foreach ($this->attributes as $key => $value)
+            $attrs[] = $key . '="' . $value . '"';
 
-        return $class.implode(' ', $attrs);
+        return $class . implode(' ', $attrs);
     }
 
     /**
@@ -152,7 +150,7 @@ class Base
      */
     public function getValue()
     {
-        $value = $this->override ? : (isset($this->attributes['value']) ? $this->attributes['value'] : null);
+        $value = $this->override ?: (isset($this->attributes['value']) ? $this->attributes['value'] : null);
 
         return $value;
     }

@@ -1,4 +1,5 @@
 <?php
+
 namespace Exedra\Support;
 
 /**
@@ -21,8 +22,7 @@ class Autoloader
 
     public static function getInstance()
     {
-        if(!static::$instance)
-        {
+        if (!static::$instance) {
             static::$instance = new static();
 
             static::$instance->splRegister();
@@ -40,22 +40,20 @@ class Autoloader
     {
         $self = $this;
 
-        spl_autoload_register(function($class) use($self)
-        {
-            foreach($self->getRegistry() as $args)
-            {
+        spl_autoload_register(function ($class) use ($self) {
+            foreach ($self->getRegistry() as $args) {
                 $autoloadPath = $args[0];
 
                 $namespace = $args[1];
 
-                if($namespace != '' && strpos($class, $namespace) !== 0)
+                if ($namespace != '' && strpos($class, $namespace) !== 0)
                     continue;
 
                 $classDir = substr($class, strlen($namespace));
 
                 $filename = $autoloadPath . DIRECTORY_SEPARATOR . (str_replace('\\', DIRECTORY_SEPARATOR, $classDir)) . '.php';
 
-                if(file_exists($filename))
+                if (file_exists($filename))
                     return require_once $filename;
             }
         });

@@ -1,4 +1,5 @@
 <?php
+
 namespace Exedra\Console\Commands;
 
 use Exedra\Routing\Group;
@@ -40,23 +41,22 @@ class RouteListCommand extends Command
 
         $total = 0;
 
-        $this->group->each(function(\Exedra\Routing\Route $route) use($table, $header, $input, &$total)
-        {
+        $this->group->each(function (\Exedra\Routing\Route $route) use ($table, $header, $input, &$total) {
             $routeName = $route->getAbsoluteName();
 
             $methods = $route->getMethod();
 
-            if(count($methods) == 4)
+            if (count($methods) == 4)
                 $methods = 'any';
             else
                 $methods = implode(', ', $methods);
 
             // list only routes that is executable
-            if(!$route->hasExecution())
+            if (!$route->hasExecution())
                 return;
 
-            if($name = $input->getOption('name'))
-                if(strpos($routeName, $name) !== 0)
+            if ($name = $input->getOption('name'))
+                if (strpos($routeName, $name) !== 0)
                     return;
 
             $row = array();
@@ -64,14 +64,14 @@ class RouteListCommand extends Command
             $data = array(
                 'name' => $route->getAbsoluteName(),
                 'method' => $methods,
-                'uri' => '/'.$route->getPath(true),
+                'uri' => '/' . $route->getPath(true),
                 'tag' => $route->hasProperty('tag') ? $route->getProperty('tag') : ''
             );
 
-            foreach($header as $col) {
+            foreach ($header as $col) {
                 $col = strtolower($col);
 
-                if(!isset($data[$col]))
+                if (!isset($data[$col]))
                     throw new \RuntimeException('Can\'t find property : ' . $col);
 
                 $row[] = $data[$col];
@@ -82,7 +82,7 @@ class RouteListCommand extends Command
             $total++;
         }, true);
 
-        if($total == 0)
+        if ($total == 0)
             $table->addRow(array(new TableCell('<info>Can\'t find any route</info>', array(
                 'colspan' => count($header)
             ))));

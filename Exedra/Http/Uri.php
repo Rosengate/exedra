@@ -1,5 +1,7 @@
 <?php
+
 namespace Exedra\Http;
+
 use Psr\Http\Message\UriInterface;
 
 /**
@@ -28,16 +30,13 @@ class Uri implements UriInterface
 
     public function __construct($uri = '')
     {
-        if(is_array($uri))
-        {
+        if (is_array($uri)) {
             $this->applyParts($uri);
-        }
-        else
-        {
+        } else {
             $uri = parse_url($ori = $uri);
 
-            if($uri === false)
-                throw new \InvalidArgumentException('Failed to build a URI by the given \''.$ori.'\'');
+            if ($uri === false)
+                throw new \InvalidArgumentException('Failed to build a URI by the given \'' . $ori . '\'');
 
             $this->applyParts($uri);
         }
@@ -45,7 +44,7 @@ class Uri implements UriInterface
 
     public function applyParts($parts)
     {
-        foreach($parts as $part => $value)
+        foreach ($parts as $part => $value)
             $this->{$part} = $value;
     }
 
@@ -64,18 +63,18 @@ class Uri implements UriInterface
      */
     public function getAuthority()
     {
-        if(!$this->host)
+        if (!$this->host)
             return '';
 
         $authority = $this->host;
 
         $userInfo = $this->getUserInfo();
 
-        if($userInfo)
-            $authority = $userInfo.'@'.$authority;
+        if ($userInfo)
+            $authority = $userInfo . '@' . $authority;
 
-        if($this->port)
-            $authority = $authority.':'.$this->port;
+        if ($this->port)
+            $authority = $authority . ':' . $this->port;
 
         return $authority;
     }
@@ -86,7 +85,7 @@ class Uri implements UriInterface
      */
     public function getUserInfo()
     {
-        return $this->user ? ($this->pass ? $this->user.':'.$this->pass : $this->user) : '';
+        return $this->user ? ($this->pass ? $this->user . ':' . $this->pass : $this->user) : '';
     }
 
     /**
@@ -307,22 +306,22 @@ class Uri implements UriInterface
     {
         $uri = '';
 
-        if($this->scheme)
-            $uri = $this->scheme.':';
+        if ($this->scheme)
+            $uri = $this->scheme . ':';
 
         $authority = $this->getAuthority();
 
-        if($authority)
-            $uri = $uri.'//'.$authority;
+        if ($authority)
+            $uri = $uri . '//' . $authority;
 
-        if($this->path)
-            $uri = $uri.($authority ? '/'.ltrim($this->path, '/') : $this->path);
+        if ($this->path)
+            $uri = $uri . ($authority ? '/' . ltrim($this->path, '/') : $this->path);
 
-        if($this->query)
-            $uri .= '?'.$this->query;
+        if ($this->query)
+            $uri .= '?' . $this->query;
 
-        if($this->fragment)
-            $uri .= '#'.$this->fragment;
+        if ($this->fragment)
+            $uri .= '#' . $this->fragment;
 
         return $uri;
     }

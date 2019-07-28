@@ -1,4 +1,5 @@
 <?php
+
 namespace Exedra\Routeller\ParserTypes;
 
 use Minime\Annotations\Interfaces\TypeInterface;
@@ -19,11 +20,9 @@ class DynamicType implements TypeInterface
 
         if (JSON_ERROR_NONE === json_last_error()) {
             return $json;
-        }
-        elseif (false !== ($int = filter_var($value, FILTER_VALIDATE_INT))) {
+        } elseif (false !== ($int = filter_var($value, FILTER_VALIDATE_INT))) {
             return $int;
-        }
-        elseif (false !== ($float = filter_var($value, FILTER_VALIDATE_FLOAT))) {
+        } elseif (false !== ($float = filter_var($value, FILTER_VALIDATE_FLOAT))) {
             return $float;
         }
 

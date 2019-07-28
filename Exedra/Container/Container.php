@@ -50,8 +50,8 @@ class Container implements \ArrayAccess
      */
     public function offsetSet($name, $value)
     {
-        if(array_key_exists($name, $this->services) && !isset($this->mutables[$name]))
-            throw new \Exedra\Exception\Exception('['.get_class($this).'] Service ['.$name.'] is publically immutable and readonly once assigned.');
+        if (array_key_exists($name, $this->services) && !isset($this->mutables[$name]))
+            throw new \Exedra\Exception\Exception('[' . get_class($this) . '] Service [' . $name . '] is publically immutable and readonly once assigned.');
 
         $this->services[$name] = $value;
 
@@ -64,7 +64,7 @@ class Container implements \ArrayAccess
      */
     public function offsetUnset($key)
     {
-        if(!in_array($key, array('service', 'callable', 'factory')))
+        if (!in_array($key, array('service', 'callable', 'factory')))
             return;
 
         unset($this->services[$key]);
@@ -88,8 +88,8 @@ class Container implements \ArrayAccess
      */
     public function __set($name, $value)
     {
-        if(array_key_exists($name, $this->services) && !isset($this->mutables[$name]))
-            throw new \Exedra\Exception\Exception('['.get_class($this).'] Service ['.$name.'] is publically immutable and readonly once assigned.');
+        if (array_key_exists($name, $this->services) && !isset($this->mutables[$name]))
+            throw new \Exedra\Exception\Exception('[' . get_class($this) . '] Service [' . $name . '] is publically immutable and readonly once assigned.');
 
         $this->services[$name] = $value;
 
@@ -102,7 +102,7 @@ class Container implements \ArrayAccess
      */
     public function setMutables(array $services)
     {
-        foreach($services as $service)
+        foreach ($services as $service)
             $this->mutables[$service] = true;
     }
 
@@ -170,7 +170,7 @@ class Container implements \ArrayAccess
      */
     public function get($name)
     {
-        if(array_key_exists($name, $this->services))
+        if (array_key_exists($name, $this->services))
             return $this->services[$name];
 
         return $this->services[$name] = $this->solve('service', $name, array($this));
@@ -220,10 +220,10 @@ class Container implements \ArrayAccess
     public function __call($name, array $args = array())
     {
         // if there's a cached stored.
-        if(isset($this->invokables[$name]))
+        if (isset($this->invokables[$name]))
             return call_user_func_array($this->invokables[$name], $args);
 
-        if(method_exists($this, $name))
+        if (method_exists($this, $name))
             return call_user_func_array(array($this, $name), $args);
 
         return $this->solve('callable', $name, $args);
@@ -251,8 +251,7 @@ class Container implements \ArrayAccess
      */
     public function dependencyCall($type, $name, array $args = array())
     {
-        switch($type)
-        {
+        switch ($type) {
             case 'service':
                 return $this->get($name);
                 break;
@@ -275,23 +274,20 @@ class Container implements \ArrayAccess
      */
     protected function solve($type, $name, array $args = array())
     {
-        if(!$this->services[$type]->has($name))
-        {
-            if($type == 'callable' && $this->services['service']->has($name))
-            {
+        if (!$this->services[$type]->has($name)) {
+            if ($type == 'callable' && $this->services['service']->has($name)) {
                 // then check on related invokable services
                 $service = $this->get($name);
 
                 // if service is invokable.
-                if(is_callable($service))
-                {
+                if (is_callable($service)) {
                     $this->invokables[$name] = $service;
 
                     return call_user_func_array($service, $args);
                 }
             }
 
-            throw new \Exedra\Exception\InvalidArgumentException('['.get_class($this).'] Unable to find ['.$name.'] registry as a registered '.$type .'.');
+            throw new \Exedra\Exception\InvalidArgumentException('[' . get_class($this) . '] Unable to find [' . $name . '] registry as a registered ' . $type . '.');
         }
 
         $registry = $this->services[$type]->get($name);
@@ -301,7 +297,7 @@ class Container implements \ArrayAccess
 
     protected function filter($type, $name, $resolve)
     {
-        foreach($this->services[$type]->getFilters($name) as $filter)
+        foreach ($this->services[$type]->getFilters($name) as $filter)
             $filter($resolve);
 
         return $resolve;
@@ -314,24 +310,21 @@ class Container implements \ArrayAccess
      */
     public function tokenResolve($name)
     {
-        if(strpos($name, 'self.callable') === 0)
+        if (strpos($name, 'self.callable') === 0)
             $name = str_replace('self.callable.', 'callable.', $name);
 
-        if(strpos($name, 'self.factory') === 0)
+        if (strpos($name, 'self.factory') === 0)
             $name = str_replace('self.factory.', 'factory.', $name);
 
-        switch($name)
-        {
+        switch ($name) {
             case 'self':
                 return $this;
                 break;
             default:
                 $split = explode('.', $name, 2);
 
-                if(isset($split[1]))
-                {
-                    switch($split[0])
-                    {
+                if (isset($split[1])) {
+                    switch ($split[0]) {
                         case 'self':
                             return $this->{$split[1]};
                             break;
@@ -348,9 +341,7 @@ class Container implements \ArrayAccess
                             return $this->{$arg};
                             break;
                     }
-                }
-                else
-                {
+                } else {
                     return $this->get($name);
                 }
                 break;
@@ -367,37 +358,34 @@ class Container implements \ArrayAccess
      */
     protected function resolve($type, $name, $registry, array $args = array())
     {
-        if($registry instanceof \Closure)
+        if ($registry instanceof \Closure)
             return call_user_func_array($registry->bindTo($this), $args);
 
-        if(is_string($registry)) {
-            if($type == 'service')
+        if (is_string($registry)) {
+            if ($type == 'service')
                 return $this->instantiate($registry);
             else
                 return $this->instantiate($registry, $args);
         }
 
         // assume index 0 as class name
-        if(is_array($registry))
-        {
+        if (is_array($registry)) {
             $class = $registry[0];
 
             $arguments = array();
 
             // argument passed
-            if(isset($registry[1]))
-            {
+            if (isset($registry[1])) {
                 // the second element isn't an array
-                if(!is_array($registry[1]))
-                    throw new \Exedra\Exception\InvalidArgumentException('['.get_class($this).'] Second value for array based ['.$name.'] registry must be an array');
+                if (!is_array($registry[1]))
+                    throw new \Exedra\Exception\InvalidArgumentException('[' . get_class($this) . '] Second value for array based [' . $name . '] registry must be an array');
 
-                foreach($registry[1] as $arg)
-                {
+                foreach ($registry[1] as $arg) {
                     // if isn't string. allow only string.
-                    if(!is_string($arg))
-                        throw new \Exedra\Exception\InvalidArgumentException('['.get_class($this).'] Argument for array based ['.$name.'] registry must be string');
+                    if (!is_string($arg))
+                        throw new \Exedra\Exception\InvalidArgumentException('[' . get_class($this) . '] Argument for array based [' . $name . '] registry must be string');
 
-                    if($arg = $this->tokenResolve($arg))
+                    if ($arg = $this->tokenResolve($arg))
                         $arguments[] = $arg;
                 }
             }
@@ -408,13 +396,12 @@ class Container implements \ArrayAccess
             return $this->instantiate($class, $arguments);
         }
 
-        throw new \Exedra\Exception\InvalidArgumentException('['.get_class($this).'] Unable to resolve the ['.$name.'] registry');
+        throw new \Exedra\Exception\InvalidArgumentException('[' . get_class($this) . '] Unable to resolve the [' . $name . '] registry');
     }
 
     protected function instantiate($class, array $arguments = array())
     {
-        switch(count($arguments))
-        {
+        switch (count($arguments)) {
             case 0:
                 return new $class();
                 break;

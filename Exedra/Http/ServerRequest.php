@@ -1,5 +1,7 @@
 <?php
+
 namespace Exedra\Http;
+
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\UriInterface;
 
@@ -63,13 +65,11 @@ class ServerRequest extends Message implements ServerRequestInterface
         $this->uploadedFiles = $uploadedFiles;
 
         // register common content-type parser
-        $this->registerMediaTypeParser('application/json', function($body)
-        {
+        $this->registerMediaTypeParser('application/json', function ($body) {
             return json_decode($body, true);
         });
 
-        $this->registerMediaTypeParser('application/x-www-form-urlencoded', function($body)
-        {
+        $this->registerMediaTypeParser('application/x-www-form-urlencoded', function ($body) {
             parse_str($body, $data);
 
             return $data;
@@ -94,39 +94,32 @@ class ServerRequest extends Message implements ServerRequestInterface
 
         $uriParts = parse_url($server['REQUEST_URI']);
 
-        if(isset($server['HTTP_HOST']))
-        {
+        if (isset($server['HTTP_HOST'])) {
             @list($host, $port) = explode(':', $server['HTTP_HOST']);
             $uriParts['host'] = $host;
 
             if ($port)
                 $uriParts['port'] = $port;
-        }
-        else
-        {
+        } else {
             $uriParts['host'] = $server['SERVER_NAME'];
             $uriParts['port'] = $server['SERVER_PORT'];
         }
 
-        $uriParts['scheme'] = isset($server['REQUEST_SCHEME']) ? $server['REQUEST_SCHEME'] : ( isset($server['HTTPS']) && $server['HTTPS'] == 'on' ? 'https' : 'http' );
+        $uriParts['scheme'] = isset($server['REQUEST_SCHEME']) ? $server['REQUEST_SCHEME'] : (isset($server['HTTPS']) && $server['HTTPS'] == 'on' ? 'https' : 'http');
 
         $headers = array();
 
-        if(function_exists('getallheaders'))
-        {
+        if (function_exists('getallheaders')) {
             // a correct case already
             $apacheHeaders = getallheaders();
 
-            foreach($apacheHeaders as $header => $value)
+            foreach ($apacheHeaders as $header => $value)
                 $headers[$header] = array_map('trim', explode(',', $value));
-        }
-        else
-        {
+        } else {
 
             // normalize the header key
-            foreach($server as $key => $value)
-            {
-                if(substr($key, 0, 5) != 'HTTP_')
+            foreach ($server as $key => $value) {
+                if (substr($key, 0, 5) != 'HTTP_')
                     continue;
 
                 $name = str_replace(' ', '-', ucwords(str_replace('_', ' ', strtolower(substr($key, 5)))));
@@ -145,7 +138,7 @@ class ServerRequest extends Message implements ServerRequestInterface
             UploadedFile::createFromGlobals($_FILES)
         );
 
-        if($server['REQUEST_METHOD'] == 'POST' && in_array($request->getMediaType(), array('application/x-www-form-urlencoded', 'multipart/form-data')))
+        if ($server['REQUEST_METHOD'] == 'POST' && in_array($request->getMediaType(), array('application/x-www-form-urlencoded', 'multipart/form-data')))
             $request->setParsedBody($_POST);
 
         return $request;
@@ -176,7 +169,7 @@ class ServerRequest extends Message implements ServerRequestInterface
     {
         return new static(
             $request->getMethod(),
-            new Uri((string) $request->getUri()),
+            new Uri((string)$request->getUri()),
             $request->getHeaders(),
             Stream::createFromContents($request->getBody()->getContents()),
             $request->getServerParams(),
@@ -190,16 +183,16 @@ class ServerRequest extends Message implements ServerRequestInterface
      */
     public function getRequestTarget()
     {
-        if($this->requestTarget)
+        if ($this->requestTarget)
             return $this->requestTarget;
 
         $target = $this->uri->getPath();
 
-        if($target === null)
+        if ($target === null)
             $target = '/';
 
-        if($query = $this->uri->getQuery())
-            $target = '?'.$query;
+        if ($query = $this->uri->getQuery())
+            $target = '?' . $query;
 
         return $target;
     }
@@ -271,9 +264,9 @@ class ServerRequest extends Message implements ServerRequestInterface
      */
     public function setUri($uri)
     {
-        if(is_string($uri) || is_array($uri))
+        if (is_string($uri) || is_array($uri))
             $this->uri = new Uri($uri);
-        else if($uri instanceof Uri)
+        else if ($uri instanceof Uri)
             $this->uri = $uri;
         else
             throw new \InvalidArgumentException('Invalid uri. Must be string, array, or Uri');
@@ -362,7 +355,7 @@ class ServerRequest extends Message implements ServerRequestInterface
      */
     public function getQueryParams()
     {
-        if($this->queryParams)
+        if ($this->queryParams)
             return $this->queryParams;
 
         parse_str($this->uri->getQuery(), $this->queryParams);
@@ -410,7 +403,7 @@ class ServerRequest extends Message implements ServerRequestInterface
      */
     public function getUploadedFile($key)
     {
-        if(isset($this->uploadedFiles[$key]))
+        if (isset($this->uploadedFiles[$key]))
             return $this->uploadedFiles[$key];
 
         return null;
@@ -446,17 +439,17 @@ class ServerRequest extends Message implements ServerRequestInterface
      */
     public function getParsedBody()
     {
-        if($this->parsedBody)
+        if ($this->parsedBody)
             return $this->parsedBody;
 
         $mediaType = $this->getMediaType();
 
-        if(!isset($this->bodyParsers[$mediaType]))
+        if (!isset($this->bodyParsers[$mediaType]))
             return $this->parsedBody;
 
-        $this->parsedBody = $this->bodyParsers[$mediaType]((string) $this->body);
+        $this->parsedBody = $this->bodyParsers[$mediaType]((string)$this->body);
 
-        if(!in_array(gettype($this->parsedBody), array('NULL', 'array', 'object')))
+        if (!in_array(gettype($this->parsedBody), array('NULL', 'array', 'object')))
             throw new \Exedra\Exception\Exception('Registered media type parser return type must be a null, array, or object');
 
         return $this->parsedBody;
@@ -469,7 +462,7 @@ class ServerRequest extends Message implements ServerRequestInterface
     {
         $contentType = $this->getHeaderLine('Content-Type');
 
-        if(!$contentType)
+        if (!$contentType)
             return null;
 
         // credit to https://github.com/slimphp/Slim-Http/blob/master/src/Request.php
@@ -609,7 +602,7 @@ class ServerRequest extends Message implements ServerRequestInterface
      */
     public function param($name, $default = null)
     {
-        if(!$this->params)
+        if (!$this->params)
             $this->params = $this->getMethod() == 'GET' ? $this->getQueryParams() : array_merge($this->getQueryParams(), $this->getParsedBody());
 
         return array_key_exists($name, $this->params) ? $this->params[$name] : $default;
@@ -621,7 +614,7 @@ class ServerRequest extends Message implements ServerRequestInterface
      */
     public function getParams()
     {
-        if(!$this->params)
+        if (!$this->params)
             $this->params = $this->getMethod() == 'GET' ? $this->getQueryParams() : array_merge($this->getQueryParams(), $this->getParsedBody());
 
         return $this->params;
@@ -642,17 +635,14 @@ class ServerRequest extends Message implements ServerRequestInterface
      */
     public function resolveUriPath()
     {
-        if(!$this->server)
+        if (!$this->server)
             return;
 
         list($requestUri) = explode('?', $this->server['REQUEST_URI']);
 
-        if(strpos($requestUri, $this->server['SCRIPT_NAME']) === 0)
-        {
+        if (strpos($requestUri, $this->server['SCRIPT_NAME']) === 0) {
             $basePath = $this->server['SCRIPT_NAME'];
-        }
-        else
-        {
+        } else {
             $basePath = explode('/', $this->server['SCRIPT_NAME']);
             array_pop($basePath);
             $basePath = implode('/', $basePath);
@@ -660,7 +650,7 @@ class ServerRequest extends Message implements ServerRequestInterface
 
         $requestUri = trim($requestUri, '/');
 
-        $requestUri = '/'.trim(substr($requestUri, strlen(trim($basePath, '/'))), '/');
+        $requestUri = '/' . trim(substr($requestUri, strlen(trim($basePath, '/'))), '/');
 
         $this->uri->setPath($requestUri);
     }

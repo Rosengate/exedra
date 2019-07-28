@@ -1,4 +1,5 @@
 <?php
+
 namespace Exedra\Routing;
 
 use Exedra\Contracts\Routing\ExecuteHandler;
@@ -60,9 +61,8 @@ class Finding
 
         $this->request = $request;
 
-        if($route)
-        {
-            foreach($parameters as $key => $param)
+        if ($route) {
+            foreach ($parameters as $key => $param)
                 $this->parameters[$key] = $param;
 
             $this->callStack = $this->resolve();
@@ -106,37 +106,35 @@ class Finding
      */
     protected function resolveMiddleware($middleware)
     {
-        if(!is_string($middleware) && !is_object($middleware) && !is_array($middleware))
-            throw new InvalidArgumentException('Unable to resolve middleware with type [' . gettype($middleware) .']');
+        if (!is_string($middleware) && !is_object($middleware) && !is_array($middleware))
+            throw new InvalidArgumentException('Unable to resolve middleware with type [' . gettype($middleware) . ']');
 
         $method = 'handle';
 
         // expect a class name
-        if(is_string($middleware))
-        {
+        if (is_string($middleware)) {
             @list($middleware, $method) = explode('@', $middleware);
 
             $middleware = new $middleware;
 
-            $method = $method ? : 'handle';
+            $method = $method ?: 'handle';
         }
 
-        if(is_array($middleware))
-        {
-            return function() use($middleware) {
+        if (is_array($middleware)) {
+            return function () use ($middleware) {
                 return call_user_func_array($middleware, func_get_args());
             };
         }
 
-        if(is_callable($middleware))
+        if (is_callable($middleware))
             return $middleware;
 
-        if(method_exists($middleware, $method))
-            return function() use($middleware, $method) {
+        if (method_exists($middleware, $method))
+            return function () use ($middleware, $method) {
                 return call_user_func_array(array($middleware, $method), func_get_args());
             };
 
-        throw new InvalidArgumentException('Middleware [' . get_class($middleware) .'] has to be callable or implements method handle()');
+        throw new InvalidArgumentException('Middleware [' . get_class($middleware) . '] has to be callable or implements method handle()');
     }
 
     /**
@@ -155,29 +153,29 @@ class Finding
         /** @var ExecuteHandler[] $handlers */
         $handlers = array();
 
-        foreach($this->route->getFullRoutes() as $route) {
+        foreach ($this->route->getFullRoutes() as $route) {
             $group = $route->getGroup();
 
-            foreach($group->factory->getExecuteHandlers() as $handler)
+            foreach ($group->factory->getExecuteHandlers() as $handler)
                 $handlers[get_class($handler)] = $handler;
 
             // stack all the handlers
-            foreach($group->getExecuteHandlers() as $name => $handler)
+            foreach ($group->getExecuteHandlers() as $name => $handler)
                 $handlers[$name] = $handler;
 
-            foreach($group->getMiddlewares() as $key => $middleware)
+            foreach ($group->getMiddlewares() as $key => $middleware)
                 $callStack->addCallable($this->resolveMiddleware($middleware[0]), $middleware[1]);
 
             // append all route middlewares
-            foreach($route->getProperty('middleware') as $key => $middleware)
+            foreach ($route->getProperty('middleware') as $key => $middleware)
                 $callStack->addCallable($this->resolveMiddleware($middleware[0]), $middleware[1]);
 
-            foreach($route->getAttributes() as $key => $value) {
-                if(is_array($value)) {
-                    if(isset($this->attributes[$key]) && !is_array($this->attributes[$key]))
-                        throw new Exception('Unable to push value into attribute [' . $key . '] on route ' . $route->getAbsoluteName(). '. The attribute type is not an array.');
+            foreach ($route->getAttributes() as $key => $value) {
+                if (is_array($value)) {
+                    if (isset($this->attributes[$key]) && !is_array($this->attributes[$key]))
+                        throw new Exception('Unable to push value into attribute [' . $key . '] on route ' . $route->getAbsoluteName() . '. The attribute type is not an array.');
 
-                    foreach($value as $val) {
+                    foreach ($value as $val) {
                         $this->attributes[$key][] = $val;
                     }
                 } else {
@@ -186,39 +184,39 @@ class Finding
             }
 
             // pass config.
-            if($config = $route->getProperty('config'))
+            if ($config = $route->getProperty('config'))
                 $this->config = array_merge($this->config, $config);
         }
 
-        foreach($handlers as $name => $class) {
+        foreach ($handlers as $name => $class) {
             $handler = null;
 
-            if(is_string($class)) {
+            if (is_string($class)) {
                 $handler = new $class;
-            } else if(is_object($class)) {
-                if($class instanceof \Closure) {
+            } else if (is_object($class)) {
+                if ($class instanceof \Closure) {
                     $class($handler = new DynamicHandler());
-                } else if($class instanceof ExecuteHandler) {
+                } else if ($class instanceof ExecuteHandler) {
                     $handler = $class;
                 }
             }
 
-            if(!$handler || !is_object($handler) || !($handler instanceof ExecuteHandler))
+            if (!$handler || !is_object($handler) || !($handler instanceof ExecuteHandler))
                 throw new InvalidArgumentException('Handler must be either class name, ' . ExecuteHandler::class . ' or \Closure ');
 
-            if($handler->validateHandle($executePattern)) {
+            if ($handler->validateHandle($executePattern)) {
                 $resolve = $handler->resolveHandle($executePattern);
 
-                if(!is_callable($resolve))
+                if (!is_callable($resolve))
                     throw new \Exedra\Exception\InvalidArgumentException('The resolveHandle() method for handler [' . get_class($handler) . '] must return \Closure or callable');
 
                 $properties = array();
 
-                if($this->route->hasDependencies())
+                if ($this->route->hasDependencies())
                     $properties['dependencies'] = $this->route->getProperty('dependencies');
 
-                if(!$resolve)
-                    throw new InvalidArgumentException('The route [' . $this->route->getAbsoluteName() . '] execute handle was not properly resolved. '.(is_string($executePattern) ? ' ['.$executePattern.']' : ''));
+                if (!$resolve)
+                    throw new InvalidArgumentException('The route [' . $this->route->getAbsoluteName() . '] execute handle was not properly resolved. ' . (is_string($executePattern) ? ' [' . $executePattern . ']' : ''));
 
                 $callStack->addCallable($resolve, $properties);
 

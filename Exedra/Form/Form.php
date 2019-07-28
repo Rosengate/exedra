@@ -1,4 +1,5 @@
 <?php
+
 namespace Exedra\Form;
 
 class Form
@@ -42,23 +43,19 @@ class Form
     {
         // if key is array,
         // loop the set, while expecting value parameter to be override
-        if(is_array($key))
-        {
+        if (is_array($key)) {
             $override = $value;
 
-            foreach($key as $k => $val)
-            {
-                if($override === true)
+            foreach ($key as $k => $val) {
+                if ($override === true)
                     $this->setOverride($k, $val);
                 else
                     $this->data[$k] = $val;
             }
 
             return $this;
-        }
-        else
-        {
-            if($override === true)
+        } else {
+            if ($override === true)
                 $this->setOverride($key, $value);
             else
                 $this->data[$key] = $value;
@@ -75,8 +72,8 @@ class Form
      */
     public function setOverride($key, $value = null)
     {
-        if(is_array($key))
-            foreach($key as $k => $val)
+        if (is_array($key))
+            foreach ($key as $k => $val)
                 $this->override[$k] = $val;
         else
             $this->override[$key] = $value;
@@ -152,23 +149,23 @@ class Form
      */
     protected function createInput($type, $name = null, $value = null, $attr = null)
     {
-        if($type == 'textarea')
+        if ($type == 'textarea')
             $input = new Input\Textarea($name);
         else
             $input = new Input\Input($type, $name);
 
-        if($name)
+        if ($name)
             $input->attr('id', $name);
 
-        if($value)
+        if ($value)
             $input->value($value);
-        else if(isset($this->data[$name]))
+        else if (isset($this->data[$name]))
             $input->value($this->data[$name]);
 
-        if($attr)
+        if ($attr)
             $input->attr($attr);
 
-        if(isset($this->override[$name]))
+        if (isset($this->override[$name]))
             $input->override($this->override[$name]);
 
         return $input;
@@ -187,26 +184,26 @@ class Form
     {
         $select = new Input\Select($name);
 
-        if($name)
+        if ($name)
             $select->attr('id', $name);
 
-        if(count($options) > 0)
+        if (count($options) > 0)
             $select->options($options);
         elseif (isset($this->dataOptions[$name]))
             $select->options($this->dataOptions[$name]);
 
-        if($value)
+        if ($value)
             $select->value($value);
-        else if(isset($this->data[$name]))
+        else if (isset($this->data[$name]))
             $select->value($this->data[$name]);
 
-        if($attr)
+        if ($attr)
             $select->attr($attr);
 
-        if(isset($this->override[$name]))
+        if (isset($this->override[$name]))
             $select->override($this->override[$name]);
 
-        if($first)
+        if ($first)
             $select->first($first);
 
         return $select;
@@ -308,7 +305,7 @@ class Form
     {
         $input = $this->createInput('checkbox', $name, $value, $attr);
 
-        if($status)
+        if ($status)
             $input->attr('checked', true);
 
         return $input;

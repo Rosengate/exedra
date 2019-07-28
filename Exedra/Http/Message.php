@@ -1,5 +1,7 @@
 <?php
+
 namespace Exedra\Http;
+
 use Psr\Http\Message\MessageInterface;
 use Psr\Http\Message\StreamInterface;
 
@@ -131,7 +133,7 @@ class Message implements MessageInterface
      */
     public function withAddedHeader($name, $value)
     {
-        if(!$this->hasHeader($name))
+        if (!$this->hasHeader($name))
             return $this->withHeader($name, $value);
 
         $message = clone $this;
@@ -147,7 +149,7 @@ class Message implements MessageInterface
     {
         $message = clone $this;
 
-        if(!$this->hasHeader($name))
+        if (!$this->hasHeader($name))
             return $message;
 
         return $message->removeHeader($name);
@@ -169,17 +171,16 @@ class Message implements MessageInterface
      */
     public function setBody($body, $mode = 'r+')
     {
-        switch(gettype($body))
-        {
+        switch (gettype($body)) {
             case 'string':
                 $this->body = Stream::createFromContents($body, $mode);
-            break;
+                break;
             case 'object':
-                if($body instanceof Stream)
+                if ($body instanceof Stream)
                     $this->body = $body;
                 else
                     $this->body = new Stream($body, $mode);
-            break;
+                break;
         }
 
         return $this;
@@ -193,13 +194,12 @@ class Message implements MessageInterface
     {
         $message = clone $this;
 
-        switch(gettype($body))
-        {
+        switch (gettype($body)) {
             case 'string':
                 $message->body = Stream::createFromContents($body);
                 break;
             case 'object':
-                if($body instanceof Stream)
+                if ($body instanceof Stream)
                     $message->body = $body;
                 else
                     $message->body = new Stream($body, 'r+');
@@ -227,7 +227,7 @@ class Message implements MessageInterface
     {
         $name = strtolower($name);
 
-        if(!isset($this->headers[$name]))
+        if (!isset($this->headers[$name]))
             return false;
 
         return in_array($value, $this->headers[$name]);
@@ -245,7 +245,7 @@ class Message implements MessageInterface
      */
     public function setHeaders(array $headerLines)
     {
-        foreach($headerLines as $header => $values)
+        foreach ($headerLines as $header => $values)
             $this->headers[strtolower($header)] = $values;
 
         $this->headerLines = $headerLines;
@@ -267,8 +267,8 @@ class Message implements MessageInterface
 
         $this->headers[$name] = $value;
 
-        foreach(array_keys($this->headerLines) as $key)
-            if(strtolower($key) == $name)
+        foreach (array_keys($this->headerLines) as $key)
+            if (strtolower($key) == $name)
                 unset($this->headerLines[$key]);
 
         $this->headerLines[$header] = $value;
@@ -286,23 +286,20 @@ class Message implements MessageInterface
     {
         $name = strtolower($header);
 
-        if(is_array($value))
-        {
-            foreach($value as $v)
+        if (is_array($value)) {
+            foreach ($value as $v)
                 $this->headers[$name][] = trim($v);
 
-            foreach(array_keys($this->headerLines) as $key)
-                if(strtolower($key) == $name)
+            foreach (array_keys($this->headerLines) as $key)
+                if (strtolower($key) == $name)
                     unset($this->headerLines[$key]);
 
             $this->headerLines[$header] = $this->headers[$name];
-        }
-        else
-        {
+        } else {
             $this->headers[$name][] = trim($value);
 
-            foreach(array_keys($this->headerLines) as $key)
-                if(strtolower($key) == $name)
+            foreach (array_keys($this->headerLines) as $key)
+                if (strtolower($key) == $name)
                     unset($this->headerLines[$key]);
 
             $this->headerLines[$header] = $this->headers[$name];
@@ -321,8 +318,8 @@ class Message implements MessageInterface
         $name = strtolower($header);
         unset($this->headers[$name]);
 
-        foreach($this->headerLines as $key => $value)
-            if(strtolower($key) == $name)
+        foreach ($this->headerLines as $key => $value)
+            if (strtolower($key) == $name)
                 unset($this->headerLines[$key]);
 
         return $this;

@@ -1,4 +1,5 @@
 <?php
+
 namespace Exedra;
 
 class File extends \SplFileInfo
@@ -83,7 +84,7 @@ class File extends \SplFileInfo
      */
     public function open($mode = 'r')
     {
-        return new \SplFileObject((string) realpath($this->filename), $mode);
+        return new \SplFileObject((string)realpath($this->filename), $mode);
     }
 
     /**

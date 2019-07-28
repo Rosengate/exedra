@@ -1,4 +1,5 @@
 <?php
+
 namespace Exedra\Session;
 
 /**
@@ -33,7 +34,7 @@ class Flash
      */
     public function initialize()
     {
-        if($this->initialized)
+        if ($this->initialized)
             return;
 
         $this->data = $this->session->get(self::BASE_KEY, array());
@@ -51,7 +52,7 @@ class Flash
      */
     public function set($key, $value)
     {
-        $this->session->set(self::BASE_KEY.'.'.$key, $value);
+        $this->session->set(self::BASE_KEY . '.' . $key, $value);
 
         return $this;
     }
@@ -73,7 +74,7 @@ class Flash
      */
     public function get($key, $default = null)
     {
-        if(!array_key_exists($key, $this->data) && $default)
+        if (!array_key_exists($key, $this->data) && $default)
             return $default;
 
         return $this->data[$key];

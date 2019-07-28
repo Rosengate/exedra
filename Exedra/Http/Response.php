@@ -1,4 +1,5 @@
 <?php
+
 namespace Exedra\Http;
 
 use Psr\Http\Message\ResponseInterface;
@@ -16,7 +17,7 @@ class Response extends Message implements ResponseInterface
     {
         parent::__construct($headers, $body, $protocol);
 
-        $this->statuses =  array(
+        $this->statuses = array(
             100 => 'Continue',
             101 => 'Switching Protocols',
             102 => 'Processing',
@@ -130,7 +131,7 @@ class Response extends Message implements ResponseInterface
      */
     public function getReasonPhrase()
     {
-        if($this->reasonPhrase)
+        if ($this->reasonPhrase)
             return $this->reasonPhrase;
 
         return isset($this->statuses[$this->status]) ? $this->statuses[$this->status] : 'Unknown';
@@ -161,13 +162,13 @@ class Response extends Message implements ResponseInterface
      */
     public function sendHeader()
     {
-        if($this->reasonPhrase || $this->protocol != '1.1')
-            header('HTTP/'.$this->getProtocolVersion().' '.$this->status.' '.$this->getReasonPhrase());
+        if ($this->reasonPhrase || $this->protocol != '1.1')
+            header('HTTP/' . $this->getProtocolVersion() . ' ' . $this->status . ' ' . $this->getReasonPhrase());
         else
             http_response_code($this->status);
 
-        foreach($this->headerLines as $key => $values)
-            header($key.': '.implode(', ', $values));
+        foreach ($this->headerLines as $key => $values)
+            header($key . ': ' . implode(', ', $values));
     }
 
     /**
@@ -223,7 +224,7 @@ class Response extends Message implements ResponseInterface
         echo $contents;
         $size = ob_get_length();
         header("Content-Length: $size");
-        if(function_exists('fastcgi_finish_request'))
+        if (function_exists('fastcgi_finish_request'))
             fastcgi_finish_request();
         ob_end_flush();
         flush();

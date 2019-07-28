@@ -1,4 +1,5 @@
 <?php
+
 namespace Exedra\View;
 
 use Exedra\Exception\NotFoundException;

@@ -1,4 +1,5 @@
 <?php
+
 namespace Exedra\Routeller\Cache;
 
 class FileCache implements CacheInterface
@@ -9,27 +10,27 @@ class FileCache implements CacheInterface
     {
         $this->dir = rtrim($dir, '/\\');
 
-        if(!file_exists($this->dir))
+        if (!file_exists($this->dir))
             mkdir($this->dir, 0777, true);
     }
 
     public function set($key, array $entries, $lastModified)
     {
-        $filename = $this->dir .'/'. $key .'.php';
+        $filename = $this->dir . '/' . $key . '.php';
 
         $cache = array(
             'last_modified' => $lastModified,
             'entries' => $entries
         );
 
-        file_put_contents($filename, '<?php return ' .var_export($cache, true). ';');
+        file_put_contents($filename, '<?php return ' . var_export($cache, true) . ';');
     }
 
     public function get($key)
     {
-        $filename = $this->dir .'/' .$key .'.php';
+        $filename = $this->dir . '/' . $key . '.php';
 
-        if(file_exists($filename))
+        if (file_exists($filename))
             return require $filename;
 
         return false;
@@ -37,15 +38,15 @@ class FileCache implements CacheInterface
 
     public function clear($key)
     {
-        unlink($this->dir .'/'. $key .'.php');
+        unlink($this->dir . '/' . $key . '.php');
     }
 
     public function clearAll()
     {
-        $files = glob($this->dir .'/*');
+        $files = glob($this->dir . '/*');
 
-        foreach($files as $file){ // iterate files
-            if(is_file($file))
+        foreach ($files as $file) { // iterate files
+            if (is_file($file))
                 unlink($file);
         }
     }

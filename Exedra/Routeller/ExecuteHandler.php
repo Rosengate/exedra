@@ -1,4 +1,5 @@
 <?php
+
 namespace Exedra\Routeller;
 
 use Exedra\Routeller\Controller\Controller;
@@ -12,7 +13,7 @@ class ExecuteHandler implements \Exedra\Contracts\Routing\ExecuteHandler
      */
     public function validateHandle($pattern)
     {
-        if(is_string($pattern) && strpos($pattern, 'routeller=') === 0)
+        if (is_string($pattern) && strpos($pattern, 'routeller=') === 0)
             return true;
 
         return false;
@@ -29,7 +30,7 @@ class ExecuteHandler implements \Exedra\Contracts\Routing\ExecuteHandler
         /** @var Controller $controller */
         $controller = $class::instance();
 
-        return function() use($controller, $method) {
+        return function () use ($controller, $method) {
             return call_user_func_array(array($controller, $method), func_get_args());
         };
     }

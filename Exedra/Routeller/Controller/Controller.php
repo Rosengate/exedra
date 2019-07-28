@@ -1,4 +1,5 @@
 <?php
+
 namespace Exedra\Routeller\Controller;
 
 abstract class Controller
@@ -16,7 +17,7 @@ abstract class Controller
     {
         $classname = static::class;
 
-        if(!isset(static::$instances[$classname]))
+        if (!isset(static::$instances[$classname]))
             static::$instances[$classname] = new static();
 
         return static::$instances[$classname];

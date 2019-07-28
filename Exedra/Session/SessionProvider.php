@@ -1,4 +1,5 @@
 <?php
+
 namespace Exedra\Session;
 
 use Exedra\Application;

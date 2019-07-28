@@ -1,4 +1,5 @@
 <?php
+
 namespace Exedra\Routeller;
 
 use Exedra\Support\DotArray;
@@ -22,7 +23,7 @@ class AnnotationsReader extends Reader
         if ($this->cache) {
             $key = $this->cache->getKey($doc);
             $ast = $this->cache->get($key);
-            if (! $ast) {
+            if (!$ast) {
                 $ast = $this->parser->parse($doc);
                 $this->cache->set($key, $ast);
             }
@@ -32,12 +33,11 @@ class AnnotationsReader extends Reader
 
         $properties = array();
 
-        foreach($ast as $key => $value)
-        {
-            if(isset(static::$exceptions[$key]))
+        foreach ($ast as $key => $value) {
+            if (isset(static::$exceptions[$key]))
                 continue;
 
-            if(strpos($key, 'attr.') === 0 && is_string($value) && strpos($value, '[] ') === 0) {
+            if (strpos($key, 'attr.') === 0 && is_string($value) && strpos($value, '[] ') === 0) {
                 $key .= '[]';
                 $value = substr_replace($value, '', 0, strlen('[] '));
             }

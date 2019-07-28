@@ -1,4 +1,5 @@
 <?php
+
 namespace Exedra\Url;
 
 use Exedra\Contracts\Url\UrlGenerator as UrlGeneratorInterface;
@@ -45,7 +46,7 @@ class UrlGenerator implements UrlGeneratorInterface
         $this->map = $router;
         $this->rootRouter = $router->getRootGroup();
         $this->request = $request;
-        $this->setBase($appUrl ? : ($request ? $request->getUri()->getScheme().'://'.$request->getUri()->getAuthority() : null ));
+        $this->setBase($appUrl ?: ($request ? $request->getUri()->getScheme() . '://' . $request->getUri()->getAuthority() : null));
         $this->callables = $callables;
     }
 
@@ -61,17 +62,18 @@ class UrlGenerator implements UrlGeneratorInterface
      */
     public function previous()
     {
-        if(!$this->request)
+        if (!$this->request)
             throw new NotFoundException('Http Request does not exist.');
 
         $referer = $this->request->getHeaderLine('referer');
 
-        return $referer ? : false;
+        return $referer ?: false;
     }
+
     public function __call($name, array $args = array())
     {
-        if(!isset($this->callables[$name]))
-            throw new NotFoundException('Method / callable ['.$name.'] does not exists');
+        if (!isset($this->callables[$name]))
+            throw new NotFoundException('Method / callable [' . $name . '] does not exists');
 
         return call_user_func_array($this->callables[$name], array_merge(array($this), $args));
     }
@@ -106,7 +108,7 @@ class UrlGenerator implements UrlGeneratorInterface
      */
     public function base($path = null)
     {
-        return ($this->baseUrl ? rtrim($this->baseUrl, '/' ).'/' : '/').($path ? trim($path, '/') : '');
+        return ($this->baseUrl ? rtrim($this->baseUrl, '/') . '/' : '/') . ($path ? trim($path, '/') : '');
     }
 
     /**
@@ -142,29 +144,29 @@ class UrlGenerator implements UrlGeneratorInterface
      */
     public function create($routeName, array $data = array(), array $query = array())
     {
-        if(strpos($routeName, '@') === 0)
+        if (strpos($routeName, '@') === 0)
             $route = $this->rootRouter->findRoute(substr($routeName, 1));
         else
             $route = $this->map->findRoute($routeName);
 
-        if(!$route)
-            throw new NotFoundException('Unable to find route ['.$routeName.']');
+        if (!$route)
+            throw new NotFoundException('Unable to find route [' . $routeName . ']');
 
         $path = $route->getAbsolutePath($data);
 
-        return $this->base($path).($query ? '?'. http_build_query($query) : null);
+        return $this->base($path) . ($query ? '?' . http_build_query($query) : null);
     }
 
     public function parent()
     {
         $route = $this->map->getUpperRoute();
 
-        if(!$route)
+        if (!$route)
             throw new NotFoundException('Unable to find the parent route for the current route.');
 
         $route = $route->getAbsoluteName();
 
-        return $this->create('@'.$route);
+        return $this->create('@' . $route);
     }
 
     /**
@@ -188,24 +190,21 @@ class UrlGenerator implements UrlGeneratorInterface
      */
     public function current(array $query = array())
     {
-        if(!$this->request)
+        if (!$this->request)
             throw new \Exedra\Exception\InvalidArgumentException('Http Request does not exist.');
 
         $uri = $this->request->getUri();
 
-        if(count($query) > 0)
-        {
+        if (count($query) > 0) {
             // append query to uri
-            if($uri->getQuery())
+            if ($uri->getQuery())
                 $query = http_build_query($query);
             else
                 $query = '?' . http_build_query($query);
-        }
-        else
-        {
+        } else {
             $query = '';
         }
 
-        return $this->request->getUri().$query;
+        return $this->request->getUri() . $query;
     }
 }

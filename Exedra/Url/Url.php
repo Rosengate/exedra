@@ -1,4 +1,5 @@
 <?php
+
 namespace Exedra\Url;
 
 class Url extends \Exedra\Http\Uri
@@ -33,7 +34,7 @@ class Url extends \Exedra\Http\Uri
      */
     public function addQueryParam($key, $value)
     {
-        if(!$this->query)
+        if (!$this->query)
             return $this->setQueryParams(array($key => $value));
 
         $params = $this->getQueryParams();
@@ -51,7 +52,7 @@ class Url extends \Exedra\Http\Uri
      */
     public function addQueryParams(array $params)
     {
-        foreach($params as $key => $value)
+        foreach ($params as $key => $value)
             $this->addQueryParam($key, $value);
 
         return $this;

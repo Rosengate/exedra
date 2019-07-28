@@ -1,4 +1,5 @@
 <?php
+
 namespace Exedra\Provider;
 
 use Exedra\Contracts\Provider\Provider;

@@ -1,4 +1,5 @@
 <?php
+
 namespace Exedra\Routing\GroupHandlers;
 
 use Exedra\Contracts\Routing\GroupHandler;
@@ -9,7 +10,7 @@ class ClosureHandler implements GroupHandler
 {
     public function validateGroup($pattern, Route $route = null)
     {
-        if(is_object($pattern) && $pattern instanceof \Closure)
+        if (is_object($pattern) && $pattern instanceof \Closure)
             return true;
 
         return false;

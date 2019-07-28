@@ -1,4 +1,5 @@
 <?php
+
 namespace Exedra\Url;
 
 /**
@@ -55,7 +56,7 @@ class UrlFactory extends UrlGenerator
     {
         $url = parent::previous();
 
-        if(!$url)
+        if (!$url)
             return false;
 
         return $this->createUrl($url);
@@ -70,8 +71,8 @@ class UrlFactory extends UrlGenerator
         $url = new Url($url);
 
         // apply filters
-        if($this->filters)
-            foreach($this->filters as $filter)
+        if ($this->filters)
+            foreach ($this->filters as $filter)
                 $url = $filter($url);
 
         return $url;

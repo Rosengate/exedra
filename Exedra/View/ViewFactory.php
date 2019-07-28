@@ -1,4 +1,5 @@
 <?php
+
 namespace Exedra\View;
 
 use Exedra\Exception\NotFoundException;
@@ -44,26 +45,22 @@ class ViewFactory
     {
         $path = $this->buildPath($path);
 
-        if(!file_exists($path))
-            throw new NotFoundException('Unable to find view ['.$path.']');
+        if (!file_exists($path))
+            throw new NotFoundException('Unable to find view [' . $path . ']');
 
         // merge with default data.
         $class = '\Exedra\View\View';
 
-        if(is_string($data))
-        {
+        if (is_string($data)) {
             // assume data as fully qualified class name
-            if($data)
-            {
+            if ($data) {
                 $class = $data;
 
                 $data = array();
             }
-        }
-        else
-        {
-            if(!is_array($data))
-                throw new NotFoundException('Argument 2 must be either string or array ['.gettype($data).'] given.');
+        } else {
+            if (!is_array($data))
+                throw new NotFoundException('Argument 2 must be either string or array [' . gettype($data) . '] given.');
         }
 
         $data = array_merge($data, $this->defaultData);
@@ -99,15 +96,11 @@ class ViewFactory
      */
     public function setDefaultData($key, $val = null)
     {
-        if(is_array($key))
-        {
-            foreach($key as $k=>$v)
-            {
+        if (is_array($key)) {
+            foreach ($key as $k => $v) {
                 $this->setDefaultData($k, $v);
             }
-        }
-        else
-        {
+        } else {
             $this->defaultData[$key] = $val;
         }
 
@@ -116,7 +109,7 @@ class ViewFactory
 
     public function offsetGet($path)
     {
-        if(isset($this->views[$path]))
+        if (isset($this->views[$path]))
             return $this->views[$path];
 
         return $this->views[$path] = $this->create($path);

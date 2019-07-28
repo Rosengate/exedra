@@ -1,4 +1,5 @@
 <?php
+
 namespace Exedra\Support\Runtime\Handler;
 
 use Exedra\Contracts\Routing\ExecuteHandler;
@@ -13,7 +14,7 @@ class Controller implements ExecuteHandler
 {
     public function validateHandle($pattern)
     {
-        if(is_string($pattern) && strpos($pattern, "controller=") === 0)
+        if (is_string($pattern) && strpos($pattern, "controller=") === 0)
             return true;
 
         return false;
@@ -21,35 +22,29 @@ class Controller implements ExecuteHandler
 
     public function resolveHandle($pattern)
     {
-        return function(Context $exe) use($pattern)
-        {
-            $controllerAction	= str_replace('controller=', '', $pattern);
+        return function (Context $exe) use ($pattern) {
+            $controllerAction = str_replace('controller=', '', $pattern);
 
-            @list($cname, $action)	= explode('@', $controllerAction);
+            @list($cname, $action) = explode('@', $controllerAction);
 
-            $args	= array();
+            $args = array();
 
-            if(preg_match('/{(.*?)}/', $cname, $match))
+            if (preg_match('/{(.*?)}/', $cname, $match))
                 $cname = str_replace($match[0], $exe->param($match[1]), $cname);
 
-            if(preg_match('/{(.*?)}/', $action, $match))
-            {
+            if (preg_match('/{(.*?)}/', $action, $match)) {
                 $method = $exe->param($match[1]);
 
-                if(is_array($method))
-                {
+                if (is_array($method)) {
                     $args = $method;
                     $method = array_shift($args);
                     $action = str_replace($match[0], $method, $action);
-                }
-                else
-                {
+                } else {
                     $action = $method;
                 }
             }
 
-            $cname = implode('/', array_map(function($value)
-            {
+            $cname = implode('/', array_map(function ($value) {
                 return ucwords($value);
             }, explode('/', $cname)));
 

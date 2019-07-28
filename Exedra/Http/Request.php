@@ -1,5 +1,7 @@
 <?php
+
 namespace Exedra\Http;
+
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\UriInterface;
 
@@ -45,16 +47,16 @@ class Request extends Message implements RequestInterface
      */
     public function getRequestTarget()
     {
-        if($this->requestTarget)
+        if ($this->requestTarget)
             return $this->requestTarget;
 
         $target = $this->uri->getPath();
 
-        if($target === null)
+        if ($target === null)
             $target = '/';
 
-        if($query = $this->uri->getQuery())
-            $target = '?'.$query;
+        if ($query = $this->uri->getQuery())
+            $target = '?' . $query;
 
         return $target;
     }
@@ -127,9 +129,9 @@ class Request extends Message implements RequestInterface
      */
     public function setUri($uri)
     {
-        if(is_string($uri) || is_array($uri))
+        if (is_string($uri) || is_array($uri))
             $this->uri = new Uri($uri);
-        else if($uri instanceof Uri)
+        else if ($uri instanceof Uri)
             $this->uri = $uri;
         else
             throw new \InvalidArgumentException('Invalid uri. Must be string, array, or Uri');

@@ -1,4 +1,5 @@
 <?php
+
 namespace Exedra\Form\Input;
 
 class Input extends Base
@@ -32,11 +33,11 @@ class Input extends Base
     {
         $type = $this->type;
 
-        if($this->override)
+        if ($this->override)
             $this->attributes['value'] = $this->override;
 
         $attributes = $this->buildAttributes();
 
-        return '<input type="'.$type.'" '.$attributes.' />';
+        return '<input type="' . $type . '" ' . $attributes . ' />';
     }
 }

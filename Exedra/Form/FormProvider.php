@@ -1,4 +1,5 @@
 <?php
+
 namespace Exedra\Form;
 
 use Exedra\Application;

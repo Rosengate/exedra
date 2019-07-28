@@ -1,4 +1,5 @@
 <?php
+
 namespace Exedra\Routeller\Cache;
 
 class ArrayCache implements CacheInterface
@@ -20,7 +21,7 @@ class ArrayCache implements CacheInterface
 
     public function get($key)
     {
-        if(!isset($this->storage[$key]))
+        if (!isset($this->storage[$key]))
             return false;
 
         return $this->storage[$key];

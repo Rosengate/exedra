@@ -1,5 +1,7 @@
 <?php
+
 namespace Exedra\Provider;
+
 use Exedra\Contracts\Provider\Provider;
 
 /**
@@ -45,17 +47,16 @@ class Registry
      */
     public function add($provider)
     {
-        if(is_object($provider) && $provider instanceof Provider)
+        if (is_object($provider) && $provider instanceof Provider)
             return $this->register($provider);
 
-        if($this->lateRegistry == true)
-        {
+        if ($this->lateRegistry == true) {
             $this->providers[$provider] = false;
 
             return $this;
         }
 
-        if(method_exists($provider, 'provides') && is_array($dependencies = $provider::provides()) && count($dependencies) > 0)
+        if (method_exists($provider, 'provides') && is_array($dependencies = $provider::provides()) && count($dependencies) > 0)
             return $this->addDeferred($provider, $dependencies);
 
         $this->providers[$provider] = true;
@@ -73,27 +74,22 @@ class Registry
      */
     public function addDeferred($provider, array $dependencies)
     {
-        foreach($dependencies as $name)
-        {
+        foreach ($dependencies as $name) {
             @list($type, $dependency) = explode('.', $name, 2);
 
-            if(!$dependency)
-            {
+            if (!$dependency) {
                 $dependency = $type;
 
                 $type = 'service';
-            }
-            else
-            {
-                if(!in_array($type, array('service', 'callable', 'factory')))
-                {
+            } else {
+                if (!in_array($type, array('service', 'callable', 'factory'))) {
                     $type = 'service';
 
                     $dependency = $name;
                 }
             }
 
-            $this->providersDeferred[$type.'.'.$dependency] = $provider;
+            $this->providersDeferred[$type . '.' . $dependency] = $provider;
         }
 
         return $this;
@@ -105,7 +101,7 @@ class Registry
      */
     public function batchAdd(array $providers)
     {
-        foreach($providers as $provider)
+        foreach ($providers as $provider)
             $this->add($provider);
 
         return $this;
@@ -139,7 +135,7 @@ class Registry
      */
     public function batchRegister(array $providers)
     {
-        foreach($providers as $provider)
+        foreach ($providers as $provider)
             $this->register($provider);
 
         return $this;
@@ -159,9 +155,8 @@ class Registry
      */
     public function boot()
     {
-        foreach($this->providers as $provider => $registered)
-        {
-            if($registered === false)
+        foreach ($this->providers as $provider => $registered) {
+            if ($registered === false)
                 $this->register(new $provider);
         }
     }
@@ -174,7 +169,7 @@ class Registry
      */
     public function listen($name)
     {
-        if(!isset($this->providersDeferred[$name]))
+        if (!isset($this->providersDeferred[$name]))
             return;
 
         $this->register(new $this->providersDeferred[$name]);

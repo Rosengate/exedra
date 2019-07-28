@@ -1,4 +1,5 @@
 <?php
+
 namespace Exedra\Support\Asset;
 
 /**
@@ -41,10 +42,8 @@ class AssetFactory
 
     protected function initialize()
     {
-        foreach($this->config as $key => $value)
-        {
-            switch($key)
-            {
+        foreach ($this->config as $key => $value) {
+            switch ($key) {
                 case 'persistable':
                     $this->setPersistable($value);
                     break;
@@ -128,9 +127,9 @@ class AssetFactory
     {
         $ds = DIRECTORY_SEPARATOR;
 
-        $filename = (isset($this->assetPaths['js']) ? $this->assetPaths['js'].'/' : '').$filename;
+        $filename = (isset($this->assetPaths['js']) ? $this->assetPaths['js'] . '/' : '') . $filename;
 
-        $filepath = $this->refinePath($this->basePath.$ds.$filename);
+        $filepath = $this->refinePath($this->basePath . $ds . $filename);
 
         return new Asset($this->urlFactory, 'js', $filepath, $filename, $this->persistable);
     }
@@ -144,9 +143,9 @@ class AssetFactory
     {
         $ds = DIRECTORY_SEPARATOR;
 
-        $filename = (isset($this->assetPaths['css']) ? $this->assetPaths['css'].'/' : '').$filename;
+        $filename = (isset($this->assetPaths['css']) ? $this->assetPaths['css'] . '/' : '') . $filename;
 
-        $filepath = $this->refinePath($this->basePath.$ds.$filename);
+        $filepath = $this->refinePath($this->basePath . $ds . $filename);
 
         return new Asset($this->urlFactory, 'css', $filepath, $filename, $this->persistable);
     }
