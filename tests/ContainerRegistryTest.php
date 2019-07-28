@@ -4,8 +4,6 @@ class ContainerRegistryTest extends BaseTestCase
 	public function caseSetUp()
 	{
 		$this->app = new \Exedra\Application(__DIR__.'/app');
-
-        $this->app->provider->add(\Exedra\Support\Provider\Framework::class);
 	}
 
 	public function testApplicationServiceRegistry()
@@ -35,12 +33,6 @@ class ContainerRegistryTest extends BaseTestCase
 		// $this->assertTrue($app->module instanceof \Exedra\Module\Registry);
 
 		$this->assertTrue($app->path instanceof \Exedra\Path);
-
-		$this->assertTrue($app->path['public'] instanceof \Exedra\Path);
-
-		$this->assertTrue($app->path['routes'] instanceof \Exedra\Path);
-
-		$this->assertTrue($app->path['app'] instanceof \Exedra\Path);
 	}
 
 	public function testRuntimeServiceRegistry()

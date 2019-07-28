@@ -3,11 +3,16 @@ require_once __DIR__.'/autoload.php';
 
 class ApplicationTest extends BaseTestCase
 {
+    /**
+     * @var \Exedra\Application
+     */
+    protected $app;
+
 	public function caseSetUp()
 	{
 		$this->app = new \Exedra\Application(__DIR__.'/Factory');
 
-        $this->app->provider->add(\Exedra\Support\Provider\Framework::class);
+		$this->app->path->autoloadPsr4('App\\', 'app/src');
 
 		$this->app->map['foo']->any('/')->execute(function($exe)
 		{
@@ -19,15 +24,8 @@ class ApplicationTest extends BaseTestCase
 	{
 		$app = new \Exedra\Application(__DIR__.'/Factory');
 
-        $app->provider->add(\Exedra\Support\Provider\Framework::class);
-
 		$this->assertEquals(__DIR__.'/Factory', $app->getRootDir());
 
-		// $this->assertEquals('TestApp', $app->getNamespace());
-
-		// $this->assertEquals('TestApp\\Foo\\Bar', $app->getNamespace('Foo\\Bar'));
-
-		$this->assertEquals(realpath(__DIR__.'/Factory/public'), realpath($app->path['public']));
 
 		$this->assertEquals(realpath(__DIR__.'/Factory'), realpath($app->getRootDir()));
 	}
@@ -182,8 +180,6 @@ class ApplicationTest extends BaseTestCase
 
 		$app = new \Exedra\Application(__DIR__);
 
-        $app->provider->add(\Exedra\Support\Provider\Framework::class);
-
 		$app->map->any('/foo/bar')->execute(function()
 		{
 			return 'baz';
@@ -207,8 +203,6 @@ class ApplicationTest extends BaseTestCase
 			));
 
 		$app = new \Exedra\Application(__DIR__);
-
-        $app->provider->add(\Exedra\Support\Provider\Framework::class);
 
 		$app->map->any('/foo/bar')->execute(function()
 		{

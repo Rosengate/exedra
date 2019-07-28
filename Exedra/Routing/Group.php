@@ -635,23 +635,4 @@ class Group implements \ArrayAccess, Registrar
 
         return $this;
     }
-
-    /**
-     * Use addRouteAlias instead
-     *
-     * @param string $routeName
-     * @param string|array $alias
-     * @deprecated
-     * @return $this
-     */
-    public function addAlias($routeName, $alias)
-    {
-        if (is_array($alias))
-            foreach ($alias as $item)
-                $this->aliasIndices[$item] = $routeName;
-        else
-            $this->aliasIndices[$alias] = $routeName;
-
-        return $this;
-    }
 }

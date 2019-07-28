@@ -15,8 +15,6 @@ class MiddlewareTest extends \BaseTestCase
 	{
 		$this->app = new \Exedra\Application(__DIR__.'/Factory');
 
-        $this->app->provider->add(\Exedra\Support\Provider\Framework::class);
-
 		$this->map = $this->app->map;
 	}
 

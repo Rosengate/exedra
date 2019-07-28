@@ -1,11 +1,14 @@
 <?php
 class ImmutabilityTest extends \BaseTestCase
 {
+    /**
+     * @var \Exedra\Application
+     */
+    protected $app;
+
 	public function caseSetUp()
 	{
 		$this->app = new \Exedra\Application(__DIR__);
-
-        $this->app->provider->add(\Exedra\Support\Provider\Framework::class);
 	}
 
 	public function  testConfig()

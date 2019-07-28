@@ -4,8 +4,6 @@ class ResponseTest extends \BaseTestCase
 	public function caseSetUp()
 	{
 		$this->app = new \Exedra\Application(__DIR__);
-
-        $this->app->provider->add(\Exedra\Support\Provider\Framework::class);
 	}
 
 	public function testResponse()

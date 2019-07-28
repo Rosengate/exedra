@@ -1,7 +1,9 @@
 <?php
 namespace App;
 
-class FooProvider implements \Exedra\Provider\ProviderInterface
+use Exedra\Contracts\Provider\Provider;
+
+class FooProvider implements Provider
 {
 	public function register(\Exedra\Application $app)
 	{

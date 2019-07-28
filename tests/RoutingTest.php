@@ -1,5 +1,6 @@
 <?php
 use Exedra\Http\ServerRequest;
+use Exedra\Routing\GroupHandlers\PathHandler;
 
 class RoutingTest extends \BaseTestCase
 {
@@ -8,9 +9,11 @@ class RoutingTest extends \BaseTestCase
 		// build a basic case
 		$app = $this->app = new \Exedra\Application(__DIR__.'/Factory');
 
-        $app->provider->add(\Exedra\Support\Provider\Framework::class);
+		$app->path->register('routes', $app->path->to('app/routes'), true);
 
-		$app->map->addRoutes(array(
+        $app->routingFactory->addGroupHandler(new PathHandler($app->path['routes']));
+
+        $app->map->addRoutes(array(
 			'one'=>['path' =>'path-one', 'execute'=> 'controller=hello@world'],
 			'two'=>['path' =>'path-two', 'subroutes'=> array(
 				'one'=> ['path' =>'sub-one', 'execute'=> 'controller=hello@world'],
@@ -209,8 +212,6 @@ class RoutingTest extends \BaseTestCase
 	public function testSpecifiedNamedParam()
 	{
 		$app = new \Exedra\Application(__DIR__);
-
-        $app->provider->add(\Exedra\Support\Provider\Framework::class);
 
 		$app->map->any('/[foo|bar:name]/[baz|bad:type]')->execute(function($exe)
 		{

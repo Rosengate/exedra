@@ -1,13 +1,16 @@
 <?php
 class HandlerTest extends \BaseTestCase
 {
+    /**
+     * @var \Exedra\Application
+     */
+    protected $app;
+
 	public function caseSetUp()
 	{
 		$this->app = new \Exedra\Application(__DIR__);
 
-        $this->app->provider->add(\Exedra\Support\Provider\Framework::class);
-
-        $this->app->autoloadSrc();
+        $this->app->path->autoloadPsr4('App\\', 'app/src');
 	}
 
 	public function testFunctionalHandler()

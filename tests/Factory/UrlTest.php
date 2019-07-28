@@ -9,8 +9,6 @@ class FactoryUrlTest extends \BaseTestCase
 	{
 		$this->app = new \Exedra\Application(__DIR__);
 
-        $this->app->provider->add(\Exedra\Support\Provider\Framework::class);
-
 		$this->map = $this->app->map;
 	}
 

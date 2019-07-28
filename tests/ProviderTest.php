@@ -1,20 +1,25 @@
 <?php
 class ProviderTest extends \BaseTestCase
 {
+    /**
+     * @var \Exedra\Application
+     */
+    protected $app;
+
 	public function caseSetUp()
 	{
 		$this->app = new \Exedra\Application(__DIR__.'/Factory');
 
-        $this->app->provider->add(\Exedra\Support\Provider\Framework::class);
+        $this->app->path->register('src', 'app/src');
 
-        $this->app->autoloadSrc();
+        $this->app->path['src']->autoloadPsr4('\App\\', '');
     }
 
 	public function testRegister()
 	{
-		$this->app['provider']->add(\App\FooProvider::class);
+		$this->app->provider->add(\App\FooProvider::class);
 
-		$this->app['provider']->register(new \App\ServiceProvider);
+		$this->app->provider->register(new \App\ServiceProvider);
 
 		$this->assertEquals('bar', $this->app->get('foo'));
 
@@ -23,11 +28,11 @@ class ProviderTest extends \BaseTestCase
 
 	public function testLateRegistry()
 	{
-		$this->app['provider']->flagAsLateRegistry();
+		$this->app->provider->flagAsLateRegistry();
 
-		$this->app['provider']->add(\App\FooProvider::class);
+		$this->app->provider->add(\App\FooProvider::class);
 
-		$this->app['provider']->boot();
+		$this->app->provider->boot();
 
 		$this->assertEquals('bar', $this->app->get('foo'));
 	}

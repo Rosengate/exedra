@@ -10,8 +10,6 @@ use Exedra\Http\ServerRequest;
 use Exedra\Path;
 use Exedra\Routing\Finding;
 use Exedra\Routing\Route;
-use Exedra\Support\Asset\AssetFactory;
-use Exedra\Support\Runtime\Form\Form;
 use Exedra\Url\UrlFactory;
 
 /**
@@ -112,12 +110,7 @@ class Context extends Container
 
                 return $context->app->create('url.factory', array($context->route->getGroup(), $context->request ?: null, $baseUrl, $urlFactory->getFilters(), $urlFactory->getCallables()));
             },
-            'redirect' => array(Redirect::class, array('self.response', 'self.url')),
-            'form' => array(Form::class, array('self')),
-            // thinking of deprecating the asset as service
-            'asset' => function (Context $context) {
-                return new AssetFactory($context->url, $context->app->path['public'], $context->config->get('asset', array()));
-            }
+            'redirect' => array(Redirect::class, array('self.response', 'self.url'))
         ));
 
         $this->setUpConfig();

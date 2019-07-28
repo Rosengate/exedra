@@ -1,13 +1,16 @@
 <?php
 class FactoryViewTest extends \BaseTestCase
 {
+    /**
+     * @var \Exedra\View\ViewFactory
+     */
+    protected $viewFactory;
+
 	public function caseSetUp()
 	{
 		$app = new \Exedra\Application(__DIR__);
 
-        $app->provider->add(\Exedra\Support\Provider\Framework::class);
-
-		$this->viewFactory = new \Exedra\View\Factory($app->path['app']->create('views'));
+		$this->viewFactory = new \Exedra\View\ViewFactory($app->path->create('app/views'));
 	}
 
 	public function viewCreate()
