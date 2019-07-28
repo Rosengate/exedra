@@ -98,7 +98,9 @@ class ServerRequest extends Message implements ServerRequestInterface
         {
             @list($host, $port) = explode(':', $server['HTTP_HOST']);
             $uriParts['host'] = $host;
-            $uriParts['port'] = $port ? : 80;
+
+            if ($port)
+                $uriParts['port'] = $port;
         }
         else
         {
