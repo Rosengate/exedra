@@ -55,28 +55,6 @@ php -S localhost:9000
 ```
 Then open up your browser and type `http://localhost:9000/hello/world` to get your `Hello world`.
 
-# Roadmap to 1.0.0
-- Full Test Coverages
-- Class and components naming
-- Removal of unnecessary codes
-- More clarity to handlers (group handler, execute handler)
-
-Roadmap to 1.0.0 [99% Done]
-======
-- Adapt several PSR's styles and standards
-  - PSR-7 Message Interfaces [DONE]
-  - PSR-2 ?
-- More clarity on HTTP Response [DONE]
-- proper jargon renames
-  - 'uri' to 'path' [DONE]
-  - builder to factory [DONE]
-- Internal Routing Improvements [NEARLY?]
-- More type of Exceptions [DONE]
-- More clarity on application structure [Structure Class removed]
-- Container based \Exedra\Application\Application and \Exedra\Application\Execution\Exec ? [DONE]
-- Move \Exedra\Application\Execution\ and all the related namespaces outsides ? [DONE]
-- Do more tests [NEEDMORE?]
-
 Thank you!
 ======
 I hope you guys like it!
