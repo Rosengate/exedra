@@ -3,9 +3,7 @@ Exédra
 [![Build Status](https://travis-ci.org/Rosengate/exedra.svg?branch=master)](https://travis-ci.org/Rosengate/exedra)
 [![MIT Licence](https://badges.frapsoft.com/os/mit/mit.png?v=103)](https://github.com/Rosengate/exedra/blob/master/LICENSE)
 
-A multi-tier nestful routing oriented PHP Microframework.
-
-p/s : About to be released on stable version
+A nestful route oriented PHP Microframework.
 
 Introduction
 ======
