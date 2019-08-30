@@ -16,16 +16,16 @@ Imagine building a plane while flying it!
 
 # Features
 - Nestable routing
-- Minimal, contextual, flexible, framework agnostic
+- Minimal, contextual, flexible, components agnostic
 - Routing component built for Psr7 Http Messages
 - Psr7 middleware support
 - Container based
-- Decoupled components
 - Explicit dependency injection (no auto wiring)
+- Annotated based route-action controller (optional)
 
 Documentation
 ======
-More detailed documentation can be found at http://exedra.rosengate.com
+More detailed documentation and installation can be found at http://exedra.rosengate.com/docs
 
 # Example
 Create an index.php file with the following contents.
