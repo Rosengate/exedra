@@ -19,7 +19,7 @@ class RoutingHandlingTest extends BaseTestCase
 
     public function testRoutingHandler()
     {
-        $this->app->routingFactory->addRoutingHandler(new \App\MyRoutingHandler());
+        $this->app->routingFactory->addRoutingHandler(new \Foo\MyRoutingHandler());
 
         $this->app->map['web']->group('paths=index,contact-us,faq');
 

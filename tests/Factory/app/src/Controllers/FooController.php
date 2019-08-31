@@ -1,5 +1,5 @@
 <?php
-namespace App\Controllers;
+namespace Foo\Controllers;
 
 use Exedra\Routeller\Controller\Controller;
 use Exedra\Runtime\Context;

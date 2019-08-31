@@ -1,5 +1,5 @@
 <?php
-namespace App;
+namespace Foo;
 
 use Exedra\Contracts\Routing\RoutingHandler;
 use Exedra\Routing\Factory;

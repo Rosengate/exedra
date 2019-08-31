@@ -120,7 +120,7 @@ class ContainerTest extends BaseTestCase
 	{
 		$this->container['service']->add('foo', function()
 		{
-			return new \App\FooInvokable;
+			return new \Foo\FooInvokable;
 		});
 
 		$this->assertEquals('bar', $this->container->foo());

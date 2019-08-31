@@ -12,7 +12,7 @@ class ApplicationTest extends BaseTestCase
 	{
 		$this->app = new \Exedra\Application(__DIR__.'/Factory');
 
-		$this->app->path->autoloadPsr4('App\\', 'app/src');
+		$this->app->path->autoloadPsr4('Foo\\', 'app/src');
 
 		$this->app->map['foo']->any('/')->execute(function($exe)
 		{

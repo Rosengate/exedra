@@ -1,5 +1,5 @@
 <?php
-namespace App\Handlers;
+namespace FooBar\Handlers;
 
 use Exedra\Contracts\Routing\ExecuteHandler;
 

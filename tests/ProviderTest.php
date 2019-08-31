@@ -17,9 +17,9 @@ class ProviderTest extends \BaseTestCase
 
 	public function testRegister()
 	{
-		$this->app->provider->add(\App\FooProvider::class);
+		$this->app->provider->add(\Foo\FooProvider::class);
 
-		$this->app->provider->register(new \App\ServiceProvider);
+		$this->app->provider->register(new \Foo\ServiceProvider);
 
 		$this->assertEquals('bar', $this->app->get('foo'));
 
@@ -30,7 +30,7 @@ class ProviderTest extends \BaseTestCase
 	{
 		$this->app->provider->flagAsLateRegistry();
 
-		$this->app->provider->add(\App\FooProvider::class);
+		$this->app->provider->add(\Foo\FooProvider::class);
 
 		$this->app->provider->boot();
 
@@ -72,7 +72,7 @@ class ProviderTest extends \BaseTestCase
 
 	public function testDeferredProvider()
 	{
-		$this->app['provider']->add(\App\FooProvider::class, array('foo'));
+		$this->app['provider']->add(\Foo\FooProvider::class, array('foo'));
 
 		$this->assertEquals('bar', $this->app->foo);
 	}

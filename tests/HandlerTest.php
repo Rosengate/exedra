@@ -10,7 +10,7 @@ class HandlerTest extends \BaseTestCase
 	{
 		$this->app = new \Exedra\Application(__DIR__);
 
-        $this->app->path->autoloadPsr4('App\\', 'app/src');
+        $this->app->path->autoloadPsr4('FooBar\\', 'foobar/src');
 	}
 
 	public function testFunctionalHandler()
@@ -43,7 +43,7 @@ class HandlerTest extends \BaseTestCase
 
 	public function testClassHandler()
 	{
-		$this->app->map->addExecuteHandler('bar', \App\Handlers\FooHandler::class);
+		$this->app->map->addExecuteHandler('bar', \FooBar\Handlers\FooHandler::class);
 
 		$this->app->map['bar']->any('/')->execute('bar=baz');
 
