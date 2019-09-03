@@ -255,7 +255,7 @@ class Route implements Registrar
     /**
      * set this route as a fail route for the current group.
      *
-     * @return $this
+     * @return self
      * @throws InvalidArgumentException
      */
     public function setAsFailRoute($bool = true)
@@ -276,7 +276,7 @@ class Route implements Registrar
     /**
      * Alias to setAsFailRoute
      *
-     * @return $this
+     * @return self
      * @throws InvalidArgumentException
      */
     public function asFailRoute($bool = true)
