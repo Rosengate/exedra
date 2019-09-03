@@ -27,7 +27,14 @@ Documentation
 ======
 More detailed documentation and installation can be found at http://exedra.rosengate.com/docs
 
+# Installation
+```
+composer require rosengate/exedra
+```
+
 # Example
+Just an example to quickly test exedra.
+
 Create an index.php file with the following contents.
 ```php
 <?php
@@ -52,6 +59,8 @@ And run a simple web server on the same dir.
 php -S localhost:9000
 ```
 Then open up your browser and type `http://localhost:9000/hello/world` to get your `Hello world`.
+
+Heads up to the documentation http://exedra.rosengate.com/docs for more detailed setup.
 
 Thank you!
 ======
