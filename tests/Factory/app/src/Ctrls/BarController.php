@@ -1,5 +1,5 @@
 <?php
-namespace Foo\Controllers;
+namespace Foo\Ctrls;
 
 use Exedra\Routeller\Controller\Controller;
 use Exedra\Routing\Group;

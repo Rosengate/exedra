@@ -9,7 +9,7 @@ class ControllerTest extends BaseTestCase
     {
         $app = $this->app = new \Exedra\Application(__DIR__.'/Factory');
         $app->provider->add(\Exedra\Routeller\RoutellerProvider::class);
-        $app->map['foo']->any('/foo')->group(\Foo\Controllers\FooController::class);
+        $app->map['foo']->any('/foo')->group(\Foo\Ctrls\FooController::class);
     }
     public function request($path, $method = 'GET')
     {
