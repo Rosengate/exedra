@@ -46,8 +46,12 @@ require_once __DIR__ . '/vendor/autoload.php';
 
 $app = new Application(__DIR__);
 
-$app->map['web']->any('/hello')->group(function(Group $group) {
-    $group['welcome']->get('/:name')->execute(function(Context $context) {
+$app->map['web']->any('/hello')->group(function (Group $group) {
+    $group->middleware(function (Context $context) {
+        return strtoupper($context->next($context));
+    });
+
+    $group['welcome']->get('/:name')->execute(function (Context $context) {
         return 'Hello ' . $context->param('name');
     });
 });
@@ -58,7 +62,7 @@ And run a simple web server on the same dir.
 ```
 php -S localhost:9000
 ```
-Then open up your browser and type `http://localhost:9000/hello/world` to get your `Hello world`.
+Then open up your browser and type `http://localhost:9000/hello/world` to get your `HELLO WORLD`.
 
 Heads up to the documentation http://exedra.rosengate.com/docs for more detailed setup.
 
