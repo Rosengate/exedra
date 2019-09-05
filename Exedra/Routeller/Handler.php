@@ -42,6 +42,11 @@ class Handler implements GroupHandler
      */
     protected $app;
 
+    /**
+     * @var \ReflectionClass[]
+     */
+    protected $classesReflection = [];
+
     public function __construct(Application $app = null, CacheInterface $cache = null, array $options = array())
     {
         $this->app = $app;
@@ -56,6 +61,9 @@ class Handler implements GroupHandler
     public function validateGroup($pattern, Route $route = null)
     {
         if (is_string($pattern)) {
+            if (strpos($pattern, 'routeller_class') === 0)
+                return true;
+
             if (strpos($pattern, 'routeller=') === 0)
                 return true;
 
@@ -78,21 +86,39 @@ class Handler implements GroupHandler
     }
 
     /**
+     * @param $className
+     * @return \ReflectionClass
+     */
+    protected function getClassReflection($className)
+    {
+        if (isset($this->classesReflection[$className]))
+            return $this->classesReflection[$className];
+
+        return $this->classesReflection[$className] = new \ReflectionClass($className);
+    }
+
+    /**
      * @param Factory $factory
      * @param $routing
      * @param Route|null $parentRoute
      * @return \Exedra\Routing\Group
      * @throws Exception
      */
-    public function resolveGroup(Factory $factory, $controller, Route $parentRoute = null)
+    public function resolveGroup(Factory $factory, $pattern, Route $parentRoute = null)
     {
         $group = $factory->createGroup(array(), $parentRoute);
 
-        if (is_object($controller)) {
-            $classname = get_class($controller);
+        if (is_object($pattern)) {
+//            $classname = get_class($pattern);
+
+            $controller = $pattern;
         } else {
-            if (strpos($controller, 'routeller=') === 0) {
-                list($classname, $method) = explode('@', str_replace('routeller=', '', $controller));
+            // resolve pattern
+            if (strpos($pattern, 'routeller_class=') === 0) {
+                return $this->resolveGroup($factory, str_replace('routeller_class=', '', $pattern), $parentRoute);
+            // pattern is uncertain
+            } else if (strpos($pattern, 'routeller=') === 0) {
+                list($classname, $method) = explode('@', str_replace('routeller=', '', $pattern));
 
                 $controller = $classname::instance()->{$method}($this->app);
 
@@ -100,18 +126,20 @@ class Handler implements GroupHandler
                     throw new Exception('Unable to validate the routing group for [' . $classname . '::' . $method . '()]');
 
                 return $this->resolveGroup($factory, $controller, $parentRoute);
-            } else if (strpos($controller, 'routeller_call') === 0) {
-                list($classname, $method) = explode('@', str_replace('routeller_call=', '', $controller));
+
+            // for sub prefix
+            } else if (strpos($pattern, 'routeller_call') === 0) {
+                list($classname, $method) = explode('@', str_replace('routeller_call=', '', $pattern));
 
                 $classname::instance()->{$method}($group, $this->app);
 
                 return $group;
             }
 
-            $classname = $controller;
+            $classname = $pattern;
 
             /** @var Controller $controller */
-            $controller = $controller::instance();
+            $controller = $classname::instance();
         }
 
         $key = md5(get_class($controller));
@@ -119,7 +147,7 @@ class Handler implements GroupHandler
         $entries = null;
 
         if ($this->isAutoReload) {
-            $reflection = new \ReflectionClass($controller);
+            $reflection = $this->getClassReflection(get_class($controller));
 
             $lastModified = filemtime($reflection->getFileName());
 
@@ -130,6 +158,31 @@ class Handler implements GroupHandler
                     $this->cache->clear($key);
                 } else {
                     $entries = $cache['entries'];
+
+                    // check for deferred routing cache
+                    foreach ($entries as $entry) {
+                        if (!isset($entry['route']))
+                            continue;
+
+                        if (isset($entry['route']['properties']) &&
+                            isset($entry['route']['properties']['subroutes']) &&
+                            is_string($entry['route']['properties']['subroutes']) && strpos($entry['route']['properties']['subroutes'], 'routeller_class=') === 0) {
+
+                            @list($subroutesClass) = explode('@', str_replace('routeller_class=', '', $entry['route']['properties']['subroutes']));
+                            $subroutesKey = md5($subroutesClass);
+                            $subroutesCache = $this->cache->get($subroutesKey);
+
+                            $ref = $this->getClassReflection($subroutesClass);
+
+                            // check cache for subroutes
+                            if (!$subroutesCache || ($subroutesCache && $subroutesCache['last_modified'] != filemtime($ref->getFileName()))) {
+                                $entries = null;
+                                $this->cache->clear($key);
+                                $this->cache->clear($subroutesKey);
+                                break;
+                            }
+                        }
+                    }
                 }
             }
         } else {
@@ -163,10 +216,11 @@ class Handler implements GroupHandler
             return $group;
         }
 
-        if (!$this->isAutoReload)
-            $reflection = new \ReflectionClass($controller);
+        if (!$this->isAutoReload) {
+            $reflection = $this->getClassReflection(get_class($controller));
+        }
 
-        if (!$reflection->isSubclassOf(Controller::class))
+        if (isset($reflection) && !$reflection->isSubclassOf(Controller::class))
             throw new Exception('[' . $classname . '] must be a type of [' . Controller::class . ']');
 
         $reader = $this->createReader();
@@ -235,14 +289,21 @@ class Handler implements GroupHandler
             $properties = $reader->getRouteProperties($reflectionMethod);
 
             // read from route properties from the class itself
-            if ($type == 'subroutes' && isset($properties['deferred'])) {
+            $subrouteClass = null;
+
+            if ($type == 'subroutes') {
                 $cname = $controller->{$methodName}($this->app);
-                $controllerRef = new \ReflectionClass($controller->{$methodName}($this->app));
 
-                if (!$controllerRef->isSubclassOf(Controller::class))
-                    throw new Exception('[' . $cname . '] must be a type of [' . Controller::class . ']');
+                if ($this->validateGroup($cname)) {
+                    $controllerRef = $this->getClassReflection($controller->{$methodName}($this->app));
 
-                $properties = $reader->getRouteProperties($controllerRef);
+                    if (!$controllerRef->isSubclassOf(Controller::class))
+                        throw new Exception('[' . $cname . '] must be a type of [' . Controller::class . ']');
+
+                    $properties = $this->propertiesDeferringMerge($reader->getRouteProperties($controllerRef), $properties);
+
+                    $subrouteClass = $cname;
+                }
             }
 
             if ($method && !isset($properties['method']))
@@ -265,6 +326,7 @@ class Handler implements GroupHandler
 
             $group->addRoute($route = $factory->createRoute($group, $routeName = (isset($properties['name']) ? $properties['name'] : $routeName), $properties));
 
+            // caching preparation
             $entry = array(
                 'route' => array(
                     'name' => $routeName,
@@ -281,7 +343,11 @@ class Handler implements GroupHandler
 
                 $entry['route']['properties']['subroutes'] = 'routeller_call=' . $classname . '@' . $methodName;
             } else if (isset($properties['subroutes'])) {
-                $entry['route']['properties']['subroutes'] = 'routeller=' . $classname . '@' . $methodName;
+                if ($subrouteClass)
+                    $entry['route']['properties']['subroutes'] = 'routeller_class=' . $subrouteClass;
+                else
+                    $entry['route']['properties']['subroutes'] = 'routeller=' . $classname . '@' . $methodName;
+
             } else if ($type == 'route_call') {
                 $controller->{$methodName}($route, $this->app);
                 $entry['route']['route_call'] = $classname . '@' . $methodName;
@@ -293,6 +359,18 @@ class Handler implements GroupHandler
         $this->cache->set($key, $entries, isset($lastModified) ? $lastModified : filemtime($reflection->getFileName()));
 
         return $group;
+    }
+
+    /**
+     * Merge properties for deferred method
+     *
+     * @param array $properties
+     * @param array $controllerProperties
+     * @return array
+     */
+    public function propertiesDeferringMerge(array $controllerProperties, array $properties)
+    {
+        return array_merge($controllerProperties, $properties);
     }
 
     /**

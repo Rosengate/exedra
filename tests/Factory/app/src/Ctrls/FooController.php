@@ -57,9 +57,6 @@ class FooController extends Controller
         return BarController::class;
     }
 
-    /**
-     * @deferred
-     */
     public function groupDeferred()
     {
         return DeferredTestController::class;
