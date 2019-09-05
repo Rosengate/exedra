@@ -58,4 +58,9 @@ class ControllerTest extends BaseTestCase
     {
         $this->assertEquals('middleware confvalue', $this->app->execute('#testconf')->response->getBody());
     }
+
+    public function testDeferred()
+    {
+        $this->assertEquals('foo.deferred-test.get', $this->request('foo/deferred/bar')->route->getAbsoluteName());
+    }
 }

@@ -10,8 +10,14 @@ class AnnotationsReader extends Reader
     protected static $exceptions = array(
         'return' => 1,
         'param' => 1,
-        'throws' => 1
+        'throws' => 1,
+        'package' => 1
     );
+
+    public function addExceptionTags(array $tags)
+    {
+        static::$exceptions = array_merge(static::$exceptions, array_flip($tags));
+    }
 
     /**
      * @param \Reflector $Reflection

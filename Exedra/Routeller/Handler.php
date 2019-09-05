@@ -234,6 +234,10 @@ class Handler implements GroupHandler
 
             $properties = $reader->getRouteProperties($reflectionMethod);
 
+            // read from route properties from the class itself
+            if ($type == 'subroutes' && isset($properties['deferred']))
+                $properties = $reader->getRouteProperties(new \ReflectionClass($controller->{$methodName}($this->app)));
+
             if ($method && !isset($properties['method']))
                 $properties['method'] = $method;
 
