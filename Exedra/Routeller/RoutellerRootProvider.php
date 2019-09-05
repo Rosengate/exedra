@@ -15,7 +15,7 @@ class RoutellerRootProvider implements Provider
 
     protected $cache;
 
-    public function __construct($controller, CacheInterface $cache = null, array $options = array())
+    public function __construct($controller = null, CacheInterface $cache = null, array $options = array())
     {
         $this->controller = $controller;
 
@@ -33,6 +33,9 @@ class RoutellerRootProvider implements Provider
 
         if (!$handler->validateGroup($this->controller))
             throw new Exception('Invalid pattern');
+
+        $app->routingFactory->addGroupHandler($handler);
+        $app->routingFactory->addExecuteHandlers(new ExecuteHandler());
 
         $controller = $this->controller;
 
