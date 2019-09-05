@@ -33,12 +33,12 @@ class Container implements \ArrayAccess
 
     /**
      * registry exist check
-     * @param string $type
+     * @param string $name
      * @return bool
      */
-    public function offsetExists($type)
+    public function offsetExists($name)
     {
-        return isset($this->services[$type]);
+        return isset($this->services[$name]) || $this->services['service']->has($name);
     }
 
     /**
@@ -194,7 +194,7 @@ class Container implements \ArrayAccess
      */
     public function __isset($name)
     {
-        return $this->services['service']->has($name);
+        return $this->offsetExists($name);
     }
 
     /**

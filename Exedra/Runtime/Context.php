@@ -126,6 +126,17 @@ class Context extends Container
     }
 
     /**
+     * Override main and check the app instance
+     *
+     * @param string $name
+     * @return bool
+     */
+    public function offsetExists($name)
+    {
+        return parent::offsetExists($name) || $this->app->offsetExists('@' . $name);
+    }
+
+    /**
      * Get application instance
      * @return \Exedra\Application
      */
