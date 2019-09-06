@@ -7,21 +7,19 @@ A nestful route oriented PHP Microframework.
 
 Introduction
 ======
-This PHP microframework focuses on nestable/groupable routing, mainly through Http Request components, with middlewarable routes and which hopefully will provide much modular application execution. Route is unique, and identifiable by name, tag, and queriable by Http Request. Imagine developing an application down the depth without losing the identity of the executions you planned, controlling the routes hierarchically with your own layers of middlewares.
+This PHP microframework focuses on nestable/groupable URI path/segments based routing, that allows you to prototype your application through URI routing without losing control over it's depth. Route is unique and identifiable by name, tag and queriable through request dispatch, or finder within URL factory. Along with nested routing, is middlewarable routing group to give you more control over your application design.
 
 The goal is to be contextual, explicitful while being simple and extremely minimal at the same time. It can be intended to work 
 as a supporting framework to your existing application.
 
-Imagine building a plane while flying it!
-
 # Features
 - Nestable routing
 - Minimal, contextual, flexible, components agnostic
+- Annotated based route-action controller (optional)
 - Routing component built for Psr7 Http Messages
 - Psr7 middleware support
 - Container based
-- Explicit dependency injection (no auto wiring)
-- Annotated based route-action controller (optional)
+- Explicit dependency injection (not auto wiring)
 
 Documentation
 ======
