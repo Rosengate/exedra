@@ -163,11 +163,11 @@ class Finding
             foreach ($group->getExecuteHandlers() as $name => $handler)
                 $handlers[$name] = $handler;
 
-            foreach ($group->getMiddlewares() as $key => $middleware)
+            foreach ($group->getMiddlewares() as $middleware)
                 $callStack->addCallable($this->resolveMiddleware($middleware[0]), $middleware[1]);
 
             // append all route middlewares
-            foreach ($route->getProperty('middleware') as $key => $middleware)
+            foreach ($route->getProperty('middleware') as $middleware)
                 $callStack->addCallable($this->resolveMiddleware($middleware[0]), $middleware[1]);
 
             foreach ($route->getAttributes() as $key => $value) {

@@ -869,7 +869,7 @@ class Route implements Registrar
             $this->properties['middleware'][] = array($middleware, $properties);
         } else {
             foreach ($middleware as $m)
-                $this->properties['middleware'][] = array($m);
+                $this->properties['middleware'][] = array($m, []);
         }
 
         return $this;
@@ -907,14 +907,9 @@ class Route implements Registrar
      * @param null $name
      * @return $this
      */
-    public function middleware($middleware, $name = null)
+    public function middleware($middleware)
     {
-        if ($name)
-            $this->properties['middleware'][$name] = $middleware;
-        else
-            $this->properties['middleware'][] = $middleware;
-
-        return $this;
+        return $this->addMiddleware($middleware);
     }
 
     /**
