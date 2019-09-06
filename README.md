@@ -12,8 +12,6 @@ This PHP microframework focuses on nestable/groupable URI path/segments based ro
 The goal is to be contextual, explicitful while being simple and extremely minimal at the same time. It can be intended to work 
 as a supporting framework to your existing application.
 
-Imagine building a plane while flying it!
-
 # Features
 - Nestable routing
 - Minimal, contextual, flexible, components agnostic
