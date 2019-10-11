@@ -5,7 +5,7 @@ namespace Exedra\Contracts\Routing;
 use Exedra\Routing\Route;
 use Psr\Http\Message\ServerRequestInterface;
 
-interface Validator
+interface ParamValidator
 {
     /**
      * Validate route in route matching process

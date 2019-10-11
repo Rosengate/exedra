@@ -1,5 +1,6 @@
 <?php namespace Exedra\Routing;
 
+use Exedra\Contracts\Routing\RouteValidator;
 use Exedra\Contracts\Routing\Registrar;
 use Exedra\Exception\Exception;
 use Exedra\Exception\InvalidArgumentException;
@@ -61,6 +62,11 @@ class Group implements \ArrayAccess, Registrar
      * @var string|null $failRoute
      */
     protected $failRoute = null;
+
+    /**
+     * @var RouteValidator[]
+     */
+    protected $validators = [];
 
     public function __construct(Factory $factory, Route $route = null, array $routes = array())
     {
@@ -421,6 +427,29 @@ class Group implements \ArrayAccess, Registrar
         return $route ?: null;
     }
 
+    protected function validate($route, $request, $groupUriPath)
+    {
+        foreach ($this->validators as $validator) {
+            if (!$validator->validate($route, $request, $groupUriPath))
+                return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Alias to addValidator
+     *
+     * @param RouteValidator $validator
+     * @return Group
+     */
+    public function addValidator(RouteValidator $validator)
+    {
+        $this->validators[] = $validator;
+
+        return $this;
+    }
+
     /**
      * A recursivable functionality to find route under this routing group, by the given request instance.
      * @param ServerRequestInterface $request
@@ -433,6 +462,13 @@ class Group implements \ArrayAccess, Registrar
     {
         // loop the group and find.
         foreach ($this->storage as $route) {
+            if (count($this->validators) > 0 && !$this->validate($route, $request, $groupUriPath))
+                return array(
+                    'route' => false,
+                    'parameter' => array(),
+                    'continue' => false
+                );
+
             $result = $route->match($request, $groupUriPath);
 
             $remainingPath = $route->getRemainingPath($groupUriPath);
@@ -467,10 +503,18 @@ class Group implements \ArrayAccess, Registrar
         }
 
         if ($this->failRoute)
-            return array('route' => $this->findRoute($this->failRoute), 'parameter' => array('request' => $request), 'continue' => false);
+            return array(
+                'route' => $this->findRoute($this->failRoute),
+                'parameter' => array('request' => $request),
+                'continue' => false
+            );
 
         // false default.
-        return array('route' => false, 'parameter' => array(), 'continue' => false);
+        return array(
+            'route' => false,
+            'parameter' => array(),
+            'continue' => false
+        );
     }
 
     /**

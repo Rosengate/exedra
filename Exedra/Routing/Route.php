@@ -1,7 +1,7 @@
 <?php namespace Exedra\Routing;
 
 use Exedra\Contracts\Routing\Registrar;
-use Exedra\Contracts\Routing\Validator;
+use Exedra\Contracts\Routing\ParamValidator;
 use Exedra\Exception\InvalidArgumentException;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -42,7 +42,7 @@ class Route implements Registrar
         'requestable' => true,
         'middleware' => array(),
         'execute' => null,
-        'validators' => array()
+        'param_validators' => array()
     );
 
     /**
@@ -390,7 +390,7 @@ class Route implements Registrar
                     'continue' => $result['continue']
                 );
 
-            if ($this->properties['validators']) {
+            if ($this->properties['param_validators']) {
                 $flag = $this->matchValidators($request, $path, $result['parameter']);
 
                 if ($flag === false)
@@ -425,14 +425,14 @@ class Route implements Registrar
      */
     protected function matchValidators(ServerRequestInterface $request, $path, array &$parameters = array())
     {
-        foreach ($this->properties['validators'] as $validation) {
+        foreach ($this->properties['param_validators'] as $validation) {
             if (is_string($validation)) {
                 if (!isset(static::$classCaches[$validation])) {
-                    /** @var Validator $validationObj */
+                    /** @var ParamValidator $validationObj */
                     $validationObj = new $validation;
 
-                    if (!($validationObj instanceof Validator))
-                        throw new InvalidArgumentException('The [' . $validation . '] validator must be type of [' . Validator::class . '].');
+                    if (!($validationObj instanceof ParamValidator))
+                        throw new InvalidArgumentException('The [' . $validation . '] validator must be type of [' . ParamValidator::class . '].');
                 } else {
                     $validationObj = static::$classCaches[$validation];
                 }
@@ -441,7 +441,7 @@ class Route implements Registrar
             } else if (is_object($validation) && ($validation instanceof \Closure)) {
                 $flag = $validation($parameters, $this, $request, $path);
             } else {
-                throw new InvalidArgumentException('The validator must be type of [' . Validator::class . '] or [' . \Closure::class . ']');
+                throw new InvalidArgumentException('The validator must be type of [' . ParamValidator::class . '] or [' . \Closure::class . ']');
             }
 
             if (!$flag || $flag === false)
@@ -1012,7 +1012,7 @@ class Route implements Registrar
      * Alias to setAttribute(key, value)
      * @param string $key
      * @param string $value
-     * @return $this
+     * @return Route
      */
     public function attr($key, $value = null)
     {
@@ -1021,26 +1021,19 @@ class Route implements Registrar
 
     /**
      *
-     * @param mixed $validator
+     * @param string|ParamValidator $validator
      * @return $this
      */
-    public function validate($validator)
+    public function validateParam($validator)
     {
-        $this->properties['validators'][] = $validator;
+        if (is_string($validator))
+            $validator = new $validator;
+
+        $this->properties['param_validators'][] = $validator;
 
         return $this;
     }
 
-    /**
-     * @param mixed $validator
-     * @return $this
-     */
-    public function addValidator($validator)
-    {
-        $this->properties['validators'][] = $validator;
-
-        return $this;
-    }
 
     /**
      * Get route property
