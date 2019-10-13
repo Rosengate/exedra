@@ -7,6 +7,7 @@ use Exedra\Exception\NotFoundException;
 use Exedra\Http\ServerRequest;
 use Exedra\Routing\Group;
 use MongoDB\Driver\Server;
+use Psr\Http\Message\UriInterface;
 
 /**
  * A route oriented url generator
@@ -104,11 +105,14 @@ class UrlGenerator implements UrlGeneratorInterface
     /**
      * Get url prefixed with $baseUrl
      * @param string $path (optional)
+     * @param UriInterface|null $baseUri
      * @return string
      */
-    public function base($path = null)
+    public function base($path = null, UriInterface $baseUri = null)
     {
-        return ($this->baseUrl ? rtrim($this->baseUrl, '/') . '/' : '/') . ($path ? trim($path, '/') : '');
+        $baseUrl = $baseUri ? (string) $baseUri : $this->baseUrl;
+
+        return ($baseUrl ? rtrim($baseUrl, '/') . '/' : '/') . ($path ? trim($path, '/') : '');
     }
 
     /**
@@ -154,7 +158,7 @@ class UrlGenerator implements UrlGeneratorInterface
 
         $path = $route->getAbsolutePath($data);
 
-        return $this->base($path) . ($query ? '?' . http_build_query($query) : null);
+        return $this->base($path, $route->getBaseUri()) . ($query ? '?' . http_build_query($query) : null);
     }
 
     public function parent()

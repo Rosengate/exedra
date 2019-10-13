@@ -532,6 +532,15 @@ class Group implements \ArrayAccess, Registrar
     }
 
     /**
+     * Whether this is a root group
+     * @return bool
+     */
+    public function isRoot()
+    {
+        return !$this->route;
+    }
+
+    /**
      * @param mixed $name
      * @return bool
      */

@@ -5,6 +5,7 @@ namespace Exedra\Routeller;
 use Exedra\Application;
 use Exedra\Contracts\Routing\GroupHandler;
 use Exedra\Exception\Exception;
+use Exedra\Http\Uri;
 use Exedra\Routing\Factory;
 use Exedra\Routing\Group;
 use Exedra\Routing\Route;
@@ -199,9 +200,11 @@ class Handler implements GroupHandler
                         return call_user_func_array(array($controller, $entry['middleware']['handle']), func_get_args());
                     }, $entry['middleware']['properties']);
                 } else if (isset($entry['route'])) {
-                    $properties = $entry['route']['properties'];
+//                    $properties = $entry['route']['properties'];
 
-                    $group->addRoute($route = $factory->createRoute($group, isset($properties['name']) ? $properties['name'] : $entry['route']['name'], $properties));
+                    $merges = $this->resolveConfig($entry['route']['properties']);
+
+                    $group->addRoute($route = $factory->createRoute($group, isset($merges['name']) ? $merges['name'] : $entry['route']['name'], $merges));
 
                     if (isset($entry['route']['route_call'])) {
                         list($classname, $methodName) = explode('@', $entry['route']['route_call']);
@@ -324,7 +327,9 @@ class Handler implements GroupHandler
             if (isset($properties['inject']) && is_string($properties['inject']))
                 $properties['inject'] = array_map('trim', explode(',', trim($properties['inject'], ' []')));
 
-            $group->addRoute($route = $factory->createRoute($group, $routeName = (isset($properties['name']) ? $properties['name'] : $routeName), $properties));
+            $merges = $this->resolveConfig($properties);
+
+            $group->addRoute($route = $factory->createRoute($group, $routeName = (isset($merges['name']) ? $merges['name'] : $routeName), $merges));
 
             // caching preparation
             $entry = array(
@@ -359,6 +364,19 @@ class Handler implements GroupHandler
         $this->cache->set($key, $entries, isset($lastModified) ? $lastModified : filemtime($reflection->getFileName()));
 
         return $group;
+    }
+
+    protected function resolveConfig(array $properties)
+    {
+        $merges = $properties;
+
+        foreach ($properties as $key => $value) {
+            if (is_string($value) && strpos($value, '$config.') === 0) {
+                $merges[$key] = $this->app->config->get(trim($value, '$config.'));
+            }
+        }
+
+        return $merges;
     }
 
     /**

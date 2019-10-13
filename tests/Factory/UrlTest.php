@@ -15,13 +15,13 @@ class FactoryUrlTest extends \BaseTestCase
 	public function testUrlCreate()
 	{
 		$this->map->addRoutes(array(
-			'tester'=>['uri'=> 'tester/[:route]', 'execute'=>function($exe)
+			'tester'=>['path'=> 'tester/[:route]', 'execute'=>function($exe)
 				{
 					$params = $exe->param('params') ? : array();
 					return $exe->url->route($exe->param('route'), $params);
 				}],
-			'r1'=>['uri'=> 'uri1/uri2', 'execute'=>function(){ }],
-			'r2'=>['uri'=> 'uri1/[:param]', 'execute'=>function(){ }]
+			'r1'=>['path'=> 'uri1/uri2', 'execute'=>function(){ }],
+			'r2'=>['path'=> 'uri1/[:param]', 'execute'=>function(){ }]
 			));
 
 		// simple uri
@@ -98,8 +98,17 @@ class FactoryUrlTest extends \BaseTestCase
 
 		$this->app->map['foo']->any('/')->execute(function(){ });
 	}
+
+    public function testBaseUri()
+    {
+        $this->app->map['foo']->uri('http://localhost:9000/baz')
+            ->any('/foo')
+            ->group(function(\Exedra\Routing\Group $group) {
+                $group['bar']->get('/foo/bar')
+                    ->execute(function() {
+                    });
+            });
+
+        $this->assertEquals('http://localhost:9000/baz/foo/foo/bar', $this->app->url->route('@foo.bar'));
+	}
 }
-
-
-
-?>

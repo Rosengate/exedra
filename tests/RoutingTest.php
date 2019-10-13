@@ -35,6 +35,11 @@ class RoutingTest extends \BaseTestCase
 		return ServerRequest::createFromArray($params);
 	}
 
+    public function sendUriRequest($uri, $method = 'GET')
+    {
+        return $this->app->request(ServerRequest::createFromArray(['method' => $method, 'uri' => $uri]))->response->getBody();
+    }
+
 	public function testApp()
 	{
 		$this->assertEquals('Exedra\Application', get_class($this->app));
@@ -287,5 +292,25 @@ class RoutingTest extends \BaseTestCase
 		$this->map['fooo']->get('/')->group('bar.php');
 
 		$this->assertEquals($this->app->execute('fooo.bad')->response->getBody(), 'baz');
+	}
+
+    public function testBaseURIRouting()
+    {
+        $this->map['hello']->uri(new \Exedra\Http\Uri('www.rosengate.com'))
+            ->get('/helo')
+            ->execute(function(){return 'w';});
+
+        $this->map['foo']->uri(new \Exedra\Http\Uri('www.rosengate.com/:hello'))
+            ->get('/:world')
+            ->group(function (\Exedra\Routing\Group $group) {
+                $group['bar']->get('/z')->execute(function(\Exedra\Runtime\Context $context) {
+                    return $context->param('world') . ' ' . $context->param('hello');
+                });
+            });
+
+        $request = $this->createRequest(['uri' => new \Exedra\Http\Uri('www.rosengate.com/helo')]);
+
+        $this->assertEquals('w', $this->app->request($request)->response->getBody());
+        $this->assertEquals('bar foo', $this->sendUriRequest('www.rosengate.com/foo/bar/z'));
 	}
 }

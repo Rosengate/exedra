@@ -2,8 +2,12 @@
 
 use Exedra\Contracts\Routing\Registrar;
 use Exedra\Contracts\Routing\ParamValidator;
+use Exedra\Exception\Exception;
 use Exedra\Exception\InvalidArgumentException;
+use Exedra\Exception\RoutingException;
+use Exedra\Http\Uri;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Message\UriInterface;
 
 class Route implements Registrar
 {
@@ -38,6 +42,7 @@ class Route implements Registrar
      * - requestable
      */
     protected $properties = array(
+        'uri' => null,
         'path' => '',
         'requestable' => true,
         'middleware' => array(),
@@ -63,7 +68,6 @@ class Route implements Registrar
      */
     protected static $aliases = array(
         'bind:middleware' => 'middleware',
-        'uri' => 'path',
         'group' => 'subroutes',
         'handler' => 'execute',
         'verb' => 'method',
@@ -364,6 +368,46 @@ class Route implements Registrar
     }
 
     /**
+     * @param UriInterface $uri
+     * @param UriInterface $requestUri
+     * @return array|false
+     */
+    protected function matchUri(UriInterface $uri , UriInterface $requestUri)
+    {
+        $basePort = $uri->getPort() ? : 80;
+        $requestPort = $requestUri->getPort() ? : 80;
+
+        $params = [];
+
+        if ($basePort != $requestPort) {
+            return false;
+        }
+
+        if (strpos($uri->getHost(), '{') === 0) {
+            $uriHost = explode('.', $uri->getHost());
+            $requestHost = explode('.', $requestUri->getHost());
+
+            $param = trim(array_shift($uriHost), '{}');
+            $value = array_shift($requestHost);
+
+            if (implode('.', $uriHost) != implode('.', $requestHost))
+                return false;
+
+            $params[$param] = $value;
+
+            return array(
+                'uri' => $uri,
+                'params' => $params
+            );
+        } else if ($uri->getHost() == $requestUri->getHost()) {
+            return array(
+                'uri' => $uri,
+                'params' => []
+            );
+        }
+    }
+
+    /**
      * Validate uri path against the request
      * @param ServerRequestInterface $request
      * @param string $path
@@ -371,6 +415,27 @@ class Route implements Registrar
      */
     public function match(ServerRequestInterface $request, $path)
     {
+        $params = array();
+
+        $routePath = $this->properties['path'];
+
+        if ($this->properties['uri']) {
+            /** @var Uri $baseUri */
+            $uriResult = $this->matchUri($this->properties['uri'], $request->getUri());
+
+            if ($uriResult === false)
+                return array(
+                    'route' => false,
+                    'parameter' => false,
+                    'continue' => false
+                );
+
+            $resultPath = trim($this->properties['uri']->getPath(), '/');
+
+            if ($resultPath)
+                $routePath = trim($resultPath . '/' . $routePath, '/');
+        }
+
         if (isset($this->properties['method'])) {
             if (!in_array(strtolower($request->getMethod()), $this->properties['method']))
                 return array(
@@ -380,39 +445,38 @@ class Route implements Registrar
                 );
         }
 
-        if (isset($this->properties['path'])) {
-            $result = $this->matchPath($path);
+        // path validation
+        $result = $this->matchPath($path, $routePath);
 
-            if (!$result['matched'])
-                return array(
-                    'route' => false,
-                    'parameter' => $result['parameter'],
-                    'continue' => $result['continue']
-                );
-
-            if ($this->properties['param_validators']) {
-                $flag = $this->matchValidators($request, $path, $result['parameter']);
-
-                if ($flag === false)
-                    return array(
-                        'route' => false,
-                        'parameter' => false,
-                        'continue' => false
-                    );
-            }
-
+        if (!$result['matched'])
             return array(
-                'route' => $this,
+                'route' => false,
                 'parameter' => $result['parameter'],
                 'continue' => $result['continue']
             );
+
+        if ($this->properties['param_validators']) {
+            $flag = $this->matchValidators($request, $path, $result['parameter']);
+
+            if ($flag === false)
+                return array(
+                    'route' => false,
+                    'parameter' => false,
+                    'continue' => false
+                );
         }
 
+        return array(
+            'route' => $this,
+            'parameter' => $result['parameter'],
+            'continue' => $result['continue']
+        );
+/*
         return array(
             'route' => false,
             'parameter' => array(),
             'continue' => false
-        );
+        );*/
     }
 
     /**
@@ -455,13 +519,12 @@ class Route implements Registrar
      * Validate given uri path
      * Return array of matched flag, and parameter.
      * @param string $path
-     * @return array|boolean
+     * @param string $routePath
+     * @return array|bool
      */
-    protected function matchPath($path)
+    protected function matchPath($path, $routePath)
     {
         $continue = true;
-
-        $routePath = $this->properties['path'];
 
         if ($this->properties['requestable'] === false)
             return false;
@@ -622,10 +685,15 @@ class Route implements Registrar
 
         $newPaths = array();
 
-        for ($i = count(explode('/', $this->properties['path'])); $i < count($paths); $i++)
+        $routePath = $this->properties['path'];
+
+        if ($this->properties['uri'] && $uriPath = trim($this->properties['uri']->getPath(), '/'))
+            $routePath = trim($uriPath . '/' . $routePath, '/');
+
+        for ($i = count(explode('/', $routePath)); $i < count($paths); $i++)
             $newPaths[] = $paths[$i];
 
-        return $this->properties['path'] != '' ? implode('/', $newPaths) : $path;
+        return $routePath != '' ? implode('/', $newPaths) : $path;
     }
 
     /**
@@ -731,6 +799,46 @@ class Route implements Registrar
     }
 
     /**
+     * Set complete URI
+     * @param UriInterface|string $uri
+     * @return Route
+     * @throws RoutingException
+     */
+    public function setUri($uri)
+    {
+        if (!$this->group->isRoot())
+            throw new RoutingException('URI routing can only be set on first group of routing');
+
+        if (is_null($uri))
+            throw new RoutingException('URI for route [' . $this->name . '] cannot be null');
+
+        if (is_string($uri))
+            $uri = new Uri($uri);
+
+        $this->setProperty('uri', $uri);
+
+        return $this;
+    }
+
+    /**
+     * Alias to setURI
+     * @param UriInterface|string $uri
+     * @return Route
+     * @throws RoutingException
+     */
+    public function uri($uri)
+    {
+        return $this->setUri($uri);
+    }
+
+    public function getBaseUri()
+    {
+        $routes = $this->getFullRoutes();
+
+        return $routes[0]->hasProperty('uri') ? $routes[0]->getProperty('uri') : null;
+    }
+
+    /**
      * Set uri path pattern for this route.
      * @param string $path
      * @return $this
@@ -748,7 +856,7 @@ class Route implements Registrar
     /**
      * Alias to setPath
      * @param string $path
-     * @return $this
+     * @return Route
      */
     public function path($path)
     {
@@ -811,7 +919,7 @@ class Route implements Registrar
     /**
      * Alias to setExecute
      * @param mixed $execute
-     * @return $this
+     * @return Route
      */
     public function execute($execute)
     {
@@ -823,7 +931,7 @@ class Route implements Registrar
     /**
      * Alias to setExecute
      * @param mixed $handle
-     * @return $this
+     * @return Route
      */
     public function handle($handle)
     {

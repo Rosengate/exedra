@@ -46,6 +46,8 @@ class RouteListCommand extends Command
 
             $methods = $route->getMethod();
 
+            $baseUri = $route->getBaseUri();
+
             if (count($methods) == 4)
                 $methods = 'any';
             else
@@ -64,7 +66,7 @@ class RouteListCommand extends Command
             $data = array(
                 'name' => $route->getAbsoluteName(),
                 'method' => $methods,
-                'uri' => '/' . $route->getPath(true),
+                'uri' => rtrim($baseUri, '/') . '/' . $route->getPath(true),
                 'tag' => $route->hasProperty('tag') ? $route->getProperty('tag') : ''
             );
 
@@ -72,7 +74,7 @@ class RouteListCommand extends Command
                 $col = strtolower($col);
 
                 if (!isset($data[$col]))
-                    throw new \RuntimeException('Can\'t find property : ' . $col);
+                    throw new \RuntimeException("Can't find property : " . $col);
 
                 $row[] = $data[$col];
             }

@@ -2,6 +2,8 @@
 
 namespace Exedra\Url;
 
+use Psr\Http\Message\UriInterface;
+
 /**
  * A route oriented url generator
  */
@@ -91,11 +93,12 @@ class UrlFactory extends UrlGenerator
     /**
      * Get url prefixed with $baseUrl
      * @param string $path (optional)
+     * @param UriInterface|null $baseUri
      * @return Url
      */
-    public function base($path = null)
+    public function base($path = null, UriInterface $baseUri = null)
     {
-        return $this->createUrl(parent::base($path));
+        return $this->createUrl(parent::base($path, $baseUri));
     }
 
     /**
