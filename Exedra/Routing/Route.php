@@ -415,11 +415,26 @@ class Route implements Registrar
      */
     public function match(ServerRequestInterface $request, $path)
     {
-        $params = array();
-
         $routePath = $this->properties['path'];
 
+        if (isset($this->properties['method'])) {
+            if (!in_array(strtolower($request->getMethod()), $this->properties['method']))
+                return array(
+                    'route' => false,
+                    'parameter' => false,
+                    'continue' => false
+                );
+        }
+
         if ($this->properties['uri']) {
+            // allow for deeper checking, skip /path checking
+            if ($this->properties['uri'] === true)
+                return array(
+                    'route' => $this,
+                    'parameter' => array(),
+                    'continue' => true
+                );
+
             /** @var Uri $baseUri */
             $uriResult = $this->matchUri($this->properties['uri'], $request->getUri());
 
@@ -434,15 +449,6 @@ class Route implements Registrar
 
             if ($resultPath)
                 $routePath = trim($resultPath . '/' . $routePath, '/');
-        }
-
-        if (isset($this->properties['method'])) {
-            if (!in_array(strtolower($request->getMethod()), $this->properties['method']))
-                return array(
-                    'route' => false,
-                    'parameter' => false,
-                    'continue' => false
-                );
         }
 
         // path validation
@@ -687,7 +693,7 @@ class Route implements Registrar
 
         $routePath = $this->properties['path'];
 
-        if ($this->properties['uri'] && $uriPath = trim($this->properties['uri']->getPath(), '/'))
+        if ($this->properties['uri'] && $this->properties['uri'] !== true && $uriPath = trim($this->properties['uri']->getPath(), '/'))
             $routePath = trim($uriPath . '/' . $routePath, '/');
 
         for ($i = count(explode('/', $routePath)); $i < count($paths); $i++)
@@ -800,20 +806,28 @@ class Route implements Registrar
 
     /**
      * Set complete URI
-     * @param UriInterface|string $uri
+     * scheme OR port is required, else it'll assume as path
+     * @param UriInterface|string|bool $uri
      * @return Route
      * @throws RoutingException
      */
     public function setUri($uri)
     {
-        if (!$this->group->isRoot())
-            throw new RoutingException('URI routing can only be set on first group of routing');
-
         if (is_null($uri))
             throw new RoutingException('URI for route [' . $this->name . '] cannot be null');
 
         if (is_string($uri))
             $uri = new Uri($uri);
+        else if ($uri !== true && !($uri instanceof UriInterface))
+            throw new RoutingException('URI can only be either string, or UriInterface, or bool (true)');
+
+        if ($uri !== true && !$uri->getHost())
+            return $this->path($uri->getPath());
+
+        if ($uri !== true) {
+            $this->setPath($uri->getPath());
+            $uri->setPath('');
+        }
 
         $this->setProperty('uri', $uri);
 
@@ -831,11 +845,31 @@ class Route implements Registrar
         return $this->setUri($uri);
     }
 
+    /**
+     * Get first uri it can get
+     * @return UriInterface|null
+     */
     public function getBaseUri()
     {
-        $routes = $this->getFullRoutes();
+        $group = $this->group;
 
-        return $routes[0]->hasProperty('uri') ? $routes[0]->getProperty('uri') : null;
+        $uri = $this->getProperty('uri');
+
+        if (is_object($uri) && $uri instanceof UriInterface)
+            return $uri;
+
+        /** @var Route $route */
+        while ($route = $group->getUpperRoute()) {
+            $uri = $route->getProperty('uri');
+
+            if (is_object($uri) && $uri instanceof UriInterface)
+                return $uri;
+
+            // recursively refer to upperRoute's group
+            $group = $route->getGroup();
+        }
+
+        return null;
     }
 
     /**
