@@ -158,16 +158,13 @@ class UrlGenerator implements UrlGeneratorInterface
 
         $path = $route->getAbsolutePath($data);
 
-//        $url = $this->base($path, $route->getBaseUri()) . ($query ? '?' . http_build_query($query) : null);
-
         return $this->parameterize($this->base($path, $route->getBaseUri()) . ($query ? '?' . http_build_query($query) : null), $data);
     }
 
     protected function parameterize($url, array $data)
     {
-        foreach ($data as $key => $value) {
+        foreach ($data as $key => $value)
             $url = str_replace('{' . $key . '}', $value, $url);
-        }
 
         return $url;
     }

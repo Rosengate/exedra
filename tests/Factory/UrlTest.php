@@ -102,13 +102,12 @@ class FactoryUrlTest extends \BaseTestCase
     public function testBaseUri()
     {
         $this->app->map['foo']->uri('http://localhost:9000/baz')
-            ->any('/foo')
             ->group(function(\Exedra\Routing\Group $group) {
                 $group['bar']->get('/foo/bar')
                     ->execute(function() {
                     });
             });
 
-        $this->assertEquals('http://localhost:9000/baz/foo/foo/bar', $this->app->url->route('@foo.bar'));
+        $this->assertEquals('http://localhost:9000/baz/foo/bar', $this->app->url->route('@foo.bar'));
 	}
 }
