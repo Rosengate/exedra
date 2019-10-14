@@ -4,6 +4,11 @@ use Exedra\Routing\GroupHandlers\PathHandler;
 
 class RoutingTest extends \BaseTestCase
 {
+    /**
+     * @var \Exedra\Routing\Group $map
+     */
+    protected $map;
+
 	public function caseSetUp()
 	{
 		// build a basic case
@@ -300,16 +305,45 @@ class RoutingTest extends \BaseTestCase
             ->get('/helo')
             ->execute(function(){return 'w';});
 
-        $this->map['foo']->uri(new \Exedra\Http\Uri('http://www.rosengate.com/:hello'))
+        $this->map['foo']->uri(new \Exedra\Http\Uri('http://{sub}.rosengate.com/:hello'))
             ->group(function (\Exedra\Routing\Group $group) {
                 $group['bar']->get('/:world/z')->execute(function(\Exedra\Runtime\Context $context) {
-                    return $context->param('world') . ' ' . $context->param('hello');
+                    return $context->param('world') . ' ' . $context->param('hello') . ' ' . $context->param('sub');
                 });
             });
 
         $request = $this->createRequest(['uri' => new \Exedra\Http\Uri('http://www.rosengate.com/helo')]);
 
         $this->assertEquals('w', $this->app->request($request)->response->getBody());
-        $this->assertEquals('bar foo', $this->sendUriRequest('http://www.rosengate.com/foo/bar/z'));
+        $this->assertEquals('bar foo www', $this->sendUriRequest('http://www.rosengate.com/foo/bar/z'));
+	}
+
+    public function testURIDomainRouting()
+    {
+        $this->map->domain('test.rosengate.com')->get('/:foo')->group(function (\Exedra\Routing\Group $group) {
+            $group->any('/:bar')->execute(function(\Exedra\Runtime\Context $context) {
+                return $context->param('foo') . ' ' . $context->param('bar');
+            });
+        });
+
+        $this->map->domain('192.168.0.100:16512')->get('/:foo')->group(function (\Exedra\Routing\Group $group) {
+            $group->any('/:bar')->execute(function(\Exedra\Runtime\Context $context) {
+                return $context->param('foo') . ' ' . $context->param('bar');
+            });
+        });
+
+        $this->assertEquals('f b', $this->sendUriRequest('http://test.rosengate.com/f/b'));
+        $this->assertEquals('d e', $this->sendUriRequest('http://192.168.0.100:16512/d/e'));
+    }
+
+    public function testURIDomainParameter()
+    {
+        $this->map->domain('{hello}.rosengate.com')->get('/:foo')->group(function (\Exedra\Routing\Group $group) {
+            $group->any('/:bar')->execute(function(\Exedra\Runtime\Context $context) {
+                return $context->param('hello') . ' ' . $context->param('foo') . ' ' . $context->param('bar');
+            });
+        });
+
+        $this->assertEquals('test f b', $this->sendUriRequest('http://test.rosengate.com/f/b'));
 	}
 }

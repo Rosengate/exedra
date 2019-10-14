@@ -28,6 +28,10 @@ class Uri implements UriInterface
 
     protected $port = '';
 
+    /**
+     * Uri constructor.
+     * @param string|array $uri
+     */
     public function __construct($uri = '')
     {
         if (is_array($uri)) {
@@ -46,6 +50,28 @@ class Uri implements UriInterface
     {
         foreach ($parts as $part => $value)
             $this->{$part} = $value;
+    }
+
+    public static function createFromAuthority($authority)
+    {
+        if (strpos($authority, '@') !== false) {
+            @list($userInfo, $domain) = explode('@', $authority);
+            @list($host, $port) = explode(':', $domain);
+            @list($user, $password) = explode(':', $userInfo);
+
+            return new static(array('user' => $user, 'password' => $password, 'host' => $host, 'port' => $port));
+        } else {
+            @list($host, $port) = explode(':', $authority);
+
+            return new static(array('host' => $host, 'port' => $port));
+        }
+    }
+
+    public static function createFromDomain($domain)
+    {
+        @list($host, $port) = explode(':', $domain);
+
+        return new static(array('host' => $host, 'port' => $port));
     }
 
     /**

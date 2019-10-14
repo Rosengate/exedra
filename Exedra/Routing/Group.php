@@ -640,6 +640,32 @@ class Group implements \ArrayAccess, Registrar
     }
 
     /**
+     * @param string $uri
+     * @return Route
+     */
+    public function uri($uri)
+    {
+        $route = $this->factory->createRoute($this, null, []);
+
+        $this->addRoute($route);
+
+        return $route->setUri($uri);
+    }
+
+    /**
+     * @param string $domain
+     * @return Route
+     */
+    public function domain($domain)
+    {
+        $route = $this->factory->createRoute($this, null, []);
+
+        $this->addRoute($route);
+
+        return $route->setDomain($domain);
+    }
+
+    /**
      * Create an empty route with the given tag
      * @param string $tag
      * @return Route

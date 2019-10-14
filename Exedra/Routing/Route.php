@@ -374,12 +374,12 @@ class Route implements Registrar
      */
     protected function matchUri(UriInterface $uri , UriInterface $requestUri)
     {
-        $basePort = $uri->getPort() ? : 80;
         $requestPort = $requestUri->getPort() ? : 80;
 
         $params = [];
 
-        if ($basePort != $requestPort) {
+        // now only check port if it's available
+        if (($basePort = $uri->getPort()) && $basePort != $requestPort) {
             return false;
         }
 
@@ -417,6 +417,8 @@ class Route implements Registrar
     {
         $routePath = $this->properties['path'];
 
+        $params = array();
+
         if (isset($this->properties['method'])) {
             if (!in_array(strtolower($request->getMethod()), $this->properties['method']))
                 return array(
@@ -449,10 +451,15 @@ class Route implements Registrar
 
             if ($resultPath)
                 $routePath = trim($resultPath . '/' . $routePath, '/');
+
+            $params = $uriResult['params'];
         }
 
         // path validation
         $result = $this->matchPath($path, $routePath);
+
+        if ($params)
+            $result['parameter'] = array_merge($result['parameter'], $params);
 
         if (!$result['matched'])
             return array(
@@ -805,6 +812,27 @@ class Route implements Registrar
     }
 
     /**
+     * Match host:port
+     *
+     * @param $domain
+     * @return Route
+     */
+    public function setDomain($domain)
+    {
+        return $this->setProperty('uri', Uri::createFromDomain($domain));
+    }
+
+    /**
+     * Alias to setDomain
+     * @param $domain
+     * @return Route
+     */
+    public function domain($domain)
+    {
+        return $this->setDomain($domain);
+    }
+
+    /**
      * Set complete URI
      * scheme OR port is required, else it'll assume as path
      * @param UriInterface|string|bool $uri
@@ -935,7 +963,7 @@ class Route implements Registrar
      */
     public function config(array $config)
     {
-        return $this->setProperty('config', $config);
+        return $this->setConfig($config);
     }
 
     /**
@@ -957,9 +985,7 @@ class Route implements Registrar
      */
     public function execute($execute)
     {
-        $this->setProperty('execute', $execute);
-
-        return $this;
+        return $this->setExecute($execute);
     }
 
     /**
