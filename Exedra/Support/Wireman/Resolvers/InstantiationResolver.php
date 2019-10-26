@@ -8,7 +8,7 @@ use Exedra\Support\Wireman\Exceptions\ParamResolveException;
 use Exedra\Support\Wireman\Exceptions\WiringResolveException;
 use Exedra\Support\Wireman\Wireman;
 
-class ClassResolver implements WiringResolver, ParamResolver
+class InstantiationResolver implements WiringResolver, ParamResolver
 {
     public function canResolveWiring($pattern)
     {

@@ -2,7 +2,7 @@
 
 namespace Exedra\Support\Wireman;
 
-use Exedra\Support\Wireman\Resolvers\ClassResolver;
+use Exedra\Support\Wireman\Resolvers\InstantiationResolver;
 use Exedra\Support\Wireman\Contracts\ParamResolver;
 use Exedra\Support\Wireman\Contracts\WiringResolver;
 use Exedra\Support\Wireman\Exceptions\ParamResolveException;
@@ -29,7 +29,7 @@ class Wireman
 
     public static function createClassResolver()
     {
-        return new static([$resolver = new ClassResolver()], [$resolver, new OptionalParamResolver()]);
+        return new static([$resolver = new InstantiationResolver()], [$resolver, new OptionalParamResolver()]);
     }
 
     /**
