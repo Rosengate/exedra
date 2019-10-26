@@ -2,11 +2,12 @@
 
 namespace Exedra\Support\Wireman;
 
-use Exedra\Support\Wireful\Resolvers\ClassResolver;
+use Exedra\Support\Wireman\Resolvers\ClassResolver;
 use Exedra\Support\Wireman\Contracts\ParamResolver;
 use Exedra\Support\Wireman\Contracts\WiringResolver;
 use Exedra\Support\Wireman\Exceptions\ParamResolveException;
 use Exedra\Support\Wireman\Exceptions\WiringResolveException;
+use Exedra\Support\Wireman\Resolvers\OptionalParamResolver;
 
 class Wireman
 {
@@ -28,7 +29,7 @@ class Wireman
 
     public static function createClassResolver()
     {
-        return new static([$resolver = new ClassResolver()], [$resolver]);
+        return new static([$resolver = new ClassResolver()], [$resolver, new OptionalParamResolver()]);
     }
 
     /**
@@ -55,8 +56,9 @@ class Wireman
     {
         $dependencies = [];
 
-        foreach ($parameters as $param)
-            $dependencies[] = $this->resolveParameters($param);
+        foreach ($parameters as $param) {
+            $dependencies[] = $this->resolveParam($param);
+        }
 
         return $dependencies;
     }
@@ -69,8 +71,9 @@ class Wireman
     public function resolveParam(\ReflectionParameter $param)
     {
         foreach ($this->paramResolvers as $resolver) {
-            if ($resolver->canResolveParam($resolver))
+            if ($resolver->canResolveParam($param)) {
                 return $resolver->resolveParam($param, $this);
+            }
         }
 
         throw new ParamResolveException($param);

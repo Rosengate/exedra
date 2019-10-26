@@ -1,6 +1,6 @@
 <?php
 
-namespace Exedra\Support\Wireful\Resolvers;
+namespace Exedra\Support\Wireman\Resolvers;
 
 use Exedra\Support\Wireman\Contracts\ParamResolver;
 use Exedra\Support\Wireman\Contracts\WiringResolver;
@@ -22,7 +22,7 @@ class ClassResolver implements WiringResolver, ParamResolver
         try {
             $dependencies = $wireman->resolveMethod($classRef->getConstructor());
         } catch (ParamResolveException $e) {
-            throw new WiringResolveException('Failed to resolve [' . $e->getMessage() . '] for ' . $pattern . '::' . $classRef->getConstructor()->getName());
+            throw new WiringResolveException('Failed to resolve [' . $e->getParameter() . '] for ' . $pattern . '::' . $classRef->getConstructor()->getName());
         }
 
         return $classRef->newInstanceArgs($dependencies);
@@ -39,10 +39,11 @@ class ClassResolver implements WiringResolver, ParamResolver
 
     /**
      * @param \ReflectionParameter $param
+     * @param Wireman $wireman
      * @return mixed
      */
     public function resolveParam(\ReflectionParameter $param, Wireman $wireman)
     {
-        return $this->resolveWiring($param->getClass(), $wireman);
+        return $this->resolveWiring($param->getClass()->getName(), $wireman);
     }
 }
