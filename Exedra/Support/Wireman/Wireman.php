@@ -80,7 +80,7 @@ class Wireman
     }
 
     /**
-     * Resolve method into an array of required dependencies
+     * Resolve method into an array of parameters
      * @param \ReflectionMethod|null $method
      * @return mixed[]
      */
@@ -90,5 +90,31 @@ class Wireman
             return [];
 
         return $this->resolveParameters($method->getParameters());
+    }
+
+    /**
+     * Resolve function/closure into an array of paramters
+     * @param \ReflectionFunction|null $function
+     * @return mixed[]
+     */
+    public function resolveFunction(\ReflectionFunction $function = null)
+    {
+        if (!$function)
+            return [];
+
+        return $this->resolveParameters($function->getParameters());
+    }
+
+    /**
+     * Resolve callable into array of resolved dependencies
+     * @param callable $callable
+     * @return mixed[]
+     */
+    public function resolveCallable(callable $callable)
+    {
+        if (is_array($callable))
+            return $this->resolveMethod(new \ReflectionMethod($callable[0], $callable[1]));
+        else
+            return $this->resolveFunction(new \ReflectionFunction($callable));
     }
 }

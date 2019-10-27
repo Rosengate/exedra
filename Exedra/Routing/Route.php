@@ -1060,7 +1060,7 @@ class Route implements Registrar
      * Add middleware to existing
      * @param mixed $middleware
      * @param array $properties
-     * @return $this
+     * @return Route
      */
     public function addMiddleware($middleware, array $properties = array())
     {
@@ -1073,7 +1073,7 @@ class Route implements Registrar
      * Alias to addMiddleware
      * @param mixed $middleware handler
      * @param null $name
-     * @return $this
+     * @return Route
      */
     public function middleware($middleware)
     {
@@ -1124,7 +1124,7 @@ class Route implements Registrar
      * Set attribute
      * @param string $key
      * @param mixed $value
-     * @return $this
+     * @return Route
      */
     public function setAttribute($key, $value = null)
     {
@@ -1190,7 +1190,7 @@ class Route implements Registrar
     /**
      *
      * @param string|ParamValidator $validator
-     * @return $this
+     * @return Route
      */
     public function validateParam($validator)
     {
@@ -1228,7 +1228,7 @@ class Route implements Registrar
      * Set property for this route.
      * @param string $key
      * @param mixed $value
-     * @return $this
+     * @return Route
      */
     protected function setProperty($key, $value)
     {
@@ -1271,7 +1271,7 @@ class Route implements Registrar
     /**
      * Set dependencies for execute arguments
      * @param array|mixed $dependencies
-     * @return $this
+     * @return Route
      */
     public function setDependencies($dependencies)
     {

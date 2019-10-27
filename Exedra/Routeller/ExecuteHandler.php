@@ -21,7 +21,7 @@ class ExecuteHandler implements \Exedra\Contracts\Routing\ExecuteHandler
 
     /**
      * Resolve into Closure or callable
-     * @return \Closure|callable
+     * @return callable
      */
     public function resolveHandle($pattern)
     {
@@ -30,8 +30,6 @@ class ExecuteHandler implements \Exedra\Contracts\Routing\ExecuteHandler
         /** @var Controller $controller */
         $controller = $class::instance();
 
-        return function () use ($controller, $method) {
-            return call_user_func_array(array($controller, $method), func_get_args());
-        };
+        return array($controller, $method);
     }
 }

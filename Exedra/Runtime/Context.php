@@ -8,6 +8,7 @@ use Exedra\Container\Container;
 use Exedra\Exception\Exception;
 use Exedra\Http\ServerRequest;
 use Exedra\Path;
+use Exedra\Routing\Call;
 use Exedra\Routing\Finding;
 use Exedra\Routing\Route;
 use Exedra\Url\UrlFactory;
@@ -197,7 +198,20 @@ class Context extends Container
             return call_user_func_array($callable, $args);
         }
 
-        return call_user_func_array($callable, func_get_args());
+        return $this->call($callable, func_get_args());
+    }
+
+    /**
+     * The main call for next method
+     * You can use wireman here to autowire
+     *
+     * @param Call $callable
+     * @param array $args
+     * @return mixed
+     */
+    protected function call(Call $callable, array $args)
+    {
+        return call_user_func_array($callable, $args);
     }
 
     /**

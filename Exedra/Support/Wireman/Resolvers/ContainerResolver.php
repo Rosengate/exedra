@@ -1,12 +1,13 @@
 <?php
 
-namespace Exedra\Support\Wireful\Resolvers;
+namespace Exedra\Support\Wireman\Resolvers;
 
 use Exedra\Container\Container;
+use Exedra\Support\Wireman\Contracts\ParamResolver;
 use Exedra\Support\Wireman\Contracts\WiringResolver;
 use Exedra\Support\Wireman\Wireman;
 
-class ContainerResolver implements WiringResolver
+class ContainerResolver implements WiringResolver, ParamResolver
 {
     protected $container;
 
@@ -26,5 +27,26 @@ class ContainerResolver implements WiringResolver
     public function resolveWiring($pattern, Wireman $wireman)
     {
         return $this->container->get($pattern);
+    }
+
+    /**
+     * @param \ReflectionParameter $param
+     * @return bool
+     */
+    public function canResolveParam(\ReflectionParameter $param)
+    {
+        if (!($class = $param->getClass()))
+            return false;
+
+        return $this->container['service']->has($class->getName());
+    }
+
+    /**
+     * @param \ReflectionParameter $param
+     * @return mixed
+     */
+    public function resolveParam(\ReflectionParameter $param, Wireman $wireman)
+    {
+        return $this->container->get($param->getClass()->getName());
     }
 }
