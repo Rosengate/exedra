@@ -297,8 +297,9 @@ class Container implements \ArrayAccess
 
     protected function filter($type, $name, $resolve)
     {
-        foreach ($this->services[$type]->getFilters($name) as $filter)
-            $filter($resolve);
+        foreach ($this->services[$type]->getFilters($name) as $filter) {
+            $resolve = $filter($resolve);
+        }
 
         return $resolve;
     }

@@ -5,6 +5,7 @@ namespace Exedra\Runtime;
 use Exedra\Application;
 use Exedra\Config;
 use Exedra\Container\Container;
+use Exedra\Contracts\Runtime\CallHandler;
 use Exedra\Exception\Exception;
 use Exedra\Http\ServerRequest;
 use Exedra\Path;
@@ -26,6 +27,7 @@ use Exedra\Url\UrlFactory;
  * @property Redirect $redirect
  * @property UrlFactory $url
  * @property Application app
+ * @property CallHandler callHandler
  */
 class Context extends Container
 {
@@ -111,7 +113,8 @@ class Context extends Container
 
                 return $context->app->create('url.factory', array($context->route->getGroup(), $context->request ?: null, $baseUrl, $urlFactory->getFilters(), $urlFactory->getCallables()));
             },
-            'redirect' => array(Redirect::class, array('self.response', 'self.url'))
+            'redirect' => array(Redirect::class, array('self.response', 'self.url')),
+            'callHandler' => \Exedra\Runtime\CallHandler::class
         ));
 
         $this->setUpConfig();
@@ -123,6 +126,8 @@ class Context extends Container
 
         $this->services['service']->on('config', function (Config $config) use ($finding) {
             $config->set($this->finding->getConfig());
+
+            return $config;
         });
     }
 
@@ -198,20 +203,7 @@ class Context extends Container
             return call_user_func_array($callable, $args);
         }
 
-        return $this->call($callable, func_get_args());
-    }
-
-    /**
-     * The main call for next method
-     * You can use wireman here to autowire
-     *
-     * @param Call $callable
-     * @param array $args
-     * @return mixed
-     */
-    protected function call(Call $callable, array $args)
-    {
-        return call_user_func_array($callable, $args);
+        return $this->callHandler->handle($callable, func_get_args());
     }
 
     /**

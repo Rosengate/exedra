@@ -8,13 +8,18 @@ class Registry implements \ArrayAccess
 
     /**
      * List of configures on dependency resolve
-     * @param array configures
+     * @param array $filters
      */
     protected $filters = array();
 
     public function __construct(array $registry = array())
     {
         $this->data = $registry;
+    }
+
+    public function intercept($name, \Closure $callback)
+    {
+        $this->filters[$name][] = $callback;
     }
 
     public function on($name, \Closure $callable)

@@ -81,6 +81,8 @@ class ContainerRegistryTest extends BaseTestCase
 			$exe->service->on('config', function($config)
 			{
 				$config->set('foo-bar', 'runtime group');
+
+				return $config;
 			});
 
 			return $exe->next($exe);
