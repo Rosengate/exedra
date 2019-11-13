@@ -14,9 +14,6 @@ class ArrayCache implements CacheInterface
     public function set($key, array $routes, $lastModified)
     {
         $this->storage[$key] = $routes;
-
-        echo '<pre>';
-        print_r($this->storage);
     }
 
     public function get($key)
