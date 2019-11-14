@@ -12,7 +12,6 @@ use Exedra\Routing\Route;
 use Exedra\Routeller\Cache\CacheInterface;
 use Exedra\Routeller\Cache\EmptyCache;
 use Exedra\Routeller\Controller\Controller;
-use Minime\Annotations\Cache\ArrayCache;
 
 class Handler implements GroupHandler
 {
@@ -83,7 +82,7 @@ class Handler implements GroupHandler
 
     protected function createReader()
     {
-        return new AnnotationsReader(new AnnotationsParser(), new ArrayCache());
+        return new AnnotationsReader();
     }
 
     /**
@@ -235,7 +234,7 @@ class Handler implements GroupHandler
             $methodName = $reflectionMethod->getName();
 
             if (strpos($methodName, 'middleware') === 0) {
-                $properties = $reader->getRouteProperties($reflectionMethod);
+                $properties = $reader->readProperties($reflectionMethod);
 
                 $entries[] = array(
                     'middleware' => array(
@@ -289,7 +288,7 @@ class Handler implements GroupHandler
                 continue;
             }
 
-            $properties = $reader->getRouteProperties($reflectionMethod);
+            $properties = $reader->readProperties($reflectionMethod);
 
             // read from route properties from the class itself
             $subrouteClass = null;
@@ -303,7 +302,7 @@ class Handler implements GroupHandler
                     if (!$controllerRef->isSubclassOf(Controller::class))
                         throw new Exception('[' . $cname . '] must be a type of [' . Controller::class . ']');
 
-                    $properties = $this->propertiesDeferringMerge($reader->getRouteProperties($controllerRef), $properties);
+                    $properties = $this->propertiesDeferringMerge($reader->readProperties($controllerRef), $properties);
 
                     $subrouteClass = $cname;
                 }

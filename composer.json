@@ -13,8 +13,7 @@
         "issues": "https://github.com/rosengate/exedra/issues"
     },
     "require": {
-        "psr/http-message": "~1.0",
-        "minime/annotations": "~3.0"
+        "psr/http-message": "~1.0"
     },
     "require-dev": {
         "phpunit/phpunit": "^4.6 || ^5.0",
