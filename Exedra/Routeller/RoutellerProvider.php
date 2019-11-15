@@ -22,7 +22,7 @@ class RoutellerProvider implements Provider
 
     public function register(Application $app)
     {
-        $app->routingFactory->addGroupHandler(new Handler($app, $this->cache, $this->options));
+        $app->routingFactory->addGroupHandler(Handler::createAppHandler($app, $this->cache, $this->options));
         $app->routingFactory->addExecuteHandlers(new ExecuteHandler());
     }
 }

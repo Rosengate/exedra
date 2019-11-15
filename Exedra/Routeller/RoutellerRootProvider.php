@@ -26,7 +26,7 @@ class RoutellerRootProvider implements Provider
 
     public function register(Application $app)
     {
-        $handler = new Handler($app, $this->cache, $this->options);
+        $handler = Handler::createAppHandler($app, $this->cache, $this->options);
 
         if (!$this->controller)
             throw new Exception('Instance of RoutellerRootProvider is required on provider registry');

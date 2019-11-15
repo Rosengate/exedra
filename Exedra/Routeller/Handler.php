@@ -5,13 +5,15 @@ namespace Exedra\Routeller;
 use Exedra\Application;
 use Exedra\Contracts\Routing\GroupHandler;
 use Exedra\Exception\Exception;
-use Exedra\Http\Uri;
+use Exedra\Routeller\Contracts\PropertyResolver;
+use Exedra\Routeller\PropertyResolvers\ConfigResolver;
 use Exedra\Routing\Factory;
 use Exedra\Routing\Group;
 use Exedra\Routing\Route;
 use Exedra\Routeller\Cache\CacheInterface;
 use Exedra\Routeller\Cache\EmptyCache;
 use Exedra\Routeller\Controller\Controller;
+use Psr\Container\ContainerInterface;
 
 class Handler implements GroupHandler
 {
@@ -35,27 +37,53 @@ class Handler implements GroupHandler
      */
     protected $options;
 
+    /**
+     * @var bool
+     */
     protected $isAutoReload;
 
     /**
-     * @var Application|null
+     * @var ContainerInterface
      */
-    protected $app;
+    protected $container;
 
     /**
      * @var \ReflectionClass[]
      */
     protected $classesReflection = [];
 
-    public function __construct(Application $app = null, CacheInterface $cache = null, array $options = array())
+    /**
+     * @var PropertyResolver[]
+     */
+    protected $propertyResolvers;
+
+    public function __construct(ContainerInterface $container = null,
+                                array $propertyResolvers = array(),
+                                CacheInterface $cache = null,
+                                array $options = array())
     {
-        $this->app = $app;
+        $this->container = $container;
+
+        $this->propertyResolvers = $propertyResolvers;
 
         $this->cache = $cache ? $cache : new EmptyCache;
 
         $this->options = $options;
 
         $this->isAutoReload = isset($this->options['auto_reload']) && $this->options['auto_reload'] === true ? true : false;
+    }
+
+    /**
+     * Just a factory to help create handler for exedra app
+     *
+     * @param Application $app
+     * @param CacheInterface|null $cache
+     * @param array $options
+     * @return static
+     */
+    public static function createAppHandler(Application $app, CacheInterface $cache = null, array $options = array())
+    {
+        return new static($app, array(new ConfigResolver($app->config)), $cache, $options);
     }
 
     public function validateGroup($pattern, Route $route = null)
@@ -120,7 +148,7 @@ class Handler implements GroupHandler
             } else if (strpos($pattern, 'routeller=') === 0) {
                 list($classname, $method) = explode('@', str_replace('routeller=', '', $pattern));
 
-                $controller = $classname::instance()->{$method}($this->app);
+                $controller = $classname::instance()->{$method}($this->container);
 
                 if (!$this->validateGroup($controller))
                     throw new Exception('Unable to validate the routing group for [' . $classname . '::' . $method . '()]');
@@ -131,7 +159,7 @@ class Handler implements GroupHandler
             } else if (strpos($pattern, 'routeller_call') === 0) {
                 list($classname, $method) = explode('@', str_replace('routeller_call=', '', $pattern));
 
-                $classname::instance()->{$method}($group, $this->app);
+                $classname::instance()->{$method}($group, $this->container);
 
                 return $group;
             }
@@ -201,17 +229,17 @@ class Handler implements GroupHandler
                 } else if (isset($entry['route'])) {
 //                    $properties = $entry['route']['properties'];
 
-                    $merges = $this->resolveConfig($entry['route']['properties']);
+                    $merges = $this->resolveProperties($entry['route']['properties']);
 
                     $group->addRoute($route = $factory->createRoute($group, isset($merges['name']) ? $merges['name'] : $entry['route']['name'], $merges));
 
                     if (isset($entry['route']['route_call'])) {
                         list($classname, $methodName) = explode('@', $entry['route']['route_call']);
 
-                        $classname::instance()->{$methodName}($route, $this->app);
+                        $classname::instance()->{$methodName}($route, $this->container);
                     }
                 } else if (isset($entry['setup'])) {
-                    $controller::instance()->{$entry['setup']['method']}($group, $this->app);
+                    $controller::instance()->{$entry['setup']['method']}($group, $this->container);
                 }
             }
 
@@ -257,7 +285,7 @@ class Handler implements GroupHandler
             }
 
             if (strpos(strtolower($methodName), 'setup') === 0) {
-                $controller->{$methodName}($group, $this->app);
+                $controller->{$methodName}($group, $this->container);
 
                 $entries[] = array(
                     'setup' => array(
@@ -294,10 +322,10 @@ class Handler implements GroupHandler
             $subrouteClass = null;
 
             if ($type == 'subroutes') {
-                $cname = $controller->{$methodName}($this->app);
+                $cname = $controller->{$methodName}($this->container);
 
                 if ($this->validateGroup($cname)) {
-                    $controllerRef = $this->getClassReflection($controller->{$methodName}($this->app));
+                    $controllerRef = $this->getClassReflection($controller->{$methodName}($this->container));
 
                     if (!$controllerRef->isSubclassOf(Controller::class))
                         throw new Exception('[' . $cname . '] must be a type of [' . Controller::class . ']');
@@ -317,7 +345,7 @@ class Handler implements GroupHandler
             if ($type == 'execute') { // if it is, save the closure.
                 $properties['execute'] = 'routeller=' . $classname . '@' . $reflectionMethod->getName();
             } else if ($type == 'subroutes') {
-                $properties['subroutes'] = $controller->{$methodName}($this->app);
+                $properties['subroutes'] = $controller->{$methodName}($this->container);
             }
 
             if (isset($properties['name']))
@@ -326,7 +354,7 @@ class Handler implements GroupHandler
             if (isset($properties['inject']) && is_string($properties['inject']))
                 $properties['inject'] = array_map('trim', explode(',', trim($properties['inject'], ' []')));
 
-            $merges = $this->resolveConfig($properties);
+            $merges = $this->resolveProperties($properties);
 
             $group->addRoute($route = $factory->createRoute($group, $routeName = (isset($merges['name']) ? $merges['name'] : $routeName), $merges));
 
@@ -339,7 +367,7 @@ class Handler implements GroupHandler
             );
 
             if ($type == 'subroutes_call') {
-                $app = $this->app;
+                $app = $this->container;
 
                 $route->group(function (Group $group) use ($controller, $methodName, $app) {
                     $controller->{$methodName}($group);
@@ -353,7 +381,7 @@ class Handler implements GroupHandler
                     $entry['route']['properties']['subroutes'] = 'routeller=' . $classname . '@' . $methodName;
 
             } else if ($type == 'route_call') {
-                $controller->{$methodName}($route, $this->app);
+                $controller->{$methodName}($route, $this->container);
                 $entry['route']['route_call'] = $classname . '@' . $methodName;
             }
 
@@ -365,14 +393,13 @@ class Handler implements GroupHandler
         return $group;
     }
 
-    protected function resolveConfig(array $properties)
+    protected function resolveProperties(array $properties)
     {
         $merges = $properties;
 
         foreach ($properties as $key => $value) {
-            if (is_string($value) && strpos($value, '$config.') === 0) {
-                $merges[$key] = $this->app->config->get(trim($value, '$config.'));
-            }
+            foreach ($this->propertyResolvers as $resolver)
+                $merges[$key] = $resolver->resolve($key, $value);
         }
 
         return $merges;

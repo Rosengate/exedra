@@ -1,6 +1,8 @@
 <?php namespace Exedra\Container;
 
-class Container implements \ArrayAccess
+use Psr\Container\ContainerInterface;
+
+class Container implements \ArrayAccess, ContainerInterface
 {
     /**
      * Container resolved services
@@ -174,6 +176,15 @@ class Container implements \ArrayAccess
             return $this->services[$name];
 
         return $this->services[$name] = $this->solve('service', $name, array($this));
+    }
+
+    /**
+     * @param string $name
+     * @return bool
+     */
+    public function has($name)
+    {
+        return $this['service']->has($name);
     }
 
     /**
