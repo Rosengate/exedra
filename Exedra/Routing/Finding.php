@@ -257,6 +257,15 @@ class Finding
     }
 
     /**
+     * Get all attributes
+     * @return array
+     */
+    public function getAllAttributes()
+    {
+        return $this->attributes;
+    }
+
+    /**
      * Check whether attribute exists
      * @param string $key
      * @return boolean

@@ -5,6 +5,7 @@ namespace Exedra\Routeller;
 use Exedra\Application;
 use Exedra\Contracts\Routing\GroupHandler;
 use Exedra\Exception\Exception;
+use Exedra\Exception\InvalidArgumentException;
 use Exedra\Routeller\Contracts\PropertyResolver;
 use Exedra\Routeller\PropertyResolvers\ConfigResolver;
 use Exedra\Routing\Factory;
@@ -414,7 +415,29 @@ class Handler implements GroupHandler
      */
     public function propertiesDeferringMerge(array $controllerProperties, array $properties)
     {
-        return array_merge($controllerProperties, $properties);
+        $merges = array_merge($properties, $controllerProperties);
+
+        if (isset($controllerProperties['path']) && isset($properties['path']))
+            $merges['path'] = '/'. trim($properties['path'], '/') . '/'. trim($controllerProperties['path'], '/');
+
+        if (isset($properties['attr']) && isset($controllerProperties['attr'])) {
+            $merges['attr'] = $properties['attr'];
+
+            foreach ($controllerProperties['attr'] as $key => $value) {
+                if (is_array($value)) {
+                    if (isset($merges['attr'][$key]) && !is_array($merges['attr'][$key]))
+                        throw new InvalidArgumentException('Unable to push value into attribute [' . $key . '].');
+
+                    foreach ($value as $val) {
+                        $merges['attr'][$key][] = $val;
+                    }
+                } else {
+                    $merges['attr'][$key] = $value;
+                }
+            }
+        }
+
+        return $merges;
     }
 
     /**

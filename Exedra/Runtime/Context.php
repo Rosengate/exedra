@@ -249,8 +249,11 @@ class Context extends Container
      * @param string|null default value
      * @return mixed
      */
-    public function attr($key, $default = null)
+    public function attr($key = null, $default = null)
     {
+        if ($key == null)
+            return array_merge($this->finding->getAllAttributes(), $this->attributes);
+
         if (isset($this->attributes[$key]))
             return $this->attributes[$key];
 
