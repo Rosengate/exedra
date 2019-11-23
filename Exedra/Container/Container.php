@@ -137,6 +137,21 @@ class Container implements \ArrayAccess, ContainerInterface
     }
 
     /**
+     * Register an instance directly
+     * @param $name
+     * @param $instance
+     * @return $this
+     */
+    public function instance($name, $instance)
+    {
+        $this->services['service']->set($name, function () use ($instance) {
+            return $instance;
+        });
+
+        return $this;
+    }
+
+    /**
      * Register a factory
      * Alias to $container['factory']->add() method
      * @param $name
