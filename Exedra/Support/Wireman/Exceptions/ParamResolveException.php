@@ -11,6 +11,8 @@ class ParamResolveException extends Exception
     public function __construct(\ReflectionParameter $parameter)
     {
         $this->parameter = $parameter;
+
+        $this->message = 'Unable to resolve param $' . $parameter->getName();
     }
 
     /**
