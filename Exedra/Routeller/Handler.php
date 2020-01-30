@@ -111,7 +111,7 @@ class Handler implements GroupHandler
 
     protected function createReader()
     {
-        return new AnnotationsReader();
+        return new AnnotationsReader(isset($this->options['property_parsers']) ? $this->options['property_parsers'] : []);
     }
 
     /**

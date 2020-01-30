@@ -2,6 +2,7 @@
 
 namespace Exedra\Routeller;
 
+use Exedra\Routeller\Contracts\PropertyParser;
 use Exedra\Routeller\Contracts\RoutePropertiesReader;
 use Exedra\Support\DotArray;
 
@@ -35,14 +36,21 @@ class AnnotationsReader implements RoutePropertiesReader
     protected $dataPattern;
 
     /**
-     * Parser constructor
-     *
+     * @var PropertyParser[]
      */
-    public function __construct()
+    private $propertyParsers;
+
+    /**
+     * Parser constructor
+     * @param PropertyParser[] $propertyParsers
+     */
+    public function __construct(array $propertyParsers = [])
     {
         $this->dataPattern = '/(?<=\\'. self::TOKEN_ANNOTATION_IDENTIFIER .')('
             . self::TOKEN_ANNOTATION_NAME
             .')(((?!\s\\'. self::TOKEN_ANNOTATION_IDENTIFIER .').)*)/s';
+
+        $this->propertyParsers = $propertyParsers;
     }
 
     public function addExceptionTags(array $tags)
@@ -51,12 +59,12 @@ class AnnotationsReader implements RoutePropertiesReader
     }
 
     /**
-     * @param \Reflector $Reflection
+     * @param \Reflector|\ReflectionMethod $reflection
      * @return array
      */
-    public function readProperties(\Reflector $Reflection)
+    public function readProperties(\Reflector $reflection)
     {
-        $doc = $Reflection->getDocComment();
+        $doc = $reflection->getDocComment();
         /*if ($this->cache) {
             $key = $this->cache->getKey($doc);
             $ast = $this->cache->get($key);
@@ -72,6 +80,13 @@ class AnnotationsReader implements RoutePropertiesReader
         $properties = array();
 
         foreach ($ast as $key => $value) {
+            if (isset($this->propertyParsers[$key])) {
+                $parser = $this->propertyParsers[$key];
+
+                $key = $parser->keyTo($reflection, $key);
+                $value = $parser->valueTo($reflection, $value);
+            }
+
             if (isset(static::$exceptions[$key]))
                 continue;
 
