@@ -41,7 +41,7 @@ class ServeCommand extends Command
             if ($answer < 7000)
                 throw new \RuntimeException('Please specify port greater than 7000');
             else if ($answer > 65500)
-                throw new\ RuntimeException('Please specify port smaller than 65500');
+                throw new \RuntimeException('Please specify port smaller than 65500');
 
             return $answer;
         };

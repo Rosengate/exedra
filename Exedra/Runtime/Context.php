@@ -44,9 +44,16 @@ class Context extends Container
     protected $callStack;
 
     /**
+     * @deprecated
      * @var array $attributes
      */
     protected $attributes = array();
+
+    /**
+     * @var array $states
+     * @var array $states
+     */
+    protected $states = array();
 
     /**
      * Route for handling exception
@@ -224,10 +231,23 @@ class Context extends Container
      */
     public function hasAttr($key)
     {
-        if (isset($this->attributes[$key]))
+        if (isset($this->states[$key]))
             return true;
 
-        return $this->finding->hasAttribute($key);
+        return $this->finding->hasState($key);
+    }
+
+    /**
+     * Alias to hasState(key)
+     * @param string $key
+     * @return boolean
+     */
+    public function hasState($key)
+    {
+        if (isset($this->states[$key]))
+            return true;
+
+        return $this->finding->hasState($key);
     }
 
     /**
@@ -238,13 +258,27 @@ class Context extends Container
      */
     public function setAttr($key, $value)
     {
-        $this->attributes[$key] = $value;
+        $this->states[$key] = $value;
+
+        return $this;
+    }
+
+    /**
+     * Set a context based state
+     * @param string $key
+     * @param mixed $value
+     * @return $this
+     */
+    public function setState($key, $value)
+    {
+        $this->states[$key] = $value;
 
         return $this;
     }
 
     /**
      * Get attribute
+     * @deprecated use state instead
      * @param string $key
      * @param string|null default value
      * @return mixed
@@ -252,12 +286,30 @@ class Context extends Container
     public function attr($key = null, $default = null)
     {
         if ($key == null)
-            return array_merge($this->finding->getAllAttributes(), $this->attributes);
+            return array_merge($this->finding->getAllStates(), $this->states);
 
-        if (isset($this->attributes[$key]))
-            return $this->attributes[$key];
+        if (isset($this->states[$key]))
+            return $this->states[$key];
 
-        return $this->finding->getAttribute($key, $default);
+        return $this->finding->getState($key, $default);
+    }
+
+    /**
+     * Get state
+     * Replacement for attribute
+     * @param string $key
+     * @param string|null default value
+     * @return mixed
+     */
+    public function state($key = null, $default = null)
+    {
+        if ($key == null)
+            return array_merge($this->finding->getAllStates(), $this->states);
+
+        if (isset($this->states[$key]))
+            return $this->states[$key];
+
+        return $this->finding->getState($key, $default);
     }
 
     /**

@@ -7,6 +7,7 @@ use Exedra\Contracts\Routing\GroupHandler;
 use Exedra\Exception\Exception;
 use Exedra\Exception\InvalidArgumentException;
 use Exedra\Routeller\Contracts\PropertyResolver;
+use Exedra\Routeller\Contracts\RoutePropertiesReader;
 use Exedra\Routeller\PropertyResolvers\ConfigResolver;
 use Exedra\Routing\Factory;
 use Exedra\Routing\Group;
@@ -57,6 +58,11 @@ class Handler implements GroupHandler
      * @var PropertyResolver[]
      */
     protected $propertyResolvers;
+
+    /**
+     * @var array
+     */
+    protected $refClassProperties = [];
 
     public function __construct(ContainerInterface $container = null,
                                 array $propertyResolvers = array(),
@@ -109,9 +115,24 @@ class Handler implements GroupHandler
         return false;
     }
 
+    /**
+     * @return RoutePropertiesReader
+     */
     protected function createReader()
     {
-        return new AnnotationsReader(isset($this->options['property_parsers']) ? $this->options['property_parsers'] : []);
+        if (isset($this->options['reader']))
+            return $this->options['reader'];
+        else
+            return new AnnotationsReader(isset($this->options['property_parsers']) ? $this->options['property_parsers'] : []);
+    }
+
+    public function readReflectionClassProperties(\ReflectionClass $refClass, RoutePropertiesReader $reader)
+    {
+        if (isset($this->refClassProperties[$name = $refClass->getName()])) {
+            return $this->refClassProperties[$name];
+        }
+
+        return $this->refClassProperties[$name] = $reader->readProperties($refClass);
     }
 
     /**
@@ -221,6 +242,7 @@ class Handler implements GroupHandler
                 $entries = $cache['entries'];
         }
 
+        // cache entries handling
         if ($entries) {
             foreach ($entries as $entry) {
                 if (isset($entry['middleware'])) {
@@ -256,9 +278,13 @@ class Handler implements GroupHandler
 
         $reader = $this->createReader();
 
+        if ($parentRoute) {
+            $parentRoute->setProperties($this->readReflectionClassProperties($reflection, $reader));
+        }
+
         $entries = array();
 
-        // loop all the class's methods
+        // loop all the refClass's methods
         foreach ($reflection->getMethods() as $reflectionMethod) {
             $methodName = $reflectionMethod->getName();
 
@@ -319,7 +345,7 @@ class Handler implements GroupHandler
 
             $properties = $reader->readProperties($reflectionMethod);
 
-            // read from route properties from the class itself
+            // read from route properties from the refClass itself
             $subrouteClass = null;
 
             if ($type == 'subroutes') {
@@ -331,7 +357,8 @@ class Handler implements GroupHandler
                     if (!$controllerRef->isSubclassOf(Controller::class))
                         throw new Exception('[' . $cname . '] must be a type of [' . Controller::class . ']');
 
-                    $properties = $this->propertiesDeferringMerge($reader->readProperties($controllerRef), $properties);
+                    // read controller route properties
+                    $properties = $this->propertiesDeferringMerge($this->readReflectionClassProperties($controllerRef, $reader), $properties);
 
                     $subrouteClass = $cname;
                 }
@@ -407,7 +434,7 @@ class Handler implements GroupHandler
     }
 
     /**
-     * Merge properties for deferred method
+     * Merge properties for deferred routing
      *
      * @param array $properties
      * @param array $controllerProperties

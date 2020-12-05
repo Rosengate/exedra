@@ -82,9 +82,17 @@ class Route implements Registrar
 
     /**
      * Route attributes
+     * @deprecated use states
      * @var array $attributes
      */
     protected $attributes = array();
+
+    /**
+     * Route states
+     * Replacement for route attributes
+     * @var array states
+     */
+    protected $states = array();
 
     public function __construct(Group $group, $name, array $properties = array())
     {
@@ -743,7 +751,8 @@ class Route implements Registrar
      */
     public function resolveGroup($pattern)
     {
-        $type = @get_class($pattern) ?: gettype($pattern);
+//        $type = @get_class($pattern) ?: gettype($pattern);
+        $type = is_object($pattern) ? get_class($pattern) : gettype($pattern);
 
         try {
             $router = $this->group->factory->resolveGroup($pattern, $this);
@@ -1003,20 +1012,29 @@ class Route implements Registrar
     /**
      * Add new group on for this route.
      * @param array|string|\Callback $subroutes
+     * @param bool $resolve
      * @return Route
      */
-    public function setSubroutes($subroutes)
+    public function setSubroutes($subroutes, $resolve = false)
     {
+        if ($resolve)
+            $subroutes = $this->resolveGroup($subroutes);
+
         return $this->setProperty('subroutes', $subroutes);
     }
 
     /**
      * Alias to setSubroutes
      * @param array|string|callback $subroutes
+     * @param bool $resolve
      * @return Route
      */
-    public function group($subroutes)
+    public function group($subroutes, $resolve = false)
     {
+        if ($resolve) {
+            $subroutes = $this->resolveGroup($subroutes);
+        }
+
         return $this->setProperty('subroutes', $subroutes);
     }
 
@@ -1122,6 +1140,7 @@ class Route implements Registrar
 
     /**
      * Set attribute
+     * @deprecated
      * @param string $key
      * @param mixed $value
      * @return Route
@@ -1131,16 +1150,43 @@ class Route implements Registrar
         if (is_array($key)) {
             foreach ($key as $item => $value) {
                 if (strrpos($item, '[]') == ($itemLength = strlen($item) - 2)) {
-                    $this->attributes[substr($item, 0, $itemLength)][] = $value;
+                    $this->states[substr($item, 0, $itemLength)][] = $value;
                 } else {
-                    $this->attributes[$item] = $value;
+                    $this->states[$item] = $value;
                 }
             }
         } else {
             if (strrpos($key, '[]') == ($keyLength = strlen($key) - 2)) {
-                $this->attributes[substr($key, 0, $keyLength)][] = $value;
+                $this->states[substr($key, 0, $keyLength)][] = $value;
             } else {
-                $this->attributes[$key] = $value;
+                $this->states[$key] = $value;
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Set state
+     * @param string $key
+     * @param mixed $value
+     * @return Route
+     */
+    public function setState($key, $value = null)
+    {
+        if (is_array($key)) {
+            foreach ($key as $item => $value) {
+                if (strrpos($item, '[]') == ($itemLength = strlen($item) - 2)) {
+                    $this->states[substr($item, 0, $itemLength)][] = $value;
+                } else {
+                    $this->states[$item] = $value;
+                }
+            }
+        } else {
+            if (strrpos($key, '[]') == ($keyLength = strlen($key) - 2)) {
+                $this->states[substr($key, 0, $keyLength)][] = $value;
+            } else {
+                $this->states[$key] = $value;
             }
         }
 
@@ -1149,12 +1195,34 @@ class Route implements Registrar
 
     /**
      * Get attribute
+     * @deprecated
      * @param string $key
      * @return mixed
      */
     public function getAttribute($key)
     {
-        return $this->attributes[$key];
+        return $this->states[$key];
+    }
+
+    /**
+     * Get state
+     * @param string $key
+     * @return mixed
+     */
+    public function getState($key)
+    {
+        return $this->states[$key];
+    }
+
+    /**
+     * Check whether attribute exist
+     * @deprecated
+     * @param string $key
+     * @return bool
+     */
+    public function hasAttribute($key)
+    {
+        return isset($this->states[$key]);
     }
 
     /**
@@ -1162,19 +1230,31 @@ class Route implements Registrar
      * @param string $key
      * @return bool
      */
-    public function hasAttribute($key)
+    public function hasState($key)
     {
-        return isset($this->attributes[$key]);
+        return isset($this->states[$key]);
     }
 
     /**
      * Get all attributes
+     * @deprecated
      * @return array
      */
     public function getAttributes()
     {
-        return $this->attributes;
+        return $this->states;
     }
+
+    /**
+     * Get all attributes
+     * @deprecated
+     * @return array
+     */
+    public function getStates()
+    {
+        return $this->states;
+    }
+
 
     /**
      * Alias to setAttribute(key, value)
@@ -1185,6 +1265,17 @@ class Route implements Registrar
     public function attr($key, $value = null)
     {
         return $this->setAttribute($key, $value);
+    }
+
+    /**
+     * Alias to setState(key, value)
+     * @param string $key
+     * @param string $value
+     * @return Route
+     */
+    public function state($key, $value = null)
+    {
+        return $this->setState($key, $value);
     }
 
     /**

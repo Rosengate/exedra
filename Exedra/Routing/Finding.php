@@ -18,9 +18,16 @@ class Finding
 
     /**
      * Finding attributes
+     * @deprecated
      * @var array $attributes
      */
     protected $attributes = array();
+
+    /**
+     * Finding states
+     * @var array $states
+     */
+    protected $states = array();
 
     /**
      * Route parameters
@@ -139,7 +146,7 @@ class Finding
 
     /**
      * Resolve finding informations and returns a CallStack
-     * resolve middlewares, config, attributes
+     * resolve middlewares, config, state
      * @return CallStack|null
      * @throws Exception
      * @throws InvalidArgumentException
@@ -172,14 +179,14 @@ class Finding
 
             foreach ($route->getAttributes() as $key => $value) {
                 if (is_array($value)) {
-                    if (isset($this->attributes[$key]) && !is_array($this->attributes[$key]))
+                    if (isset($this->states[$key]) && !is_array($this->states[$key]))
                         throw new Exception('Unable to push value into attribute [' . $key . '] on route ' . $route->getAbsoluteName() . '. The attribute type is not an array.');
 
                     foreach ($value as $val) {
-                        $this->attributes[$key][] = $val;
+                        $this->states[$key][] = $val;
                     }
                 } else {
-                    $this->attributes[$key] = $value;
+                    $this->states[$key] = $value;
                 }
             }
 
@@ -247,22 +254,55 @@ class Finding
 
     /**
      * Get route found attribute
+     * @deprecated
      * @param string $key
      * @param mixed $default value
      * @return mixed
      */
     public function getAttribute($key, $default = null)
     {
-        return array_key_exists($key, $this->attributes) ? $this->attributes[$key] : $default;
+        return array_key_exists($key, $this->states) ? $this->states[$key] : $default;
+    }
+
+    /**
+     * Get route found state
+     * @param string $key
+     * @param mixed $default value
+     * @return mixed
+     */
+    public function getState($key, $default = null)
+    {
+        return array_key_exists($key, $this->states) ? $this->states[$key] : $default;
     }
 
     /**
      * Get all attributes
+     * @deprecated
      * @return array
      */
     public function getAllAttributes()
     {
-        return $this->attributes;
+        return $this->states;
+    }
+
+    /**
+     * Get all states
+     * @return array
+     */
+    public function getAllStates()
+    {
+        return $this->states;
+    }
+
+    /**
+     * Check whether attribute exists
+     * @deprecated
+     * @param string $key
+     * @return boolean
+     */
+    public function hasAttribute($key)
+    {
+        return array_key_exists($key, $this->states);
     }
 
     /**
@@ -270,9 +310,9 @@ class Finding
      * @param string $key
      * @return boolean
      */
-    public function hasAttribute($key)
+    public function hasState($key)
     {
-        return array_key_exists($key, $this->attributes);
+        return array_key_exists($key, $this->states);
     }
 
     /**

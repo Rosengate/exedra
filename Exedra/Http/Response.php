@@ -13,7 +13,7 @@ class Response extends Message implements ResponseInterface
 
     protected $statuses;
 
-    public function __construct($status = 200, array $headers = array(), StreamInterface $body, $protocol = '1.1', $reason = null)
+    public function __construct($status = 200, array $headers = array(), StreamInterface $body = null, $protocol = '1.1', $reason = null)
     {
         parent::__construct($headers, $body, $protocol);
 
