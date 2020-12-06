@@ -2,6 +2,7 @@
 
 namespace Exedra\Support\Wireman\Resolvers;
 
+use Exedra\Support\BcHelper;
 use Exedra\Support\Wireman\Contracts\ParamResolver;
 use Exedra\Support\Wireman\Contracts\WiringResolver;
 use Exedra\Support\Wireman\Exceptions\ParamResolveException;
@@ -34,7 +35,12 @@ class InstantiationResolver implements WiringResolver, ParamResolver
      */
     public function canResolveParam(\ReflectionParameter $param)
     {
-        return !!$param->getClass();
+        return BcHelper::ReflectionParamIsClass($param);
+//        if (version_compare(phpversion(), '7.0.0', '>=')) {
+//            return !!$param->getType();
+//        } else {
+//            return !!$param->getClass();
+//        }
     }
 
     /**
@@ -44,6 +50,9 @@ class InstantiationResolver implements WiringResolver, ParamResolver
      */
     public function resolveParam(\ReflectionParameter $param, Wireman $wireman)
     {
-        return $this->resolveWiring($param->getClass()->getName(), $wireman);
+        return $this->resolveWiring(BcHelper::ReflectionParamGetClass($param), $wireman);
+//        $type = version_compare(phpversion(), '7.0.0', '>=') ? (string) $param->getType() : $param->getClass()->getName();
+//
+//        return $this->resolveWiring($type, $wireman);
     }
 }
