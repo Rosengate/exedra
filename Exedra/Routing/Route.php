@@ -466,6 +466,13 @@ class Route implements Registrar
         // path validation
         $result = $this->matchPath($path, $routePath);
 
+        if (!$result)
+            return array(
+                'route' => false,
+                'parameter' => array(),
+                'continue' => false
+            );
+
         if ($params)
             $result['parameter'] = array_merge($result['parameter'], $params);
 
