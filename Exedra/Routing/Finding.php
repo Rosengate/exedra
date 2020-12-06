@@ -106,6 +106,11 @@ class Finding
         return $this->parameters;
     }
 
+    protected function createMiddleware($class)
+    {
+        return new $class;
+    }
+
     /**
      * @param $middleware
      * @return callable
@@ -122,7 +127,7 @@ class Finding
         if (is_string($middleware)) {
             @list($middleware, $method) = explode('@', $middleware);
 
-            $middleware = new $middleware;
+            $middleware = $this->createMiddleware($middleware);
 
             $method = $method ? : 'handle';
         }
@@ -138,9 +143,6 @@ class Finding
 
         if (method_exists($middleware, $method))
             return [$middleware, $method];
-//            return function () use ($middleware, $method) {
-//                return call_user_func_array(array($middleware, $method), func_get_args());
-//            };
 
         throw new InvalidArgumentException('Middleware [' . get_class($middleware) . '] has to be callable or implements method handle()');
     }
