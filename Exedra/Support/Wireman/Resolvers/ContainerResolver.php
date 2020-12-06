@@ -35,10 +35,17 @@ class ContainerResolver implements WiringResolver, ParamResolver
      */
     public function canResolveParam(\ReflectionParameter $param)
     {
-        if (!($class = $param->getClass()))
-            return false;
+        if (version_compare(phpversion(), '7.0.0', '>=')) {
+            if (!($type = $param->getType()))
+                return false;
 
-        return $this->container['service']->has($class->getName());
+            return $this->container['service']->has((string) $type);
+        } else {
+            if (!$class = $param->getClass())
+                return false;
+
+            return $this->container['service']->has((string) $class->getName());
+        }
     }
 
     /**
@@ -47,6 +54,10 @@ class ContainerResolver implements WiringResolver, ParamResolver
      */
     public function resolveParam(\ReflectionParameter $param, Wireman $wireman)
     {
-        return $this->container->get($param->getClass()->getName());
+        if (version_compare(phpversion(), '7.0.0', '>=')) {
+            return $this->container->get((string) $param->getType());
+        } else {
+            return $this->container->get($param->getClass()->getName());
+        }
     }
 }
