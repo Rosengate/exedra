@@ -108,7 +108,7 @@ class Finding
 
     /**
      * @param $middleware
-     * @return \Closure
+     * @return callable
      * @throws InvalidArgumentException
      */
     protected function resolveMiddleware($middleware)
@@ -124,7 +124,7 @@ class Finding
 
             $middleware = new $middleware;
 
-            $method = $method ?: 'handle';
+            $method = $method ? : 'handle';
         }
 
         if (is_array($middleware)) {
@@ -137,9 +137,10 @@ class Finding
             return $middleware;
 
         if (method_exists($middleware, $method))
-            return function () use ($middleware, $method) {
-                return call_user_func_array(array($middleware, $method), func_get_args());
-            };
+            return [$middleware, $method];
+//            return function () use ($middleware, $method) {
+//                return call_user_func_array(array($middleware, $method), func_get_args());
+//            };
 
         throw new InvalidArgumentException('Middleware [' . get_class($middleware) . '] has to be callable or implements method handle()');
     }
