@@ -74,11 +74,12 @@ class Factory
      */
     protected function setUp()
     {
-        $this->register(array(
-            'finding' => Finding::class,
-            'route' => Route::class,
-            'group' => Group::class
-        ));
+        // to deprecate this method because we've no control over the dependencies
+//        $this->register(array(
+//            'finding' => Finding::class,
+//            'route' => Route::class,
+//            'group' => Group::class
+//        ));
 
         $this->addDefaultGroupHandler(new ClosureHandler());
         $this->addDefaultGroupHandler(new ArrayHandler());
@@ -129,6 +130,9 @@ class Factory
      */
     public function createRoute(Group $group, $name, array $parameters)
     {
+        if (!isset($this->registry[$name]))
+            return new Route($group, $name, $parameters);
+
         return $this->create('route', array($group, $name, $parameters));
     }
 
@@ -140,6 +144,9 @@ class Factory
      */
     public function createGroup(array $routes = array(), Route $route = null)
     {
+        if (!isset($this->registry['group']))
+            return new Group($this, $route, $routes);
+
         return $this->create('group', array($this, $route, $routes));
     }
 
@@ -244,6 +251,9 @@ class Factory
      */
     public function createFinding(Route $route = null, array $parameters = null, ServerRequestInterface $request = null)
     {
+        if (!isset($this->registry['finding']))
+            return new Finding($route, $parameters, $request);
+
         return $this->create('finding', array($route, $parameters, $request));
     }
 }
