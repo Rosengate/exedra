@@ -313,6 +313,23 @@ class Context extends Container
     }
 
     /**
+     * @return mixed[]
+     */
+    public function flags()
+    {
+        return $this->finding->getFlags();
+    }
+
+    /**
+     * @param $flag
+     * @return bool
+     */
+    public function hasFlag($flag)
+    {
+        return $this->finding->hasFlag($flag);
+    }
+
+    /**
      * Check whether given param key exists
      * @param string $name
      * @return boolean

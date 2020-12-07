@@ -30,6 +30,12 @@ class Finding
     protected $states = array();
 
     /**
+     * Finding flags
+     * @var mixed[]
+     */
+    protected $flags = [];
+
+    /**
      * Route parameters
      * @var array $parameters
      */
@@ -180,9 +186,11 @@ class Finding
             foreach ($route->getProperty('middleware') as $middleware)
                 $callStack->addCallable($this->resolveMiddleware($middleware[0]), $middleware[1]);
 
-            foreach ($route->getAttributes() as $key => $value) {
+            foreach ($route->getStates() as $key => $value)
                 $this->states[$key] = $value;
-            }
+
+            foreach ($route->getFlags() as $flag)
+                $this->flags[] = $flag;
 
             // pass config.
             if ($config = $route->getProperty('config'))
@@ -281,9 +289,19 @@ class Finding
 
     /**
      * Get all states
+     * @deprecated use getStates instead
      * @return array
      */
     public function getAllStates()
+    {
+        return $this->states;
+    }
+
+    /**
+     * Get all states
+     * @return array
+     */
+    public function getStates()
     {
         return $this->states;
     }
@@ -307,6 +325,24 @@ class Finding
     public function hasState($key)
     {
         return array_key_exists($key, $this->states);
+    }
+
+    /**
+     * Get all the collected flags
+     * @return mixed[]
+     */
+    public function getFlags()
+    {
+        return $this->flags;
+    }
+
+    /**
+     * @param $flag
+     * @return bool
+     */
+    public function hasFlag($flag)
+    {
+        return in_array($flag, $this->flags);
     }
 
     /**

@@ -94,6 +94,12 @@ class Route implements Registrar
      */
     protected $states = array();
 
+    /**
+     * Route flags
+     * @var mixed[]
+     */
+    protected $flags = array();
+
     public function __construct(Group $group, $name, array $properties = array())
     {
         $this->name = $name;
@@ -1214,6 +1220,18 @@ class Route implements Registrar
         return $this;
     }
 
+    public function setFlags(array $flags)
+    {
+        $this->flags = array_merge($this->flags, $flags);
+
+        return $this;
+    }
+
+    public function getFlags()
+    {
+        return $this->flags;
+    }
+
     /**
      * Get attribute
      * @deprecated
@@ -1268,7 +1286,6 @@ class Route implements Registrar
 
     /**
      * Get all attributes
-     * @deprecated
      * @return array
      */
     public function getStates()

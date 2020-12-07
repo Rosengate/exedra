@@ -4,6 +4,7 @@ namespace Exedra\Routeller;
 
 use Exedra\Routeller\Attributes\Attr;
 use Exedra\Routeller\Attributes\Config;
+use Exedra\Routeller\Attributes\Flag;
 use Exedra\Routeller\Attributes\Middleware;
 use Exedra\Routeller\Attributes\State;
 use Exedra\Routeller\Contracts\RouteAttribute;
@@ -31,7 +32,7 @@ class AttributesReader implements RoutePropertiesReader
 
             if ($attr instanceof Middleware)
                 $middlewares[] = $attr->getValue();
-            else if (isset($properties[$property]) && ($attr instanceof State || $attr instanceof Attr || $attr instanceof Config))
+            else if (isset($properties[$property]) && ($attr instanceof State || $attr instanceof Attr || $attr instanceof Config || $attr instanceof Flag))
                 $properties[$property] = array_merge($properties[$property], $attr->getValue());
             else
                 DotArray::set($properties, $attr->getProperty(), $attr->getValue());
@@ -56,6 +57,9 @@ class AttributesReader implements RoutePropertiesReader
 //                $stateAttribute->key() => $stateAttribute->value()
 //            ]);
         }
+
+        echo '<pre>';
+        print_r($properties);
 
 //        foreach ($this->handlers as $handler) {
 //            foreach ($reflector->getAttributes($handler->name(), \ReflectionAttribute::IS_INSTANCEOF) as $attribute) {
