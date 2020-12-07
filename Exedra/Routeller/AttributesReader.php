@@ -58,9 +58,6 @@ class AttributesReader implements RoutePropertiesReader
 //            ]);
         }
 
-        echo '<pre>';
-        print_r($properties);
-
 //        foreach ($this->handlers as $handler) {
 //            foreach ($reflector->getAttributes($handler->name(), \ReflectionAttribute::IS_INSTANCEOF) as $attribute) {
 //                $state = $handler->handle($attribute);
