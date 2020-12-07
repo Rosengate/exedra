@@ -7,6 +7,7 @@ use Exedra\Routeller\Attributes\Config;
 use Exedra\Routeller\Attributes\Middleware;
 use Exedra\Routeller\Attributes\State;
 use Exedra\Routeller\Contracts\RouteAttribute;
+use Exedra\Routeller\Contracts\StateAttribute;
 use Exedra\Routeller\Contracts\StateAttributeHandler;
 use Exedra\Routeller\Contracts\RoutePropertiesReader;
 use Exedra\Support\DotArray;
@@ -14,31 +15,15 @@ use Exedra\Support\DotArray;
 class AttributesReader implements RoutePropertiesReader
 {
     /**
-     * @var StateAttributeHandler[]
-     */
-    private array $handlers;
-
-    /**
-     * AttributesReader constructor.
-     * @param StateAttributeHandler[] $handlers
-     */
-    public function __construct(array $handlers = [])
-    {
-        $this->handlers = $handlers;
-    }
-
-    /**
      * @param \Reflector|\ReflectionMethod $reflector
      */
     public function readProperties(\Reflector $reflector)
     {
-        $attributes = $reflector->getAttributes(RouteAttribute::class, \ReflectionAttribute::IS_INSTANCEOF);
-
         $properties = [];
 
         $middlewares = [];
 
-        foreach ($attributes as $reflection) {
+        foreach ($reflector->getAttributes(RouteAttribute::class, \ReflectionAttribute::IS_INSTANCEOF) as $reflection) {
             /** @var RouteAttribute $attr */
             $attr = $reflection->newInstance();
 
@@ -55,15 +40,25 @@ class AttributesReader implements RoutePropertiesReader
         if (count($middlewares) > 0)
             DotArray::set($properties, 'middleware', $middlewares);
 
-        foreach ($this->handlers as $handler) {
-            foreach ($reflector->getAttributes($handler->name(), \ReflectionAttribute::IS_INSTANCEOF) as $attribute) {
-                $state = $handler->handle($attribute);
+        /** @var \ReflectionAttribute $attribute */
+        foreach ($reflector->getAttributes(StateAttribute::class, \ReflectionAttribute::IS_INSTANCEOF) as $attribute) {
+            /** @var StateAttribute $stateAttribute */
+            $stateAttribute = $attribute->newInstance();
 
-                DotArray::set($properties, 'state', [
-                    $state->key => $state->value
-                ]);
-            }
+            DotArray::set($properties, 'state', [
+                $stateAttribute->key() => $stateAttribute->value()
+            ]);
         }
+
+//        foreach ($this->handlers as $handler) {
+//            foreach ($reflector->getAttributes($handler->name(), \ReflectionAttribute::IS_INSTANCEOF) as $attribute) {
+//                $state = $handler->handle($attribute);
+//
+//                DotArray::set($properties, 'state', [
+//                    $state->key => $state->value
+//                ]);
+//            }
+//        }
 
         return $properties;
     }
