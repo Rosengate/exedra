@@ -1174,6 +1174,18 @@ class Route implements Registrar
     }
 
     /**
+     * Set states
+     * @param array $states
+     * @return $this
+     */
+    public function setStates(array $states)
+    {
+        $this->states = array_merge($this->states, $states);
+
+        return $this;
+    }
+
+    /**
      * Set state
      * @param string $key
      * @param mixed $value
@@ -1181,21 +1193,23 @@ class Route implements Registrar
      */
     public function setState($key, $value = null)
     {
-        if (is_array($key)) {
-            foreach ($key as $item => $value) {
-                if (strrpos($item, '[]') == ($itemLength = strlen($item) - 2)) {
-                    $this->states[substr($item, 0, $itemLength)][] = $value;
-                } else {
-                    $this->states[$item] = $value;
-                }
-            }
-        } else {
-            if (strrpos($key, '[]') == ($keyLength = strlen($key) - 2)) {
-                $this->states[substr($key, 0, $keyLength)][] = $value;
-            } else {
-                $this->states[$key] = $value;
-            }
-        }
+//        if (is_array($key)) {
+//            foreach ($key as $item => $value) {
+//                if (strrpos($item, '[]') == ($itemLength = strlen($item) - 2)) {
+//                    $this->states[substr($item, 0, $itemLength)][] = $value;
+//                } else {
+//                    $this->states[$item] = $value;
+//                }
+//            }
+//        } else {
+//            if (strrpos($key, '[]') == ($keyLength = strlen($key) - 2)) {
+//                $this->states[substr($key, 0, $keyLength)][] = $value;
+//            } else {
+//                $this->states[$key] = $value;
+//            }
+//        }
+
+        $this->states[$key] = $value;
 
         return $this;
     }

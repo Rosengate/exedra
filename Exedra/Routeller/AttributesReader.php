@@ -45,9 +45,16 @@ class AttributesReader implements RoutePropertiesReader
             /** @var StateAttribute $stateAttribute */
             $stateAttribute = $attribute->newInstance();
 
-            DotArray::set($properties, 'state', [
-                $stateAttribute->key() => $stateAttribute->value()
-            ]);
+            if (!isset($properties['states']))
+                $properties['states'] = [];
+
+            DotArray::set($properties['states'], $stateAttribute->key(), $stateAttribute->value());
+
+//            $properties['state'][$stateAttribute->key()] = $stateAttribute->value();
+
+//            DotArray::set($properties, 'state', [
+//                $stateAttribute->key() => $stateAttribute->value()
+//            ]);
         }
 
 //        foreach ($this->handlers as $handler) {

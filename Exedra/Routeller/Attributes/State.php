@@ -19,7 +19,7 @@ class State implements RouteAttribute
 
     public function getProperty(): string
     {
-        return 'state';
+        return 'states';
     }
 
     public function getValue(): mixed

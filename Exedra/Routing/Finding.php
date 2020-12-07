@@ -181,16 +181,7 @@ class Finding
                 $callStack->addCallable($this->resolveMiddleware($middleware[0]), $middleware[1]);
 
             foreach ($route->getAttributes() as $key => $value) {
-                if (is_array($value)) {
-                    if (isset($this->states[$key]) && !is_array($this->states[$key]))
-                        throw new Exception('Unable to push value into attribute [' . $key . '] on route ' . $route->getAbsoluteName() . '. The attribute type is not an array.');
-
-                    foreach ($value as $val) {
-                        $this->states[$key][] = $val;
-                    }
-                } else {
-                    $this->states[$key] = $value;
-                }
+                $this->states[$key] = $value;
             }
 
             // pass config.
