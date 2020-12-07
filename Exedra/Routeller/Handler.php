@@ -64,6 +64,9 @@ class Handler implements GroupHandler
      */
     protected $refClassProperties = [];
 
+    /** @var array  */
+    protected $read = [];
+
     public function __construct(ContainerInterface $container = null,
                                 array $propertyResolvers = array(),
                                 CacheInterface $cache = null,
@@ -278,7 +281,7 @@ class Handler implements GroupHandler
 
         $reader = $this->createReader();
 
-        if ($parentRoute) {
+        if ($parentRoute && !isset($this->read[$reflection->getName()])) {
             $parentRoute->setProperties($this->readReflectionClassProperties($reflection, $reader));
         }
 
@@ -359,6 +362,9 @@ class Handler implements GroupHandler
 
                     // read controller route properties
                     $properties = $this->propertiesDeferringMerge($this->readReflectionClassProperties($controllerRef, $reader), $properties);
+
+                    // to prevent route setProperties re-run above.
+                    $this->read[$controllerRef->getName()] = true;
 
                     $subrouteClass = $cname;
                 }
