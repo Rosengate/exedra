@@ -100,6 +100,12 @@ class Route implements Registrar
      */
     protected $flags = array();
 
+    /**
+     * Decorators
+     * @var array
+     */
+    protected $decorators = array();
+
     public function __construct(Group $group, $name, array $properties = array())
     {
         $this->name = $name;
@@ -1070,6 +1076,40 @@ class Route implements Registrar
             foreach ($middleware as $m)
                 $this->properties['middleware'][] = array($m, []);
         }
+
+        return $this;
+    }
+
+    public function setDecorators(array $decorators)
+    {
+        foreach ($decorators as $decorator)
+            $this->decorators[] = $decorator;
+
+        return $this;
+    }
+
+    public function getDecorators()
+    {
+        return $this->decorators;
+    }
+
+    public function addDecorator($decorator)
+    {
+        $this->decorators[] = $decorator;
+
+        return $this;
+    }
+
+    public function setDecorator($decorator)
+    {
+        $this->decorators[] = $decorator;
+
+        return $this;
+    }
+
+    public function decorator($decorator)
+    {
+        $this->decorators[] = $decorator;
 
         return $this;
     }

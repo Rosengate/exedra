@@ -314,6 +314,19 @@ class Handler implements GroupHandler
                 continue;
             }
 
+            if (strpos($methodName, 'decorate') === 0) {
+                $entries = array(
+                    'decorator' => array(
+                        'properties' => [],
+                        'handle' => $reflectionMethod->getName()
+                    )
+                );
+
+                $group->addDecorator($reflectionMethod->getClosure($controller));
+
+                continue;
+            }
+
             if (strpos(strtolower($methodName), 'setup') === 0) {
                 $controller->{$methodName}($group, $this->container);
 

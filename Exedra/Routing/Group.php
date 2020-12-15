@@ -68,6 +68,11 @@ class Group implements \ArrayAccess, Registrar
      */
     protected $validators = [];
 
+    /**
+     * @var array
+     */
+    protected array $decorators = [];
+
     public function __construct(Factory $factory, Route $route = null, array $routes = array())
     {
         $this->factory = $factory;
@@ -196,6 +201,25 @@ class Group implements \ArrayAccess, Registrar
         }
 
         return $this;
+    }
+
+    public function addDecorator($decorator)
+    {
+        if ($this->route) {
+            $this->route->addDecorator($decorator);
+        } else {
+            $this->decorators[] = $decorator;
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getDecorators()
+    {
+        return $this->decorators;
     }
 
     /**

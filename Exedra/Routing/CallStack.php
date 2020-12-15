@@ -11,11 +11,23 @@ class CallStack
     /**
      * @param callable $callable
      * @param array $properties
+     * @deprecated
      * @return $this
      */
     public function addCallable(callable $callable, array $properties = array())
     {
         $this->callables[] = new Call($callable, $properties);
+
+        return $this;
+    }
+
+    /**
+     * @param Call $call
+     * @return $this
+     */
+    public function addCall(Call $call)
+    {
+        $this->callables[] = $call;
 
         return $this;
     }

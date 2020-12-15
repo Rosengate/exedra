@@ -162,12 +162,16 @@ class Finding
      */
     protected function resolve()
     {
-        $callStack = new CallStack;
+//        $callStack = new CallStack;
 
         $executePattern = $this->route->getProperty('execute');
 
         /** @var ExecuteHandler[] $handlers */
         $handlers = array();
+
+        $middlewares = array();
+
+        $decorators = array();
 
         foreach ($this->route->getFullRoutes() as $route) {
             $group = $route->getGroup();
@@ -180,17 +184,25 @@ class Finding
                 $handlers[$name] = $handler;
 
             foreach ($group->getMiddlewares() as $middleware)
-                $callStack->addCallable($this->resolveMiddleware($middleware[0]), $middleware[1]);
+                $middlewares[] = new Call($this->resolveMiddleware($middleware[0]), $middleware[1]);
+//                $callStack->addCallable($this->resolveMiddleware($middleware[0]), $middleware[1]);
 
             // append all route middlewares
             foreach ($route->getProperty('middleware') as $middleware)
-                $callStack->addCallable($this->resolveMiddleware($middleware[0]), $middleware[1]);
+                $middlewares[] = new Call($this->resolveMiddleware($middleware[0]), $middleware[1]);
+//                $callStack->addCallable($this->resolveMiddleware($middleware[0]), $middleware[1]);
 
             foreach ($route->getStates() as $key => $value)
                 $this->states[$key] = $value;
 
             foreach ($route->getFlags() as $flag)
                 $this->flags[] = $flag;
+
+            foreach ($group->getDecorators() as $decorator)
+                $decorators[] = new Call($this->resolveMiddleware($decorator));
+
+            foreach ($route->getDecorators() as $decorator)
+                $decorators[] = new Call($this->resolveMiddleware($decorator));
 
             // pass config.
             if ($config = $route->getProperty('config'))
@@ -227,13 +239,31 @@ class Finding
                 if (!$resolve)
                     throw new InvalidArgumentException('The route [' . $this->route->getAbsoluteName() . '] execute handle was not properly resolved. ' . (is_string($executePattern) ? ' [' . $executePattern . ']' : ''));
 
-                $callStack->addCallable($resolve, $properties);
+//                $callStack->addCallable($resolve, $properties);
 
-                return $callStack;
+                return $this->createCallStack($middlewares, $decorators, new Call($resolve, $properties));
+
+//                return $callStack;
             }
         }
 
         return null;
+    }
+
+    /**
+     * @param Call[] $middlewares
+     * @param Call[] $decorators
+     * @param Call $resolver
+     * @return CallStack
+     */
+    protected function createCallStack(array $middlewares, array $decorators, Call $resolver)
+    {
+        $callStack = new CallStack();
+
+        foreach (array_merge($middlewares, $decorators, [$resolver]) as $call)
+            $callStack->addCall($call);
+
+        return $callStack;
     }
 
     /**
