@@ -71,7 +71,7 @@ class Group implements \ArrayAccess, Registrar
     /**
      * @var array
      */
-    protected array $decorators = [];
+    protected $decorators = [];
 
     public function __construct(Factory $factory, Route $route = null, array $routes = array())
     {
