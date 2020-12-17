@@ -330,6 +330,25 @@ class Context extends Container
     }
 
     /**
+     * @param $key
+     * @param $default
+     * @return array|null
+     */
+    public function series($key, $default = array())
+    {
+        return $this->finding->getSeries($key, $default);
+    }
+
+    /**
+     * @param $key
+     * @return bool
+     */
+    public function hasSeries($key)
+    {
+        return $this->finding->hasSeries($key);
+    }
+
+    /**
      * Check whether given param key exists
      * @param string $name
      * @return boolean

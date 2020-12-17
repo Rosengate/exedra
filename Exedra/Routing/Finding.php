@@ -33,7 +33,13 @@ class Finding
      * Finding flags
      * @var mixed[]
      */
-    protected $flags = [];
+    protected $flags = array();
+
+    /**
+     * Finding serieses
+     * @var array
+     */
+    protected $serieses = array();
 
     /**
      * Route parameters
@@ -197,6 +203,14 @@ class Finding
 
             foreach ($route->getFlags() as $flag)
                 $this->flags[] = $flag;
+
+            foreach ($route->getSerieses() as $key => $value) {
+                if (!array_key_exists($key, $this->serieses))
+                    $this->serieses[$key] = array();
+
+                foreach ($value as $v)
+                    $this->serieses[$key][] = $v;
+            }
 
             foreach ($group->getDecorators() as $decorator)
                 $decorators[] = new Call($this->resolveMiddleware($decorator));
@@ -373,6 +387,33 @@ class Finding
     public function hasFlag($flag)
     {
         return in_array($flag, $this->flags);
+    }
+
+    /**
+     * @param $key
+     * @param null $default
+     * @return array|null
+     */
+    public function getSeries($key, $default = array())
+    {
+        return isset($this->serieses[$key]) ? $this->serieses[$key] : $default;
+    }
+
+    /**
+     * @param $key
+     * @return bool
+     */
+    public function hasSeries($key)
+    {
+        return array_key_exists($key, $this->serieses);
+    }
+
+    /**
+     * @return array
+     */
+    public function getSerieses()
+    {
+        return $this->serieses;
     }
 
     /**

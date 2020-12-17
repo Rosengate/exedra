@@ -88,17 +88,25 @@ class Route implements Registrar
     protected $attributes = array();
 
     /**
-     * Route states
-     * Replacement for route attributes
+     * Route meta information : state
+     * A key based information
      * @var array states
      */
     protected $states = array();
 
     /**
-     * Route flags
+     * Route meta information : flags
+     * A generic single array of information
      * @var mixed[]
      */
     protected $flags = array();
+
+    /**
+     * Route meta information : series
+     * An additive meta information
+     * @var array
+     */
+    protected $serieses = array();
 
     /**
      * Decorators
@@ -1270,6 +1278,77 @@ class Route implements Registrar
     public function getFlags()
     {
         return $this->flags;
+    }
+
+    /**
+     * Get all series
+     * @return array
+     */
+    public function getSerieses()
+    {
+        return $this->serieses;
+    }
+
+    /**
+     * Alias to updateSeries
+     * @param $key
+     * @param $value
+     * @return $this
+     */
+    public function setSeries($key, $value = null)
+    {
+        if (!isset($this->serieses[$key]))
+            $this->serieses[$key] = array();
+
+        $this->serieses[$key] = $value;
+
+        return $this;
+    }
+
+    /**
+     * @param array $serieses
+     * @return $this
+     */
+    public function setSerieses(array $serieses)
+    {
+        foreach ($serieses as $key => $value) {
+            foreach ($value as $v) {
+                if (!isset($this->serieses[$key]))
+                    $this->serieses[$key] = array();
+
+                $this->serieses[$key][] = $v;
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Alias to setSeries
+     * @param $key
+     * @param $value
+     */
+    public function updateSeries($key, $value = null)
+    {
+        if (!isset($this->serieses[$key]))
+            $this->serieses[$key] = array();
+
+        $this->serieses[$key][] = $value;
+
+        return $this;
+    }
+
+    /**
+     * Get a series
+     * @param $key
+     * @return array|mixed
+     */
+    public function getSeries($key)
+    {
+        if (!isset($this->series[$key]))
+            return array();
+
+        return $this->series[$key];
     }
 
     /**
