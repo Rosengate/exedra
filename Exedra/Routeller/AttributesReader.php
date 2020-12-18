@@ -9,8 +9,6 @@ use Exedra\Routeller\Attributes\Middleware;
 use Exedra\Routeller\Attributes\Series;
 use Exedra\Routeller\Attributes\State;
 use Exedra\Routeller\Contracts\RouteAttribute;
-use Exedra\Routeller\Contracts\StateAttribute;
-use Exedra\Routeller\Contracts\StateAttributeHandler;
 use Exedra\Routeller\Contracts\RoutePropertiesReader;
 use Exedra\Support\DotArray;
 
@@ -52,33 +50,6 @@ class AttributesReader implements RoutePropertiesReader
 
         if (count($middlewares) > 0)
             DotArray::set($properties, 'middleware', $middlewares);
-
-        /** @var \ReflectionAttribute $attribute */
-        foreach ($reflector->getAttributes(StateAttribute::class, \ReflectionAttribute::IS_INSTANCEOF) as $attribute) {
-            /** @var StateAttribute $stateAttribute */
-            $stateAttribute = $attribute->newInstance();
-
-            if (!isset($properties['states']))
-                $properties['states'] = [];
-
-            DotArray::set($properties['states'], $stateAttribute->key(), $stateAttribute->value());
-
-//            $properties['state'][$stateAttribute->key()] = $stateAttribute->value();
-
-//            DotArray::set($properties, 'state', [
-//                $stateAttribute->key() => $stateAttribute->value()
-//            ]);
-        }
-
-//        foreach ($this->handlers as $handler) {
-//            foreach ($reflector->getAttributes($handler->name(), \ReflectionAttribute::IS_INSTANCEOF) as $attribute) {
-//                $state = $handler->handle($attribute);
-//
-//                DotArray::set($properties, 'state', [
-//                    $state->key => $state->value
-//                ]);
-//            }
-//        }
 
         return $properties;
     }
