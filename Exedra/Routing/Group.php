@@ -203,6 +203,14 @@ class Group implements \ArrayAccess, Registrar
         return $this;
     }
 
+    public function addDecorators(array $decorators)
+    {
+        foreach ($decorators as $decorator)
+            $this->addDecorator($decorator);
+
+        return $this;
+    }
+
     public function addDecorator($decorator)
     {
         if ($this->route) {
