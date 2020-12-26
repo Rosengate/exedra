@@ -194,8 +194,8 @@ class Finding
 //                $callStack->addCallable($this->resolveMiddleware($middleware[0]), $middleware[1]);
 
             // append all route middlewares
-            foreach ($route->getProperty('middleware') as $middleware)
-                $middlewares[] = new Call($this->resolveMiddleware($middleware[0]), $middleware[1]);
+//            foreach ($route->getProperty('middleware') as $middleware)
+//                $middlewares[] = new Call($this->resolveMiddleware($middleware[0]), $middleware[1]);
 //                $callStack->addCallable($this->resolveMiddleware($middleware[0]), $middleware[1]);
 
             foreach ($route->getStates() as $key => $value)

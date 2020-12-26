@@ -15,6 +15,8 @@ class Group implements \ArrayAccess, Registrar
      */
     public $route;
 
+    protected $isRoot = false;
+
     /**
      * Cached routes
      * @var array routes
@@ -77,7 +79,12 @@ class Group implements \ArrayAccess, Registrar
     {
         $this->factory = $factory;
 
-        $this->route = $route;
+        if (!$route) {
+            $this->isRoot = true;
+            $this->route = $factory->createRoute($this, '', []);
+        } else {
+            $this->route = $route;
+        }
 
         if (count($routes) > 0)
             $this->addRoutes($routes);
@@ -227,7 +234,8 @@ class Group implements \ArrayAccess, Registrar
      */
     public function getDecorators()
     {
-        return $this->decorators;
+        return $this->route->getDecorators();
+//        return $this->decorators;
     }
 
     /**
@@ -253,7 +261,8 @@ class Group implements \ArrayAccess, Registrar
      */
     public function getMiddlewares()
     {
-        return $this->middlewares;
+        return $this->route->getMiddlewares();
+//        return $this->middlewares;
     }
 
     /**
@@ -304,10 +313,13 @@ class Group implements \ArrayAccess, Registrar
 
     /**
      * Get the route this routing group was bound to.
-     * @return Route
+     * @return Route|null
      */
     public function getUpperRoute()
     {
+        if ($this->isRoot)
+            return null;
+
         return $this->route;
     }
 
@@ -549,14 +561,33 @@ class Group implements \ArrayAccess, Registrar
         );
     }
 
+    public function getRoute()
+    {
+        if ($this->isRoot)
+            return null;
+
+        return $this->route;
+    }
+
+    public function getRootRoute()
+    {
+        if (!$this->isRoot)
+            return null;
+
+        return $this->route;
+    }
+
     /**
      * Recusively get the uppermost Routing\Group
      * @return Group $group
      */
     public function getRootGroup()
     {
-        if (!$this->route)
+        if ($this->isRoot)
             return $this;
+
+//        if (!$this->route)
+//            return $this;
 
         $group = $this->route->getGroup();
 
@@ -569,6 +600,7 @@ class Group implements \ArrayAccess, Registrar
      */
     public function isRoot()
     {
+        return $this->isRoot;
         return !$this->route;
     }
 

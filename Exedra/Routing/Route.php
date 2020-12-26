@@ -1122,6 +1122,11 @@ class Route implements Registrar
         return $this;
     }
 
+    public function getMiddlewares()
+    {
+        return $this->getProperty('middleware');
+    }
+
     /**
      * Add an array of middlewares
      * @param array $middlewares
