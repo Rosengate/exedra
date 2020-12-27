@@ -67,6 +67,20 @@ class Handler implements GroupHandler
     /** @var array  */
     protected $read = [];
 
+    /**
+     * @var RoutePropertiesReader|null
+     */
+    protected $reader;
+
+    /**
+     * @var array|mixed
+     */
+    private $propertyParsers;
+
+    const OPTION_AUTO_RELOAD = 'auto_reload';
+    const OPTION_READER = 'reader';
+    const OPTION_PROPERTY_PARSERS = 'property_parsers';
+
     public function __construct(ContainerInterface $container = null,
                                 array $propertyResolvers = array(),
                                 CacheInterface $cache = null,
@@ -80,7 +94,11 @@ class Handler implements GroupHandler
 
         $this->options = $options;
 
-        $this->isAutoReload = isset($this->options['auto_reload']) && $this->options['auto_reload'] === true ? true : false;
+        $this->isAutoReload = isset($this->options[static::OPTION_AUTO_RELOAD]) && $this->options[static::OPTION_AUTO_RELOAD] === true;
+
+        $this->reader = isset($options[static::OPTION_READER]) ? $options[static::OPTION_READER] : null;
+
+        $this->propertyParsers = isset($options[static::OPTION_PROPERTY_PARSERS]) ? $options[static::OPTION_PROPERTY_PARSERS] : [];
     }
 
     /**
@@ -123,10 +141,10 @@ class Handler implements GroupHandler
      */
     protected function createReader()
     {
-        if (isset($this->options['reader']))
-            return $this->options['reader'];
+        if ($this->reader)
+            return $this->reader;
         else
-            return new AnnotationsReader(isset($this->options['property_parsers']) ? $this->options['property_parsers'] : []);
+            return new AnnotationsReader($this->propertyParsers);
     }
 
     public function readReflectionClassProperties(\ReflectionClass $refClass, RoutePropertiesReader $reader)
