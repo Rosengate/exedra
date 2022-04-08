@@ -16,7 +16,6 @@ use Exedra\Routing\Route;
 use Exedra\Routeller\Cache\CacheInterface;
 use Exedra\Routeller\Cache\EmptyCache;
 use Exedra\Routeller\Controller\Controller;
-use Psr\Container\ContainerInterface;
 
 class Handler implements GroupHandler
 {
@@ -46,7 +45,7 @@ class Handler implements GroupHandler
     protected $isAutoReload;
 
     /**
-     * @var ContainerInterface
+     * @var Container
      */
     protected $container;
 
@@ -82,7 +81,13 @@ class Handler implements GroupHandler
     const OPTION_READER = 'reader';
     const OPTION_PROPERTY_PARSERS = 'property_parsers';
 
-    public function __construct(Container $container = null,
+    /**
+     * @param Container|null $container
+     * @param array $propertyResolvers
+     * @param CacheInterface|null $cache
+     * @param array $options
+     */
+    public function __construct($container = null,
                                 array $propertyResolvers = array(),
                                 CacheInterface $cache = null,
                                 array $options = array())
