@@ -1,8 +1,6 @@
 <?php namespace Exedra\Container;
 
-use Psr\Container\ContainerInterface;
-
-class Container implements \ArrayAccess, ContainerInterface
+class Container implements \ArrayAccess
 {
     /**
      * Container resolved services

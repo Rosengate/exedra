@@ -3,6 +3,7 @@
 namespace Exedra\Routeller;
 
 use Exedra\Application;
+use Exedra\Container\Container;
 use Exedra\Contracts\Routing\GroupHandler;
 use Exedra\Exception\Exception;
 use Exedra\Exception\InvalidArgumentException;
@@ -81,7 +82,7 @@ class Handler implements GroupHandler
     const OPTION_READER = 'reader';
     const OPTION_PROPERTY_PARSERS = 'property_parsers';
 
-    public function __construct(ContainerInterface $container = null,
+    public function __construct(Container $container = null,
                                 array $propertyResolvers = array(),
                                 CacheInterface $cache = null,
                                 array $options = array())
