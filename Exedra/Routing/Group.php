@@ -4,6 +4,7 @@ use Exedra\Contracts\Routing\RouteValidator;
 use Exedra\Contracts\Routing\Registrar;
 use Exedra\Exception\Exception;
 use Exedra\Exception\InvalidArgumentException;
+use Exedra\Exception\NoParentRouteException;
 use Exedra\Exception\RouteNotFoundException;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -69,11 +70,6 @@ class Group implements \ArrayAccess, Registrar
      * @var RouteValidator[]
      */
     protected $validators = [];
-
-    /**
-     * @var array
-     */
-    protected $decorators = [];
 
     public function __construct(Factory $factory, Route $route = null, array $routes = array())
     {
@@ -223,7 +219,7 @@ class Group implements \ArrayAccess, Registrar
         if ($this->route) {
             $this->route->addDecorator($decorator);
         } else {
-            $this->decorators[] = $decorator;
+            throw new NoParentRouteException('Unable to add decorator without parent route');
         }
 
         return $this;
@@ -235,7 +231,6 @@ class Group implements \ArrayAccess, Registrar
     public function getDecorators()
     {
         return $this->route->getDecorators();
-//        return $this->decorators;
     }
 
     /**

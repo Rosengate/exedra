@@ -215,8 +215,8 @@ class Finding
             foreach ($group->getDecorators() as $decorator)
                 $decorators[] = new Call($this->resolveMiddleware($decorator));
 
-            foreach ($route->getDecorators() as $decorator)
-                $decorators[] = new Call($this->resolveMiddleware($decorator));
+//            foreach ($route->getDecorators() as $decorator)
+//                $decorators[] = new Call($this->resolveMiddleware($decorator));
 
             // pass config.
             if ($config = $route->getProperty('config'))
