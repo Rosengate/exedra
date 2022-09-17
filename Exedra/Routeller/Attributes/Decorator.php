@@ -4,7 +4,7 @@ namespace Exedra\Routeller\Attributes;
 
 use Exedra\Routeller\Contracts\RouteAttribute;
 
-#[\Attribute(\Attribute::TARGET_METHOD|\Attribute::TARGET_CLASS)]
+#[\Attribute(\Attribute::IS_REPEATABLE|\Attribute::TARGET_METHOD|\Attribute::TARGET_CLASS)]
 class Decorator implements RouteAttribute
 {
     protected $decorator;
