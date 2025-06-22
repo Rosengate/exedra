@@ -520,7 +520,8 @@ class Handler implements GroupHandler
             return null;
 
         $routeName = ucfirst(substr($method, 5, strlen($method)));
-        return strtolower(preg_replace('/([a-z])([A-Z])/', '$1-$2', $routeName));
+
+        return static::kebabCase($routeName);
     }
 
     /**
@@ -533,7 +534,8 @@ class Handler implements GroupHandler
             return null;
 
         $routeName = ucfirst(substr($method, 3, strlen($method)));
-        return strtolower(preg_replace('/([a-z])([A-Z])/', '$1-$2', $routeName));
+
+        return static::kebabCase($routeName);
     }
 
     /**
@@ -546,7 +548,7 @@ class Handler implements GroupHandler
         foreach (static::$httpVerbs as $verb) {
             if (strpos($method, $verb) === 0) {
                 $methodName = ucfirst(substr($method, strlen($verb), strlen($method)));
-                $methodName = strtolower(preg_replace('/([a-z])([A-Z])/', '$1-$2', $methodName));
+                $methodName = static::kebabCase($methodName);
 
                 $routeName = $methodName ? $verb . '-' . $methodName : $verb;
                 $method = $verb;
@@ -568,7 +570,8 @@ class Handler implements GroupHandler
             return null;
 
         $routeName = ucfirst(substr($method, 7, strlen($method)));
-        return strtolower(preg_replace('/([a-z])([A-Z])/', '$1-$2', $routeName));
+
+        return static::kebabCase($routeName);
     }
 
     /**
@@ -581,6 +584,16 @@ class Handler implements GroupHandler
             return null;
 
         $routeName = ucfirst(substr($method, 5, strlen($method)));
-        return strtolower(preg_replace('/([a-z])([A-Z])/', '$1-$2', $routeName));
+
+        return static::kebabCase($routeName);
+    }
+
+    public static function kebabCase($string)
+    {
+        $string = preg_replace('/(?<=[a-z0-9])(?=[A-Z])/', '-', $string);
+        $string = preg_replace('/(?<=[a-zA-Z])(?=\d)/', '-', $string);
+        $string = str_replace('_', '-', $string);
+
+        return strtolower($string);
     }
 }
