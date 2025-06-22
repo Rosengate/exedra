@@ -83,7 +83,7 @@ class Handler implements GroupHandler
 
     /**
      * @param Container|null $container
-     * @param array $propertyResolvers
+     * @param PropertyResolver[] $propertyResolvers
      * @param CacheInterface|null $cache
      * @param array $options
      */
@@ -519,7 +519,8 @@ class Handler implements GroupHandler
         if (strpos($method, 'route') !== 0)
             return null;
 
-        return strtolower(substr($method, 5, strlen($method)));
+        $routeName = ucfirst(substr($method, 5, strlen($method)));
+        return strtolower(preg_replace('/([a-z])([A-Z])/', '$1-$2', $routeName));
     }
 
     /**
@@ -531,7 +532,8 @@ class Handler implements GroupHandler
         if (strpos($method, 'sub') !== 0)
             return null;
 
-        return strtolower(substr($method, 3, strlen($method)));
+        $routeName = ucfirst(substr($method, 3, strlen($method)));
+        return strtolower(preg_replace('/([a-z])([A-Z])/', '$1-$2', $routeName));
     }
 
     /**
@@ -543,7 +545,9 @@ class Handler implements GroupHandler
     {
         foreach (static::$httpVerbs as $verb) {
             if (strpos($method, $verb) === 0) {
-                $methodName = strtolower(substr($method, strlen($verb), strlen($method)));
+                $methodName = ucfirst(substr($method, strlen($verb), strlen($method)));
+                $methodName = strtolower(preg_replace('/([a-z])([A-Z])/', '$1-$2', $methodName));
+
                 $routeName = $methodName ? $verb . '-' . $methodName : $verb;
                 $method = $verb;
 
@@ -563,7 +567,8 @@ class Handler implements GroupHandler
         if (strpos($method, 'execute') !== 0)
             return null;
 
-        return strtolower(substr($method, 7, strlen($method)));
+        $routeName = ucfirst(substr($method, 7, strlen($method)));
+        return strtolower(preg_replace('/([a-z])([A-Z])/', '$1-$2', $routeName));
     }
 
     /**
@@ -575,6 +580,7 @@ class Handler implements GroupHandler
         if (strpos($method, 'group') !== 0)
             return null;
 
-        return strtolower(substr($method, 5, strlen($method)));
+        $routeName = ucfirst(substr($method, 5, strlen($method)));
+        return strtolower(preg_replace('/([a-z])([A-Z])/', '$1-$2', $routeName));
     }
 }
