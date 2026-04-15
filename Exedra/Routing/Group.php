@@ -678,6 +678,11 @@ class Group implements \ArrayAccess, Registrar
         return $this->method('delete', $path);
     }
 
+    public function head($path = '/')
+    {
+        return $this->method('head', $path);
+    }
+
     public function patch($path = '/')
     {
         return $this->method('patch', $path);

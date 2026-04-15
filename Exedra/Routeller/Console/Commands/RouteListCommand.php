@@ -46,7 +46,7 @@ class RouteListCommand extends \Exedra\Console\Commands\RouteListCommand
 
             $methods = $route->getMethod();
 
-            if (count($methods) == 4)
+            if (count($methods) == 7)
                 $methods = 'any';
             else
                 $methods = implode(', ', $methods);
@@ -80,7 +80,7 @@ class RouteListCommand extends \Exedra\Console\Commands\RouteListCommand
             $data = array(
                 'name' => $route->getAbsoluteName(),
                 'action' => $action,
-                'method' => count($route->getMethod()) == 6 ? 'any' : $methods,
+                'method' => count($route->getMethod()) == 7 ? 'any' : $methods,
                 'uri' => '/' . $route->getPath(true),
                 'tag' => $route->hasProperty('tag') ? $route->getProperty('tag') : ''
             );

@@ -22,7 +22,7 @@ class Handler implements GroupHandler
     /**
      * @var array $httpVerbs
      */
-    protected static $httpVerbs = array('get', 'post', 'put', 'patch', 'delete', 'options');
+    protected static $httpVerbs = array('get', 'post', 'put', 'patch', 'delete', 'head', 'options');
 
     /**
      * @var

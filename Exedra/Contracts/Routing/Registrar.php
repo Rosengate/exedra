@@ -16,6 +16,8 @@ interface Registrar
 
     public function delete($path);
 
+    public function head($path);
+
     public function options($path);
 
     public function path($path);

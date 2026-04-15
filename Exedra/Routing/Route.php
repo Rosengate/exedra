@@ -806,7 +806,7 @@ class Route implements Registrar
     public function getMethod()
     {
         if (!isset($this->properties['method']))
-            return array('get', 'post', 'put', 'delete', 'patch', 'options');
+            return array('get', 'post', 'put', 'delete', 'head', 'patch', 'options');
 
         return $this->properties['method'];
     }
@@ -969,7 +969,7 @@ class Route implements Registrar
     public function setMethod($method)
     {
         if ($method == 'any')
-            $method = array('get', 'post', 'put', 'delete', 'patch', 'options');
+            $method = array('get', 'post', 'put', 'delete', 'head', 'patch', 'options');
         else if (!is_array($method))
             $method = explode('|', $method);
 
@@ -1631,6 +1631,21 @@ class Route implements Registrar
         $this->setPath($path);
 
         return $this;
+    }
+
+    /**
+     * Set method to HEAD and path
+     * @param $path
+     * @return $this
+     */
+    public function head($path = '/')
+    {
+        $this->setMethod('HEAD');
+
+        $this->setPath($path);
+
+        return $this;
+
     }
 
     /**

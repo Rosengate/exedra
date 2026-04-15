@@ -35,6 +35,11 @@ class FooController extends Controller
     {
     }
 
+    public function head()
+    {
+
+    }
+
     public function put()
     {
     }

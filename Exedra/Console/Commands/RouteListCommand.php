@@ -48,7 +48,7 @@ class RouteListCommand extends Command
 
             $baseUri = $route->getBaseUri();
 
-            if (count($methods) == 4)
+            if (count($methods) == 7)
                 $methods = 'any';
             else
                 $methods = implode(', ', $methods);
